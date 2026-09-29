@@ -17,6 +17,7 @@
     "max_tasks": 1,
     "temperature": 0
   },
+  "group_retries": 1,
   "judge": {
     "base_model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
     "context_tokens": 16384,
@@ -46,8 +47,8 @@
     "checkpoint_ttl_seconds": 172800,
     "rank": 8
   },
-  "output": "artifacts/repository-grpo-qwen-nemotron/run",
-  "run_id": "repository-grpo-qwen-nemotron",
+  "output": "artifacts/training-runs/{run_id}",
+  "run_id": "auto",
   "schema_version": "1.0",
   "seed": 42,
   "spend": {
@@ -73,11 +74,25 @@
       "learning_rate": 1e-05,
       "max_batches": 1,
       "max_updates": 1,
+      "optimizer": {
+        "beta1": 0.9,
+        "beta2": 0.95,
+        "eps": 1e-12,
+        "grad_clip_norm": 1.0,
+        "weight_decay": 0.0
+      },
       "temperature": 1
     }
   ],
   "tracking": {
+    "experiment_id": "grpo-model-and-judge",
     "mode": "disabled",
-    "project": "repository-qa-training"
+    "notes": "Qwen4B with frozen Nemotron; 48-hour retention. Do not launch until experiment is selected. Shared direct-GRPO allocation.",
+    "project": "repository-qa-training",
+    "tags": [
+      "grpo",
+      "collection",
+      "experimental-reference"
+    ]
   }
 }

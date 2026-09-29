@@ -5,9 +5,26 @@ from .storage import digest
 from .tinker_backend import bounded
 
 
+class HFJudgeRenderer:
+    """Use the same non-thinking HF chat template as the policy, without cookbook."""
+    def __init__(self, tokenizer, context_tokens, sdk):
+        from .rendering import ChatRenderer
+        self.tokenizer, self.sdk = tokenizer, sdk
+        self.chat = ChatRenderer(tokenizer, context_tokens)
+
+    def build_generation_prompt(self, messages):
+        return self.sdk.ModelInput.from_ints(self.chat.prompt(messages))
+
+    def get_stop_sequences(self):
+        return [self.tokenizer.eos_token_id]
+
+    def parse_response(self, tokens):
+        return {'content': self.tokenizer.decode(tokens, skip_special_tokens=True)}, True
+
+
 class TinkerJudge:
     def __init__(self, config, ledger=None, service=None, sdk=None, renderer_factory=None):
-        if renderer_factory is None:
+        if renderer_factory is None and config['renderer'] != 'hf-chat-no-thinking-v1':
             try:
                 from tinker_cookbook.renderers import get_renderer
             except ImportError:
@@ -30,16 +47,19 @@ class TinkerJudge:
                 base_model=config['base_model'], retry_config=RetryConfig(enable_retry_logic=False,
                 progress_timeout=self.timeout)), self.timeout)
             tokenizer = bounded(self.sampler.get_tokenizer, self.timeout)
-            self.renderer = renderer_factory(config['renderer'], tokenizer, model_name=config['base_model'])
+            self.renderer = (HFJudgeRenderer(tokenizer, config['context_tokens'], sdk)
+                if renderer_factory is None else renderer_factory(config['renderer'], tokenizer, model_name=config['base_model']))
             self.identity = {'base_model': config['base_model'], 'renderer': config['renderer'],
                 'tokenizer_class': type(tokenizer).__name__,
-                'template_hash': digest(getattr(tokenizer, 'chat_template', None)),
+                'template_hash': digest(tokenizer.get_chat_template() if hasattr(tokenizer, 'get_chat_template')
+                                        else getattr(tokenizer, 'chat_template', None)),
                 'sdk': importlib.metadata.version('tinker'),
-                'context_tokens': config['context_tokens'], 'temperature': 0}
-            try:
-                self.identity['cookbook'] = importlib.metadata.version('tinker-cookbook')
-            except importlib.metadata.PackageNotFoundError:
-                self.identity['cookbook'] = 'injected-test-renderer'
+                'context_tokens': config['context_tokens'], 'temperature': config.get('temperature', 0)}
+            if config['renderer'] != 'hf-chat-no-thinking-v1':
+                try:
+                    self.identity['cookbook'] = importlib.metadata.version('tinker-cookbook')
+                except importlib.metadata.PackageNotFoundError:
+                    self.identity['cookbook'] = 'injected-test-renderer'
             self.policy_id = 'judge:'+digest(self.identity)
             self.renderer.build_generation_prompt([{'role':'user','content':'Preflight'}])
         except BaseException:
@@ -47,7 +67,7 @@ class TinkerJudge:
             raise
 
     def sample(self, messages, max_tokens, temperature):
-        if temperature != 0 or max_tokens != self.config['max_tokens']:
+        if temperature != self.config.get('temperature', 0) or max_tokens != self.config['max_tokens']:
             raise ValueError('Judge sampling settings must match frozen configuration')
         prompt = self.renderer.build_generation_prompt(messages)
         tokens = prompt.to_ints()

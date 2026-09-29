@@ -30,6 +30,91 @@ unknown if any contributing episode's cost is unavailable.
 
 ## Configuration and data boundary
 
+### Configurable experiments and W&B names
+
+Copy [`examples/training-experiment.json`](../examples/training-experiment.json)
+for a collection GRPO experiment. All settings below are read from JSON; no code
+edits or per-run command-line hyperparameter overrides are required:
+
+| JSON field | What it controls |
+|---|---|
+| `model.base_model` | Tinker solver/training model |
+| `model.rank` | LoRA rank |
+| `judge.base_model` | Independent frozen Tinker judge; never updated by training |
+| `judge.renderer` | `hf-chat-no-thinking-v1`, or an installed Tinker cookbook renderer name |
+| `judge.context_tokens`, `max_tokens`, `temperature`, `provider_timeout_seconds` | Judge-only context, generation and request settings |
+| `stages[].learning_rate` | Learning rate for that stage |
+| `stages[].batch_size` | Tasks per GRPO batch, or examples per SFT batch |
+| `stages[].group_size` | Attempts per task; nominal GRPO episodes per batch = batch size × group size |
+| `stages[].max_updates`, `max_batches` | Successful-update and attempted-batch limits |
+| `stages[].optimizer` | Optional `beta1`, `beta2`, `eps`, `weight_decay`, `grad_clip_norm` passed to Tinker Adam |
+| `seed` | Task-order RNG and trainer initialization seed |
+| `group_retries` | Whole-group retries for retryable infrastructure failures; default 1 |
+| `limits` | Generation, output/context token, tool, latency and provider limits |
+| `evaluation.every`, `max_tasks`, `temperature` | Scheduled development evaluation cadence, prefix size and sampling temperature |
+| `model.checkpoint_ttl_seconds`, `checkpoint_every` | Retention and SFT checkpoint cadence; GRPO still commits each update |
+| `spend.cap_usd`, `ledger`, `prices` | Persistent reservation ceiling, ledger location and solver prices |
+
+Omitted optimizer fields retain SDK defaults. GRPO temperature remains 1 because
+the current importance-sampling objective uses that behavior-policy contract;
+judge/evaluation temperatures may be any finite nonnegative value. No PPO, KL,
+learning-rate scheduler or parallel-rollout setting is implied by these controls.
+Evaluation also runs at stage completion (and before collection training), even
+when `evaluation.every` is zero. Task budgets can narrow run limits.
+
+Set `judge.prices: null` to fetch and pin that model's current sampling prices at
+run setup, or supply a model-bound price object with `model`, `prefill`, `sample`,
+`source`, and `checked_at`. `spend.prices: null` resolves solver pricing when a new
+ledger is created. Changing a model requires its matching prices; use a fresh
+ledger for a different solver. The template uses separate solver/judge models
+and automatic prices; availability and the spending estimate are checked at launch.
+Plain `validate` does not fetch prices or contact providers. `validate --remote`
+checks model capabilities/renderers, but is not a complete spending preflight.
+
+`run_id: "auto"` creates a new ID for every new run/fork. Use `{run_id}` in `output`
+and `spend.ledger` to keep artifacts and reservations separate. Explicit run IDs
+and paths remain supported. Relative paths are relative to the working directory.
+The resolved config is saved as `config.json` and embedded in checkpoints.
+
+W&B uses the resolved run ID as its stable ID, and generates a readable name such
+as `Qwen3.5-4B__judge-Qwen3.5-9B__grpo-lr1e-05-b1-g4__r8-s42__<run-id>`.
+Multi-stage names include each stage. The full run config is logged, and update
+events include learning rate, batch size, group size and explicit optimizer settings.
+The tracking config also accepts:
+
+```json
+{
+  "mode": "online",
+  "project": "repository-qa-training",
+  "entity": "your-team",
+  "experiment_id": "lr-group-size-sweep",
+  "run_name": "optional-readable-condition",
+  "tags": ["grpo", "independent-judge"],
+  "notes": "Describe the hypothesis and changed settings."
+}
+```
+
+`experiment_id` becomes the W&B group. `run_name` overrides the generated condition
+label; the unique run ID is still appended. Omit optional fields rather than using
+empty strings. Tracking identity is persisted in `tracking.json`, including when
+W&B is disabled/unavailable. Resume keeps that identity; standalone evaluation gets
+a separate W&B ID and `evaluation` job type. The example defaults to disabled
+tracking; set `tracking.mode` to `online` after configuring your account/project.
+
+```bash
+python3 -m training_pipeline validate --config examples/training-experiment.json
+python3 -m training_pipeline run --config examples/training-experiment.json
+# Resume the exact saved experiment, not the template with run_id: auto:
+python3 -m training_pipeline resume --checkpoint /absolute/path/to/checkpoint.json
+```
+
+Changing judge, optimizer or other training semantics requires a new run/fork.
+A fork keeps weights with a fresh optimizer and requires matching solver model/rank;
+changing the base model requires a fresh run. Old configs without `judge` retain
+their legacy same-base-model judge behavior. Independent judge settings apply to
+collection mode; strict repository mode continues using each task's frozen judge
+contract. Neither mode's grading is made calibrated merely by selecting a larger model.
+
 The executable configuration example is `examples/training-toy.json`. Set a unique
 output directory and run ID. Stages may be omitted or repeated, but the stage list
 must be nonempty. Each stage specifies its update limit, attempted-batch limit,
@@ -301,10 +386,10 @@ Truncated or malformed grades remain unresolved. No judge optimizer is created.
 
 The launch estimate and each request reserve the judge's own published token
 prices against the same total ledger as policy, Modal, and checkpoint charges.
-The example deliberately retains the existing pilot's $5 ledger; it does not
-create fresh spending authorization. The nearly exhausted ledger will block a
-new full pilot. A new experiment needs its separately authorized total cap and
-ledger, and refreshed pricing before execution.
+The current example uses the project's $650 direct-GRPO allocation and 48-hour
+checkpoint retention. The total project ceiling is $1,000, including all other
+allocations; see `configs/experiments/project-budget.json`. No experiment may be
+launched yet. Historical pilot configs and ledgers remain unchanged.
 
 Before comparing policies, re-evaluate the unchanged Qwen base and candidates
 using this frozen judge and identical cohorts. Do not compare Nemotron scores
@@ -312,3 +397,8 @@ against the earlier Qwen-judged pilot as evidence of model improvement. Check
 agreement on audited, correct, incorrect, partial, and insufficient-evidence
 answers; until calibrated, all quality conclusions remain exploratory. The
 completed one-update pilot established integration, not quality improvement.
+
+
+Current launch configurations and budget allocation are indexed in
+`configs/experiments/README.md`. The single live Nemotron check is recorded in
+`reports/nemotron-single-rollout-check.md`; it establishes integration, not calibration.

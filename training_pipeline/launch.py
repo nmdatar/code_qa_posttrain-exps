@@ -3,15 +3,20 @@ from .collection import modal_reservation
 from .contracts import ConfigurationError
 
 
-def estimate(config, prices):
+def estimate(config, prices, evaluation_only=False):
     limits = config['limits']
     stages = config['stages']
     if config['environment']['kind'] != 'collection':
         raise ConfigurationError('Launch estimate requires collection configuration')
-    rollouts = sum(s['max_batches']*s['batch_size']*s['group_size']*2 for s in stages)
+    rollouts = 0 if evaluation_only else sum(s['max_batches']*s['batch_size']*s['group_size']*(1+config.get('group_retries', 1)) for s in stages)
     updates = sum(min(s['max_updates'],s['max_batches']) for s in stages)
     # Baseline, stage ends, and every possible scheduled evaluation; double-counting is conservative.
-    evaluations = (1+len(stages)+updates)*config['evaluation']['max_tasks']
+    max_tasks = config['evaluation']['max_tasks']
+    if 'cohort_manifest' in config['evaluation']:
+        from .storage import read
+        cohorts = read(config['evaluation']['cohort_manifest'])
+        max_tasks = max(len(cohorts['selection']), len(cohorts['confirmation']))
+    evaluations = max_tasks if evaluation_only else (1+len(stages)+updates)*max_tasks
     episodes = rollouts+evaluations
     sample_calls = episodes*limits['max_generations']
     sample = sample_calls*(limits['context_tokens']*prices['prefill']+limits['max_tokens_per_call']*prices['sample'])/1e6
@@ -20,8 +25,13 @@ def estimate(config, prices):
         j = config['judge']
         judge = episodes*(j['context_tokens']*j['prices']['prefill']+j['max_tokens']*j['prices']['sample'])/1e6
     training_tokens = sum(s['max_batches']*s['batch_size']*s['group_size'] for s in stages)*limits['max_generations']*limits['context_tokens']
-    train = training_tokens*prices['train']/1e6
-    checkpoints = 1+updates+len(stages)
+    train = 0 if evaluation_only else training_tokens*prices['train']/1e6
+    checkpoints = 0 if evaluation_only else 1+updates+len(stages)
+    if not evaluation_only and 'stopping' in config:
+        # Final no-signal boundary plus persisted baseline/regression decisions.
+        checkpoints += 1
+        if 'regression_delta' in config['stopping']:
+            checkpoints += 1+updates+len(stages)
     storage = checkpoints*prices['params']*32/1e9*prices['storage_gb_month']*config['model']['checkpoint_ttl_seconds']/(28*86400)
     modal = episodes*modal_reservation(config)
     components = {'policy_sampling':sample,'reference_grading':judge,'training':train,'checkpoint_storage':storage,'modal_sandboxes':modal}

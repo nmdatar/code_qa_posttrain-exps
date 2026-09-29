@@ -120,18 +120,20 @@ class TinkerBackend:
             raise ConfigurationError('Unsupported loss')
         return self.sdk.Datum(model_input=self.sdk.ModelInput.from_ints(row.input_tokens), loss_fn_inputs=values)
 
-    def update(self, rows, loss, learning_rate):
+    def update(self, rows, loss, learning_rate, optimizer=None):
         if self.trainer is None or self.poisoned:
             raise AmbiguousUpdate('Training client unavailable; restore a checkpoint')
         if not rows or not any(any(r.weights) for r in rows):
             raise ValueError('Cannot update an empty or zero-contribution batch')
         data = [self.datum(row, loss) for row in rows]
+        # Validate optimizer settings locally before any paid forward/backward call.
+        params = self.sdk.AdamParams(learning_rate=learning_rate, **(optimizer or {}))
         if self.ledger:
             self.ledger.reserve('train', input_tokens=sum(len(r.input_tokens) for r in rows))
         try:
             fw = self.trainer.forward_backward(data, loss_fn=loss).result(timeout=self.timeout)
             checked_loss = check_reduction(rows, loss, fw)
-            op = self.trainer.optim_step(self.sdk.AdamParams(learning_rate=learning_rate)).result(timeout=self.timeout)
+            op = self.trainer.optim_step(params).result(timeout=self.timeout)
         except Exception as exc:
             self.poisoned = True
             raise AmbiguousUpdate('Unknown training outcome; restore last committed checkpoint (' +

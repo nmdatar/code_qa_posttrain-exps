@@ -31,20 +31,49 @@ def atomic_json(path, value):
         os.close(fd)
 
 
+def run_label(config):
+    """Human-readable experimental condition, independent of the unique run ID."""
+    solver = config['model']['base_model'].rsplit('/', 1)[-1]
+    judge = config.get('judge', {}).get('base_model')
+    if judge is None:
+        judge = config['model']['base_model'] if config['environment']['kind'] == 'collection' else 'task-verifier'
+    stages = []
+    for stage in config['stages']:
+        label = f"{stage['kind']}-lr{stage['learning_rate']:g}-b{stage['batch_size']}"
+        if stage['kind'] == 'grpo':
+            label += f"-g{stage['group_size']}"
+        stages.append(label)
+    return f"{solver}__judge-{judge.rsplit('/', 1)[-1]}__{'_then_'.join(stages)}__r{config['model']['rank']}-s{config['seed']}"
+
+
 class Tracker:
-    def __init__(self, root, config, run_id, wandb_module=None):
+    def __init__(self, root, config, run_id, wandb_module=None, run_config=None, job_type='training'):
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
         self.run_id = run_id
         self.remote = None
         self.wandb = None
+        # Resume keeps the original remote identity and display name. A standalone
+        # evaluation is a separate W&B job, even when writing beside training logs.
+        suffix = '-eval-' + uuid.uuid4().hex[:8] if job_type == 'evaluation' else ''
+        identity_path = self.root / ('tracking' + suffix + '.json')
+        name = config.get('run_name') or (run_label(run_config) if run_config else run_id)
+        self.organization = {'id': run_id + suffix, 'name': name + '__' + run_id + suffix,
+            'group': config.get('experiment_id'), 'entity': config.get('entity'),
+            'project': config.get('project'), 'job_type': job_type,
+            'tags': config.get('tags', []), 'notes': config.get('notes')}
+        if identity_path.exists():
+            self.organization = read(identity_path)
+        else:
+            atomic_json(identity_path, self.organization)
+        self.event('run_metadata', organization=self.organization, config=run_config)
         if config.get('mode', 'disabled') != 'disabled':
             try:
                 if wandb_module is None:
                     import wandb as wandb_module
                 self.wandb = wandb_module
-                self.remote = wandb_module.init(project=config['project'], mode=config['mode'],
-                    id=run_id, resume='allow', dir=str(self.root), job_type='training',
+                self.remote = wandb_module.init(**self.organization, mode=config['mode'],
+                    resume='allow', dir=str(self.root), config=run_config,
                     settings=wandb_module.Settings(disable_git=True))
             except Exception as exc:
                 self._append({'event': 'tracking_failure', 'error_type': type(exc).__name__})

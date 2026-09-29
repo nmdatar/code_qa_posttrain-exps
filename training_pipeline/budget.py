@@ -14,7 +14,7 @@ class BudgetLimit(RuntimeError):
     pass
 
 
-def current_prices(model):
+def current_prices(model, sampling_only=False):
     try:
         import certifi
         context = ssl.create_default_context(cafile=certifi.where())
@@ -27,14 +27,16 @@ def current_prices(model):
     if len(matches) != 1:
         raise ValueError('No unambiguous published price for model')
     m = matches[0]
-    prices = {k: float(m[k].removeprefix('$')) for k in ('prefill', 'sample', 'train')}
+    prices = {k: float(m[k].removeprefix('$')) for k in (('prefill', 'sample') if sampling_only else ('prefill', 'sample', 'train'))}
+    if sampling_only:
+        return {**prices, 'model': model, 'source': url, 'checked_at': datetime.now(timezone.utc).isoformat()}
     # Storage is not in models.json. Require the published rate to remain visible.
     page = 'https://tinker-docs.thinkingmachines.ai/tinker/models/'
     with urllib.request.urlopen(urllib.request.Request(page, headers={'User-Agent': 'Mozilla/5.0'}), timeout=30, context=context) as response:
         html = response.read().decode()
     if '$0.10 per GB per month' not in html:
         raise ValueError('Cannot verify storage pricing; update estimator before spending')
-    return {**prices, 'storage_gb_month': .10, 'params': m['params'], 'source': url,
+    return {**prices, 'model': model, 'storage_gb_month': .10, 'params': m['params'], 'source': url,
             'storage_source': page, 'checked_at': datetime.now(timezone.utc).isoformat()}
 
 
@@ -77,7 +79,7 @@ class SpendLedger:
 
     def estimate(self, kind, input_tokens=0, output_tokens=0, ttl_seconds=None):
         if ttl_seconds is not None and (type(ttl_seconds) is not int or ttl_seconds <= 0):
-            raise ValueError('Invalid checkpoint retention')
+            raise ValueError("Invalid checkpoint retention")
         if any(type(v) is not int or v < 0 for v in (input_tokens, output_tokens)):
             raise ValueError('Token counts must be nonnegative integers')
         p = self.prices

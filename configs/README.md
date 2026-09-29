@@ -1,6 +1,18 @@
+Current Qwen4B + Nemotron configurations: [experiment index](experiments/README.md).
+These use 48-hour retention and the shared project allocation; do not launch yet.
+
 # Run configurations
 
-Each JSON file describes one reusable run setup. Evaluation configs are consumed by `eval_pipeline.run --config`; training configs use the separate `training_eval run --config` schema documented in [TRAINING.md](../TRAINING.md). Do not interchange the two formats.
+Each JSON file describes one reusable run setup. Evaluation configs here are consumed by `eval_pipeline.run --config`.
+
+For current Tinker/Modal training, copy [training-experiment.json](../examples/training-experiment.json)
+and run `python3 -m training_pipeline run --config <your-config.json>`. It exposes
+independent solver/judge models, stage learning rates, batch/group sizes, optimizer
+settings, budgets, and descriptive W&B run names/groups. See the
+[training configuration guide](../docs/TRAINING_PIPELINE.md#configurable-experiments-and-wb-names).
+
+The separate adapter-based `training_eval run --config` schema is documented in
+[TRAINING.md](../TRAINING.md). These training and evaluation formats are not interchangeable.
 
 ## First baseline
 
