@@ -61,9 +61,11 @@ commands: a chat's displayed directory may differ from the worktree it edits.
 
 ## Validation
 
-- Full combined offline suite: 337 tests passed.
-- After the final CLI compatibility adjustment: 9 targeted tests passed,
-  including 2 new worktree-integration regression tests.
+- Clean export of committed snapshot `b6932da`: all 339 offline tests passed.
+  This includes 2 new worktree-integration regression tests and confirms the
+  imported code does not rely on untracked source files.
+- Other agents continued editing the shared training pipeline after the snapshot;
+  these subsequent changes are outside this validation result.
 - No new live inference, training, deployment, or paid-service validation.
 
 Pre-integration copies of replaced files were saved at
