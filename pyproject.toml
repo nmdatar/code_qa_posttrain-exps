@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=65"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "correctness-first-qa-eval"
+version = "0.1.0"
+description = "Evidence-grounded repository QA grading and bounded RL rewards"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+remote = ["modal==1.5.5"]
+tinker = ["tinker==0.30.4", "tinker-cookbook==0.5.7"]
+modal = ["modal>=1.5,<2"]
+training = ["tinker==0.30.4", "transformers==5.17.0", "jinja2==3.1.6"]
+tracking = ["wandb>=0.19,<1"]
+
+[project.scripts]
+qa-eval = "qa_eval.cli:main"
+qa-eval-run = "eval_pipeline.run:main"
+qa-sandbox = "agent_harness.sandbox_cli:main"
+agent-harness = "agent_harness.cli:main"
+agent-harness-remote = "agent_harness.remote_cli:main"
+training-eval = "training_eval.cli:main"
+qa-train = "training_pipeline.cli:entrypoint"
+
+[tool.setuptools.packages.find]
+include = ["qa_eval*", "eval_pipeline*", "agent_harness*", "training_pipeline*", "dataset_builder*", "training_eval*"]
