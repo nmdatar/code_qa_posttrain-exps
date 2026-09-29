@@ -5,6 +5,8 @@ import math
 import re
 from pathlib import Path
 import secrets
+import threading
+import time
 from agent_harness.images import normalize_recipe, _hash, _identity, validate_manifest
 from agent_harness.modal_backend import ModalSandboxBackend, SandboxLimits
 from agent_harness.repository_tools import command
@@ -135,6 +137,8 @@ class CollectionFactory:
         if 'judge' in config:
             self.reward_version = VERSION+'-judge-'+digest({'config':config['judge'], 'prompt':JUDGE_PROMPT})
             self.identity = 'experimental-collection-'+digest({'environment':config['environment'], 'reward':self.reward_version})
+        self._judge_init_lock = threading.Lock()
+        self._judge_slots = threading.BoundedSemaphore(config.get('concurrency', {}).get('judges', 1))
         self.key = secrets.token_bytes(32)
 
     def create(self, row, episode_id, trajectory_path):
@@ -152,30 +156,38 @@ class CollectionFactory:
             raise
 
     def prepare_judge(self):
-        if self.judge is None and 'judge' in self.config:
-            from .judge import TinkerJudge
-            self.judge = TinkerJudge(self.config['judge'], self.ledger)
+        with self._judge_init_lock:
+            if self.judge is None:
+                if 'judge' in self.config:
+                    from .judge import TinkerJudge
+                    self.judge = TinkerJudge(self.config['judge'], self.ledger)
+                else:
+                    from .tinker_backend import TinkerBackend
+                    self.judge = TinkerBackend(self.config['model'], self.config['limits'], self.ledger)
 
     def grade(self, request):
+        waiting = time.monotonic()
+        with self._judge_slots:
+            return self._grade(request, time.monotonic()-waiting)
+
+    def _grade(self, request, queue_seconds=0):
         self.prepare_judge()
-        if self.judge is None:
-            from .tinker_backend import TinkerBackend
-            # Frozen base sampler; no judge optimizer, no checkpoint refresh.
-            self.judge = TinkerBackend(self.config['model'], self.config['limits'], self.ledger)
+        started = time.monotonic()
         sample = self.judge.sample([{'role':'system','content':JUDGE_PROMPT},
                                    {'role':'user','content':json.dumps(request)}],
                                    self.config.get('judge', {}).get('max_tokens', 512),
                                    self.config.get('judge', {}).get('temperature', 0))
+        timing = {'queue_seconds':queue_seconds, 'sampling_seconds':time.monotonic()-started}
         text = sample.text.strip()
         if text.startswith('```json') and text.endswith('```'):
             text = text[7:-3].strip()
         atomic_json(self.root/'private'/(request['episode_id']+'.judge-raw.json'),
-                    {'generation':asdict(sample),'request':request,'version':self.reward_version, 'judge_identity':getattr(self.judge, 'identity', {'base_model':self.judge_model})})
+                    {'timing':timing,'generation':asdict(sample),'request':request,'version':self.reward_version, 'judge_identity':getattr(self.judge, 'identity', {'base_model':self.judge_model})})
         if sample.stop_reason == 'length':
             raise ValueError('Truncated judge output')
         result, repaired = parse_judge(text)
         atomic_json(self.root/'private'/(request['episode_id']+'.judge.json'),
-                    {'generation':asdict(sample),'request':request,'parsed':result,'syntax_repaired':repaired,'version':self.reward_version, 'judge_identity':getattr(self.judge, 'identity', {'base_model':self.judge_model})})
+                    {'timing':timing,'generation':asdict(sample),'request':request,'parsed':result,'syntax_repaired':repaired,'version':self.reward_version, 'judge_identity':getattr(self.judge, 'identity', {'base_model':self.judge_model})})
         return result
 
     def close(self):

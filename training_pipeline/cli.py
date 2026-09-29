@@ -11,6 +11,8 @@ from .orchestrator import Pipeline, make_backend, evaluate_checkpoint
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     subs = p.add_subparsers(dest='command', required=True)
+    bench = subs.add_parser('benchmark', help='Paid frozen-policy throughput measurement; no training')
+    bench.add_argument('--config', type=Path, required=True)
     comparison = subs.add_parser('compare', help='Compare matched evaluation reports (offline)')
     comparison.add_argument('--base', type=Path, required=True)
     comparison.add_argument('--candidates', type=Path, nargs='+', required=True)
@@ -42,6 +44,10 @@ def main(argv=None):
     smoke = subs.add_parser('smoke')
     smoke.add_argument('--output', type=Path, default=Path('artifacts/training-smoke'))
     a = p.parse_args(argv)
+    if a.command == 'benchmark':
+        from .benchmark import benchmark
+        print(json.dumps(benchmark(read(a.config)), indent=2))
+        return 0
     if a.command == 'compare':
         from .comparison import compare
         from .storage import atomic_json
@@ -78,6 +84,11 @@ def main(argv=None):
     if a.command == 'resume' and config['run_id'] == 'auto':
         p.error('Resume needs the resolved checkpoint config; omit --config or use the saved run/config.json')
     data = inputs(config)
+    if 'benchmark' in config:
+        from .benchmark import selected_tasks
+        selected_tasks(config, data)
+        if a.command != 'validate':
+            p.error('Benchmark configs must use the benchmark command, not training')
     if a.command == 'validate':
         result = {'status': 'valid', 'data_identity': data['identity'],
                   'counts': {k: len(data[k]) for k in ('sft', 'tasks', 'development')}}

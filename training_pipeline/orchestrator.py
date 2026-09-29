@@ -4,6 +4,8 @@ import random
 import uuid
 import hashlib
 import fcntl
+import time
+from .concurrency import ordered_map
 from pathlib import Path
 from agent_harness.runner import run_episode
 from .config import inputs, resolve_run_config
@@ -82,7 +84,7 @@ class Pipeline:
             self.root.mkdir(parents=True, exist_ok=True)
         self.tracker = self.tracker or Tracker(self.root, self.config['tracking'], self.config['run_id'],
                                                run_config=self.config, job_type=job_type)
-        self.backend = self.backend or make_backend(self.config, evaluation_only=job_type == 'evaluation')
+        self.backend = self.backend or make_backend(self.config, evaluation_only=job_type in {'evaluation', 'benchmark'})
         if self.factory is None and self.config['environment']['kind'] == 'collection':
             from .collection import CollectionFactory
             self.factory = CollectionFactory(self.config, self.root, self.backend.ledger)
@@ -137,17 +139,32 @@ class Pipeline:
             temperature=temperature, tracker=self.tracker)
 
     def group(self, task, size, temperature):
+        return self.groups([task], size, temperature)[0]
+
+    def groups(self, tasks, size, temperature):
+        workers = self.config.get('concurrency', {}).get('rollouts', 1)
+        policy = self.backend.policy_id
+        output = [None] * len(tasks)
+        pending = list(range(len(tasks)))
         retries = self.config.get('group_retries', 1)
         for attempt in range(retries + 1):
-            group_id = 'group-' + uuid.uuid4().hex
-            group = [self.rollout(task, group_id, temperature) for _ in range(size)]
-            unresolved = [t for t in group if t.verification is None or t.verification.status == 'unresolved']
-            if not unresolved:
-                return group
-            self.tracker.event('excluded_group', group_id=group_id, attempt=attempt,
-                               episodes=[t.episode_id for t in group])
-            if attempt == retries or not all(t.verification and t.verification.retryable for t in unresolved):
-                return group
+            jobs = [(i, 'group-' + uuid.uuid4().hex) for i in pending]
+            episodes = ordered_map(lambda job: self.rollout(tasks[job[0]], job[1], temperature),
+                                   [job for job in jobs for _ in range(size)], workers)
+            pending = []
+            for offset, (i, group_id) in enumerate(jobs):
+                group = episodes[offset*size:(offset+1)*size]
+                if self.backend.policy_id != policy or any(t.policy_id != policy for t in group):
+                    raise ConfigurationError('Policy changed during rollout batch')
+                unresolved = [t for t in group if t.verification is None or t.verification.status == 'unresolved']
+                output[i] = group
+                if unresolved:
+                    self.tracker.event('excluded_group', group_id=group_id, attempt=attempt,
+                                       episodes=[t.episode_id for t in group])
+                    if attempt < retries and all(t.verification and t.verification.retryable for t in unresolved):
+                        pending.append(i)
+            if not pending:
+                return output
         raise AssertionError('Unreachable')
 
     def evaluate(self, manifest=None, tasks=None, cohort=None, base=False):
@@ -164,8 +181,17 @@ class Pipeline:
         if any(t['split'] != 'development' for t in selected):
             raise ConfigurationError('Automatic evaluation is development-only')
         rows = []
-        for task in selected:
-            trajectory = self.rollout(task, 'evaluation-' + uuid.uuid4().hex, self.config['evaluation']['temperature'])
+        ledger = getattr(self.backend, 'ledger', None)
+        reserved_before = read(ledger.path)['reserved_usd'] if ledger else None
+        started = time.monotonic()
+        policy = self.backend.policy_id
+        workers = self.config.get('concurrency', {}).get('rollouts', 1)
+        trajectories = ordered_map(lambda task: self.rollout(task, 'evaluation-' + uuid.uuid4().hex,
+            self.config['evaluation']['temperature']), selected, workers)
+        elapsed = time.monotonic() - started
+        if self.backend.policy_id != policy or any(t.policy_id != policy for t in trajectories):
+            raise ConfigurationError('Policy changed during evaluation')
+        for task, trajectory in zip(selected, trajectories):
             v = trajectory.verification
             rows.append({'task_id': task['id'], 'episode_id': trajectory.episode_id,
                          'family_id': task['family_id'], 'usage': trajectory.usage,
@@ -173,7 +199,11 @@ class Pipeline:
                          'termination': trajectory.termination})
         resolved = [r for r in rows if r['status'] == 'resolved']
         report = {'checkpoint_id': manifest['id'] if manifest else 'unchanged-base', 'policy_id': self.backend.policy_id,
-                  'cohort': cohort_identity,
+                  'cohort': cohort_identity, 'wall_seconds': elapsed,
+                  'episodes_per_second': len(rows)/elapsed if elapsed else None,
+                  'reserved_cost_usd': read(ledger.path)['reserved_usd']-reserved_before if ledger else None,
+                  'actual_billing_usd': None,
+                  'concurrency': self.config.get('concurrency', {'rollouts':1,'judges':1}),
                   'data_identity': self.data['identity'], 'environment': self.factory.identity,
                   'config_hash': semantic_hash(self.config), 'synthetic': self.config['environment']['kind'] == 'toy',
                   'reward_version': self.factory.reward_version,
@@ -268,7 +298,9 @@ class Pipeline:
                     loss = 'cross_entropy'
                 else:
                     tasks = self._batch(self.data['tasks'], stage['batch_size'])
-                    groups = [self.group(t, stage['group_size'], stage['temperature']) for t in tasks]
+                    groups = (self.groups(tasks, stage['group_size'], stage['temperature'])
+                        if self.config.get('concurrency', {}).get('rollouts', 1) > 1 else
+                        [self.group(t, stage['group_size'], stage['temperature']) for t in tasks])
                     rows, stats = grpo_batch(groups)
                     loss = 'importance_sampling'
                 self.state['attempted_batches'] += 1

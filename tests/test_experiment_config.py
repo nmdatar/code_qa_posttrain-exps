@@ -142,6 +142,7 @@ class ExperimentConfigTests(unittest.TestCase):
             def unresolved(*args):
                 t = trajectory()
                 from training_pipeline.contracts import VerificationResult
+                t.policy_id = pipeline.backend.policy_id
                 t.verification = VerificationResult('unresolved', None, 'v1', retryable=True)
                 return t
             pipeline.rollout = Mock(side_effect=unresolved)

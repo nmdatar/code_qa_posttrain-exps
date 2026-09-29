@@ -7,16 +7,16 @@ historical checkpoints. No experiment has been authorized to start yet.
 
 The project allocation is $1,000 total, not $1,000 per run. See
 [project-budget.json](project-budget.json): $50 historical/other-worktree reserve,
-$5 single grading check, $45 baseline, $650 direct GRPO, $160 combined learning-rate
-screens, and $90 confirmation/contingency. The historical reserve is not a bill;
+$5 single grading check, $120 baseline, $650 direct GRPO, $160 combined learning-rate
+screens, and $15 confirmation/contingency. The historical reserve is not a bill;
 reconcile all worktree spending before launch. Caps are enforced per ledger,
 not globally across independent worktrees. Do not copy a config to a fresh ledger
 and treat that as additional authorization.
 
 | Config | Operation when execution is authorized | Conservative estimate | Cap |
 |---|---|---:|---:|
-| `01-baseline.json` | `baseline --cohort selection` | <= $6.66 | $45 shared |
-| `01-baseline-confirmation.json` | `baseline --cohort confirmation` | <= $6.66 | Same $45 |
+| `01-baseline.json` | `baseline --cohort selection` | <= $6.66 | $120 shared |
+| `01-baseline-confirmation.json` | `baseline --cohort confirmation` | <= $6.66 | Same $120 |
 | `02-direct-grpo.json` | `run`: 16 tasks × 4 attempts, LR 1e-5, at most 30 updates / 30 batches | ~$613 | $650 |
 | `03-lr-5e-6-screen.json` | Later screen: 4 tasks × 4 attempts, 5 updates / 8 batches | ~$78 | $80 |
 | `03-lr-1e-5-screen.json` | Matched later screen at LR 1e-5 | ~$78 | $80 |
@@ -43,8 +43,8 @@ does not yet have cookbook. Baseline and cohort commands depend on the experimen
 readiness code, so use the tested integrated revision rather than an old checkout.
 
 No runnable SFT, efficiency-reward, symbol-navigation, retrieval, or compression
-arms are claimed ready: their data/adapter prerequisites remain. Concurrency
-benchmark arms and durable best-checkpoint archives also remain unimplemented.
+arms are claimed ready: their data/adapter prerequisites remain. Durable best-checkpoint archives remain unimplemented. Concurrency benchmark
+arms are now prepared; see [the concurrency guide](../../docs/CONCURRENCY.md).
 48-hour remote retention is not a permanent model archive.
 
 Other worktree `posttrain` configs use separate fresh training releases, different
@@ -52,3 +52,9 @@ schemas, rank/temperature settings, and a $20 hard cap. They are not interchange
 with these configs. Historical Qwen-9B/397B evaluation configs remain unchanged and
 are not the current experiment defaults. Detailed inventory and source checks are
 in `reports/experiment-config-audit.json`.
+
+
+The eight `01-throughput-c*-r*.json` configs and the additional baseline selection
+repeat share the $120 baseline ledger. All other allocations are unchanged;
+the project ceiling remains $1,000. Use `qa-train benchmark` for throughput
+configs, which never allocates training. No experiments have been launched.

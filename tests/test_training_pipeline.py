@@ -210,6 +210,8 @@ class PipelineTests(unittest.TestCase):
         def rollout(task,gid,temp):
             t=trajectory(len(calls),0)
             t.group_id=gid
+            t.policy_id=self.backend.policy_id
+            for g in t.generations:g.policy_id=t.policy_id
             if len(calls)==0:
                 t.verification=VerificationResult('unresolved',None,'v1',retryable=True)
             calls.append(t)

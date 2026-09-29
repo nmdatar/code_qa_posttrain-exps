@@ -86,7 +86,7 @@ class ReadinessTests(unittest.TestCase):
         pipeline.setup(True)
         outcomes = iter([VerificationResult('resolved', .8, 'test'), VerificationResult('unresolved', None, 'test')])
         def rollout(task, *_):
-            return Trajectory('r', 0, task['id'], 'h', 'g', task['id'], 'p', 'e', 'x', 'development',
+            return Trajectory('r', 0, task['id'], 'h', 'g', task['id'], pipeline.backend.policy_id, 'e', 'x', 'development',
                               termination='completed', verification=next(outcomes))
         pipeline.rollout = rollout
         report = pipeline.evaluate(base=True)

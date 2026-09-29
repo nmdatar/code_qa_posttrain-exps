@@ -6,6 +6,7 @@ import queue
 import threading
 from .contracts import AmbiguousUpdate, ConfigurationError, Generation, InfrastructureError
 from .rendering import ChatRenderer
+from .concurrency import SamplingClient
 
 
 def bounded(call, timeout):
@@ -53,6 +54,7 @@ class TinkerBackend:
     def __init__(self, model, limits, ledger=None, service=None, sdk=None):
         if sdk is None:
             import tinker as sdk
+        self._render_lock = threading.Lock()
         self.sdk = sdk
         self.service = service or sdk.ServiceClient(timeout=limits['provider_timeout_seconds'], max_retries=0)
         self.model, self.limits, self.ledger = model, limits, ledger
@@ -75,8 +77,8 @@ class TinkerBackend:
 
     def _sampler(self, **kwargs):
         from tinker.lib.retry_handler import RetryConfig
-        return bounded(lambda: self.service.create_sampling_client(**kwargs,
-            retry_config=RetryConfig(enable_retry_logic=False, progress_timeout=self.timeout)), self.timeout)
+        return SamplingClient(bounded(lambda: self.service.create_sampling_client(**kwargs,
+            retry_config=RetryConfig(enable_retry_logic=False, progress_timeout=self.timeout)), self.timeout))
 
     def create_trainer(self, seed):
         self.trainer = bounded(lambda: self.service.create_lora_training_client(
@@ -84,7 +86,8 @@ class TinkerBackend:
         self.poisoned = False
 
     def sample(self, messages, max_tokens, temperature):
-        prompt = self.renderer.prompt(messages)
+        with self._render_lock:
+            prompt = self.renderer.prompt(messages)
         if len(prompt) + max_tokens > self.limits['context_tokens']:
             raise ValueError('Context overflow; no silent truncation')
         if self.ledger:
@@ -96,8 +99,10 @@ class TinkerBackend:
         except Exception as exc:
             raise InfrastructureError('Tinker sampling failed: ' + type(exc).__name__) from None
         sequence = response.sequences[0]
+        with self._render_lock:
+            text = self.renderer.tokenizer.decode(sequence.tokens, skip_special_tokens=True)
         result = Generation(prompt, list(sequence.tokens), list(sequence.logprobs or []),
-            self.renderer.tokenizer.decode(sequence.tokens, skip_special_tokens=True),
+            text,
             str(sequence.stop_reason), self.policy_id)
         result.validate()
         return result

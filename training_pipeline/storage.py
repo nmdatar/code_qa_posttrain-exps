@@ -5,6 +5,8 @@ import json
 import os
 from pathlib import Path
 import uuid
+import threading
+from .concurrency import synchronized
 
 
 def digest(value):
@@ -51,6 +53,7 @@ class Tracker:
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
         self.run_id = run_id
+        self._io_lock = threading.RLock()
         self.remote = None
         self.wandb = None
         # Resume keeps the original remote identity and display name. A standalone
@@ -78,12 +81,14 @@ class Tracker:
             except Exception as exc:
                 self._append({'event': 'tracking_failure', 'error_type': type(exc).__name__})
 
+    @synchronized
     def _append(self, event):
         with (self.root / 'events.jsonl').open('a') as f:
             f.write(json.dumps(event, allow_nan=False) + '\n')
             f.flush()
             os.fsync(f.fileno())
 
+    @synchronized
     def event(self, event, **fields):
         row = {'event_id': uuid.uuid4().hex, 'run_id': self.run_id, 'event': event, **fields}
         self._append(row)
@@ -95,6 +100,7 @@ class Tracker:
                               'error_type': type(exc).__name__})
         return row
 
+    @synchronized
     def trajectory(self, trajectory):
         path = self.root / 'trajectories' / (trajectory.episode_id + '.json')
         atomic_json(path, trajectory.to_dict())
@@ -117,6 +123,7 @@ class Tracker:
             except Exception as exc:
                 self._append({'event': 'tracking_failure', 'error_type': type(exc).__name__})
 
+    @synchronized
     def artifact(self, path, kind):
         """Mirror an explicitly selected local artifact; never walk private folders."""
         if not self.remote:
@@ -130,6 +137,7 @@ class Tracker:
             self._append({'event': 'tracking_failure', 'artifact': str(path),
                           'error_type': type(exc).__name__})
 
+    @synchronized
     def finish(self, status):
         self.event('run_finish', status=status)
         if self.remote:

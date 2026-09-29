@@ -37,6 +37,22 @@ class CollectionTests(unittest.TestCase):
     def episode(self, name='ep'):
         return self.factory.create(self.row,name,self.root/(name+'.json'))
 
+    def test_concurrent_modal_episodes_are_isolated_and_cleaned(self):
+        import threading
+        from training_pipeline.concurrency import ordered_map
+        barrier = threading.Barrier(4)
+        def episode(i):
+            e = self.episode('parallel-'+str(i))
+            try:
+                barrier.wait(timeout=3)
+                self.assertNotIn('SECRET', json.dumps(e.messages))
+            finally:
+                e.close()
+        ordered_map(episode, range(4), 4)
+        self.assertEqual(len(self.modal.instances),4)
+        self.assertEqual(len({id(s) for s in self.modal.instances}),4)
+        for sandbox in self.modal.instances:sandbox.terminate.assert_called_once()
+
     def test_workspace_private_separation_freshness_and_reservation(self):
         a,b=self.episode('a'),self.episode('b')
         self.assertNotIn('SECRET',json.dumps(a.messages))

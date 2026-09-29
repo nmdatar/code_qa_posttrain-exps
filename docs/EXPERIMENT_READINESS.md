@@ -63,7 +63,7 @@ Task batches no longer repeat a task when crossing an epoch boundary. The next p
 ## Remaining work
 
 - Independently reviewed judge calibration, adversarial answers, repeated live grading, and a frozen evaluator decision.
-- Bounded parallel rollout/judge execution, provider concurrency verification, and the procedure 01 throughput study.
+- Live provider concurrency verification and the procedure 01 throughput study. Bounded parallel execution is now implemented and offline tested; see [concurrency](CONCURRENCY.md).
 - Durable checkpoint export/import with verified optimizer restoration and archive-gated best-model selection.
 - Shared rollout-output-token allowance with crash-safe accounting across retries and resume.
 - SFT collection bridge, tiered verifier integration, and the tool/retrieval/history experiment arms.

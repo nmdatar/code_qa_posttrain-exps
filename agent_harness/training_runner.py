@@ -13,11 +13,18 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
     trajectory = Trajectory(run_id, stage, task['id'], digest(task), group_id, episode_id,
         backend.policy_id, factory.identity, experiment_hash, task['split'])
     start = time.monotonic()
+    timings = {}
+    def measured(phase, call):
+        began = time.monotonic()
+        try:
+            return call()
+        finally:
+            timings[phase] = timings.get(phase, 0) + time.monotonic()-began
     episode = None
     output_tokens = 0
     tool_calls = 0
     try:
-        episode = factory.create(task, episode_id, tracker.root / 'trajectories' / (episode_id + '.json'))
+        episode = measured('provision_seconds', lambda: factory.create(task, episode_id, tracker.root / 'trajectories' / (episode_id + '.json')))
         # Task-specific limits can only narrow the run limits.
         effective = dict(limits)
         for k, v in getattr(episode, 'limits', {}).items():
@@ -32,7 +39,7 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
             max_tokens = min(effective['max_tokens_per_call'], effective['max_output_tokens'] - output_tokens)
             if hasattr(episode, 'prepare_generation'):
                 episode.prepare_generation(effective['max_generations'] - _)
-            generation = backend.sample(episode.messages, max_tokens, temperature)
+            generation = measured('generation_seconds', lambda: backend.sample(episode.messages, max_tokens, temperature))
             generation.validate()
             if generation.policy_id != trajectory.policy_id:
                 raise ValueError('Policy changed within episode')
@@ -57,7 +64,7 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
                     if tool_calls >= effective['max_tool_calls']:
                         raise BudgetExceeded('Tool budget exhausted')
                     tool_calls += 1
-                done, observation = episode.step(action)
+                done, observation = measured('action_seconds', lambda: episode.step(action))
             except (ValueError, KeyError, TypeError) as exc:
                 done, observation = False, {'error': 'Invalid action: ' + type(exc).__name__}
             trajectory.events.append({'kind': 'observation', 'value': observation})
@@ -71,7 +78,7 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
             episode.messages.append({'role': 'user', 'content': 'Tool observation: ' + text})
         else:
             trajectory.termination = 'budget_exhausted'
-        trajectory.verification = episode.verify(trajectory)
+        trajectory.verification = measured('verification_seconds', lambda: episode.verify(trajectory))
         trajectory.verification.validate()
     except BudgetLimit:
         trajectory.verification = VerificationResult('unresolved', None, factory.reward_version, ['spending ceiling'])
@@ -82,7 +89,7 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
                                                      [type(exc).__name__], retryable=True)
     except BudgetExceeded:
         trajectory.termination = 'budget_exhausted'
-        trajectory.verification = episode.verify(trajectory) if episode else VerificationResult(
+        trajectory.verification = measured('verification_seconds', lambda: episode.verify(trajectory)) if episode else VerificationResult(
             'unresolved', None, factory.reward_version, ['No episode'])
     except ValueError as exc:
         trajectory.termination = 'agent_error'
@@ -91,13 +98,13 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
     finally:
         if episode:
             try:
-                episode.close()
+                measured('cleanup_seconds', episode.close)
             except Exception as exc:
                 trajectory.termination = 'infrastructure_error'
                 trajectory.verification = VerificationResult('unresolved', None, factory.reward_version,
                     ['Cleanup failed: ' + type(exc).__name__], retryable=True)
         trajectory.usage = {'input_tokens': sum(len(g.prompt) for g in trajectory.generations),
                             'output_tokens': output_tokens, 'tool_calls': tool_calls,
-                            'latency_seconds': time.monotonic() - start, 'cost_usd': None}
+                            'latency_seconds': time.monotonic() - start, 'cost_usd': None, **timings}
         tracker.trajectory(trajectory)
     return trajectory

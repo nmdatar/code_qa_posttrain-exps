@@ -20,7 +20,20 @@ def positive(value, name, integer=False):
 
 def validate_config(c):
     exact(c, ['schema_version', 'run_id', 'output', 'model', 'seed', 'limits', 'stages',
-              'environment', 'evaluation', 'tracking', 'checkpoint_every', 'spend'], ['judge', 'group_retries', 'stopping'])
+              'environment', 'evaluation', 'tracking', 'checkpoint_every', 'spend'], ['judge', 'group_retries', 'stopping', 'concurrency', 'benchmark'])
+    if 'benchmark' in c:
+        exact(c['benchmark'], ['task_manifest', 'manifest_hash', 'attempts'])
+        positive(c['benchmark']['attempts'], 'benchmark.attempts', True)
+        if c['environment']['kind'] != 'collection':
+            raise ConfigurationError('Throughput benchmark requires collection environment')
+    if 'concurrency' in c:
+        exact(c['concurrency'], ['rollouts', 'judges'])
+        for key, value in c['concurrency'].items():
+            positive(value, 'concurrency.'+key, True)
+            if value > 32:
+                raise ConfigurationError('Concurrency is bounded to 32 per process')
+        if c['environment']['kind'] == 'repository' and c['concurrency']['rollouts'] > 1:
+            raise ConfigurationError('Concurrent strict-repository grading is not supported; use collection')
     if 'stopping' in c:
         exact(c['stopping'], [], ['initial_zero_batches', 'regression_delta', 'regression_checks'])
         for key, value in c['stopping'].items():

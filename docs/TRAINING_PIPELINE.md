@@ -402,3 +402,8 @@ completed one-update pilot established integration, not quality improvement.
 Current launch configurations and budget allocation are indexed in
 `configs/experiments/README.md`. The single live Nemotron check is recorded in
 `reports/nemotron-single-rollout-check.md`; it establishes integration, not calibration.
+
+
+Bounded collection concurrency and the no-training throughput benchmark are
+implemented; see [the concurrency guide](CONCURRENCY.md). Paid benchmark execution
+remains paused.

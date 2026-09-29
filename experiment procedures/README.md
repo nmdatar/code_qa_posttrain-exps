@@ -25,7 +25,7 @@ Defer REINFORCE (2), PPO and learned rewards (4), stronger-model annotations (8)
 | SFT, fork, optimizer-aware resume | Implemented; toy/backend checks exist. Collection inputs currently permit GRPO only, so repository SFT requires an eligible dataset adapter. |
 | Public/private separation, bounded repository tools, immutable policy groups | Implemented for the experimental source-reading path. |
 | Batch of 16 tasks | Configuration supports task batch size; this scale has not been benchmarked live. |
-| 8–32 simultaneous episodes | **Prerequisite:** implement and test bounded concurrency, thread-safe provider access, global sandbox limits, durable logging, and concurrent spending reservations. Current training orchestration is sequential; there is no supported concurrency config field. |
+| 8–32 simultaneous episodes | Implemented with bounded episode and judge concurrency, serialized SDK submission/logging, shared reservations, and cleanup barriers. Offline tested; provider capacity and throughput remain unmeasured. See [concurrency guide](../docs/CONCURRENCY.md). |
 | Frozen 32/85 evaluation cohorts | Implemented: `cohorts` writes a hashed family-stratified manifest; pin it in `evaluation`. Training uses selection; `baseline` and `evaluate` support explicit `--cohort`. See [readiness implementation](../docs/EXPERIMENT_READINESS.md). |
 | Confidence intervals and reporting | Implemented: demonstrated quality over all assigned tasks, coverage/completion, and offline paired repository bootstrap with unresolved sensitivity. Statistical gates do not establish judge calibration or seed provenance. |
 | Automatic best selection and durable archive/restore | **Prerequisite:** implement and verify. Saving expiring remote state is insufficient. |
