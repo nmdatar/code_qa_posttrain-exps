@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ExperimentConfig",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "1.0"
+      ]
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reward_version": {
+      "enum": [
+        "1.0"
+      ]
+    },
+    "frozen": {
+      "type": "boolean"
+    },
+    "latency_enabled": {
+      "type": "boolean"
+    },
+    "environment_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "accounting": {
+      "type": "object",
+      "properties": {
+        "input_token": {
+          "type": "number",
+          "minimum": 0
+        },
+        "output_token": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "tool_second": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "input_token",
+        "output_token",
+        "tool_second"
+      ],
+      "additionalProperties": false
+    },
+    "training_judge_family": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evaluation_judge_family": {
+      "type": "string",
+      "minLength": 1
+    },
+    "judge_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "judge_command": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "judge_timeout_seconds": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "max_evidence_bytes": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "candidate_preselected": {
+      "type": "boolean"
+    },
+    "baseline_manifest_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "budgets_manifest_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "task_manifest": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "task_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "id",
+          "task_hash"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "reward_version",
+    "frozen",
+    "latency_enabled",
+    "environment_id",
+    "accounting",
+    "training_judge_family",
+    "evaluation_judge_family",
+    "judge_version",
+    "judge_command",
+    "judge_timeout_seconds",
+    "max_evidence_bytes",
+    "candidate_preselected",
+    "baseline_manifest_hash",
+    "budgets_manifest_hash",
+    "task_manifest"
+  ],
+  "additionalProperties": false
+}

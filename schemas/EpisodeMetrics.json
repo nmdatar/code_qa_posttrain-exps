@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EpisodeMetrics",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "1.0"
+      ]
+    },
+    "task_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "submission_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "experiment_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "episode_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trajectory_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "latency_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "time_to_first_token_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "input_tokens": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "output_tokens": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "tool_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "tool_calls": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    },
+    "retries": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "cost": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": 0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "termination_reason": {
+      "enum": [
+        "completed",
+        "budget_exhausted",
+        "agent_error",
+        "infrastructure_error"
+      ]
+    },
+    "integrity_violation": {
+      "type": "boolean"
+    },
+    "execution_records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "command": {
+            "type": "string",
+            "minLength": 1
+          },
+          "exit_code": {
+            "type": "integer"
+          },
+          "stdout_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "id",
+          "command",
+          "exit_code",
+          "stdout_sha256"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "probes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fixture_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "commit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "isolated": {
+            "type": "boolean"
+          },
+          "stdout_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "status": {
+            "enum": [
+              "completed",
+              "infrastructure_error"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "fixture_id",
+          "commit",
+          "isolated",
+          "stdout_sha256",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "schema_version",
+    "task_hash",
+    "submission_hash",
+    "experiment_id",
+    "episode_id",
+    "trajectory_ref",
+    "latency_seconds",
+    "time_to_first_token_seconds",
+    "input_tokens",
+    "output_tokens",
+    "tool_seconds",
+    "tool_calls",
+    "retries",
+    "cost",
+    "termination_reason",
+    "integrity_violation",
+    "execution_records",
+    "probes"
+  ],
+  "additionalProperties": false
+}

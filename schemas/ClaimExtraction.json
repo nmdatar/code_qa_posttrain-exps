@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ClaimExtraction",
+  "type": "object",
+  "properties": {
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "enum": [
+              "text",
+              "diagram"
+            ]
+          },
+          "evidence_requests": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "start_line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "end_line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "file_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "symbol": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "path",
+                "start_line",
+                "end_line",
+                "file_sha256"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "source",
+          "evidence_requests"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "answer_mode": {
+      "enum": [
+        "answer",
+        "abstention",
+        "clarification"
+      ]
+    },
+    "extraction_complete": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "claims",
+    "answer_mode",
+    "extraction_complete"
+  ],
+  "additionalProperties": false
+}

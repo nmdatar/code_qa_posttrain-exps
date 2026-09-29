@@ -1,0 +1,275 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TaskSpec",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "1.0"
+      ]
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "question": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repository": {
+      "type": "object",
+      "properties": {
+        "family_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40,64}$"
+        },
+        "url": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "family_id",
+        "commit",
+        "url"
+      ],
+      "additionalProperties": false
+    },
+    "lineage_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "split": {
+      "enum": [
+        "train",
+        "development",
+        "final_test"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "minLength": 1
+    },
+    "answerability": {
+      "enum": [
+        "answerable",
+        "unanswerable",
+        "needs_clarification"
+      ]
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "weight": {
+            "enum": [
+              1,
+              3
+            ]
+          },
+          "separable_subparts": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 0
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "start_line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "end_line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "file_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "symbol": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "path",
+                "start_line",
+                "end_line",
+                "file_sha256"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "weight",
+          "separable_subparts",
+          "evidence"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "critical_errors": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    },
+    "permitted_tools": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    },
+    "budgets": {
+      "type": "object",
+      "properties": {
+        "latency_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "compute_units": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "max_tool_calls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_output_tokens": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_submission_bytes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "latency_seconds",
+        "compute_units",
+        "max_tool_calls",
+        "max_output_tokens",
+        "max_submission_bytes"
+      ],
+      "additionalProperties": false
+    },
+    "diagram": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "criteria": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "allowed_abstractions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "required",
+        "criteria",
+        "allowed_abstractions"
+      ],
+      "additionalProperties": false
+    },
+    "probes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fixture_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_stdout_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "id",
+          "fixture_id",
+          "expected_stdout_sha256"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "human_reviewed": {
+      "type": "boolean"
+    },
+    "gold_status": {
+      "enum": [
+        "accepted",
+        "draft",
+        "ambiguous"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "question",
+    "repository",
+    "lineage_id",
+    "split",
+    "category",
+    "answerability",
+    "claims",
+    "critical_errors",
+    "permitted_tools",
+    "budgets",
+    "diagram",
+    "probes",
+    "human_reviewed",
+    "gold_status"
+  ],
+  "additionalProperties": false
+}

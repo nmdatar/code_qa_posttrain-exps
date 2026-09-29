@@ -1,0 +1,711 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GradeReport",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "1.0"
+      ]
+    },
+    "reward_version": {
+      "enum": [
+        "1.0"
+      ]
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "submission_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "family_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lineage_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "split": {
+      "type": "string",
+      "minLength": 1
+    },
+    "category": {
+      "type": "string",
+      "minLength": 1
+    },
+    "answerability": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tier": {
+      "enum": [
+        "failed",
+        "partial",
+        "accepted",
+        "unresolved"
+      ]
+    },
+    "reward": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      ]
+    },
+    "coverage": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "efficiency": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      ]
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "pass",
+              "defect",
+              "failure",
+              "unresolved"
+            ]
+          },
+          "detail": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "name",
+          "status",
+          "detail"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    },
+    "semantic": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema_version": {
+              "enum": [
+                "1.0"
+              ]
+            },
+            "task_hash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "submission_hash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "experiment_hash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "judge_family": {
+              "type": "string",
+              "minLength": 1
+            },
+            "judge_version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "prompt_version": {
+              "enum": [
+                "1.0"
+              ]
+            },
+            "snapshot_fingerprint": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "required_claims": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "coverage": {
+                    "enum": [
+                      "absent",
+                      "partial",
+                      "complete"
+                    ]
+                  },
+                  "verdict": {
+                    "enum": [
+                      "supported",
+                      "contradicted",
+                      "insufficient"
+                    ]
+                  },
+                  "material_error": {
+                    "type": "boolean"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_keys": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 0
+                  }
+                },
+                "required": [
+                  "id",
+                  "coverage",
+                  "verdict",
+                  "material_error",
+                  "reason",
+                  "evidence_keys"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 0
+            },
+            "additional_claims": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "coverage": {
+                    "enum": [
+                      "absent",
+                      "partial",
+                      "complete"
+                    ]
+                  },
+                  "verdict": {
+                    "enum": [
+                      "supported",
+                      "contradicted",
+                      "insufficient"
+                    ]
+                  },
+                  "material_error": {
+                    "type": "boolean"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_keys": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 0
+                  }
+                },
+                "required": [
+                  "id",
+                  "coverage",
+                  "verdict",
+                  "material_error",
+                  "reason",
+                  "evidence_keys"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 0
+            },
+            "extracted_claims": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source": {
+                    "enum": [
+                      "text",
+                      "diagram"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "text",
+                  "source"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 0
+            },
+            "citation_links": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "claim_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "citation_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "supported": {
+                    "type": "boolean"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "claim_id",
+                  "citation_id",
+                  "supported",
+                  "reason"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 0
+            },
+            "uncited_claim_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            "critical_error": {
+              "type": "boolean"
+            },
+            "false_execution_claim": {
+              "type": "boolean"
+            },
+            "answer_mode": {
+              "enum": [
+                "answer",
+                "abstention",
+                "clarification"
+              ]
+            },
+            "answerability_satisfied": {
+              "type": "boolean"
+            },
+            "diagram": {
+              "type": "object",
+              "properties": {
+                "assessed": {
+                  "type": "boolean"
+                },
+                "supported": {
+                  "type": "boolean"
+                },
+                "complete": {
+                  "type": "boolean"
+                },
+                "consistent": {
+                  "type": "boolean"
+                },
+                "readable": {
+                  "type": "boolean"
+                },
+                "material_error": {
+                  "type": "boolean"
+                },
+                "findings": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 0
+                }
+              },
+              "required": [
+                "assessed",
+                "supported",
+                "complete",
+                "consistent",
+                "readable",
+                "material_error",
+                "findings"
+              ],
+              "additionalProperties": false
+            },
+            "assessment_complete": {
+              "type": "boolean"
+            },
+            "needs_review": {
+              "type": "boolean"
+            },
+            "evidence_keys": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            "disagreements": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "schema_version",
+            "task_hash",
+            "submission_hash",
+            "experiment_hash",
+            "judge_family",
+            "judge_version",
+            "prompt_version",
+            "snapshot_fingerprint",
+            "required_claims",
+            "additional_claims",
+            "extracted_claims",
+            "citation_links",
+            "uncited_claim_ids",
+            "critical_error",
+            "false_execution_claim",
+            "answer_mode",
+            "answerability_satisfied",
+            "diagram",
+            "assessment_complete",
+            "needs_review",
+            "evidence_keys",
+            "disagreements"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "metrics": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema_version": {
+              "enum": [
+                "1.0"
+              ]
+            },
+            "task_hash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "submission_hash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "experiment_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "episode_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "trajectory_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "latency_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "time_to_first_token_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "input_tokens": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "output_tokens": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "tool_seconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "tool_calls": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            "retries": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "cost": {
+              "oneOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "termination_reason": {
+              "enum": [
+                "completed",
+                "budget_exhausted",
+                "agent_error",
+                "infrastructure_error"
+              ]
+            },
+            "integrity_violation": {
+              "type": "boolean"
+            },
+            "execution_records": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "command": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "exit_code": {
+                    "type": "integer"
+                  },
+                  "stdout_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                },
+                "required": [
+                  "id",
+                  "command",
+                  "exit_code",
+                  "stdout_sha256"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 0
+            },
+            "probes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "fixture_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "commit": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "isolated": {
+                    "type": "boolean"
+                  },
+                  "stdout_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "status": {
+                    "enum": [
+                      "completed",
+                      "infrastructure_error"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "fixture_id",
+                  "commit",
+                  "isolated",
+                  "stdout_sha256",
+                  "status"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "schema_version",
+            "task_hash",
+            "submission_hash",
+            "experiment_id",
+            "episode_id",
+            "trajectory_ref",
+            "latency_seconds",
+            "time_to_first_token_seconds",
+            "input_tokens",
+            "output_tokens",
+            "tool_seconds",
+            "tool_calls",
+            "retries",
+            "cost",
+            "termination_reason",
+            "integrity_violation",
+            "execution_records",
+            "probes"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "experiment_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "environment_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "latency_enabled": {
+      "type": "boolean"
+    },
+    "scoring_contract_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "planned_task_hashes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      },
+      "minItems": 1
+    },
+    "compute_units": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "number",
+          "minimum": 0
+        }
+      ]
+    },
+    "diagram_present": {
+      "type": "boolean"
+    },
+    "material_error": {
+      "type": "boolean"
+    },
+    "judge_role": {
+      "enum": [
+        "training",
+        "evaluation"
+      ]
+    },
+    "candidate_preselected": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema_version",
+    "reward_version",
+    "task_id",
+    "task_hash",
+    "submission_hash",
+    "family_id",
+    "lineage_id",
+    "split",
+    "category",
+    "answerability",
+    "tier",
+    "reward",
+    "coverage",
+    "efficiency",
+    "checks",
+    "reasons",
+    "semantic",
+    "metrics",
+    "experiment_hash",
+    "environment_id",
+    "latency_enabled",
+    "scoring_contract_hash",
+    "planned_task_hashes",
+    "compute_units",
+    "diagram_present",
+    "material_error",
+    "judge_role",
+    "candidate_preselected"
+  ],
+  "additionalProperties": false
+}

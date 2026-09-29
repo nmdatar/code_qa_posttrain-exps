@@ -47,7 +47,9 @@ training architecture.
 The “Dataset creation” chat was actively implementing `posttrain` in
 `/Users/ndatar/.codex/worktrees/dataset-generation/action-interview`. Its current
 pipeline was not imported wholesale or marked complete. Main-folder training work
-was also active and was preserved. Dataset-builder files imported here are the
+was also active and was preserved. Its current shared runtime dependencies are
+recorded as a Git snapshot so the integrated code can travel with its imports;
+that snapshot does not declare the active training task complete. Dataset-builder files imported here are the
 completed harness dependency snapshot, not the active dataset worktree's latest
 version.
 
