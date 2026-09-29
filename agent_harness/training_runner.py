@@ -30,6 +30,8 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
                 trajectory.termination = 'budget_exhausted'
                 break
             max_tokens = min(effective['max_tokens_per_call'], effective['max_output_tokens'] - output_tokens)
+            if hasattr(episode, 'prepare_generation'):
+                episode.prepare_generation(effective['max_generations'] - _)
             generation = backend.sample(episode.messages, max_tokens, temperature)
             generation.validate()
             if generation.policy_id != trajectory.policy_id:
@@ -46,7 +48,9 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
                 trajectory.termination = 'budget_exhausted'
                 break
             try:
-                action = json.loads(generation.text)
+                action = episode.parse_action(generation.text) if hasattr(episode, 'parse_action') else json.loads(generation.text)
+                if hasattr(episode, 'parse_action'):
+                    trajectory.events.append({'kind': 'parsed_action', 'value': action})
                 if not isinstance(action, dict):
                     raise ValueError('Action must be a JSON object')
                 if 'tool' in action:

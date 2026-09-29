@@ -75,7 +75,9 @@ class SpendLedger:
                           'reserved_usd': 0.0, 'reservations': [], 'actual_billing_usd': None}
             atomic_json(self.path, self.state)
 
-    def estimate(self, kind, input_tokens=0, output_tokens=0):
+    def estimate(self, kind, input_tokens=0, output_tokens=0, ttl_seconds=None):
+        if ttl_seconds is not None and (type(ttl_seconds) is not int or ttl_seconds <= 0):
+            raise ValueError('Invalid checkpoint retention')
         if any(type(v) is not int or v < 0 for v in (input_tokens, output_tokens)):
             raise ValueError('Token counts must be nonnegative integers')
         p = self.prices
@@ -87,7 +89,7 @@ class SpendLedger:
             # 32 bytes per base-model parameter for BOTH state and sampler artifacts:
             # deliberately much larger than rank-8 adapters + optimizer state.
             gb = p['params'] * 32 / 1e9
-            return gb * p['storage_gb_month'] * self.ttl / (28*86400)
+            return gb * p['storage_gb_month'] * (self.ttl if ttl_seconds is None else ttl_seconds) / (28*86400)
         raise ValueError('Unpriced operation')
 
     def reserve(self, kind, **usage):

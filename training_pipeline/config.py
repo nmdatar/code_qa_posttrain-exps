@@ -20,7 +20,7 @@ def positive(value, name, integer=False):
 
 def validate_config(c):
     exact(c, ['schema_version', 'run_id', 'output', 'model', 'seed', 'limits', 'stages',
-              'environment', 'evaluation', 'tracking', 'checkpoint_every', 'spend'])
+              'environment', 'evaluation', 'tracking', 'checkpoint_every', 'spend'], ['judge'])
     if not isinstance(c['output'], str) or not c['output']:
         raise ConfigurationError('Output directory is required')
     if c['schema_version'] != '1.0' or not isinstance(c['run_id'], str) or not c['run_id']:
@@ -52,7 +52,7 @@ def validate_config(c):
         if s['kind'] == 'grpo':
             if type(s.get('group_size')) is not int or s['group_size'] < 2 or s.get('temperature') != 1:
                 raise ConfigurationError('GRPO requires group_size >= 2 and temperature=1')
-    exact(c['environment'], ['kind'], ['release', 'manifest_sha256', 'calibration', 'calibration_sha256', 'modal_prices'])
+    exact(c['environment'], ['kind'], ['release', 'manifest_sha256', 'calibration', 'calibration_sha256', 'modal_prices', 'protocol_version'])
     if c['environment']['kind'] not in {'toy', 'repository', 'collection'}:
         raise ConfigurationError('Unsupported environment')
     if c['environment']['kind'] == 'repository' and not all(c['environment'].get(k) for k in
@@ -69,6 +69,25 @@ def validate_config(c):
             raise ConfigurationError('Missing Modal price provenance')
         if any(s['kind'] != 'grpo' for s in c['stages']):
             raise ConfigurationError('Collection inputs support GRPO only')
+    if 'judge' in c:
+        if c['environment']['kind'] != 'collection':
+            raise ConfigurationError('Independent judge currently supports collection environments only')
+        j = c['judge']
+        exact(j, ['base_model', 'renderer', 'context_tokens', 'max_tokens', 'provider_timeout_seconds', 'prices'])
+        for key in ('base_model', 'renderer'):
+            if not isinstance(j[key], str) or not j[key]:
+                raise ConfigurationError('Judge '+key+' is required')
+        for key in ('context_tokens', 'max_tokens', 'provider_timeout_seconds'):
+            positive(j[key], 'judge '+key, True)
+        if j['max_tokens'] >= j['context_tokens']:
+            raise ConfigurationError('Judge generation budget must leave room for context')
+        exact(j['prices'], ['model', 'prefill', 'sample', 'source', 'checked_at'])
+        if j['prices']['model'] != j['base_model']:
+            raise ConfigurationError('Judge prices must match judge model')
+        for key in ('prefill', 'sample'):
+            positive(j['prices'][key], 'judge '+key)
+        if not j['prices']['source'] or not j['prices']['checked_at']:
+            raise ConfigurationError('Missing judge price provenance')
     exact(c['evaluation'], ['every', 'max_tasks', 'temperature'])
     if type(c['evaluation']['every']) is not int or c['evaluation']['every'] < 0:
         raise ConfigurationError('Invalid evaluation cadence')

@@ -156,7 +156,7 @@ class TinkerBackend:
         if self.trainer is None or self.poisoned:
             raise AmbiguousUpdate('Cannot save uncertain training state')
         if self.ledger:
-            self.ledger.reserve('checkpoint')
+            self.ledger.reserve('checkpoint', ttl_seconds=self.model['checkpoint_ttl_seconds'])
         ttl = self.model['checkpoint_ttl_seconds']
         state = self.trainer.save_state(name, ttl_seconds=ttl).result(timeout=self.timeout)
         sample = self.trainer.save_weights_for_sampler(name, ttl_seconds=ttl).result(timeout=self.timeout)

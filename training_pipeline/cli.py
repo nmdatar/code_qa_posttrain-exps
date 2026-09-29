@@ -49,7 +49,18 @@ def main(argv=None):
                   'counts': {k: len(data[k]) for k in ('sft', 'tasks', 'development')}}
         if a.remote:
             from .tinker_backend import TinkerBackend
-            result['model'] = TinkerBackend(config['model'], config['limits']).identity
+            backend = TinkerBackend(config['model'], config['limits'])
+            try:
+                result['model'] = backend.identity
+            finally:
+                backend.close()
+        if a.remote and 'judge' in config:
+            from .judge import TinkerJudge
+            judge = TinkerJudge(config['judge'])
+            try:
+                result['judge'] = judge.identity
+            finally:
+                judge.close()
         print(json.dumps(result, indent=2))
         return 0
     pipeline = Pipeline(config, data=data)

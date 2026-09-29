@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "run_id": "example-toy-training",
+  "output": "artifacts/example-training/run",
+  "model": {
+    "base_model": "Qwen/Qwen3.5-4B",
+    "rank": 8,
+    "checkpoint_ttl_seconds": 86400
+  },
+  "seed": 42,
+  "limits": {
+    "max_generations": 2,
+    "max_tokens_per_call": 64,
+    "max_output_tokens": 128,
+    "context_tokens": 512,
+    "max_tool_calls": 1,
+    "max_tool_output_bytes": 2048,
+    "latency_seconds": 120,
+    "provider_timeout_seconds": 120
+  },
+  "stages": [
+    {
+      "kind": "sft",
+      "max_updates": 1,
+      "max_batches": 1,
+      "batch_size": 8,
+      "learning_rate": 0.0001
+    },
+    {
+      "kind": "grpo",
+      "max_updates": 2,
+      "max_batches": 4,
+      "batch_size": 2,
+      "group_size": 4,
+      "learning_rate": 1e-05,
+      "temperature": 1
+    }
+  ],
+  "environment": {
+    "kind": "toy"
+  },
+  "evaluation": {
+    "every": 1,
+    "max_tasks": 2,
+    "temperature": 0
+  },
+  "checkpoint_every": 1,
+  "tracking": {
+    "mode": "disabled",
+    "project": "repository-qa-training"
+  },
+  "spend": {
+    "cap_usd": 5.0,
+    "ledger": "artifacts/example-training-spend.json",
+    "prices": null
+  }
+}

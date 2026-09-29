@@ -17,6 +17,7 @@ import threading
 import time
 
 from .process import run_process
+from .stream_process import StreamProcess, SERVER
 
 
 class BudgetExceeded(RuntimeError):
@@ -127,6 +128,7 @@ class ModalSandboxBackend:
             app = modal.App.lookup(self.manifest["app_name"], create_if_missing=True)
             started = time.monotonic()
             sb = modal.Sandbox.create(
+                *(["python3", "-u", "-I", "-c", SERVER] if self.manifest["workspace_path"] == "/workspace" else []),
                 app=app, image=modal.Image.from_id(self.manifest["image_id"]),
                 workdir=self.manifest["workspace_path"], block_network=True, include_oidc_identity_token=False,
                 timeout=self.limits.lifetime_seconds,
@@ -134,7 +136,7 @@ class ModalSandboxBackend:
                 memory=(self.limits.memory_mib, self.limits.memory_limit_mib),
                 tags={"episode_id": episode_id, "environment_id": self.manifest["environment_id"]},
             )
-            episode = ModalEpisode(sb, journal, self.limits, self._slots.release, started)
+            episode = ModalEpisode(sb, journal, self.limits, self._slots.release, started, self.manifest["workspace_path"])
             journal.write("created", sandbox_id=sb.object_id)
             recipe = self.manifest["recipe"]
             for phase, commands in (("setup", recipe.get("setup_commands", [])),
@@ -183,7 +185,9 @@ class ModalSandboxBackend:
 
 
 class ModalEpisode:
-    def __init__(self, sandbox, journal, limits, release, started):
+    def __init__(self, sandbox, journal, limits, release, started, workspace_path="/repo"):
+        self._workspace_path = workspace_path
+        self._stream_process = StreamProcess(sandbox) if workspace_path == "/workspace" else None
         self.sandbox_id = sandbox.object_id
         self.journal_path = journal.path
         self._sandbox, self._journal, self._limits = sandbox, journal, limits
@@ -196,7 +200,9 @@ class ModalEpisode:
         remaining = self._limits.lifetime_seconds - (time.monotonic() - self._started)
         if remaining < 1:
             raise BudgetExceeded("Sandbox lifetime exhausted")
-        return run_process(self._sandbox, argv, min(timeout, int(remaining)), self._limits.max_output_bytes)
+        if self._stream_process:
+            return self._stream_process.run(argv, min(timeout, int(remaining)), self._limits.max_output_bytes)
+        return run_process(self._sandbox, argv, min(timeout, int(remaining)), self._limits.max_output_bytes, workdir=self._workspace_path)
 
     def execute(self, argv, *, timeout_seconds=None):
         """Execute authorized argv; nonzero exits are observations, not outages.

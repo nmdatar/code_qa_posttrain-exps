@@ -202,7 +202,113 @@ The export uses `experimental-rollout-release-1.0`, preserving collection-native
 Modal environments and reference-comparison grading. It is a task export, not a
 completed RL run. `rollout_eligible` and `experimental_rl_task_eligible` are true;
 `training_eligible` remains false for the existing strict training-loader contract.
-The current strict `qa-train run` adapter cannot consume this format: the remaining
-integration is a collection-native rollout adapter and provisional reference reward.
+Use `environment.kind: collection` with `qa-train run` for this format. The
+collection adapter uses the shared episode runner, isolated `/workspace` Modal
+images, and a frozen base-model reference judge. Its provisional reward is labeled
+`experimental-reference-v1`; it does not enter the strict calibrated evaluation path.
 Do not relabel draft references as human-approved gold to satisfy that adapter.
 No new SFT examples are manufactured and no provider spending is incurred by export.
+
+
+## First repository GRPO pilot
+
+`examples/training-repository-pilot.json` starts Qwen/Qwen3.5-4B directly with
+rank-8 GRPO, learning rate 1e-5, groups of four, one task per batch, at most two
+batches and one optimizer update. SFT is absent. The first checkpoint provides
+the baseline evaluation; the committed final checkpoint uses the same two
+development tasks. Equal-reward batches skip the optimizer as usual.
+
+The collection loader admits source-reading tasks only: 858 training and 117
+development records. It checks release hashes, private reference and pinned source
+bindings, and family splits. Executable tasks are not silently downgraded to
+source-only tasks. Public questions/tools enter the sandbox; private references
+and grading remain on the host and in judge requests. AnswerSubmission and trusted
+EpisodeRecorder telemetry are retained. Invalid/missing answers or citations score
+zero; unknown grading or infrastructure outcomes remain unresolved. The reference
+judge uses a frozen Qwen/Qwen3.5-4B base sampler, never the updated policy. This is
+an inexpensive exploratory reward, not independent calibrated quality evidence.
+
+The $5 ledger covers policy sampling, judge sampling, updates, checkpoint storage,
+and full-lifetime Modal reservations at resource limits with a 2x rate allowance.
+No images are built. The pre-dispatch estimate includes whole-group retries and
+conservative evaluation/checkpoint counts. Reservations persist before calls;
+ambiguous calls retain them. Provider billing is distinct and may be unavailable.
+Pricing evidence is saved alongside `launch-estimate.json` and `spend.json`.
+
+```sh
+qa-train validate --config examples/training-repository-pilot.json
+qa-train validate --remote --config examples/training-repository-pilot.json
+qa-train run --config examples/training-repository-pilot.json
+```
+
+The run directory is exclusive; for a new experiment choose a new run ID/output
+and budget ledger. For recovery, use the last committed checkpoint with `resume`;
+never blindly reissue an ambiguous optimizer call. A config copied to another
+machine must point to the exported release and its pinned source checkouts.
+
+### Qwen pilot protocol correction
+
+Use `examples/training-repository-qwen-v2.json` for the corrected pilot. It pins
+`environment.protocol_version: experimental-reference-v2`. The earlier pilot
+exposed a literal `TASK_ID` placeholder in the example and rejected Markdown-fenced
+JSON. V2 inserts the actual task ID, accepts a single JSON fence, and supplies only
+missing envelope metadata (`task_id`, schema version, optional diagram). It does
+not repair answer text, citation paths, citation ranges, or source hashes. Both raw
+generations and parsed actions are persisted. This change uses a new run/fork,
+not silent continuation of training under changed protocol semantics.
+
+Collection images use a persistent Python command server over Modal stdin/stdout,
+with sequential commands, bounded outputs and deadlines, and sandbox teardown.
+The initial Modal exec transport timed out on these prebuilt images; a live
+command-stream readiness/listing probe passed before the corrected run.
+
+The v2 pilot shares the original $5 ledger, including reservations from failed
+attempts. Its estimate plus prior reservations was $4.9183 before dispatch. It
+uses one GRPO group (four attempts), at most one update, and one fixed development
+task before and after. These small samples can verify training integration but
+cannot establish reliable quality improvement.
+
+
+### Independent judge for Qwen experiments
+
+`examples/training-repository-qwen-nemotron.json` keeps the policy at
+`Qwen/Qwen3.5-4B` and selects a frozen
+`nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16` judge, matching the training judge
+family in the separate `posttrain` configuration. The cookbook renderer is
+`nemotron3_disable_thinking`; judging uses temperature 0, a 16,384-token total
+context limit, and at most 1,024 output tokens. The same frozen judge grades
+training and development to keep their scale consistent. This is a candidate
+judge upgrade, not evidence of improved grading accuracy or calibration.
+
+Install optional dependencies in the environment used for this runner:
+
+```sh
+python -m pip install -e '.[training,tinker,remote]'
+qa-train validate --config examples/training-repository-qwen-nemotron.json
+qa-train validate --config examples/training-repository-qwen-nemotron.json --remote
+```
+
+Remote validation checks sampling capability and renderer construction without
+sampling tokens or creating a training client. Independent judges do not need
+training capability. Missing dependencies/models fail explicitly; there is no
+fallback to Qwen. Legacy configs without `judge` retain their original frozen
+policy-family judge for historical checkpoint evaluation.
+
+Judge settings, prompt identity, and pricing participate in the experiment/reward
+identity. Changing them requires a new run or fork, not resume. Reports retain
+raw judge tokens, conditioning tokens, stop reason, and model/renderer identity.
+Truncated or malformed grades remain unresolved. No judge optimizer is created.
+
+The launch estimate and each request reserve the judge's own published token
+prices against the same total ledger as policy, Modal, and checkpoint charges.
+The example deliberately retains the existing pilot's $5 ledger; it does not
+create fresh spending authorization. The nearly exhausted ledger will block a
+new full pilot. A new experiment needs its separately authorized total cap and
+ledger, and refreshed pricing before execution.
+
+Before comparing policies, re-evaluate the unchanged Qwen base and candidates
+using this frozen judge and identical cohorts. Do not compare Nemotron scores
+against the earlier Qwen-judged pilot as evidence of model improvement. Check
+agreement on audited, correct, incorrect, partial, and insufficient-evidence
+answers; until calibrated, all quality conclusions remain exploratory. The
+completed one-update pilot established integration, not quality improvement.

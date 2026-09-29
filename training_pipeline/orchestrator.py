@@ -28,7 +28,16 @@ def make_backend(config):
         prices = read(ledger_path)['prices']
     else:
         prices = settings['prices'] or current_prices(config['model']['base_model'])
-    ledger = SpendLedger(ledger_path, settings['cap_usd'], prices, config['model']['checkpoint_ttl_seconds'])
+    if config['environment']['kind'] == 'collection':
+        from .launch import estimate
+        plan = estimate(config, prices)
+        prior = read(ledger_path)['reserved_usd'] if ledger_path.exists() else 0
+        plan['prior_reserved_usd'] = prior
+        plan['combined_upper_estimate_usd'] = prior + plan['upper_estimate_usd']
+        if plan['status'] != 'within_ceiling' or plan['combined_upper_estimate_usd'] > settings['cap_usd']:
+            raise ConfigurationError('Planned collection run exceeds spending ceiling')
+        atomic_json(Path(config['output']).parent / 'launch-estimate.json', plan)
+    ledger = SpendLedger(ledger_path, settings['cap_usd'], prices, read(ledger_path)['ttl_seconds'] if ledger_path.exists() else config['model']['checkpoint_ttl_seconds'])
     return TinkerBackend(config['model'], config['limits'], ledger)
 
 
@@ -71,6 +80,11 @@ class Pipeline:
         if self.factory is None and self.config['environment']['kind'] == 'collection':
             from .collection import CollectionFactory
             self.factory = CollectionFactory(self.config, self.root, self.backend.ledger)
+            try:
+                self.factory.prepare_judge()
+            except BaseException:
+                self.backend.close()
+                raise
         self.factory = self.factory or (ToyFactory() if self.config['environment']['kind'] == 'toy' else
                                        RepositoryFactory(self.config, self.root))
 
@@ -135,6 +149,8 @@ class Pipeline:
         report = {'checkpoint_id': manifest['id'], 'policy_id': self.backend.policy_id,
                   'data_identity': self.data['identity'], 'environment': self.factory.identity,
                   'config_hash': semantic_hash(self.config), 'synthetic': self.config['environment']['kind'] == 'toy',
+                  'reward_version': self.factory.reward_version,
+                  'reward_calibrated': False if self.config['environment']['kind'] == 'collection' else None,
                   'expected': len(selected), 'attempted': len(rows), 'resolved': len(resolved),
                   'mean_reward': sum(r['reward'] for r in resolved)/len(resolved) if resolved else None, 'results': rows}
         path = self.root / 'evaluations' / (manifest['id'] + '-' + uuid.uuid4().hex + '.json')
@@ -180,7 +196,7 @@ class Pipeline:
                     self.rng.setstate(tuples(self.state['rng']))
             if purpose != 'resume':
                 self.commit()
-            if purpose != 'resume' and self.config['environment']['kind'] == 'collection':
+            if self.config['environment']['kind'] == 'collection' and self.state['optimizer_step'] == 0 and not list((self.root/'evaluations').glob(self.last_manifest['id']+'-*.json')):
                 self.evaluate()
             self.tracker.event('run_start', purpose=purpose, optimizer_step=self.state['optimizer_step'])
             while self.state['stage'] < len(self.config['stages']):
