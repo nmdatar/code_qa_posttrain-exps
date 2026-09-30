@@ -1,0 +1,173 @@
+{
+  "schema_version": "rl-stability-design-v1",
+  "status": "stopped_infrastructure_archived",
+  "source": "https://cognition.com/blog/swe-grep",
+  "anchor": {
+    "model": "Qwen/Qwen3.5-4B",
+    "rank": 8,
+    "learning_rate": 1e-05,
+    "group_size": 4,
+    "batch_size": 2,
+    "training_reward": "positive-coverage-v4",
+    "grading_version": "all-claims-v7",
+    "data_release": "repo-qa-training-claims-v6",
+    "tool_read_policy": "paginate-v1",
+    "tool_action_policy": "action-alias-v1",
+    "judge_evidence_policy": "definition-context-v1",
+    "initialization": "fresh_base",
+    "max_batches": 16,
+    "max_updates": 16,
+    "seed": 42
+  },
+  "fixed_limits": {
+    "max_tool_calls": 5,
+    "max_generations": 6,
+    "max_output_tokens": 3072,
+    "max_tokens_per_call": 512,
+    "max_tool_output_bytes": 3500,
+    "context_tokens": 8192,
+    "latency_seconds": 300
+  },
+  "stages": [
+    {
+      "id": "frozen-speed",
+      "training": false,
+      "arms": [
+        {
+          "id": "serial",
+          "tool_parallelism": 1
+        },
+        {
+          "id": "parallel2",
+          "tool_parallelism": 2
+        },
+        {
+          "id": "parallel4",
+          "tool_parallelism": 4
+        }
+      ],
+      "selection_tasks": 32,
+      "repeat_count": 2
+    },
+    {
+      "id": "matched-rl",
+      "training": true,
+      "arms": [
+        {
+          "id": "grpo-serial",
+          "algorithm": "grpo",
+          "learning_rate": 1e-05,
+          "tool_parallelism": 1
+        },
+        {
+          "id": "grpo-parallel4",
+          "algorithm": "grpo",
+          "learning_rate": 1e-05,
+          "tool_parallelism": 4
+        },
+        {
+          "id": "reinforce-parallel4",
+          "algorithm": "reinforce",
+          "baseline": "prior-mean-v1",
+          "learning_rate": 1e-05,
+          "tool_parallelism": 4
+        }
+      ],
+      "requires": "frozen-speed complete and valid grades"
+    },
+    {
+      "id": "stability-ablation",
+      "training": true,
+      "requires": "implemented and verified loss/termination flags plus matched-rl control",
+      "arms": [
+        "control",
+        "overlong-mask",
+        "invalid-format-zero",
+        "inverse-tool-width",
+        "combined"
+      ],
+      "deferred": [
+        "extreme-sequence-ratio-mask",
+        "sequence-importance-sampling-loss"
+      ]
+    },
+    {
+      "id": "replication",
+      "seeds": [
+        43,
+        44
+      ],
+      "arms": "incumbent and at most one challenger, fresh matched starts"
+    },
+    {
+      "id": "confirmation",
+      "tasks": 85,
+      "when": "once after freeze; never feed results back into candidate selection"
+    }
+  ],
+  "checkpoints": {
+    "routine_ttl_seconds": 172800,
+    "best_retention_seconds": 1209600,
+    "save": "initial, every acknowledged update, skipped-batch boundaries, every evaluation decision",
+    "resume": "same configuration, weights, optimizer, RNG, task cursor, running baseline and controller state",
+    "fork": "changed scientific configuration uses new run ID and fresh optimizer",
+    "remote_resume_implemented": false
+  },
+  "promotion": {
+    "min_resolved_selection_fraction": 0.95,
+    "primary": "final-scheduled strict demonstrated quality",
+    "quality_tie_margin": 0.03125,
+    "tie_breaker": "lower p50 and p95 end-to-end latency, then lower reserved cost",
+    "require": "quality delta >= 0 and paired 95% interval lower bound >= -0.03125; exploratory until replicated",
+    "unresolved": "retain unknowns and report missing-grade bounds; never silently set to incorrect"
+  },
+  "budget": {
+    "paid_jobs_launched": true,
+    "new_cap_usd": 1000,
+    "launch_gate": "reconcile existing authoritative ledgers; fresh full conservative estimate must fit remaining authorized project cap"
+  },
+  "controller": {
+    "implemented": true,
+    "candidate_limit": 5,
+    "training_jobs_at_once": 1,
+    "states": [
+      "planned",
+      "reserved",
+      "submitted",
+      "running",
+      "checkpointed",
+      "evaluated",
+      "kept",
+      "rejected",
+      "blocked"
+    ],
+    "persist": [
+      "source_hash",
+      "config_hash",
+      "data_hash",
+      "run_id",
+      "submission_receipt",
+      "last_checkpoint",
+      "attempted_batches",
+      "optimizer_updates",
+      "ledger_reservation",
+      "evaluation_ids",
+      "decision"
+    ],
+    "restart": "reconcile receipt and remote process first; never duplicate submit or replay ambiguous optimizer calls"
+  },
+  "active_campaign": "rl-stability-v1",
+  "active_protocol": "LAUNCH.md",
+  "submission": {
+    "bundle_id": "90a7caece6fb5dddae7d0020dac75d18d05632817f819e7d0fe7259675bd772e",
+    "controller": "qa-exp-sct4v3hg7no53lt5aaqnvr25ddifmmubp6az47ip44szm5n5o4xa",
+    "isolated": true,
+    "sandbox_id": "sb-A93ekERvbmrRW2kztaq4dp",
+    "status": "submitted",
+    "volume": "qa-state-sct4v3hg7no53lt5aaqnvr25ddifmmubp6az47ip44szm5n5o4xa"
+  },
+  "monitor": "monitor-parallel-rl-autoresearch",
+  "final_results": "RESULTS.md",
+  "final_reserved_usd": 47.32301276157127,
+  "monitor_status": "PAUSED"
+}
