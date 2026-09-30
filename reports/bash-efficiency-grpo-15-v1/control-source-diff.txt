@@ -1,0 +1,104 @@
+--- control/training_pipeline/efficiency_reward.py
++++ efficiency/training_pipeline/efficiency_reward.py
+@@ -6,6 +6,19 @@
+ import math
+ 
+ VERSIONS = ('tier-quality-v1', 'tier-efficiency-v1')
++
++
++def token_penalty(correctness, output_tokens, output_budget):
++    """Retain 90–100% of factual correctness; never reward incorrect brevity."""
++    if correctness is None:
++        return None
++    if (type(correctness) not in (int, float) or not math.isfinite(correctness)
++            or not 0 <= correctness <= 1):
++        raise ValueError('Invalid correctness')
++    if any(type(v) not in (int, float) or not math.isfinite(v) or v < 0
++           for v in (output_tokens, output_budget)) or output_budget <= 0:
++        raise ValueError('Missing or invalid trusted token counts')
++    return correctness * (1 - .1 * min(output_tokens / output_budget, 1.))
+ 
+ 
+ def feedback(result, metrics, budget, version, citation_errors=()):
+--- control/training_pipeline/config.py
++++ efficiency/training_pipeline/config.py
+@@ -40,7 +40,12 @@
+         from .shaped_reward import VERSION as reward_version
+         from .efficiency_reward import VERSIONS as tier_versions
+         from .reward_alignment import VERSION as aligned_version
+-        exact(c['training_reward'], ['version'])
++        exact(c['training_reward'], ['version'], ['efficiency_penalty'])
++        if 'efficiency_penalty' in c['training_reward']:
++            if (c['training_reward']['efficiency_penalty'] != 'output-token-fraction-v1'
++                    or c['training_reward']['version'] != 'positive-coverage-v4'
++                    or c['environment'].get('scoring_policy') != 'correctness-only-v1'):
++                raise ConfigurationError('Token penalty requires correctness-only positive coverage')
+         if c['training_reward']['version'] not in (reward_version, aligned_version, *tier_versions) or c['environment'].get('grading_version') not in ('all-claims-v6', 'all-claims-v7'):
+             raise ConfigurationError('Shaped reward requires a versioned reliable grader')
+         if c['training_reward']['version'] == aligned_version and c['environment'].get('grading_version') != 'all-claims-v7':
+--- control/training_pipeline/efficiency_metrics.py
++++ efficiency/training_pipeline/efficiency_metrics.py
+@@ -18,7 +18,9 @@
+             valid = [v for v in values if v is not None]
+             result['mean_' + name + '_score'] = sum(valid)/len(valid) if valid else None
+             result[name + '_measurement_coverage'] = len(valid)/n
+-        result['mean_full_correctness_rate'] = sum(t.verification.reward == 1 for t in correctness_rows)/n
++        full_correct = sum(t.verification.status == 'resolved' and
++                           t.verification.diagnostics.get('correctness_score') == 1 for t in correctness_rows)
++        result['mean_full_correctness_rate'] = full_correct/n
+     for key in ('input_tokens', 'output_tokens', 'tool_calls', 'tool_seconds', 'latency_seconds'):
+         values = [t.usage.get(key) for t in trajectories]
+         valid = [v for v in values if type(v) in (int, float) and math.isfinite(v) and v >= 0]
+@@ -26,6 +28,8 @@
+         # Missing instrumentation must never look like free computation.
+         result['mean_' + key] = sum(valid)/n if len(valid) == n else None
+         result[key + '_per_accepted_answer'] = sum(valid)/len(accepted) if len(valid) == n and accepted else None
++        if correctness_rows:
++            result[key + '_per_fully_correct_answer'] = sum(valid)/full_correct if len(valid) == n and full_correct else None
+     keys = ('input_tokens', 'output_tokens', 'tool_seconds')
+     if all(result['mean_' + k] is not None for k in keys):
+         result['mean_compute_units'] = (result['mean_input_tokens']
+@@ -37,4 +41,8 @@
+         if feedback and feedback.get('eligible') and feedback.get('tier') == 'accepted':
+             bonuses.append(feedback['reward'] - .9)
+     result['mean_accepted_efficiency_bonus'] = sum(bonuses)/len(bonuses) if bonuses else None
++    penalties = [t.verification.diagnostics['training_feedback']['efficiency_penalty']
++                 for t in trajectories if t.verification
++                 and (t.verification.diagnostics.get('training_feedback') or {}).get('efficiency_penalty') is not None]
++    result['mean_efficiency_penalty'] = sum(penalties)/len(penalties) if penalties else None
+     return result
+--- control/training_pipeline/storage.py
++++ efficiency/training_pipeline/storage.py
+@@ -122,7 +122,7 @@
+                     prefix = 'evaluation' if event == 'evaluation' else 'training'
+                     row.update({prefix+'/'+k: v for k, v in fields.items()
+                         if k.startswith(('mean_', 'accepted_', 'compute_units_'))
+-                        or k.endswith(('_per_accepted_answer', '_measurement_coverage'))})
++                        or k.endswith(('_per_accepted_answer', '_per_fully_correct_answer', '_measurement_coverage'))})
+                 if event == 'evaluation':
+                     row.update({'evaluation/'+k: fields[k] for k in
+                                 ('demonstrated_quality', 'scoring_coverage', 'mean_reward', 'completion_rate', 'wall_seconds') if k in fields})
+--- control/training_pipeline/collection.py
++++ efficiency/training_pipeline/collection.py
+@@ -522,11 +522,20 @@
+         training_feedback = result.get('training_feedback')
+         shaped = bool(self.factory.config.get('training_reward')) and self.row['split'] == 'train'
+         reward = training_feedback['reward'] if (shaped or pure_correctness) and training_feedback else result['score']
++        correctness_reward = reward
++        if shaped and self.factory.config['training_reward'].get('efficiency_penalty'):
++            from .efficiency_reward import token_penalty
++            reward = token_penalty(correctness_reward, self.recorder.record.get('output_tokens'),
++                                   self.factory.config['limits']['max_output_tokens'])
++            training_feedback = {**(training_feedback or {}), 'reward':reward,
++                'correctness_reward':correctness_reward,
++                'efficiency_penalty':None if reward is None else correctness_reward - reward,
++                'efficiency_version':'output-token-fraction-v1'}
+         return VerificationResult(result['status'],reward,self.factory.reward_version,[result['reason'], *reasons],
+             {'citation_validation_errors':reasons, 'calibrated':False,'strict_score':result['score'],
+              'training_reward':training_feedback['reward'] if training_feedback else None,
+              'training_feedback':training_feedback, 'reward_applied':'correctness' if pure_correctness else ('training' if shaped else 'strict'),
+-             **({'correctness_score':reward,'correctness_status':result['status'],**citation_diagnostics(submission,result.get('semantic'),reasons)} if pure_correctness else {}),
++             **({'correctness_score':correctness_reward,'correctness_status':result['status'],**citation_diagnostics(submission,result.get('semantic'),reasons)} if pure_correctness else {}),
+              'training_coverage':result.get('coverage_assessment'), 'strict_status':result.get('strict_status',result['status']),
+              'judge_policy':'base:'+self.factory.judge_model,
+              'evaluation_label':('experimental_full_claim_audit' if result.get('semantic') else 'experimental_claim_coverage'),'claims':result['claims'],
