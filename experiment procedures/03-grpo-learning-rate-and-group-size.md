@@ -1,5 +1,11 @@
 # 03 — GRPO learning rate, then group size
 
+## Current runnable scope
+
+Current-v8 has a fixed 2×2 rate/group-size comparison: 5e-6/1e-5 × four/eight attempts, two/one tasks per batch, 16 attempted batches, and the same maximum 393,216 rollout-output tokens per arm. No winning-rate placeholder remains. Use selection to compare fixed arms; do not claim the 1e-5 default is an established winner. Independent arms can overlap, subject to shared provider capacity.
+
+See the [current suite](../configs/experiments/current-v8/README.md) for authoritative settings. The design below includes historical larger-scope extensions; it does not override current configs.
+
 **Question:** Which small GRPO setting improves quality per sampled token and per dollar?
 
 **Hypothesis:** Learning-rate choice and within-question sampling diversity affect useful updates; eight attempts may reduce zero-variance groups but also reduce question diversity at a fixed episode batch size.
@@ -41,8 +47,8 @@ Apply the [shared measurement, checkpoint, and budget contract](README.md). Keep
 
 Promotion requires at least **95% scoring coverage** (31/32 selection tasks and 81/85 confirmation tasks). Repeat training finalists with seeds 42, 43, and 44; select their checkpoints before inspecting confirmation results. Frozen-policy-only comparisons use the repeated-inference protocol stated above instead of claiming training-seed replication.
 
-For any training arm, commit resumable state and sampler weights after every acknowledged GRPO update; evaluate every five successful updates and at the final committed checkpoint. Skips do not count as updates. Retain routine checkpoints for 48 hours and archive every new selection-best model durably, with checksums and verified sampling/optimizer restoration, before changing the best pointer. For frozen-weight studies, retain the source checkpoint plus the complete harness variant bundle instead of inventing an optimizer checkpoint.
+For any training arm, commit resumable state and sampler weights after every acknowledged GRPO update; use the frozen arm’s evaluation cadence (every six successful updates and final evaluation for current GRPO). Skips do not count as updates. Retain routine checkpoints for 48 hours and retain selection-best remote state for 14 days and preserve sampler archives/checksums; indefinite durable optimizer restoration is not established. For frozen-weight studies, retain the source checkpoint plus the complete harness variant bundle instead of inventing an optimizer checkpoint.
 
-Exclude unresolved groups; allow only one whole-group infrastructure retry before quarantine. Equal-reward groups contribute zero, and all-zero batches skip optimization. Stop on ambiguous optimizer outcomes and restore the last committed boundary without blindly retrying. Stop at the separately authorized total budget; the earlier $5 smoke ceiling does not authorize this experiment. Count unsuccessful attempts, graders, evaluation, storage, and retries in cost.
+Exclude unresolved groups; use zero whole-group retries in the current v7 campaign; quarantine unresolved groups. Equal-reward groups contribute zero, and all-zero batches skip optimization. Stop on ambiguous optimizer outcomes and restore the last committed boundary without blindly retrying. Stop at the separately authorized total budget; the earlier $5 smoke ceiling does not authorize this experiment. Count unsuccessful attempts, graders, evaluation, storage, and retries in cost.
 
 Persist a frozen experiment specification, resolved configurations, dataset/cohort hashes, model and grader identities, source revisions, all raw trajectories and grades, local events, cost ledger, per-task evaluation tables, checkpoint/archive manifests, and a decision report. W&B is optional. Mark unsupported capabilities as prerequisites; use only the [documented CLI](README.md#budget-stopping-and-commands), never invented flags. Report implementation readiness, live execution, and quality evidence separately.

@@ -1,0 +1,11 @@
+# Experiment 3: learning rate and group size
+
+Status: completed in an isolated parallel controller. See [final results](/Users/ndatar/.codex/worktrees/parallel-experiment-campaigns/action-interview/reports/parallel-experiment-campaigns/RESULTS.md). Best observed setting: LR5e-6/group4, provisional only; the other group4 arm suffered104 infrastructure failures and all final scoring coverage was below95%.
+
+Four fresh-base GRPO arms: LR 5e-6/1e-5 crossed with group size 4/8. Same seed42, v6 dataset, v7 grader, rank8, tools and episode limits as initial grpo-long-v6. Each arm has 16 attempted batches, 8 trajectories/batch, 128 total attempts. Group4 sees32 questions; group8 sees16, following the same shuffled prefix. This tests allocation of a fixed rollout budget, not group size at fixed question exposure.
+
+Run all four sequentially in the frozen bundle, avoiding aggregate provider concurrency differences. Maximum controller time4hours; own $320 ledger per arm, total cap$1280. Historical measured runs suggest roughly $260–$280 for four arms, but actual consumption can differ. Existing expanded-study allocations are unchanged. Prices checked against official Tinker models.json and Modal pricing on2026-09-29; rates unchanged.
+
+Primary outcome: final scheduled checkpoint demonstrated strict quality on the same32 selection tasks. Report initial quality and paired changes, scoring coverage, completions, acknowledged updates, contributing trajectories, zero-variance groups, actual tokens and ledger reservations. Compare rates within each group size and groups within each rate; report interactions. Use paired task bootstrap intervals and missing-grade sensitivity. Require >=95% scoring coverage for an unqualified result. Unknown grades are not known wrong answers. A single-seed32-task screen can yield only a provisional choice; report no clear winner when uncertainty is large. On quality ties prefer lower cost, then group4. Confirmation cohort remains untouched.
+
+Execution used the isolated worktree bundle7d68ebb0a2929ab92569b87676298f16c20da27f486bdeb70ebae895b9b66fa7. All four arms finished; do not resubmit the prepared original bundle. Download and final reports reside in the parallel-experiment-campaigns worktree.
