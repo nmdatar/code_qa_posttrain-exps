@@ -1,5 +1,11 @@
 # 06 — Frozen-policy tools, retrieval, and history
 
+## Current runnable scope
+
+Current-v8 provides runnable frozen-base, twice-repeated control/symbols, lexical/hybrid-subword, and hybrid-subword/history comparisons, plus finalist-only confirmation configs. The actual collection adapter now exposes Python AST definition/reference-occurrence tools, 512-token bounded source retrieval, and an evidence ledger with episode-scoped archived-observation readback. The first hybrid variant uses explicitly frozen char-trigram-hash-256-v1 embeddings; pretrained neural embeddings remain a distinct follow-up rather than being claimed implemented. Sources/index parameters are manifest-bound and exclude private grading data. Python execution remains disabled for the source-reading pool.
+
+See the [current suite](../configs/experiments/current-v8/README.md) for authoritative settings. The design below includes historical larger-scope extensions; it does not override current configs.
+
 **Question:** Which harness changes improve Qwen3.5-4B quality or cost before paying for retraining?
 
 **Hypothesis:** Better evidence access or representation can outperform additional training, but extra tools and compression may also increase errors, latency, or citation loss.
@@ -37,8 +43,8 @@ Apply the [shared measurement, checkpoint, and budget contract](README.md). Keep
 
 Promotion requires at least **95% scoring coverage** (31/32 selection tasks and 81/85 confirmation tasks). Repeat training finalists with seeds 42, 43, and 44; select their checkpoints before inspecting confirmation results. Frozen-policy-only comparisons use the repeated-inference protocol stated above instead of claiming training-seed replication.
 
-For any training arm, commit resumable state and sampler weights after every acknowledged GRPO update; evaluate every five successful updates and at the final committed checkpoint. Skips do not count as updates. Retain routine checkpoints for 48 hours and archive every new selection-best model durably, with checksums and verified sampling/optimizer restoration, before changing the best pointer. For frozen-weight studies, retain the source checkpoint plus the complete harness variant bundle instead of inventing an optimizer checkpoint.
+For any training arm, commit resumable state and sampler weights after every acknowledged GRPO update; use the frozen arm’s evaluation cadence (every six successful updates and final evaluation for current GRPO). Skips do not count as updates. Retain routine checkpoints for 48 hours and retain selection-best remote state for 14 days and preserve sampler archives/checksums; indefinite durable optimizer restoration is not established. For frozen-weight studies, retain the source checkpoint plus the complete harness variant bundle instead of inventing an optimizer checkpoint.
 
-Exclude unresolved groups; allow only one whole-group infrastructure retry before quarantine. Equal-reward groups contribute zero, and all-zero batches skip optimization. Stop on ambiguous optimizer outcomes and restore the last committed boundary without blindly retrying. Stop at the separately authorized total budget; the earlier $5 smoke ceiling does not authorize this experiment. Count unsuccessful attempts, graders, evaluation, storage, and retries in cost.
+Exclude unresolved groups; use zero whole-group retries in the current v7 campaign; quarantine unresolved groups. Equal-reward groups contribute zero, and all-zero batches skip optimization. Stop on ambiguous optimizer outcomes and restore the last committed boundary without blindly retrying. Stop at the separately authorized total budget; the earlier $5 smoke ceiling does not authorize this experiment. Count unsuccessful attempts, graders, evaluation, storage, and retries in cost.
 
 Persist a frozen experiment specification, resolved configurations, dataset/cohort hashes, model and grader identities, source revisions, all raw trajectories and grades, local events, cost ledger, per-task evaluation tables, checkpoint/archive manifests, and a decision report. W&B is optional. Mark unsupported capabilities as prerequisites; use only the [documented CLI](README.md#budget-stopping-and-commands), never invented flags. Report implementation readiness, live execution, and quality evidence separately.
