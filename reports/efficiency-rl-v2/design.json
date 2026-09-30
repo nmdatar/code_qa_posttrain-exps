@@ -1,0 +1,51 @@
+{
+  "arms": [
+    "tier-quality-v1",
+    "tier-efficiency-v1"
+  ],
+  "caveats": [
+    "Runtime affected by service load; token counts are primary efficiency measurement.",
+    "Changing seed does not guarantee more signal.",
+    "Only selection cohort; no confirmation tuning.",
+    "Same-family uncalibrated judge; no success claim from sparse or incomplete grading."
+  ],
+  "frozen_source_parent": "0512c3ed7b01669509461a169a0ec4b5ab3d784c2d3d9bab67e1b42e08df1b1a",
+  "goal": "Numeric held-out efficiency changes over optimizer iterations, with quality reported alongside.",
+  "initialization": "fresh base Qwen3.5-4B, rank8, seed43; independent repeat of seed42, not a resume",
+  "metrics": [
+    "mean output tokens per assigned eval task",
+    "mean input tokens",
+    "mean model+action seconds (excludes grading and provisioning)",
+    "mean end-to-end seconds (includes grading and provisioning)",
+    "acceptance count",
+    "scoring coverage",
+    "completion rate"
+  ],
+  "new_accounting_cap_usd": 1310,
+  "report": "Numeric JSON/CSV/table and live W&B eval curves, as subsequently requested. Compare tokens/runtime and acceptance over optimizer updates.",
+  "schedule": {
+    "always_evaluate_final": true,
+    "eval_every_updates": 4,
+    "eval_questions": 32,
+    "max_attempted_batches": 32,
+    "max_optimizer_updates": 16
+  },
+  "source_changes": [
+    "aggregate-only W&B logging",
+    "mean generation+action seconds telemetry"
+  ],
+  "additional_treatment": {
+    "requested_by_user": "Increase efficiency reward coefficient from .10 to .20",
+    "reward": "accepted: 0.9 + 0.20 * clip(1 - compute/task_budget, 0, 1); failed/partial/unresolved unchanged",
+    "reward_max": 1.1,
+    "interpretation": "Doubled bonus coefficient, not 20 percent of a normalized reward. Raw mean rewards cannot be compared across treatments. Group standardization may cancel changes for some reward patterns.",
+    "initialization": "Same fresh base and seed43 as other v2 arms",
+    "bundle_id": "4d06b6556d7e55c03261b81590097d4921c3de821503fff23a95f5121e035fdb",
+    "additional_accounting_cap_usd": 660,
+    "validation": "Known accepted reward .97 becomes 1.04 at efficiency .7; failed/partial/unresolved and citation failure unchanged; max1.1 finite; config and 3 aggregate reporting tests passed.",
+    "status_at_submission": "Existing efficiency .10 had 2 updates; added treatment initializes independently.",
+    "status": "cancelled at user request; Modal exit137 verified",
+    "include_in_comparison": false
+  },
+  "combined_accounting_cap_usd": 1970
+}
