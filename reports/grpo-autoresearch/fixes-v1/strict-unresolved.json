@@ -1,0 +1,60 @@
+[
+  {
+    "task_id": "import-43544c025fdaa9cc2029afcd",
+    "control": "complete",
+    "reason": "Semantic assessment requires adjudication",
+    "disagreements": [
+      "Required claim c1 cannot be verified because the supplied source snippet (e7) ends at line 1039 and does not include the __exit__ method implementation."
+    ],
+    "required_claims": [
+      {
+        "coverage": "absent",
+        "evidence_keys": [],
+        "id": "c1",
+        "material_error": false,
+        "reason": "The supplied source snippet (e7) does not contain the __exit__ method implementation to verify that context exit calls close.",
+        "verdict": "insufficient"
+      },
+      {
+        "coverage": "complete",
+        "evidence_keys": [
+          "source_36ce515a708aa344778d558e"
+        ],
+        "id": "c2",
+        "material_error": false,
+        "reason": "Source e7 lines 1034-1035 explicitly show raw.close() being called when _content_consumed is false.",
+        "verdict": "supported"
+      },
+      {
+        "coverage": "complete",
+        "evidence_keys": [
+          "source_36ce515a708aa344778d558e"
+        ],
+        "id": "c3",
+        "material_error": false,
+        "reason": "Source e7 lines 1037-1039 explicitly show release_conn being invoked if available via getattr.",
+        "verdict": "supported"
+      },
+      {
+        "coverage": "complete",
+        "evidence_keys": [
+          "source_36ce515a708aa344778d558e"
+        ],
+        "id": "c4",
+        "material_error": false,
+        "reason": "Source e7 shows the conditional skip of raw.close and contains no code in close() that modifies _content_consumed or sets a closed flag.",
+        "verdict": "supported"
+      },
+      {
+        "coverage": "complete",
+        "evidence_keys": [
+          "source_36ce515a708aa344778d558e"
+        ],
+        "id": "c5",
+        "material_error": false,
+        "reason": "Source e7 shows no guard against repeated calls to raw.close within the close() method, implying reliance on the underlying object.",
+        "verdict": "supported"
+      }
+    ]
+  }
+]

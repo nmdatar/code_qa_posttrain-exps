@@ -1,0 +1,1144 @@
+[
+  {
+    "task_id": "import-1286486da6b74ddb5248c1bc",
+    "base_reward": "0.5",
+    "final_reward": "1.0",
+    "delta": "0.5",
+    "base_status": "resolved",
+    "final_status": "resolved",
+    "base_strict": "1.0",
+    "final_strict": "0.0",
+    "base_episode": "ep-988f2fb41935401ab5d97b5060e987b9",
+    "final_episode": "ep-a87840a6572749f39a1adc342c48f186",
+    "reasons": [
+      "Citation does not entail its associated claim"
+    ],
+    "semantic": {
+      "additional_claims": [
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "ef5fcb5c6639d3aef78c51f6755498f59cfad890c92d6caabb73e1c3fb76bd10",
+            "97c4ed03e91951375e1611d1491d00517d54c278c6539d724ca8cc71e3de72fa"
+          ],
+          "id": "claim_1",
+          "material_error": false,
+          "reason": "The implementation of skipna handling for first()/last() resides in xarray/core/duck_array_ops.py, as shown by the function definitions at lines 812-823 and 826-837.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "ef5fcb5c6639d3aef78c51f6755498f59cfad890c92d6caabb73e1c3fb76bd10",
+            "97c4ed03e91951375e1611d1491d00517d54c278c6539d724ca8cc71e3de72fa"
+          ],
+          "id": "claim_2",
+          "material_error": false,
+          "reason": "For chunked arrays with skipna True/None and NaN-capable dtype, first()/last() call chunked_nanfirst/chunked_nanlast (lines 818-819, 832-833).",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "ef5fcb5c6639d3aef78c51f6755498f59cfad890c92d6caabb73e1c3fb76bd10",
+            "97c4ed03e91951375e1611d1491d00517d54c278c6539d724ca8cc71e3de72fa"
+          ],
+          "id": "claim_3",
+          "material_error": false,
+          "reason": "For non-chunked arrays with skipna True/None and NaN-capable dtype, first()/last() call nputils.nanfirst/nanlast (lines 820-821, 834-835).",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "ef5fcb5c6639d3aef78c51f6755498f59cfad890c92d6caabb73e1c3fb76bd10",
+            "97c4ed03e91951375e1611d1491d00517d54c278c6539d724ca8cc71e3de72fa"
+          ],
+          "id": "claim_4",
+          "material_error": false,
+          "reason": "When skipna is False or dtype cannot hold NaN (signed integer or string), first()/last() return the first/last element via take(..., 0/-1) regardless of NaNs (lines 823, 837).",
+          "verdict": "supported"
+        }
+      ],
+      "answer_mode": "answer",
+      "answerability_satisfied": true,
+      "assessment_complete": true,
+      "citation_links": [
+        {
+          "citation_id": "c1",
+          "claim_id": "c1",
+          "reason": "Citation c1 (duck_array_ops.py:812-823) covers the first() function's skipna/dtype branching and delegation to nanfirst variants, supporting c1.",
+          "supported": true
+        },
+        {
+          "citation_id": "c2",
+          "claim_id": "c2",
+          "reason": "Citation c2 (duck_array_ops.py:826-837) covers last() and, together with nputils.py evidence, supports that nanlast locates valid positions along the axis; however, the mechanistic detail is in nputils.py, which is not directly cited but is reachable via the answer's reference to nputils.nanfirst/nanlast.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_1",
+          "reason": "Lines 812-823 show first() defined in duck_array_ops.py, supporting claim_1.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_2",
+          "reason": "Lines 818-819 within c1's range show the chunked branch calling chunked_nanfirst/chunked_nanlast.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_3",
+          "reason": "claim_3 concerns non-chunked calls to nputils.nanfirst/nanlast, which occur at lines 820-821 (within c1) and 834-835 (outside c1). Since c1 only covers 812-823, it partially supports claim_3 but does not cover last()'s non-chunked branch; thus not fully supported by c1 alone.",
+          "supported": false
+        },
+        {
+          "citation_id": "c2",
+          "claim_id": "claim_3",
+          "reason": "Lines 834-835 within c2's range show last() calling nputils.nanlast for non-chunked arrays, supporting claim_3 for last(); combined with c1 for first(), the claim is supported across both citations.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_4",
+          "reason": "Line 823 within c1 shows the fallback take(..., 0) when skipna is False or dtype is integer/string.",
+          "supported": true
+        },
+        {
+          "citation_id": "c2",
+          "claim_id": "claim_4",
+          "reason": "Line 837 within c2 shows the fallback take(..., -1) for last() under the same conditions.",
+          "supported": true
+        }
+      ],
+      "critical_error": false,
+      "diagram": {
+        "assessed": false,
+        "complete": false,
+        "consistent": false,
+        "findings": [],
+        "material_error": false,
+        "readable": false,
+        "supported": false
+      },
+      "disagreements": [],
+      "evidence_keys": [
+        "0d2c5543e50d8d30a367c9e999893e29140d8b5f6920f61a11f9e3ffb8835583",
+        "656ea503231f44fb05c20e8f677faa1c5ff33e8349b7cb93d60c9755f092e4c1",
+        "97c4ed03e91951375e1611d1491d00517d54c278c6539d724ca8cc71e3de72fa",
+        "c7e163f975c2d8247bcb3905547104582f3ad48c72680aaf3141125061544217",
+        "caeb6c25b7e43f7a8145978b4f3a5df715876cb550e92a6bc3d06b0e48c784e8",
+        "cc8f1b7ec7701eaab367cda32b90dc40ceaad7f6cff33adcb084b17d69fd522e",
+        "df750ff1c8525f450de81509efb3e0bd022715859a8d957dc7ebec7375db6698",
+        "ef5fcb5c6639d3aef78c51f6755498f59cfad890c92d6caabb73e1c3fb76bd10",
+        "repository_snapshot",
+        "source_3b3d2fe77ef3b95484bc542c",
+        "source_ef1736992e44f5b7655396ad"
+      ],
+      "experiment_hash": "5f08460b430dcbf74db4966f22f2da7cae08b7ca8d4ecb05ee721101cd4c3413",
+      "extracted_claims": [
+        {
+          "id": "claim_1",
+          "source": "text",
+          "text": "The `skipna` parameter handling for `first()` and `last()` is implemented in `xarray/core/duck_array_ops.py`."
+        },
+        {
+          "id": "claim_2",
+          "source": "text",
+          "text": "For multi-dimensional arrays with NaN values, if `skipna` is True or None (and the dtype supports NaN), the functions call `chunked_nanfirst` or `chunked_nanlast` for chunked arrays."
+        },
+        {
+          "id": "claim_3",
+          "source": "text",
+          "text": "For multi-dimensional arrays with NaN values, if `skipna` is True or None (and the dtype supports NaN), the functions call `nputils.nanfirst` or `nputils.nanlast` for non-chunked arrays."
+        },
+        {
+          "id": "claim_4",
+          "source": "text",
+          "text": "If `skipna` is False or the dtype does not support NaN, the functions return the first/last element regardless of NaNs."
+        }
+      ],
+      "false_execution_claim": false,
+      "judge_family": "qwen",
+      "judge_version": "all-claims-v7",
+      "needs_review": false,
+      "prompt_version": "1.0",
+      "required_claims": [
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "ef5fcb5c6639d3aef78c51f6755498f59cfad890c92d6caabb73e1c3fb76bd10",
+            "97c4ed03e91951375e1611d1491d00517d54c278c6539d724ca8cc71e3de72fa"
+          ],
+          "id": "c1",
+          "material_error": false,
+          "reason": "The answer correctly identifies that skipna handling in first()/last() depends on dtype (checking for signed integer or string) and skipna value, delegating to nanfirst/nanlast for NaN-capable dtypes when skipna is True/None, per lines 814-821 and 828-835.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "df750ff1c8525f450de81509efb3e0bd022715859a8d957dc7ebec7375db6698"
+          ],
+          "id": "c2",
+          "material_error": false,
+          "reason": "The answer states that nanfirst/nanlast locate valid positions along the requested axis; this is confirmed by nputils.nanfirst/nanlast using argmax on ~isnull and selecting via _select_along_axis along the given axis (lines 48-70).",
+          "verdict": "supported"
+        }
+      ],
+      "schema_version": "1.0",
+      "snapshot_fingerprint": "8373c90881db3e140e79d00275a41431902b5ebe41bce3b6d6291278c0b6aa0d",
+      "submission_hash": "35ba98391aae07f9d4d64447133d5d6d532202b1245a3d6199c4052ad8763a71",
+      "task_hash": "79278df6f606607411076baca08a57e591b9703afd8fc717fd4de21fb816b04d",
+      "uncited_claim_ids": []
+    },
+    "material_error": false,
+    "claims": [
+      {
+        "coverage": "complete",
+        "evidence_keys": [
+          "ef5fcb5c6639d3aef78c51f6755498f59cfad890c92d6caabb73e1c3fb76bd10",
+          "97c4ed03e91951375e1611d1491d00517d54c278c6539d724ca8cc71e3de72fa"
+        ],
+        "id": "c1",
+        "material_error": false,
+        "reason": "The answer correctly identifies that skipna handling in first()/last() depends on dtype (checking for signed integer or string) and skipna value, delegating to nanfirst/nanlast for NaN-capable dtypes when skipna is True/None, per lines 814-821 and 828-835.",
+        "verdict": "supported"
+      },
+      {
+        "coverage": "complete",
+        "evidence_keys": [
+          "df750ff1c8525f450de81509efb3e0bd022715859a8d957dc7ebec7375db6698"
+        ],
+        "id": "c2",
+        "material_error": false,
+        "reason": "The answer states that nanfirst/nanlast locate valid positions along the requested axis; this is confirmed by nputils.nanfirst/nanlast using argmax on ~isnull and selecting via _select_along_axis along the given axis (lines 48-70).",
+        "verdict": "supported"
+      }
+    ]
+  },
+  {
+    "task_id": "import-17422b22d16d64b11ac50cbc",
+    "base_reward": "1.0",
+    "final_reward": "1.0",
+    "delta": "0.0",
+    "base_status": "resolved",
+    "final_status": "resolved",
+    "base_strict": "1.0",
+    "final_strict": "0.0",
+    "base_episode": "ep-9dc12a8845494da4bdf982926059df54",
+    "final_episode": "ep-50afeb7ac889416d9d918ea1b5e08f54",
+    "reasons": [
+      "Missing or unsupported required facts; Extracted assertions lack assessed citation support"
+    ],
+    "semantic": {
+      "additional_claims": [
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "source_a05c88455c0388955499aed9"
+          ],
+          "id": "claim_1",
+          "material_error": false,
+          "reason": "The answer states TestGetItem methods instantiate DataTree using from_dict at lines 283, 303, and 311. Evidence e12 confirms these lines contain calls to DataTree.from_dict within the TestGetItem class.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "source_02ac28ab060f33b79749d5bc"
+          ],
+          "id": "claim_2",
+          "material_error": false,
+          "reason": "The answer states from_dict is located at lines 1150-1250. Evidence e11 shows the method definition starting at line 1150 and ending around 1228 (within the claimed range).",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "source_02ac28ab060f33b79749d5bc"
+          ],
+          "id": "claim_3",
+          "material_error": false,
+          "reason": "The answer states the method first identifies the root node. Evidence e11 lines 1181-1190 show logic to find and pop root data ('', '.', '/', './') before creating the root node.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "source_02ac28ab060f33b79749d5bc"
+          ],
+          "id": "claim_4",
+          "material_error": false,
+          "reason": "The answer states the method sorts path keys by depth to ensure hierarchical nodes are created before children. Evidence e11 lines 1204-1211 explicitly define a depth function and sort items by it, with a comment confirming the purpose.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "source_02ac28ab060f33b79749d5bc",
+            "source_a05c88455c0388955499aed9"
+          ],
+          "id": "claim_5",
+          "material_error": false,
+          "reason": "The answer claims this order is critical for validating hierarchical access. The tests in e12 (e.g., line 289 accessing 'results' then 'results/highres') rely on the tree structure being valid, which the sorted insertion ensures. The logical connection is supported by the code structure and test usage.",
+          "verdict": "supported"
+        }
+      ],
+      "answer_mode": "answer",
+      "answerability_satisfied": true,
+      "assessment_complete": true,
+      "citation_links": [
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_1",
+          "reason": "Citation c1 (lines 283-287) covers the first instance mentioned in claim_1.",
+          "supported": true
+        },
+        {
+          "citation_id": "c2",
+          "claim_id": "claim_1",
+          "reason": "Citation c2 (lines 303-307) covers the second instance mentioned in claim_1.",
+          "supported": true
+        },
+        {
+          "citation_id": "c3",
+          "claim_id": "claim_1",
+          "reason": "Citation c3 (lines 311-314) covers the third instance mentioned in claim_1.",
+          "supported": true
+        },
+        {
+          "citation_id": "c4",
+          "claim_id": "claim_2",
+          "reason": "Citation c4 (lines 1181-1212) falls within the claimed range 1150-1250 and shows the method implementation.",
+          "supported": true
+        },
+        {
+          "citation_id": "c4",
+          "claim_id": "claim_3",
+          "reason": "Citation c4 includes lines 1181-1190 which handle root node identification.",
+          "supported": true
+        },
+        {
+          "citation_id": "c4",
+          "claim_id": "claim_4",
+          "reason": "Citation c4 includes lines 1204-1211 which implement the sorting by depth.",
+          "supported": true
+        }
+      ],
+      "critical_error": false,
+      "diagram": {
+        "assessed": false,
+        "complete": false,
+        "consistent": false,
+        "findings": [],
+        "material_error": false,
+        "readable": false,
+        "supported": false
+      },
+      "disagreements": [],
+      "evidence_keys": [
+        "075281a1358e9191544be29f44463425d4ba5b66ffe1c2f94d6fedaef7037080",
+        "67f19c1b1522680f3c9846e551757e639d7c78519bc0698ee361421941db8d23",
+        "8cd16602312c3b58ab5e527d426de92d99a980cfd48ab63877c52f2fb74038fd",
+        "90e60211e7cbbcfb8924c0ee9f082bc4b3691b7bad00b4a70877d94ee8bf0c61",
+        "94173d431f2f7f6352cf1ab7b139c9f2cc079b9eed6c6a8f20aeaf259c4332e5",
+        "dc145571819b5b20af11f88acf0232cb24383c7030dd8dfc1c9b456db578c600",
+        "e52f96441b0a80577dcff664a8ba74f287123711b8e3334cd9ab657136040f0f",
+        "f6130e1acc6e0e071cabb5b4a171780ada06e61cca6f51c91884371ec9f3ab18",
+        "fc6221a959b919480d2d243bd6523f96a2e764f0664741cbf3ea2cd10bf8c9c7",
+        "repository_snapshot",
+        "source_02ac28ab060f33b79749d5bc",
+        "source_a05c88455c0388955499aed9"
+      ],
+      "experiment_hash": "5f08460b430dcbf74db4966f22f2da7cae08b7ca8d4ecb05ee721101cd4c3413",
+      "extracted_claims": [
+        {
+          "id": "claim_1",
+          "source": "text",
+          "text": "TestGetItem methods instantiate DataTree using DataTree.from_dict at lines 283, 303, and 311 in test_datatree.py."
+        },
+        {
+          "id": "claim_2",
+          "source": "text",
+          "text": "The DataTree.from_dict method is located at lines 1150-1250 in datatree.py."
+        },
+        {
+          "id": "claim_3",
+          "source": "text",
+          "text": "The from_dict method constructs the tree by first identifying the root node."
+        },
+        {
+          "id": "claim_4",
+          "source": "text",
+          "text": "The from_dict method sorts remaining path keys by depth to ensure hierarchical nodes are created before their children."
+        },
+        {
+          "id": "claim_5",
+          "source": "text",
+          "text": "The depth-first construction order in from_dict is critical for validating that hierarchical node access patterns work correctly during the test suite."
+        }
+      ],
+      "false_execution_claim": false,
+      "judge_family": "qwen",
+      "judge_version": "all-claims-v7",
+      "needs_review": false,
+      "prompt_version": "1.0",
+      "required_claims": [
+        {
+          "coverage": "partial",
+          "evidence_keys": [
+            "source_02ac28ab060f33b79749d5bc",
+            "source_a05c88455c0388955499aed9"
+          ],
+          "id": "c1",
+          "material_error": false,
+          "reason": "The answer correctly identifies that tests use DataTree.from_dict and that the method sorts keys by depth to ensure hierarchical creation (supported by e11 lines 1204-1224). However, the claim requires coupling to 'intermediate node creation'. While the code shows 'new_nodes_along_path=True' (line 1223) which enables intermediate node creation, the answer's explanation focuses on the sorting order ensuring parents are created before children, but does not explicitly articulate the mechanism of 'intermediate node creation' via the 'new_nodes_along_path' flag or how the tests specifically rely on this for 'hierarchical lookup' beyond general tree construction. The support is present but the explicit link to 'intermediate node creation' as a distinct coupled mechanism in the explanation is slightly inferred rather than fully detailed.",
+          "verdict": "supported"
+        }
+      ],
+      "schema_version": "1.0",
+      "snapshot_fingerprint": "8373c90881db3e140e79d00275a41431902b5ebe41bce3b6d6291278c0b6aa0d",
+      "submission_hash": "c608f480ec74d0325e66bbf3521e31b4ff2be4fcf1a38db725517c6c4f202df8",
+      "task_hash": "936476cc08a91e4829719e47e0f856b21ba37527949fb76873fd8795e05cb8e8",
+      "uncited_claim_ids": []
+    },
+    "material_error": false,
+    "claims": [
+      {
+        "coverage": "partial",
+        "evidence_keys": [
+          "source_02ac28ab060f33b79749d5bc",
+          "source_a05c88455c0388955499aed9"
+        ],
+        "id": "c1",
+        "material_error": false,
+        "reason": "The answer correctly identifies that tests use DataTree.from_dict and that the method sorts keys by depth to ensure hierarchical creation (supported by e11 lines 1204-1224). However, the claim requires coupling to 'intermediate node creation'. While the code shows 'new_nodes_along_path=True' (line 1223) which enables intermediate node creation, the answer's explanation focuses on the sorting order ensuring parents are created before children, but does not explicitly articulate the mechanism of 'intermediate node creation' via the 'new_nodes_along_path' flag or how the tests specifically rely on this for 'hierarchical lookup' beyond general tree construction. The support is present but the explicit link to 'intermediate node creation' as a distinct coupled mechanism in the explanation is slightly inferred rather than fully detailed.",
+        "verdict": "supported"
+      }
+    ]
+  },
+  {
+    "task_id": "import-188040463405615ffa93ff21",
+    "base_reward": "1.0",
+    "final_reward": "1.0",
+    "delta": "0.0",
+    "base_status": "resolved",
+    "final_status": "resolved",
+    "base_strict": "1.0",
+    "final_strict": "0.0",
+    "base_episode": "ep-21ce57f892b24638834419cbe20986f6",
+    "final_episode": "ep-f72bc549794144468e369bb0f006a650",
+    "reasons": [
+      "Missing or unsupported required facts; Additional assertions are not fully supported; Extracted assertions lack assessed citation support; Citation does not entail its associated claim"
+    ],
+    "semantic": {
+      "additional_claims": [
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "source_0c84671bc85cdb46b2d976d1"
+          ],
+          "id": "claim_1",
+          "material_error": false,
+          "reason": "The answer states 'writing a Dataset with multiple DataArrays having different chunk sizes', which matches the code in e5 (lines 2329-2338) where `x` has chunks (50, 100) and `y` has (100, 50).",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "source_0c84671bc85cdb46b2d976d1"
+          ],
+          "id": "claim_2",
+          "material_error": false,
+          "reason": "The answer states xarray must preserve `chunksizes` encoding individually. Evidence e5 (lines 2331, 2335, 2340-2341) shows explicit setting of `chunksizes` for x and y, and assertions verifying they are preserved individually after the roundtrip.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "source_0c84671bc85cdb46b2d976d1"
+          ],
+          "id": "claim_3",
+          "material_error": false,
+          "reason": "The answer describes the risk of misalignment between file-level specification and dask representation without explicit management. The test structure in e5 implies this necessity by explicitly setting the encoding before writing; without this, the default behavior might not respect the desired inconsistent chunking across variables in the HDF5 file format.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "partial",
+          "evidence_keys": [],
+          "id": "claim_4",
+          "material_error": false,
+          "reason": "The answer claims misalignment could cause 'data access issues or incorrect chunking'. While plausible, the provided evidence (e5) only verifies the preservation of the `chunksizes` metadata tuple. It does not contain code or comments demonstrating actual data access failures or incorrect chunking resulting from the absence of this metadata. This part of the claim relies on external knowledge not present in the snippet.",
+          "verdict": "insufficient"
+        }
+      ],
+      "answer_mode": "answer",
+      "answerability_satisfied": true,
+      "assessment_complete": true,
+      "citation_links": [
+        {
+          "citation_id": "c1",
+          "claim_id": "c1",
+          "reason": "Citation c1 points to lines 2326-2342 in test_backends.py, which corresponds exactly to evidence e2 and the relevant portion of e5 containing the test logic for `test_write_inconsistent_chunks`.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_1",
+          "reason": "The cited lines define the test setup with inconsistent chunks.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_2",
+          "reason": "The cited lines contain the assertions verifying individual `chunksizes` preservation.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_3",
+          "reason": "The cited lines show the explicit management required, implying the risk if omitted.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_4",
+          "reason": "The cited lines do not demonstrate the negative consequences (data access issues) claimed; they only assert the positive case of correct metadata preservation.",
+          "supported": false
+        }
+      ],
+      "critical_error": false,
+      "diagram": {
+        "assessed": false,
+        "complete": false,
+        "consistent": false,
+        "findings": [],
+        "material_error": false,
+        "readable": false,
+        "supported": false
+      },
+      "disagreements": [],
+      "evidence_keys": [
+        "129403a91627eb5348cd39a6112219011d63dbc2929b7ec0c83098bb4f3c57d0",
+        "15a6f4278e241f206749dede5499b91bf532b3f49375496b2183d62570794fbb",
+        "8196512bcc7f44d11cb75ec022ff881877137f5825c6461270274bfb7b9fde67",
+        "repository_snapshot",
+        "source_0c84671bc85cdb46b2d976d1"
+      ],
+      "experiment_hash": "5f08460b430dcbf74db4966f22f2da7cae08b7ca8d4ecb05ee721101cd4c3413",
+      "extracted_claims": [
+        {
+          "id": "claim_1",
+          "source": "text",
+          "text": "The test_write_inconsistent_chunks method demonstrates writing a Dataset with multiple DataArrays having different chunk sizes to a file."
+        },
+        {
+          "id": "claim_2",
+          "source": "text",
+          "text": "xarray must preserve the specific `chunksizes` encoding metadata for each variable individually when writing such a Dataset."
+        },
+        {
+          "id": "claim_3",
+          "source": "text",
+          "text": "Without explicit management of `chunksizes` metadata, the file-level chunk specification (h5netcdf) might not align with the distributed dask chunk representation."
+        },
+        {
+          "id": "claim_4",
+          "source": "text",
+          "text": "Misalignment between file-level chunk specification and dask chunk representation could cause data access issues or incorrect chunking upon reading."
+        }
+      ],
+      "false_execution_claim": false,
+      "judge_family": "qwen",
+      "judge_version": "all-claims-v7",
+      "needs_review": false,
+      "prompt_version": "1.0",
+      "required_claims": [
+        {
+          "coverage": "partial",
+          "evidence_keys": [
+            "15a6f4278e241f206749dede5499b91bf532b3f49375496b2183d62570794fbb",
+            "source_0c84671bc85cdb46b2d976d1"
+          ],
+          "id": "c1",
+          "material_error": false,
+          "reason": "The answer correctly identifies the mechanism (preserving explicit `chunksizes` encoding per variable) and the context (inconsistent chunks). However, it omits the specific verification method mentioned in the claim text: the 'roundtrip' operation. The evidence (e2, e5) explicitly shows `self.roundtrip(ds)` being used to verify that the metadata survives the write/read cycle. The answer mentions 'upon reading' but does not explicitly link this to the roundtrip test pattern which is central to the claim's phrasing.",
+          "verdict": "supported"
+        }
+      ],
+      "schema_version": "1.0",
+      "snapshot_fingerprint": "8373c90881db3e140e79d00275a41431902b5ebe41bce3b6d6291278c0b6aa0d",
+      "submission_hash": "993a88249303eb6b9d312463ff6aaab730f16ef1d1ff56df3458f91ff4584e38",
+      "task_hash": "f764344fe6e99dff19212190ae96dd096a5503ecda1bbdc397a8103eb4121551",
+      "uncited_claim_ids": []
+    },
+    "material_error": false,
+    "claims": [
+      {
+        "coverage": "partial",
+        "evidence_keys": [
+          "15a6f4278e241f206749dede5499b91bf532b3f49375496b2183d62570794fbb",
+          "source_0c84671bc85cdb46b2d976d1"
+        ],
+        "id": "c1",
+        "material_error": false,
+        "reason": "The answer correctly identifies the mechanism (preserving explicit `chunksizes` encoding per variable) and the context (inconsistent chunks). However, it omits the specific verification method mentioned in the claim text: the 'roundtrip' operation. The evidence (e2, e5) explicitly shows `self.roundtrip(ds)` being used to verify that the metadata survives the write/read cycle. The answer mentions 'upon reading' but does not explicitly link this to the roundtrip test pattern which is central to the claim's phrasing.",
+        "verdict": "supported"
+      }
+    ]
+  },
+  {
+    "task_id": "import-60456a08ebdf9cc210dd4eb3",
+    "base_reward": "1.0",
+    "final_reward": "1.0",
+    "delta": "0.0",
+    "base_status": "resolved",
+    "final_status": "resolved",
+    "base_strict": "1.0",
+    "final_strict": "0.0",
+    "base_episode": "ep-db6d618f02564134bdb4ded998906662",
+    "final_episode": "ep-5c5121fdcc0d4fb88bcddeb4d6c7f31e",
+    "reasons": [
+      "Additional assertions are not fully supported; Extracted assertions lack assessed citation support; Citation does not entail its associated claim"
+    ],
+    "semantic": {
+      "additional_claims": [
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "04b8f41ade0f141f25f530fb343cf396bce213ec915ea9851559720c5d2326b1"
+          ],
+          "id": "claim_1",
+          "material_error": false,
+          "reason": "Directly supported by the absence of BuildKit secret handling in the source code (e3).",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "753a1682637f1c0966571bb80ca3012383bf628d17cfd1ee5541ab2da8460161",
+            "04b8f41ade0f141f25f530fb343cf396bce213ec915ea9851559720c5d2326b1"
+          ],
+          "id": "claim_2",
+          "material_error": false,
+          "reason": "The source code (e2, e3) explicitly imports and uses `docker.client.Client` or `docker.api.client.APIClient` (standard Docker Python client) to perform the build.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "partial",
+          "evidence_keys": [
+            "04b8f41ade0f141f25f530fb343cf396bce213ec915ea9851559720c5d2326b1"
+          ],
+          "id": "claim_3",
+          "material_error": false,
+          "reason": "The answer claims credentials are passed via environment variables or daemon config. While the code shows `DOCKER_TIMEOUT` being read from an env var (e3, line 55), the provided snippet does not show logic for passing authentication credentials via env vars or daemon config specifically for the build process. This part of the claim relies on external knowledge or unprovided code sections.",
+          "verdict": "insufficient"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "04b8f41ade0f141f25f530fb343cf396bce213ec915ea9851559720c5d2326b1"
+          ],
+          "id": "claim_4",
+          "material_error": false,
+          "reason": "The source code (e3) confirms no buildkit-specific secret handling is implemented in the `_build_with_docker` method.",
+          "verdict": "supported"
+        }
+      ],
+      "answer_mode": "answer",
+      "answerability_satisfied": true,
+      "assessment_complete": true,
+      "citation_links": [
+        {
+          "citation_id": "c1",
+          "claim_id": "c1",
+          "reason": "Citation c1 points to lines 24-40 (imports). While this establishes the use of the docker library, the actual evidence for the lack of BuildKit integration is in the build method (lines 84+). However, the citation broadly supports the context of the DockerBuilder implementation. A more precise citation would include the build method, but the claim is factually supported by the file content referenced.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_1",
+          "reason": "Same as c1; the file context supports the claim.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_2",
+          "reason": "Lines 24-40 explicitly show the import of the standard Docker Python client classes.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_3",
+          "reason": "Lines 24-40 only contain imports and do not show credential passing logic.",
+          "supported": false
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_4",
+          "reason": "The file context supports the negative claim, though the specific proof is in the build method.",
+          "supported": true
+        }
+      ],
+      "critical_error": false,
+      "diagram": {
+        "assessed": false,
+        "complete": false,
+        "consistent": false,
+        "findings": [],
+        "material_error": false,
+        "readable": false,
+        "supported": false
+      },
+      "disagreements": [],
+      "evidence_keys": [
+        "04b8f41ade0f141f25f530fb343cf396bce213ec915ea9851559720c5d2326b1",
+        "753a1682637f1c0966571bb80ca3012383bf628d17cfd1ee5541ab2da8460161",
+        "98016f2140a240e78bcbfcae0aba260e31ffa0d3f8952257b7cc0a2bb6cc5670",
+        "repository_snapshot",
+        "source_308bb48b610dda93ef7bdd33"
+      ],
+      "experiment_hash": "5f08460b430dcbf74db4966f22f2da7cae08b7ca8d4ecb05ee721101cd4c3413",
+      "extracted_claims": [
+        {
+          "id": "claim_1",
+          "source": "text",
+          "text": "CEKit's DockerBuilder does not integrate with Docker's buildkit secrets API."
+        },
+        {
+          "id": "claim_2",
+          "source": "text",
+          "text": "The code uses the standard Docker Python client (docker-py or docker) to build images."
+        },
+        {
+          "id": "claim_3",
+          "source": "text",
+          "text": "Credentials are passed via environment variables or the Docker daemon's configuration."
+        },
+        {
+          "id": "claim_4",
+          "source": "text",
+          "text": "No buildkit-specific secret handling is implemented in the source."
+        }
+      ],
+      "false_execution_claim": false,
+      "judge_family": "qwen",
+      "judge_version": "all-claims-v7",
+      "needs_review": false,
+      "prompt_version": "1.0",
+      "required_claims": [
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "04b8f41ade0f141f25f530fb343cf396bce213ec915ea9851559720c5d2326b1"
+          ],
+          "id": "c1",
+          "material_error": false,
+          "reason": "The answer correctly states that CEKit's DockerBuilder does not integrate with BuildKit secrets. The provided source code (e3, lines 84-94) shows the build invocation using `docker_client.build(**docker_args)` with standard arguments (path, pull, rm) and no `secrets` parameter or BuildKit-specific integration.",
+          "verdict": "supported"
+        }
+      ],
+      "schema_version": "1.0",
+      "snapshot_fingerprint": "7d103ab7f8fd277f5f1ec329f62c5d4a84247165663cc98313055eaefbb00db6",
+      "submission_hash": "43ce3676295e59306dab9a6861e45554817795cd571b0a96b77c3356679211e0",
+      "task_hash": "5bd5f35fce0eccfe505372d935404b63d2da74d46f73bad7da55e01b5389b248",
+      "uncited_claim_ids": []
+    },
+    "material_error": false,
+    "claims": [
+      {
+        "coverage": "complete",
+        "evidence_keys": [
+          "04b8f41ade0f141f25f530fb343cf396bce213ec915ea9851559720c5d2326b1"
+        ],
+        "id": "c1",
+        "material_error": false,
+        "reason": "The answer correctly states that CEKit's DockerBuilder does not integrate with BuildKit secrets. The provided source code (e3, lines 84-94) shows the build invocation using `docker_client.build(**docker_args)` with standard arguments (path, pull, rm) and no `secrets` parameter or BuildKit-specific integration.",
+        "verdict": "supported"
+      }
+    ]
+  },
+  {
+    "task_id": "import-b3a3034800814aaddeb67f0d",
+    "base_reward": "1.0",
+    "final_reward": "1.0",
+    "delta": "0.0",
+    "base_status": "resolved",
+    "final_status": "resolved",
+    "base_strict": "1.0",
+    "final_strict": "0.0",
+    "base_episode": "ep-db1a618b4eef49e289acd250f65a5fc8",
+    "final_episode": "ep-507d195c7a2f470baf5166f29043de64",
+    "reasons": [
+      "Extracted assertions lack assessed citation support; Citation does not entail its associated claim"
+    ],
+    "semantic": {
+      "additional_claims": [
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "a330d716fedb80f1f7dc015420908e5c6cfcf04c2433080f6c8f3229042e53f5"
+          ],
+          "id": "claim_1",
+          "material_error": false,
+          "reason": "Source e5 (lines 181-184) confirms that when expected_dtype is None, the code checks type equality using 'is' without enforcing a specific NumPy dtype.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "de37203fcc1612500d9c1954d23b382742560325c2584383e9c7db841d090916"
+          ],
+          "id": "claim_2",
+          "material_error": false,
+          "reason": "Source e6 (line 185) shows the condition 'elif expected_dtype is not False', implying that if it is False, the dtype/type check block is skipped.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "a33386a5dc58d0879fad2b6bd908801c5b688f3708e4d40edccd3d68754e4e81"
+          ],
+          "id": "claim_3",
+          "material_error": false,
+          "reason": "Source e7 (line 251) explicitly shows a call to _assertIndexedLikeNDArray with expected_dtype=False.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "3f9a55b1272a639baa588b3530ae7747dd4e4c7869f96c78436a535d5e91d1fa"
+          ],
+          "id": "claim_4",
+          "material_error": false,
+          "reason": "Source e8 (lines 185-187) confirms that for non-False values (specific dtypes), the code asserts equality of the .dtype attribute.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "9da5a94e0a471c952b4ad15801cb988c1fdf67c691c2d34f2f51538467e1f2c1"
+          ],
+          "id": "claim_5",
+          "material_error": false,
+          "reason": "Source e9 (line 211) shows the helper being called with the string 'datetime64[us]' as the expected_dtype.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "a330d716fedb80f1f7dc015420908e5c6cfcf04c2433080f6c8f3229042e53f5",
+            "de37203fcc1612500d9c1954d23b382742560325c2584383e9c7db841d090916",
+            "3f9a55b1272a639baa588b3530ae7747dd4e4c7869f96c78436a535d5e91d1fa"
+          ],
+          "id": "claim_6",
+          "material_error": false,
+          "reason": "This is a correct summary of the behaviors verified in claims 1, 2, and 4, supported by the collective evidence e5, e6, e8.",
+          "verdict": "supported"
+        }
+      ],
+      "answer_mode": "answer",
+      "answerability_satisfied": true,
+      "assessment_complete": true,
+      "citation_links": [
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_1",
+          "reason": "Citation c1 (lines 181-187) covers the logic described in claim_1 (lines 181-184).",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_2",
+          "reason": "Citation c1 (lines 181-187) includes line 185 which implements the skip logic for False.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_3",
+          "reason": "Citation c1 (lines 181-187) does not include line 251 where the usage of False is demonstrated.",
+          "supported": false
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_4",
+          "reason": "Citation c1 (lines 181-187) covers the logic described in claim_4 (lines 185-187).",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_5",
+          "reason": "Citation c1 (lines 181-187) does not include line 211 where the datetime64[us] example occurs.",
+          "supported": false
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_6",
+          "reason": "Citation c1 contains the implementation logic that supports the summary in claim_6.",
+          "supported": true
+        }
+      ],
+      "critical_error": false,
+      "diagram": {
+        "assessed": false,
+        "complete": false,
+        "consistent": false,
+        "findings": [],
+        "material_error": false,
+        "readable": false,
+        "supported": false
+      },
+      "disagreements": [],
+      "evidence_keys": [
+        "3f9a55b1272a639baa588b3530ae7747dd4e4c7869f96c78436a535d5e91d1fa",
+        "9da5a94e0a471c952b4ad15801cb988c1fdf67c691c2d34f2f51538467e1f2c1",
+        "a330d716fedb80f1f7dc015420908e5c6cfcf04c2433080f6c8f3229042e53f5",
+        "a33386a5dc58d0879fad2b6bd908801c5b688f3708e4d40edccd3d68754e4e81",
+        "b7fda76049ce696ef3c138f14c99839f5e0603c927560e0346b14d27d653ebca",
+        "bd78b41590f8d79b04e6819b656cf4731afbf65515c9e369922689a571b5adff",
+        "de37203fcc1612500d9c1954d23b382742560325c2584383e9c7db841d090916",
+        "ea0ec5c1b0c36ba3ad9eed953c7631ef62d6aae2a301517f40950d79282b9cd3",
+        "repository_snapshot",
+        "source_4aada200ac1535d2a855ba61"
+      ],
+      "experiment_hash": "5f08460b430dcbf74db4966f22f2da7cae08b7ca8d4ecb05ee721101cd4c3413",
+      "extracted_claims": [
+        {
+          "id": "claim_1",
+          "source": "text",
+          "text": "The `expected_dtype` parameter value `None` checks that the Python type of the value matches using `type(variable.values[0]) is type(expected_value0)` without enforcing a specific NumPy dtype."
+        },
+        {
+          "id": "claim_2",
+          "source": "text",
+          "text": "The `expected_dtype` parameter value `False` skips the dtype/type check entirely."
+        },
+        {
+          "id": "claim_3",
+          "source": "text",
+          "text": "The usage of `False` to skip type checking is demonstrated at line 251."
+        },
+        {
+          "id": "claim_4",
+          "source": "text",
+          "text": "A specific dtype string value for `expected_dtype` asserts that the NumPy dtype of the value exactly matches the provided string."
+        },
+        {
+          "id": "claim_5",
+          "source": "text",
+          "text": "The strict type validation using a specific dtype string is used for checking `datetime64[us]` at line 211."
+        },
+        {
+          "id": "claim_6",
+          "source": "text",
+          "text": "The three-valued logic encoding allows the test helper to flexibly verify Python object identity, strict NumPy dtype equality, or skip type checking based on the test scenario."
+        }
+      ],
+      "false_execution_claim": false,
+      "judge_family": "qwen",
+      "judge_version": "all-claims-v7",
+      "needs_review": false,
+      "prompt_version": "1.0",
+      "required_claims": [
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "bd78b41590f8d79b04e6819b656cf4731afbf65515c9e369922689a571b5adff"
+          ],
+          "id": "c1",
+          "material_error": false,
+          "reason": "The answer correctly identifies the three-valued logic (None, False, specific dtype) and the semantic distinction for each case as verified by the source code in e2 (lines 181-187).",
+          "verdict": "supported"
+        }
+      ],
+      "schema_version": "1.0",
+      "snapshot_fingerprint": "8373c90881db3e140e79d00275a41431902b5ebe41bce3b6d6291278c0b6aa0d",
+      "submission_hash": "73a1741e4917ccc00abeb75ad9aead0cfbd908e8e4f1c3d38eaca2db7b66115f",
+      "task_hash": "fb8002025998ccc0245092fd986f909fe2d0376eb442235d5963c2795049197e",
+      "uncited_claim_ids": []
+    },
+    "material_error": false,
+    "claims": [
+      {
+        "coverage": "complete",
+        "evidence_keys": [
+          "bd78b41590f8d79b04e6819b656cf4731afbf65515c9e369922689a571b5adff"
+        ],
+        "id": "c1",
+        "material_error": false,
+        "reason": "The answer correctly identifies the three-valued logic (None, False, specific dtype) and the semantic distinction for each case as verified by the source code in e2 (lines 181-187).",
+        "verdict": "supported"
+      }
+    ]
+  },
+  {
+    "task_id": "import-db220c52daf5914fdb8abda0",
+    "base_reward": "1.0",
+    "final_reward": "1.0",
+    "delta": "0.0",
+    "base_status": "resolved",
+    "final_status": "resolved",
+    "base_strict": "1.0",
+    "final_strict": "0.0",
+    "base_episode": "ep-578201926858461b974a803eaceff09e",
+    "final_episode": "ep-1d2c61d771324741a7ba4970b2374c8f",
+    "reasons": [
+      "Material falsehood, contradiction, or false execution claim"
+    ],
+    "semantic": {
+      "additional_claims": [
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "source_85c4aa1988ff0c65d11fb8b7"
+          ],
+          "id": "claim_1",
+          "material_error": false,
+          "reason": "Supported by e7 line 81 ('allow_errors=True') which ensures execution continues despite errors.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "source_85c4aa1988ff0c65d11fb8b7"
+          ],
+          "id": "claim_2",
+          "material_error": false,
+          "reason": "Supported by e7 line 97 ('return n_steps, observed, calls, nb'), showing the notebook object is returned regardless of execution errors due to allow_errors=True.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "partial",
+          "evidence_keys": [
+            "source_85c4aa1988ff0c65d11fb8b7"
+          ],
+          "id": "claim_3",
+          "material_error": true,
+          "reason": "The answer attributes the core error handling logic to `execute_notebook`. Evidence e7 shows the logic (allow_errors=True) is inside the function documented by lines 35-36 and implemented in lines 41-97. In PyBryt, `execute_notebook` is often a convenience wrapper that calls `execute`. The docstring quoted (lines 35-36) belongs to `execute`, not `execute_notebook`. Attributing the docstring and primary logic to the wrong function name is a material error.",
+          "verdict": "contradicted"
+        },
+        {
+          "coverage": "partial",
+          "evidence_keys": [
+            "source_85c4aa1988ff0c65d11fb8b7"
+          ],
+          "id": "claim_4",
+          "material_error": true,
+          "reason": "The answer claims `execute_notebook` explicitly states the quote. The evidence (e7 lines 35-36) shows this text is part of the docstring for the `execute` function (inferred from the surrounding code block in e7), not `execute_notebook`. While the behavior is correct, the attribution of the source text to the wrong function is a factual error.",
+          "verdict": "contradicted"
+        }
+      ],
+      "answer_mode": "answer",
+      "answerability_satisfied": true,
+      "assessment_complete": true,
+      "citation_links": [
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_1",
+          "reason": "Citation c1 points to lines 35-36 which mention 'Errors during execution are ignored', supporting the claim.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_2",
+          "reason": "Citation c1 supports the context of the function that returns the notebook.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_3",
+          "reason": "Citation c1 (lines 35-36) is the docstring for `execute`, not `execute_notebook`. The claim incorrectly attributes the logic to `execute_notebook`.",
+          "supported": false
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_4",
+          "reason": "The quote exists in the cited lines, but the claim asserts it is stated by `execute_notebook`, whereas the evidence shows it belongs to the `execute` function's docstring.",
+          "supported": false
+        }
+      ],
+      "critical_error": false,
+      "diagram": {
+        "assessed": false,
+        "complete": false,
+        "consistent": false,
+        "findings": [],
+        "material_error": false,
+        "readable": false,
+        "supported": false
+      },
+      "disagreements": [],
+      "evidence_keys": [
+        "3367b603db279fefa7dc3baebdf99b41ba9b54dbc8fe2a5b04e4abea763fe577",
+        "650d24ec0a0eeaa246fede6643f88de949925f90a4f1a82bab54ed281a65faa0",
+        "89a2e541e2eed2343bade57a5ea5e91d3c7831287238101c24f112776773286d",
+        "8cb492fe641bd0946aae2b7c246fe27f6743be15faf0e1688df5004fb1f60969",
+        "8ee7b4958fe3fbbbc1a2aec2c12866e027f98f1ab0c4086cbc5334f3c5731473",
+        "repository_snapshot",
+        "source_63b4c715387b4672d94e122a",
+        "source_85c4aa1988ff0c65d11fb8b7"
+      ],
+      "experiment_hash": "5f08460b430dcbf74db4966f22f2da7cae08b7ca8d4ecb05ee721101cd4c3413",
+      "extracted_claims": [
+        {
+          "id": "claim_1",
+          "source": "text",
+          "text": "The expected state when student notebook execution fails during PyBryt's memory footprint collection is that execution errors are ignored."
+        },
+        {
+          "id": "claim_2",
+          "source": "text",
+          "text": "The executed notebook is returned regardless of failure."
+        },
+        {
+          "id": "claim_3",
+          "source": "text",
+          "text": "Error recovery is handled by the `execute_notebook` function in `pybryt/execution/__init__.py`."
+        },
+        {
+          "id": "claim_4",
+          "source": "text",
+          "text": "The `execute_notebook` function explicitly states: 'Errors during execution are ignored, and the executed notebook can be written to a file using the output argument.'"
+        }
+      ],
+      "false_execution_claim": false,
+      "judge_family": "qwen",
+      "judge_version": "all-claims-v7",
+      "needs_review": false,
+      "prompt_version": "1.0",
+      "required_claims": [
+        {
+          "coverage": "partial",
+          "evidence_keys": [
+            "source_85c4aa1988ff0c65d11fb8b7"
+          ],
+          "id": "c1",
+          "material_error": true,
+          "reason": "The answer correctly identifies that execution errors are ignored (supported by e7 line 81 'allow_errors=True') and that the notebook is returned. However, it contains a material error by attributing this behavior and the specific quote to the `execute_notebook` function. The provided evidence (e7 lines 35-36, 81-97) shows the docstring and logic belong to the `execute` function (implied by context of lines 41-97), while `execute_notebook` is a different wrapper (often in student.py or calling execute). The quote provided in the answer matches the docstring in e7 lines 35-36, which describes the internal `execute` function's behavior, not necessarily `execute_notebook` directly if they are distinct. More critically, the answer claims `execute_notebook` explicitly states the quote, but the evidence shows the quote is from the docstring of the function defined in `pybryt/execution/__init__.py` starting around line 28 (inferred from docstring ending at 36), which is `execute`, whereas `execute_notebook` typically handles file I/O and calls `execute`. If the candidate conflates the two functions, it is a factual error regarding the code structure. Additionally, the answer omits the specific mechanism of error recovery during *memory footprint collection* (the try/except blocks or `allow_errors` flag in the preprocessor) beyond just saying 'ignored'.",
+          "verdict": "supported"
+        }
+      ],
+      "schema_version": "1.0",
+      "snapshot_fingerprint": "bd2ca2c99e8c79d1bbe6e6105acba8b71f63871d9249b7a10130ee36911892f0",
+      "submission_hash": "6caae782876ae362210226dff12decd1ac1bc7e77f021750755dab0a7b562485",
+      "task_hash": "b2be744f524839cf8ab4d4eb4e544e1b577c70e479cdb6243cca62f459d711f8",
+      "uncited_claim_ids": []
+    },
+    "material_error": true,
+    "claims": [
+      {
+        "coverage": "partial",
+        "evidence_keys": [
+          "source_85c4aa1988ff0c65d11fb8b7"
+        ],
+        "id": "c1",
+        "material_error": true,
+        "reason": "The answer correctly identifies that execution errors are ignored (supported by e7 line 81 'allow_errors=True') and that the notebook is returned. However, it contains a material error by attributing this behavior and the specific quote to the `execute_notebook` function. The provided evidence (e7 lines 35-36, 81-97) shows the docstring and logic belong to the `execute` function (implied by context of lines 41-97), while `execute_notebook` is a different wrapper (often in student.py or calling execute). The quote provided in the answer matches the docstring in e7 lines 35-36, which describes the internal `execute` function's behavior, not necessarily `execute_notebook` directly if they are distinct. More critically, the answer claims `execute_notebook` explicitly states the quote, but the evidence shows the quote is from the docstring of the function defined in `pybryt/execution/__init__.py` starting around line 28 (inferred from docstring ending at 36), which is `execute`, whereas `execute_notebook` typically handles file I/O and calls `execute`. If the candidate conflates the two functions, it is a factual error regarding the code structure. Additionally, the answer omits the specific mechanism of error recovery during *memory footprint collection* (the try/except blocks or `allow_errors` flag in the preprocessor) beyond just saying 'ignored'.",
+        "verdict": "supported"
+      }
+    ]
+  }
+]
