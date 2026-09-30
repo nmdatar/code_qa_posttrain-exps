@@ -1,3 +1,8 @@
+> For real collection experiments and screens, use
+> [Remote experiments](REMOTE_EXPERIMENTS.md). The full loop and controller run on
+> Modal; Tinker handles inference and optimization. Local collection execution is
+> disabled. Offline validation and synthetic smoke commands below remain valid.
+
 # Training pipeline
 
 `training_pipeline` orchestrates synchronous SFT and GRPO using Tinker. Tinker runs

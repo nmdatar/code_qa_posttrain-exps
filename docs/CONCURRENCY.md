@@ -1,3 +1,7 @@
+> Production collection runs now execute in a detached Modal sandbox. Use
+> [Remote experiments](REMOTE_EXPERIMENTS.md); the local paid command examples
+> below are historical and now fail closed. Worker limits still apply remotely.
+
 # Bounded rollout concurrency
 
 `training_pipeline` now supports parallel episode collection for collection GRPO,

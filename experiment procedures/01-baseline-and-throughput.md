@@ -1,5 +1,11 @@
 # 01 — Baseline quality and rollout throughput
 
+## Current runnable scope
+
+Current-v8 provides fresh baseline/selection-repeat/confirmation configs and eight throughput arms, all bound to training-claims-v6 and the current strict v7 judge/context policies. The throughput manifest is regenerated against the new data identity. Original throughput results remain incomplete; these are prepared measurements. Keep timing arms isolated.
+
+See the [current suite](../configs/experiments/current-v8/README.md) for authoritative settings. The design below includes historical larger-scope extensions; it does not override current configs.
+
 **Question:** Can the unchanged Qwen3.5-4B policy produce reliably scored investigations, and what concurrency provides useful throughput without degrading them?
 
 **Hypothesis:** Bounded parallel episodes reduce wall time while preserving isolation, completion, and scoring coverage. This experiment makes no learning claim and performs no optimizer updates.
@@ -12,7 +18,7 @@
 - Baseline evaluation: temperature 0 on all 32 selection and 85 confirmation tasks. Repeat the selection evaluation once to estimate unchanged-model variability; retain both measurements.
 - Throughput arms: concurrency **1, 8, 16, 32**, each collecting four attempts for the same 16 training tasks at temperature 1, without updates. Pick tasks by the same deterministic family-stratified method as the cohorts, using seed string `throughput-v1` and 16 slots. Use one task group per selected task, 64 episodes per arm.
 - Run two measured repetitions per concurrency: first in ascending concurrency, then descending. Report cold provisioning and the second pass separately; identical sampling seeds are not a guarantee of identical outputs under provider scheduling.
-- Prerequisites: bounded global concurrency, SDK concurrency safety, semaphore-limited sandbox creation, thread-safe logging, and atomic shared reservations. A `concurrency` JSON setting is not currently supported. Explicit 32/85 cohort routing and baseline evaluation without trainer allocation are now implemented and offline-tested; live verification remains pending. See [implementation details](../docs/EXPERIMENT_READINESS.md).
+- Prerequisites: bounded global concurrency, SDK concurrency safety, semaphore-limited sandbox creation, thread-safe logging, and atomic shared reservations. The `concurrency` JSON setting is implemented and offline-tested; provider capacity still requires measurement. Explicit 32/85 cohort routing and baseline evaluation without trainer allocation are now implemented and offline-tested; live verification remains pending. See [implementation details](../docs/EXPERIMENT_READINESS.md).
 
 ## Procedure
 
@@ -39,9 +45,9 @@ Apply the [shared measurement, checkpoint, and budget contract](README.md). Keep
 
 Promotion requires at least **95% scoring coverage** (31/32 selection tasks and 81/85 confirmation tasks). Repeat training finalists with seeds 42, 43, and 44; select their checkpoints before inspecting confirmation results. Frozen-policy-only comparisons use the repeated-inference protocol stated above instead of claiming training-seed replication.
 
-For any training arm, commit resumable state and sampler weights after every acknowledged GRPO update; evaluate every five successful updates and at the final committed checkpoint. Skips do not count as updates. Retain routine checkpoints for 48 hours and archive every new selection-best model durably, with checksums and verified sampling/optimizer restoration, before changing the best pointer. For frozen-weight studies, retain the source checkpoint plus the complete harness variant bundle instead of inventing an optimizer checkpoint.
+For any training arm, commit resumable state and sampler weights after every acknowledged GRPO update; use the frozen arm’s evaluation cadence (every six successful updates and final evaluation for current GRPO). Skips do not count as updates. Retain routine checkpoints for 48 hours and retain selection-best remote state for 14 days and preserve sampler archives/checksums; indefinite durable optimizer restoration is not established. For frozen-weight studies, retain the source checkpoint plus the complete harness variant bundle instead of inventing an optimizer checkpoint.
 
-Exclude unresolved groups; allow only one whole-group infrastructure retry before quarantine. Equal-reward groups contribute zero, and all-zero batches skip optimization. Stop on ambiguous optimizer outcomes and restore the last committed boundary without blindly retrying. Stop at the separately authorized total budget; the earlier $5 smoke ceiling does not authorize this experiment. Count unsuccessful attempts, graders, evaluation, storage, and retries in cost.
+Exclude unresolved groups; use zero whole-group retries in the current v7 campaign; quarantine unresolved groups. Equal-reward groups contribute zero, and all-zero batches skip optimization. Stop on ambiguous optimizer outcomes and restore the last committed boundary without blindly retrying. Stop at the separately authorized total budget; the earlier $5 smoke ceiling does not authorize this experiment. Count unsuccessful attempts, graders, evaluation, storage, and retries in cost.
 
 Persist a frozen experiment specification, resolved configurations, dataset/cohort hashes, model and grader identities, source revisions, all raw trajectories and grades, local events, cost ledger, per-task evaluation tables, checkpoint/archive manifests, and a decision report. W&B is optional. Mark unsupported capabilities as prerequisites; use only the [documented CLI](README.md#budget-stopping-and-commands), never invented flags. Report implementation readiness, live execution, and quality evidence separately.
 
