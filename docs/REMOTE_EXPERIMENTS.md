@@ -14,7 +14,9 @@ Local offline validation, comparisons, and synthetic tests remain supported.
 The generic `agent_harness.remote_cli` is a different task adapter and is not the
 entrypoint for these collection experiments.
 
-## Frozen grading contract
+## Historical grading contract (initial campaign)
+
+This section describes the initial campaign; later reward and grader identities are pinned in each study config. See the [research progression](../experiments/README.md) and [reward guide](REWARD_SHAPING.md) before comparing scores.
 
 Initial configs use `Qwen/Qwen3.5-4B` for the policy and
 `Qwen/Qwen3.5-397B-A17B` for the judge. `all-claims-v3` reuses the robust
@@ -50,19 +52,16 @@ processes. Use the newly versioned config run IDs; old outputs remain untouched.
 Existing local ledgers are imported and cloud spending must extend that history;
 a divergent ledger stops execution instead of resetting the budget.
 
-From the project root:
+The example below uses a retained campaign-v8 design. Review its prerequisites and budget before any submission; preparation is separate from starting paid work. Old screen commands are preserved in the [historical index](EXPERIMENT_HISTORY.md). From the project root:
 
 ```sh
 .venv-eval/bin/python -m training_pipeline.remote prepare \
-  --configs configs/experiments/01-throughput-c08-r1.json \
-            configs/experiments/01-throughput-c16-r1.json \
-            configs/experiments/02-direct-grpo-screen.json \
-            configs/experiments/03-lr-5e-6-small-screen.json \
-  --parallel-training \
-  --output artifacts/remote-initial-screens
+  --configs configs/experiments/current-v8/02-direct-grpo.json \
+  --budget-plan configs/experiments/current-v8/budget-plan.json \
+  --output artifacts/campaign-v8-direct-grpo
 
 .venv-eval/bin/python -m training_pipeline.remote submit \
-  --bundle artifacts/remote-initial-screens
+  --bundle artifacts/campaign-v8-direct-grpo
 ```
 
 Preparation is offline: it verifies inputs, computes the total against each shared

@@ -38,7 +38,7 @@ Four attempted batches were a machinery/signal pilot; the later main-run report 
 
 ## GRPO main v7
 
-A bounded 12-batch design followed a citation-routing fix; archived launch/readiness records and partial live curves are not a complete held-out final result.
+A bounded 12-batch design followed a citation-routing fix; archived launch/readiness records and saved training curves alone do not establish a final held-out result.
 
 **Why retire from main:** This older reward/data campaign is superseded as a reader entry point by the retained longer GRPO study. Do not relabel it a successful or failed final quality comparison without final evidence.
 

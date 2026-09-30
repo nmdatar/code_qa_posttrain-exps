@@ -5,9 +5,7 @@
 # Bounded rollout concurrency
 
 `training_pipeline` now supports parallel episode collection for collection GRPO,
-development/base evaluation, and a training-task throughput benchmark. No paid
-concurrent run has been launched; provider throughput and rate-limit behavior
-still need the controlled benchmark.
+development/base evaluation, and a training-task throughput benchmark. Measured throughput and rate-limit behavior are study-specific; consult the linked reports rather than treating configured concurrency as a benchmark result.
 
 ```json
 "concurrency": {"rollouts": 16, "judges": 4}
@@ -40,33 +38,24 @@ limit; unresolved groups remain excluded and equal-reward groups contribute zero
 The optimizer and sampler refresh run only after the complete batch has drained.
 No asynchronous learning, replay, clipping, or extra optimizer epochs were added.
 
-## Experiment 1 benchmark
+## Throughput benchmark designs
 
-Eight frozen-policy configs, two repetitions per concurrency value, are in
-`configs/experiments/01-throughput-c{01,08,16,32}-r{1,2}.json`.
-They pin `experiments/qwen4b-throughput-v1.json`: 16 deterministically stratified
-training tasks, four attempts each, temperature 1. The judge cap stays four in
-all arms. A retry adds a complete group; reports count all attempted episodes.
+The retained [campaign-v8 suite](../configs/experiments/current-v8/README.md)
+contains eight frozen-policy throughput designs, two repeats at each concurrency.
+Their exact task manifest, judge cap, retry behavior and budgets are specified in
+the configs. Run timed throughput arms sequentially so they do not compete.
 
 ```sh
-# Offline validation only.
-qa-train validate --config configs/experiments/01-throughput-c08-r1.json
-
-# Paid benchmark — prepared, but do not execute until the user starts Experiment 1.
-qa-train benchmark --config configs/experiments/01-throughput-c08-r1.json
+# Offline configuration validation; no provider allocation.
+python -m training_pipeline validate --config configs/experiments/current-v8/01-throughput-c08-r1.json
 ```
 
-The benchmark creates no trainer, gradient, optimizer update, or checkpoint.
-It writes `benchmark.json` with wall time, episodes/second, completion, scoring
-coverage, exclusions, token/tool totals, provisioning/generation/action/grading/
-cleanup timings, judge queue/sampling time, and conservative cost reservations.
-Phase times summed across workers can exceed wall time. Actual billing is
-reported as unavailable rather than inferred from reservations. Complete
-trajectories and failed attempts remain local.
+Use the [remote execution guide](REMOTE_EXPERIMENTS.md) for packaging and
+submission. The benchmark creates no trainer or optimizer update. It reports
+wall time, completion and scoring coverage, token/tool totals, stage timings,
+and conservative cost reservations. Summed concurrent stage times can exceed
+wall time; reservations are not provider invoices.
 
-Run the baseline selection, confirmation, and selection repeat plus the eight
-throughput arms against the same $120 baseline ledger. This reallocates $75 from
-the previous confirmation/contingency reserve; the project total remains $1,000.
-Provider estimates and remaining ledger balance must be checked at launch.
-Training configs remain serial until the throughput comparison selects a worker
-count; set `concurrency` in a new run/fork, not by changing a resumed run.
+The early baseline failed its scoring-coverage gate, and its planned throughput
+sweep was incomplete. Its old allocation and launch instructions are preserved
+in the [historical index](EXPERIMENT_HISTORY.md), not recommendations for new runs.

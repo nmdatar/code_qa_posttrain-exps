@@ -1,10 +1,14 @@
 # Strict evaluation and positive training feedback
 
-The opt-in `training_reward: {"version": "positive-coverage-v4"}` requires
-`environment.grading_version: "all-claims-v6"`. Use
-`configs/experiments/reward-v4/diagnostic.json` for the bounded benchmark (no
-optimizer updates). Live calibration matched 4/7 expected cases and blocked the rollout diagnostic;
-see `reports/reward-shaping-v4/README.md`. No GRPO run has been performed.
+This page records the early positive-feedback reward design and subsequent
+revisions. It is not a universal description of every retained study's reward.
+See the [research progression](../experiments/README.md) for later comparisons.
+
+The historical `positive-coverage-v4` / `all-claims-v6` diagnostic matched 4/7
+expected calibration scores and blocked further rollout. Its config and report
+are preserved in the [historical index](EXPERIMENT_HISTORY.md); shared reward
+implementations and regression tests remain. The absence of GRPO updates in that
+diagnostic is not a claim that no later GRPO experiments ran.
 
 ## Early-training reward contract
 
@@ -62,10 +66,11 @@ Any subsequent formula/prompt change needs another version and frozen validation
 
 ## Validation and launch gate
 
-`PYTHONPATH=. .venv-eval/bin/python scripts/validate_reward_shaping.py` writes
-source-grounded synthetic ranking fixtures and an offline projection of retained
-selection judgments. These fixtures verify the arithmetic contract, not live
-judge calibration. Confirmation answers are excluded from reward design.
+The [archived validation script](https://github.com/nmdatar/action-interview/blob/2b70198df1db7b3028448d8f05772e55c52ea6fc/scripts/validate_reward_shaping.py) produced
+source-grounded synthetic ranking fixtures and an offline projection of selection
+judgments. It has been retired from main; the reward/grader regression tests
+remain. Those checks verify the arithmetic contract, not live judge calibration.
+Confirmation answers are excluded from reward design.
 
 The live diagnostic uses four family-stratified training questions selected before
 seeing rewards, four fresh attempts each, temperature 1, eight rollout workers,

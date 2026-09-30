@@ -1,6 +1,6 @@
 # Current runnable experiment suite — campaign v8
 
-This supersedes current-v7 for new work. **Campaign v8 uses dataset v6 and grader v7**; these numbers identify different components. All 43 execution configs validate offline. No new paid jobs have been launched. Frozen historical configurations, reports and active remote bundles are unchanged.
+This versioned design suite superseded current-v7. **Campaign v8 uses dataset v6 and grader v7**; these numbers identify different components. The original preparation validated 43 execution configs offline and did not launch paid jobs. This is preparation-time evidence, not the execution status of every later study. See the [research progression](../../../experiments/README.md) for completed comparisons and the [historical index](../../../docs/EXPERIMENT_HISTORY.md) for retired bundles. Frozen config contents and remote bundles are unchanged.
 
 ## Common frozen conditions
 

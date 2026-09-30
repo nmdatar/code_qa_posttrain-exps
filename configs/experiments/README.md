@@ -25,3 +25,17 @@ not reset spending or authorize a new campaign.
 Superseded launch bundles and diagnostics are indexed in the
 [historical record](../../docs/EXPERIMENT_HISTORY.md), with exact archive links
 and a machine-readable removal manifest.
+
+## Known historical reuse limitations
+
+The cleanup audit found three pre-existing schema-validation failures in
+`efficiency-rl-v2`: `efficiency.json` and `quality-only.json` have incompatible
+configuration fields, and `efficiency020.json` has an unsupported reward/grader
+combination. The `grpo-autoresearch/fixes-v1-validation.json` config also pins a
+cohort hash that differs from its referenced manifest. These exact files and
+inputs are unchanged from the pre-cleanup revision; preserve them as evidence,
+not ready-to-launch defaults. Repair requires a new versioned config, not a
+silent rewrite of frozen experiment history.
+
+The [cleanup validation record](../../docs/EXPERIMENT_CLEANUP_VALIDATION.json)
+distinguishes schema/input checks from live execution.
