@@ -1,0 +1,208 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-31eac5408780f375485d1372",
+      "reference_sha256": "a185b076b74f845dff2884881b9a6c5f9a44bce91c4415178a1dc29dc03ec9c4",
+      "question_sha256": "e75f3432948ebf7687e7d3185b8f9b5ede6b0ae99c80cc285837f048098a365c",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "record_alg_type reports all matching categories",
+          "verdict": "partially_supported",
+          "reason": "It reports only categories also selected in algorithm_type, not every category a minimizer belongs to.",
+          "evidence": {
+            "path": "fitbenchmarking/controllers/base_controller.py",
+            "start_line": 312,
+            "end_line": 327
+          }
+        }
+      ],
+      "material_errors": [
+        "It reports only categories also selected in algorithm_type, not every category a minimizer belongs to."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no dependency scripts or repository code executed.",
+      "corrected_reference_answer": "Controllers map named algorithm categories to minimizer lists, allowing overlap (fitbenchmarking/controllers/base_controller.py:28-63). validate_minimizer accepts membership in any requested category, while cost functions reject incompatible categories and bounds checks reject unsupported minimizers (fitbenchmarking/controllers/base_controller.py:280-310,329-343; fitbenchmarking/cost_func/base_cost_func.py:112-130). record_alg_type reports matching categories restricted to those requested, not all categories (fitbenchmarking/controllers/base_controller.py:312-327)."
+    },
+    {
+      "task_id": "import-3444d274f9cae3a319785822",
+      "reference_sha256": "70e2517c1999c9b40dd92c7d225cc205037ab5662246fea981ee8af6027d5216",
+      "question_sha256": "e44d72b2474399204dc9d208f3b3c0ef782b53d874daa70dcc336c646006a9e0",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Averaging was chosen because convergence variability makes mean representative",
+          "verdict": "partially_supported",
+          "reason": "Mean and ratio warning are explicit; reason for rejecting median/minimum is not stated by source.",
+          "evidence": {
+            "path": "fitbenchmarking/core/fitting_benchmarking.py",
+            "start_line": 549,
+            "end_line": 575
+          }
+        }
+      ],
+      "material_errors": [
+        "Mean and ratio warning are explicit; reason for rejecting median/minimum is not stated by source."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no dependency scripts or repository code executed.",
+      "corrected_reference_answer": "perform_fit repeats one execution num_runs times, computes sum(runtime_list)/num_runs, and warns when max/min exceeds four (fitbenchmarking/core/fitting_benchmarking.py:549-575). The warning mentions caching or unrelated CPU activity and does not alter the mean. This establishes the chosen aggregation, but not why robust alternatives were rejected; claims about API simplicity or typical convergence behavior are interpretations, not demonstrated design rationale."
+    },
+    {
+      "task_id": "import-373aa29d8b5bfa69b48d18c3",
+      "reference_sha256": "3a86357b5ebce094e03a33830e49de23819e8050e3ecad8dcfb5816960fb109e",
+      "question_sha256": "ba1957ef4442312bc23bdd9c80f77511508de2eb2caf731f5ccda080b3c783b7",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "record_alg_type records every matched algorithm category",
+          "verdict": "partially_supported",
+          "reason": "Recording filters on requested algorithm_type as well as membership.",
+          "evidence": {
+            "path": "fitbenchmarking/controllers/base_controller.py",
+            "start_line": 323,
+            "end_line": 327
+          }
+        }
+      ],
+      "material_errors": [
+        "Recording filters on requested algorithm_type as well as membership."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no dependency scripts or repository code executed.",
+      "corrected_reference_answer": "The base algorithm_check dictionary defines all, ls, deriv_free, general, simplex, trust_region, levenberg-marquardt, gauss_newton, bfgs, conjugate_gradient, steepest_descent and global_optimization (fitbenchmarking/controllers/base_controller.py:28-63). Concrete controllers fill lists, with a minimizer eligible for multiple categories (fitbenchmarking/controllers/scipy_controller.py:17-31). validate_minimizer accepts any selected category match; record_alg_type joins only matching selected categories (fitbenchmarking/controllers/base_controller.py:280-327)."
+    },
+    {
+      "task_id": "import-4485991c91c0846307404438",
+      "reference_sha256": "7dcdbd458565bc57ccc0346361ce0bab00c9ad9d611a6504874ef844695970a9",
+      "question_sha256": "aa2520f3a894fce5c33428ae72ac47227a39cb015f33b67c20de806930f34fc2",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Release prep modifies README badges in tag then restores development links",
+          "verdict": "supported",
+          "reason": "Script enforces branch pattern, backs up README, substitutes tag, commits/tags then restores and commits.",
+          "evidence": {
+            "path": "ci/prep_and_tag_release.sh",
+            "start_line": 28,
+            "end_line": 55
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no dependency scripts or repository code executed."
+    },
+    {
+      "task_id": "import-53606b9e461942e29f7b3dc6",
+      "reference_sha256": "8d8ad39c434674f9f3fdba88faf4def34e2d19ad1ae6eb556895e23911721bc9",
+      "question_sha256": "5cbe006477e4e9da71e119d97214b5931814d78ee26a4e80d8a1ee42ad0290d7",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Cleanup is guaranteed regardless of fitting failure",
+          "verdict": "partially_supported",
+          "reason": "controller.cleanup is inside try and skipped if validation/execution raises; later Matlab cleanup can itself fail before timer reset.",
+          "evidence": {
+            "path": "fitbenchmarking/core/fitting_benchmarking.py",
+            "start_line": 550,
+            "end_line": 611
+          }
+        }
+      ],
+      "material_errors": [
+        "controller.cleanup is inside try and skipped if validation/execution raises; later Matlab cleanup can itself fail before timer reset."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no dependency scripts or repository code executed.",
+      "corrected_reference_answer": "OutputGrabber enables stdout/stderr capture outside Windows/debug/IPython and stops active grabbers on context exit (fitbenchmarking/utils/output_grabber.py:24-47). perform_fit validates and times controller executions inside that context; cleanup is called only after successful timing. It catches validation/general exceptions to set flags, then calls optional clear_matlab and resets the timer (fitbenchmarking/core/fitting_benchmarking.py:550-611). Thus stream restoration uses context exit, but general controller cleanup is not guaranteed after earlier failure and the later cleanup sequence is not protected by finally."
+    },
+    {
+      "task_id": "import-8067202b59802400f5895cb1",
+      "reference_sha256": "4e7cacd10fc13313c4c955e5b83599aceed48af68088632b4cd12456372ebfc6",
+      "question_sha256": "1ef5449e408f6770485391aaf603b1c7e889ada61a4ded1c9cdac5a3f2c966b5",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Table toggle spans generated checkbox handlers and JS colspan/cells",
+          "verdict": "supported",
+          "reason": "Toggle adjusts minimizer visibility, ancestor colspan, nth-child data cells; Python creates onclick calls.",
+          "evidence": {
+            "path": "fitbenchmarking/templates/js/table.js",
+            "start_line": 47,
+            "end_line": 69
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no dependency scripts or repository code executed."
+    },
+    {
+      "task_id": "import-d5f285a182b89f3bc2e6bca9",
+      "reference_sha256": "e2b5e24813bec4b72b0020f8d7d0efab58628bf8ea3743cf2e8732a021620a16",
+      "question_sha256": "a0758e49b16f10f075e709dbc7c2409b0001a8553658caabf3622a9e19768b58",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "create_dirs functions and absolute results_dir setter organize outputs",
+          "verdict": "supported",
+          "reason": "Directory functions return paths and group_results removes/recreates existing directory; Options setter abspath and orchestrator match.",
+          "evidence": {
+            "path": "fitbenchmarking/utils/create_dirs.py",
+            "start_line": 9,
+            "end_line": 103
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no dependency scripts or repository code executed."
+    },
+    {
+      "task_id": "import-dc1baf839bf7024efff74187",
+      "reference_sha256": "560fe57ac344615f0fe7535fc7413b747feb260aa39aaa9e390fcc354e8b20fd",
+      "question_sha256": "638a7d9f3c6a82672890dffc06f5b528b238460561131a44b203a77056f08cb5",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Dependency setup scripts reside in build directory",
+          "verdict": "supported",
+          "reason": "Read mantid, cutest, gsl and ralfit scripts confirms package-manager, source and CMake installation mechanisms.",
+          "evidence": {
+            "path": "build/ralfit.sh",
+            "start_line": 8,
+            "end_line": 20
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no dependency scripts or repository code executed."
+    },
+    {
+      "task_id": "import-df9f0a9790e7c322298d3c3a",
+      "reference_sha256": "be04ce0a09d9c45d1c7b641348f007aec61f4adb0e76bb74efd9d1edf9876a49",
+      "question_sha256": "4d63a59cc052500e2071e94aebd275d0fb86b30a33a5d4d5eb2a0db2076fe0b6",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Plot class style dictionaries define line appearance and zorder",
+          "verdict": "supported",
+          "reason": "All listed colors, markers, styles, order and transparency directly match; profiler uses nine colors and four styles.",
+          "evidence": {
+            "path": "fitbenchmarking/results_processing/plots.py",
+            "start_line": 22,
+            "end_line": 52
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no dependency scripts or repository code executed."
+    }
+  ]
+}

@@ -1,0 +1,253 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-d3bcd834dd0920db8bb91097",
+      "reference_sha256": "bfb392cc1a7f267379ec2d572ffaabc4e014341335b672800f4d9c881fe87510",
+      "question_sha256": "6b972853e9de0fd7c4d6a7003d09b91b45382493fcdc59f730d3564c6babcc5f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Session opening, saving, and concurrent ordering",
+          "verdict": "supported",
+          "reason": "The interface explicitly requires implementers to consider synchronization and promises no ordering; context push opens and process_response saves after callbacks.",
+          "evidence": {
+            "path": "src/flask/sessions.py",
+            "start_line": 141,
+            "end_line": 146
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-dee784cda1141aca2941bca5",
+      "reference_sha256": "3230d477a5152c5a8d87eb137bd0671bad639ae58b365cfb7b23492b15c702d7",
+      "question_sha256": "ec9235c1b33b5bf22e3b70b10711bc9cc581843620df236c085720d8b3b2872e",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Error-handler lookup priorities",
+          "verdict": "partially_supported",
+          "reason": "Nested loops are code then scope then MRO; reference additionally asserts NotFound beats a 404 handler, but registrations resolve to the same class/code slot.",
+          "evidence": {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 831,
+            "end_line": 845
+          }
+        }
+      ],
+      "material_errors": [
+        "Nested loops are code then scope then MRO; reference additionally asserts NotFound beats a 404 handler, but registrations resolve to the same class/code slot."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The lookup is in src/flask/sansio/app.py:823-846. Its order is status code (then None), blueprint scopes (then application scope), then exception MRO. The question reverses the outer two loops. The first matching handler wins. Registration stores a handler by resolved code and class (src/flask/sansio/scaffold.py:653-654); a 404 registration and NotFound registration are not independent priority levels."
+    },
+    {
+      "task_id": "import-dfccc70e3617e5d08cde95ed",
+      "reference_sha256": "74f6517f872d51ceadf2bf5acc2b6ad6f709458d8d8bb94cff02b7b04721c203",
+      "question_sha256": "f4fe89cf78f9fb9606a235414d2f8aebc6c3a959220ba6ed858fe4acb343e0b7",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Subdomain test dependency chain",
+          "verdict": "partially_supported",
+          "reason": "Test configuration and matching are correct, but Werkzeug does not directly set request.blueprint; it is derived from endpoint. URL-building digression is not tested.",
+          "evidence": {
+            "path": "tests/test_testing.py",
+            "start_line": 117,
+            "end_line": 138
+          }
+        }
+      ],
+      "material_errors": [
+        "Test configuration and matching are correct, but Werkzeug does not directly set request.blueprint; it is derived from endpoint. URL-building digression is not tested."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "test_blueprint_with_subdomain enables subdomain_matching, configures SERVER_NAME=example.com:1234 and APPLICATION_ROOT=/foo, registers company with subdomain xxx and its / route, then creates test_request_context(\"/\", subdomain=\"xxx\"). It verifies the URL before entering the context and the blueprint after entering, then verifies the same URL through the test client (tests/test_testing.py:117-138). Context push performs matching after opening the session (src/flask/ctx.py:380-394). request.blueprint derives the blueprint name from the matched endpoint (src/flask/wrappers.py:161-178)."
+    },
+    {
+      "task_id": "import-e3142892c90740145751e1c7",
+      "reference_sha256": "76748c88a48ac95007cfe77a1241d58cea3d33129f1da08fd40fba94d64ac7ba",
+      "question_sha256": "e3901d925eebd9bbda860fb5b13740a7804f9cfe3d091c93a350d808ced8b7fd",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Serializer construction proves a concurrency bottleneck",
+          "verdict": "unsupported",
+          "reason": "New serializer construction is visible; expensive HMAC initialization, immutable configuration, and measured bottleneck are not established.",
+          "evidence": {
+            "path": "src/flask/sessions.py",
+            "start_line": 317,
+            "end_line": 335
+          }
+        }
+      ],
+      "material_errors": [
+        "New serializer construction is visible; expensive HMAC initialization, immutable configuration, and measured bottleneck are not established."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The premise is not established by this source. get_signing_serializer builds a key list from current configuration and constructs URLSafeTimedSerializer (src/flask/sessions.py:317-335). save_session calls it when writing a cookie, after the should_set_cookie guard (src/flask/sessions.py:383-387). Repeated allocation may have cost, but the code does not demonstrate that construction performs expensive cryptographic work or causes a high-concurrency bottleneck. Benchmark before optimizing; any cache must account for changes to keys and serializer settings."
+    },
+    {
+      "task_id": "import-e7241e0671b61cec057fda60",
+      "reference_sha256": "b15bbeb888129eb32c718ea443a66dc130433a115d49aa81bb90ec4b93e8e837",
+      "question_sha256": "57dce721f1eddb206e2b4563bb7273e0c02c77b04352a4a662dc1dd0341db290",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "ensure_ascii changes JSON Unicode escaping",
+          "verdict": "supported",
+          "reason": "Default true is passed by setdefault; tests/test_json.py:48-54 verifies escaped versus literal snowman.",
+          "evidence": {
+            "path": "src/flask/json/provider.py",
+            "start_line": 144,
+            "end_line": 179
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-ebf43e16c9d7e714408632f7",
+      "reference_sha256": "f785133f28c95c9747e15010b9ea7ff8593b4cedfca50e48e0a8ebd42309271f",
+      "question_sha256": "3be115fadd7d305107b0ae5804f621d25d0dc314bcd9d9091f9e00bac5c14d70",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Distinct blueprints repeat filter registration and cause significant degradation",
+          "verdict": "partially_supported",
+          "reason": "Identity-based first registration is correct; duplicate registration names raise before callbacks, and source provides no performance magnitude.",
+          "evidence": {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 302,
+            "end_line": 321
+          }
+        }
+      ],
+      "material_errors": [
+        "Identity-based first registration is correct; duplicate registration names raise before callbacks, and source provides no performance magnitude."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "Distinct blueprint objects registered under unique names each count as a first registration (src/flask/sansio/blueprints.py:302-321). record_once runs each such callback (src/flask/sansio/blueprints.py:233-244), and the filter callback assigns into the shared Jinja filter dictionary (src/flask/sansio/blueprints.py:461-475). Repeated same-key registrations therefore overwrite the filter and add startup work. Duplicate registration names instead raise ValueError. These operations do not by themselves establish significant performance degradation; that requires measurement."
+    },
+    {
+      "task_id": "import-ed5816a3e38a30cd474bd6bf",
+      "reference_sha256": "3a65508f6d510f73619d916d57f500c3b1f1e24071a5b712e1e494338c687ecf",
+      "question_sha256": "f14e30b78db5d886418aa4dd65f7665f761353373d6ed8ad1da2a5623c8bd8b9",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "URL-building tests location",
+          "verdict": "supported",
+          "reason": "TestUrlFor contains anchor, scheme, external flag, alternating schemes, and method-based rule assertions.",
+          "evidence": {
+            "path": "tests/test_helpers.py",
+            "start_line": 102,
+            "end_line": 162
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-f9a9324d4d417a121b8defc7",
+      "reference_sha256": "da855fa32626d264a4b550bdeb3126c7ab78fb4b29a81f304c20e6177578a5d6",
+      "question_sha256": "86040176e6294f738ef41f221241df1a22829cf7494aab35d43ac59f6f73e98f",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Dual inheritance proves layered debug paths",
+          "verdict": "partially_supported",
+          "reason": "Class supports both exception categories, but contains no enhanced-info implementation or debug-mode guard and does not cause both registered handlers to run.",
+          "evidence": {
+            "path": "src/flask/debughelpers.py",
+            "start_line": 17,
+            "end_line": 20
+          }
+        }
+      ],
+      "material_errors": [
+        "Class supports both exception categories, but contains no enhanced-info implementation or debug-mode guard and does not cause both registered handlers to run."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "UnexpectedUnicodeError inherits AssertionError and UnicodeError; its docstring states a goal of better reporting for unexpected Unicode or binary data (src/flask/debughelpers.py:17-20). It can therefore be caught as either base category. This unifies categorization rather than proving separate validation and encoding layers. Flask selects a single first matching handler by code, scope, and MRO (src/flask/sansio/app.py:831-845); both handler paths do not automatically receive the exception. The declaration alone does not establish a debug-only execution path."
+    },
+    {
+      "task_id": "import-fb251bfe1f21351861faed14",
+      "reference_sha256": "a8f9ea556b8856895c78b3e8c271a852361139ce2952defe26edc6911a4adba0",
+      "question_sha256": "d6165b75f45c234e4ac2d7c7923cfbb79ba199d7fbea3af7c7efaae1526482c1",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "ScriptInfo factory versus import discovery",
+          "verdict": "supported",
+          "reason": "Cached app takes precedence, then provided callable, explicit import path, and conventional wsgi.py/app.py lookup.",
+          "evidence": {
+            "path": "src/flask/cli.py",
+            "start_line": 333,
+            "end_line": 372
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-fb7295517f5f9074cd3579cb",
+      "reference_sha256": "f34369d248e637b487147bdb7b334b1ef42ddafb94b35dc792b7dc0b9dce1976",
+      "question_sha256": "7b34125959629a518ab895236c5d914cd61953618b0f8021bd402f71fb654c2b",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "MethodView method inheritance",
+          "verdict": "supported",
+          "reason": "Absent explicit methods, collects base sets and recognized methods visible on subclass, assigning only nonempty set.",
+          "evidence": {
+            "path": "src/flask/views.py",
+            "start_line": 165,
+            "end_line": 180
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-fbdfb244b7d6e7078b752398",
+      "reference_sha256": "a0e31e6a5f07bb8df35374548222b8f27efb16c8a9629d39d7f6aae0ac3be09e",
+      "question_sha256": "326b700c645513dba8fe04853654955e3c8489fd6db532b1740e5e8456c55f25",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Root handler prevents Flask default handler",
+          "verdict": "supported",
+          "reason": "has_level_handler traverses parents until propagation stops and checks handler effective threshold; create_logger uses it at76-77.",
+          "evidence": {
+            "path": "src/flask/logging.py",
+            "start_line": 31,
+            "end_line": 47
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    }
+  ]
+}

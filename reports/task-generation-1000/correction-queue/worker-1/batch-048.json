@@ -1,0 +1,109 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 1,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-048.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "20970130c0fef506443f7367a43e569b2ed2bd30f90cca02672788b5151dfede",
+      "question": "What is the dependency relationship between the test class's instance initialization method accessing the class name attribute and Python's object model?",
+      "question_sha256": "23893389399f961028bc34262b659a2356a66586ef0b98b52bf6742252205956",
+      "reference_answer": "In this fixture, self is an instance without a defined __name__, while self.__class__ is a class object with the standard class-name attribute. The expected no-member markers occur on self.__name__, not on self.__class__.__name__ (tests/functional/a/access/access_to__name__.py:7-21). This is not a universal ban on instance __name__: application classes can define such an attribute explicitly.",
+      "reference_sha256": "d427722c26b094ed33a1494811b31c80ce1faab7b3ed4c7a513f90b66a606924",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-bd5294761a162315d100e42b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "9a22e4fa131a80525606287d09f6f1e65247e5097c0abe490c6a741439aa96d3",
+      "question": "How does the test class that extends parent slots using augmentation assignment interact with ancestor slot definitions in the class checker?",
+      "question_sha256": "240614d2315746b0597d77c5903ac2dd7c04415de4234a3a0697ffa41398e7f8",
+      "reference_answer": "The fixture is a regression case for augmented __slots__ and explicitly suppresses undefined-variable on the augmentation (tests/functional/s/slots_checks.py:192-203). The checker infers locally defined slots with ilookup and validates their elements (pylint/checkers/classes/class_checker.py:1553-1588). _check_redefined_slots gathers names from ancestors and warns on intersection with the inferred child names (lines 1618-1642). This describes static validation and robustness, not a guarantee that bare __slots__ += in a subclass is a valid runtime way to access the parent binding.",
+      "reference_sha256": "b6c2814e317de20247b5b32eacee6cc3a4b96f37f81065a977dfc8644a67f3a8",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-d33c176e2df1bfb9bc625346"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "607859c84e5b963324e8003fb8d56098f5024296dd1e03141df012442c57f7fa",
+      "question": "Why does the test case that validates detection of overridden methods marked as immutable use the typing decorator that prevents subclass modifications to maintain behavioral contracts in class hierarchies?",
+      "question_sha256": "09a93e644bce5efb76166770bc1b1073543e62d460df6661361f4c586dd3a8fa",
+      "reference_answer": "The fixture uses typing.final to state that a method should not be overridden. For Python 3.8+ analysis, the checker detects the parent decorator and emits overridden-final-method on an override (pylint/checkers/classes/class_checker.py:1503-1511). This validates a static no-override contract; it does not make the method immutable, prevent runtime subclass modifications, or establish behavioral substitutability.",
+      "reference_sha256": "0f14bafecb9f938deb6f4457846adc598d3ae7fde4fc7513110803cca2a109e2",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-d688225fe2428e87aea9830a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "697f1cb691f2ac96aec4c673edb08d684176f07efa0bf6888f4a046f6af61f85",
+      "question": "What architectural design flaw exists in the string formatting conversion method checker that violates the contract-based responsibility separation between type inference layers and their callers?",
+      "question_sha256": "84f2fd33ed2b3f20463b32dc2231e8f72e214726a93d7f29f1d2823d9d36b6f5",
+      "reference_answer": "The premise is not demonstrated. visit_functiondef calls _safe_infer_call_result(node, node), then dispatches an inferred result to the relevant protocol checker (pylint/checkers/classes/special_methods_checker.py:179-190). The helper passes its caller argument to infer_call_result and declines ambiguous or failed inference (lines 30-53). These lines establish the analysis strategy, not a circular dependency or requirement that caller be a distinct external function. A redesign requires a concrete inference failure and examination of the inference API contract.",
+      "reference_sha256": "1e7c0b25cccee861ebc4f7a6f13dc80b7b93d4e83d5931a3027250d70238272a",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e1b83a9a9039f4212e9b4187"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "834bb040e14554e5dcada6c3d859ab31066caa7e063522abad81c4948b2280b2",
+      "question": "What architectural decision in the while-loop refactoring checker requires a control flow tracking flag when traversing nested if-else chains to identify break statements and prevent false positives?",
+      "question_sha256": "e1aac01ed88e819141db25749c397fb4ac77ec7746ed575251efb71268c3ad9a",
+      "reference_answer": "The checker collects leading if statements in a truthy-constant while loop. While following each else/elif chain, a non-If else statement sets tainted; the next primary candidate is then not processed. Already collected candidates are retained and filtered for a leading Break, and may still produce a suggestion (pylint/extensions/consider_refactoring_into_while_condition.py:52-88). The flag prevents pulling a later break condition ahead of intervening else-side effects; it does not reject the entire current chain.",
+      "reference_sha256": "baf40c5f942488490ae2382496cf72ba9195c1d90f8996ff71dc716a10213c79",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e52e08202655091cb46d684b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "d72fdbe8eabf7e0c16fc1ed58514cdb635e0714483da1fbcf413c355aecfc947",
+      "question": "Where is the call chain through which the forward reference resolution for string literal type annotations in function return type annotations gets processed by the type checking infrastructure?",
+      "question_sha256": "8abaa382318782cc2f77a63504486ebe0aa85afcfc73798520fbd040738e72c5",
+      "reference_answer": "AST traversal invokes VariablesChecker.visit_const for constants. For a string in an annotation context, outside the excluded Literal/Annotated parameter cases, it parses node.value with extract_node and passes the result to _store_type_annotation_node (pylint/checkers/variables.py:3461-3489). The latter records names from Name, Attribute and Subscript forms (lines 2994-3017). This is name-use bookkeeping for string annotations, not a complete forward-reference type resolver; parse failures are ignored.",
+      "reference_sha256": "18471d331c32b5d9d243a6834080ed55f42860e8af771cb8651b8b02d0d02314",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-efcdc2f96c6ba2b9aced8685"
+    }
+  ]
+}

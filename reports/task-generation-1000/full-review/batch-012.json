@@ -1,0 +1,277 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-3950d154749fe63577cf0c0a",
+      "reference_sha256": "4011d2e426f4c5da92ad603bcb702382327cd1a04de65ad7931cb47d3c0a1f6e",
+      "question_sha256": "cdeda6c64b0c434df0fca73352241b7289629229fa853ba27d14c1cec6c75644",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Bound form count comes from management data and invalid defaults may mask errors",
+          "verdict": "partially_supported",
+          "reason": "Count branch is correct, but full_clean explicitly records invalid management form as a non-form error.",
+          "evidence": {
+            "path": "django/forms/formsets.py",
+            "start_line": 410,
+            "end_line": 425
+          }
+        }
+      ],
+      "material_errors": [
+        "Count branch is correct, but full_clean explicitly records invalid management form as a non-form error."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "BaseFormSet.initial_form_count returns management_form.cleaned_data[INITIAL_FORM_COUNT] when bound; otherwise it uses len(initial) or zero (django/forms/formsets.py:192-199). This count determines initial versus extra forms. It is not reconciled against server initial-list length, so a valid but different submitted count changes that classification. Missing or invalid management values are not silently accepted: full_clean records a missing_management_form error (410-421)."
+    },
+    {
+      "task_id": "import-49809902aa400b161e7c1457",
+      "reference_sha256": "bab0527024e790a47fca844c7bef7b2f9a86d0269a127dcba62b07734725e72f",
+      "question_sha256": "9aef0c887e9b3361a9c9c349de91c76127f88fff68065b2df3cf162114533d66",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "DurationField chooses native value or microseconds by connection feature",
+          "verdict": "supported",
+          "reason": "Preparation and conversion hooks match exactly.",
+          "evidence": {
+            "path": "django/db/models/fields/__init__.py",
+            "start_line": 1893,
+            "end_line": 1904
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-4c744eb48b4b9c0d749a377a",
+      "reference_sha256": "30d06a7485c2a11c4e0993f2e4696206703333091c238abeee3001cabd927c95",
+      "question_sha256": "8a9e4e54f18abe1624b3509006586c7f0d56680ef93f5aba388c9b9506342dc5",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Reference implements Template Method",
+          "verdict": "partially_supported",
+          "reason": "The base defines a polymorphic interface and defaults, not a fixed template algorithm sequencing overridden steps.",
+          "evidence": {
+            "path": "django/db/backends/ddl_references.py",
+            "start_line": 9,
+            "end_line": 48
+          }
+        }
+      ],
+      "material_errors": [
+        "The base defines a polymorphic interface and defaults, not a fixed template algorithm sequencing overridden steps."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Reference is a polymorphic base interface for deferred DDL reference objects (django/db/backends/ddl_references.py:9-48). It supplies false predicates, no-op rename methods, and requires subclasses to implement SQL string conversion. Table implements table matching/renaming (51-69); richer subclasses track columns or compose statement parts. This is interface-based polymorphism rather than evidence of a classic Template Method algorithm."
+    },
+    {
+      "task_id": "import-535d769c328871b186aff333",
+      "reference_sha256": "be249cb548215b074994a2943b66113c8af58bc2e4be11a70ee05919cccc653a",
+      "question_sha256": "3b051e67faab9122ce08eeab16ce799cb4e928be93cd312eaabea8f056e31c7a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "MultipleObjectMixin clones QuerySets, falls back to manager, then applies ordering",
+          "verdict": "supported",
+          "reason": "Branches and unguarded order_by match; ordinary list plus ordering will fail.",
+          "evidence": {
+            "path": "django/views/generic/list.py",
+            "start_line": 22,
+            "end_line": 47
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-61119dd3437675675599db61",
+      "reference_sha256": "3f4e43a20219b08ac21a51d39fcc873a38147a366244e6cbee857542278aeaff",
+      "question_sha256": "90038cae3d2bcf098cdc4029c94f95bf500e1cccc824e1c203f688d61c790672",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Redirect helper depends on login session assertion and default CSRF bypass",
+          "verdict": "supported",
+          "reason": "Test login posts credentials only and asserts SESSION_KEY; handler sets bypass flag; auth login rotates token.",
+          "evidence": {
+            "path": "tests/auth_tests/test_views.py",
+            "start_line": 79,
+            "end_line": 88
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-73b93f0a5cfce972e6e03cb4",
+      "reference_sha256": "9a13f62651950772006d674e660fa047bf45189f9b7c2a5ab37c87ebb3cd9bb6",
+      "question_sha256": "7f6f53485332a39ea7c35d2d898694a73149e75bd19477fa0be19cd896293624",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Person has two nullable self foreign keys with SET_NULL",
+          "verdict": "supported",
+          "reason": "Model declarations and deletion.SET_NULL field update substantiate preservation of referencing children through these relations.",
+          "evidence": {
+            "path": "tests/m2o_recursive/models.py",
+            "start_line": 26,
+            "end_line": 33
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-7a8e5fce8ed60429423f422d",
+      "reference_sha256": "487d6139e332db00decc888c811348b6c486f48f41b3f7bb9b84d90bcd68a2f4",
+      "question_sha256": "201588d0f600c7c23febb23f732fbdd5e508f0d03f1d2cc98bf1c9621dbee661",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Refactoring hasattr/extend necessarily improves throughput",
+          "verdict": "contradicted",
+          "reason": "No benchmark supports throughput claims; error_list is already stored and the proposed getattr(None) alters semantics if None is a mapping key.",
+          "evidence": {
+            "path": "django/forms/fields.py",
+            "start_line": 186,
+            "end_line": 198
+          }
+        }
+      ],
+      "material_errors": [
+        "No benchmark supports throughput claims; error_list is already stored and the proposed getattr(None) alters semantics if None is a mapping key."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "run_validators invokes every validator, remaps an individual error message when its code exists in error_messages, extends a list with each error_list, then raises an aggregate ValidationError (django/forms/fields.py:186-198). ValidationError stores error_list during construction (django/core/exceptions.py:167-182); accessing it does not construct a new list. The code does not establish a bottleneck or that flattening later is faster. Any refactoring should be benchmarked and preserve missing-code behavior, message overrides, and error order."
+    },
+    {
+      "task_id": "import-80e0bd535d2dab28c20b2941",
+      "reference_sha256": "58c4d8eeb4dc2289d26542cbacecefa96d9fbd11e78369b3c4f4589ce8920364",
+      "question_sha256": "a123cf4148da96f57c8acb08d03c48fe03de50dc7088ef07ecc9be7aa3a23abf",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Populated migration history is the reason post_migrate must be suppressed",
+          "verdict": "partially_supported",
+          "reason": "Actual condition is restricted apps or serialized rollback, not migration-history population alone.",
+          "evidence": {
+            "path": "django/test/testcases.py",
+            "start_line": 1251,
+            "end_line": 1272
+          }
+        }
+      ],
+      "material_errors": [
+        "Actual condition is restricted apps or serialized rollback, not migration-history population alone."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "inhibit_post_migrate is an internal flush option. flush emits post_migrate only when SQL was executed and inhibition is false (django/core/management/commands/flush.py:86-91). TransactionTestCase enables inhibition for a restricted available_apps set or serialized_rollback with saved contents, avoiding recreation of data that will be restored (django/test/testcases.py:1251-1272). Populated migration history alone is not the condition."
+    },
+    {
+      "task_id": "import-8256ac589aed18728dda2aef",
+      "reference_sha256": "2e2b0df9a6781c287e0341e5dffc247a95f4eb9e0de861ca76b3d16815d46912",
+      "question_sha256": "cdc891ae8030e6a7d18a2291672f01f5c5c0a0a21e55be1db94597862bdc5c28",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Referencing Target automatically propagates target uniqueness validation",
+          "verdict": "contradicted",
+          "reason": "full_clean validates the current instance; ForeignKey.validate checks referenced-row existence. save rejects certain unsaved relations rather than saving them.",
+          "evidence": {
+            "path": "django/db/models/fields/related.py",
+            "start_line": 1127,
+            "end_line": 1142
+          }
+        }
+      ],
+      "material_errors": [
+        "full_clean validates the current instance; ForeignKey.validate checks referenced-row existence. save rejects certain unsaved relations rather than saving them."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Target.name uniqueness is checked when Target.validate_unique/full_clean is invoked; full_clean excludes failed fields before its unique checks (django/db/models/base.py:1594-1626). A ForeignKey to name requires an eligible unique target at model-check time (django/db/models/fields/related.py:638-674), and ForeignKey.validate checks that a matching target row exists (1127-1142). Referencing Target does not recursively call its uniqueness validation. save does not run full_clean and the related-save preparation can reject unsaved related objects (base.py:1202-1204)."
+    },
+    {
+      "task_id": "import-87284dbb640a5fec7e8cc9c7",
+      "reference_sha256": "c222ce81c2d51dbd4ed0ab5ef7aef603fc26e858b5bd3079474edf817d881f2a",
+      "question_sha256": "4370c86596f6fff2a6ca8fa9aa8384706a7b71522b163b9a525c35fadf69664a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "URL asvar suppresses NoReverseMatch and assigns empty string",
+          "verdict": "supported",
+          "reason": "Exact try/except and context assignment match.",
+          "evidence": {
+            "path": "django/template/defaulttags.py",
+            "start_line": 480,
+            "end_line": 491
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-87c5ca19ae578a5cf219738a",
+      "reference_sha256": "3a56f1092589667eedc0c5b0e98611b7aab2d644d3ee19415e838271ff72972f",
+      "question_sha256": "3de30c884a2793fa3b3709856ce880f660045d23c3b60dddfb979a3621ea92bd",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Non-deferred parent attributes retain lazy-loading semantics",
+          "verdict": "partially_supported",
+          "reason": "Reference body correctly says eager for non-deferred, but final assertion repeats false question premise.",
+          "evidence": {
+            "path": "django/db/models/query_utils.py",
+            "start_line": 209,
+            "end_line": 231
+          }
+        }
+      ],
+      "material_errors": [
+        "Reference body correctly says eager for non-deferred, but final assertion repeats false question premise."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Django passes a nested related select mask into get_default_columns and excludes fields outside that mask (django/db/models/sql/compiler.py:1026-1030,1241-1260). Non-deferred fields selected by select_related are loaded eagerly. Deferred fields remain absent from instance data and DeferredAttribute retrieves them on access, using a parent-chain value if available or refresh_from_db otherwise (django/db/models/query_utils.py:209-231). Thus lazy loading applies to deferred fields, not non-deferred parent attributes."
+    },
+    {
+      "task_id": "import-89f132eab20a4e4d332ec777",
+      "reference_sha256": "82aef1d7388c068d32271185c9c95b40670b959b7c0c8fbe2cf1b918a81117f6",
+      "question_sha256": "df4573e1ab207fb531f47e443d518c905cfa487273431b7892345895cb2888df",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Detail and model-form mixins compose independent object/template/form concerns",
+          "verdict": "supported",
+          "reason": "Tests isolate template naming and ModelFormMixin context with deferred objects; ModelFormMixin inherits FormMixin and SingleObjectMixin.",
+          "evidence": {
+            "path": "tests/generic_views/test_detail.py",
+            "start_line": 185,
+            "end_line": 204
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    }
+  ]
+}

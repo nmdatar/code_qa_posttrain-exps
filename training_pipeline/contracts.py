@@ -8,6 +8,10 @@ class ConfigurationError(ValueError):
     pass
 
 
+class PolicyFormatError(ValueError):
+    """Policy-authored schema violation, distinct from execution/infrastructure."""
+
+
 class InfrastructureError(RuntimeError):
     pass
 

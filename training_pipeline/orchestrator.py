@@ -345,10 +345,10 @@ class Pipeline:
                         [self.group(t, stage['group_size'], stage['temperature']) for t in tasks])
                     if stage['kind'] == 'reinforce':
                         baselines = self.state.setdefault('reinforce_baselines', {})
-                        rows, stats, baseline = reinforce_batch(groups, baselines.get(str(stage_index)))
+                        rows, stats, baseline = reinforce_batch(groups, baselines.get(str(stage_index)), stage.get('stability'))
                         baselines[str(stage_index)] = baseline
                     else:
-                        rows, stats = grpo_batch(groups)
+                        rows, stats = grpo_batch(groups, stage.get('stability'))
                     loss = 'importance_sampling'
                 collection_and_grading_seconds = time.monotonic() - batch_started
                 update_seconds = 0.0
@@ -399,7 +399,7 @@ class Pipeline:
                 # optimizer so it is also a resumable boundary. SFT honors cadence.
                 every = self.config['evaluation']['every']
                 scheduled_evaluation = bool(rows) and every and self.state['optimizer_step'] % every == 0
-                should_commit = done or scheduled_evaluation or (bool(rows) and (stage['kind'] in {'grpo', 'reinforce'} or
+                should_commit = (stage['kind'] in {'grpo', 'reinforce'} and not rows) or done or scheduled_evaluation or (bool(rows) and (stage['kind'] in {'grpo', 'reinforce'} or
                     self.state['optimizer_step'] % self.config['checkpoint_every'] == 0))
                 checkpoint_seconds = 0.0
                 if should_commit:

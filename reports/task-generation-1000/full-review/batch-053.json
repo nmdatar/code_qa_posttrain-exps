@@ -1,0 +1,208 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-1eee93e899bdaf49229336c7",
+      "reference_sha256": "1fd8e8a57122d0f33516e799ce698d99f9950864122e7f43660b7b1801eea775",
+      "question_sha256": "a5d5aaabacc37ad3f7fde7c8f259023f83bf6293486174076937c2c29e2af48f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "FITS lacks compression decoder",
+          "verdict": "supported",
+          "reason": "Entire native reader parses headers and emits raw tile; no compression keyword dispatch or codec support. Bit-depth mode mapping does not prove comprehensive FITS support.",
+          "evidence": {
+            "path": "src/PIL/FitsImagePlugin.py",
+            "start_line": 26,
+            "end_line": 63
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-46d164d1fddcedd7c8a72721",
+      "reference_sha256": "cfe821d0f255157f4a36d9170739d3986989caf4af3833ab944316aa344aef9f",
+      "question_sha256": "0aee1e4afd9f14be4c825783ffb22512cadd53e98dc872af8a310c8ee0a32a60",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "FreeType repeated calls inherently leak through cycles",
+          "verdict": "unsupported",
+          "reason": "Destructor releases face/bytes; Python font and bytes references do not establish a back-reference cycle. Leak test exercises repeated drawing with one font, not progressive font construction proof.",
+          "evidence": {
+            "path": "src/_imagingft.c",
+            "start_line": 1214,
+            "end_line": 1221
+          }
+        }
+      ],
+      "material_errors": [
+        "Destructor releases face/bytes; Python font and bytes references do not establish a back-reference cycle. Leak test exercises repeated drawing with one font, not progressive font construction proof."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The premise is not established. FreeTypeFont holds its C font and optionally bytes (src/PIL/ImageFont.py:198-216), while font_dealloc releases FT_Face and allocated font bytes (src/_imagingft.c:1214-1221). These references alone do not form a cycle. The leak regression test repeatedly draws using one font and a memory limit (Tests/test_font_leaks.py:6-23); it is not evidence that current repeated ImageFont operations necessarily leak. Distinguish retained live font objects, allocator behavior, and an actual unreleased allocation using a measured reproduction before assigning a cause."
+    },
+    {
+      "task_id": "import-58bfff5b84fffcb8ce8357a8",
+      "reference_sha256": "4ed6a7d95e949f1644bab7904447bce7cfedb295c8268616d96e67b9d3249cb2",
+      "question_sha256": "e0cb27c190f82ae5c2d1c0a036fc44b2dae1c31490257ba5216455f321e463bb",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Dual FITS architecture offers complete native reading",
+          "verdict": "partially_supported",
+          "reason": "Compatibility override is explicit, but limited raw native reader is not complete FITS implementation and override is not automatically temporary.",
+          "evidence": {
+            "path": "src/PIL/FitsStubImagePlugin.py",
+            "start_line": 27,
+            "end_line": 43
+          }
+        }
+      ],
+      "material_errors": [
+        "Compatibility override is explicit, but limited raw native reader is not complete FITS implementation and override is not automatically temporary."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "At this pin, FitsImagePlugin provides a built-in reader using FITS headers and a raw tile (src/PIL/FitsImagePlugin.py:26-63). FitsStubImagePlugin retains register_handler for existing external handlers: it emits a deprecation warning and overrides the FITS open registration for backward compatibility (src/PIL/FitsStubImagePlugin.py:18-43). The stub obtains size/mode through the native reader, then invokes the handler (src/PIL/FitsStubImagePlugin.py:51-66). This is a transition path, not two automatically alternating loaders or a claim of complete FITS coverage."
+    },
+    {
+      "task_id": "import-78be3db0a17c279b33383e34",
+      "reference_sha256": "4d45ec81dc554cf4f1d77b3ff6e77ec4733391f2f08ea9047c20bb8ab02c9fb2",
+      "question_sha256": "859b79adc39b411ecf9334a4739777df1129f2970d62799e5ef36b918b810a07",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "FITS identifiers and absent compression constants",
+          "verdict": "supported",
+          "reason": "SIMPLE acceptance, FITS format strings and BITPIX mapping are directly present; tile is raw with no compressed codec constants.",
+          "evidence": {
+            "path": "src/PIL/FitsImagePlugin.py",
+            "start_line": 17,
+            "end_line": 63
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-93eda4a7f7ffd5a5284b0cbf",
+      "reference_sha256": "7f28862b6edc444888ccccd481d7f669ea3739e9b85cf60b494a0f2a704c27c6",
+      "question_sha256": "c12f772fc2675eea5869240116e9546db5c334cf182daf8e68801c3b28a8f8f6",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "FITS plugin registry compatibility override",
+          "verdict": "supported",
+          "reason": "Explicit removal/re-registration and metadata delegation match; Image.register_open3212-3214 appends ID and replaces OPEN entry. ID is list, not dictionary.",
+          "evidence": {
+            "path": "src/PIL/FitsStubImagePlugin.py",
+            "start_line": 34,
+            "end_line": 66
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-cf2f71e7e7b258f739a7dd54",
+      "reference_sha256": "d61e9ee287e584e36444c8fbba963603eed2bfb0bbdacc9c67302562da3eb518",
+      "question_sha256": "e6070659a800c96c056384eefa93a32e53482a3f1dbd6f616460c5b2a425b4c1",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Full plugins guarantee optimal performance and no dependencies",
+          "verdict": "partially_supported",
+          "reason": "Stub delegation is defined, but blanket zero-dependency and optimal-performance rationale is unsubstantiated.",
+          "evidence": {
+            "path": "src/PIL/ImageFile.py",
+            "start_line": 315,
+            "end_line": 335
+          }
+        }
+      ],
+      "material_errors": [
+        "Stub delegation is defined, but blanket zero-dependency and optimal-performance rationale is unsubstantiated."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "ImageFile subclasses implement format identification/parsing and configure image loading, while StubImageFile explicitly identifies a format and relies on external code to load it (src/PIL/ImageFile.py:315-335). BUFR demonstrates application-specific handler registration and delegation (src/PIL/BufrStubImagePlugin.py:17-24,40-55). This lets specialized handlers integrate with Pillow's image interface without implementing all format processing in that stub. Full plugin implementations do not universally guarantee zero dependencies or optimal performance; those claims do not follow from this architecture."
+    },
+    {
+      "task_id": "import-d4e1aefc13962e0d2c508dad",
+      "reference_sha256": "60dc855a335442ffe0f07e38be4a41e059e4e6b6f4827b5201d28122a7f23f0b",
+      "question_sha256": "d653fc3f7130a7c7b5cb4aca1dd11ca29cebb00c11ae653c83ed38b267bb5f4d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Deprecated FITS handler overrides direct registry",
+          "verdict": "supported",
+          "reason": "Stores handler, warns, removes ID if present, registers stub using native accept; load delegates through StubImageFile326-335.",
+          "evidence": {
+            "path": "src/PIL/FitsStubImagePlugin.py",
+            "start_line": 18,
+            "end_line": 43
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-e10ace2cbd40679911ed7eb5",
+      "reference_sha256": "dc91bf5b087cf7d903186735cd83b8ea5e3d9279deb58e9fda4b0c0ec8dc2cb2",
+      "question_sha256": "1c0ef8f56ef54b8c02b3cf2118ad2db07680197fbb673109830988001e5ee37d",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Array export avoids copying and cannot be unified efficiently",
+          "verdict": "partially_supported",
+          "reason": "Export explicitly materializes bytes and calls np.array; performance intent and impossibility of unified protocol are unsupported.",
+          "evidence": {
+            "path": "src/PIL/Image.py",
+            "start_line": 669,
+            "end_line": 685
+          }
+        }
+      ],
+      "material_errors": [
+        "Export explicitly materializes bytes and calls np.array; performance intent and impossibility of unified protocol are unsupported."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The two directions have different entry points. Image.__array__ builds shape/type metadata, materializes image bytes (expanding mode 1), and returns np.array over an array-interface wrapper (src/PIL/Image.py:665-685). This is not zero-copy exposure of Pillow's internal storage. fromarray inspects a foreign __array_interface__, selects mode/rawmode, validates dimensionality, converts strided inputs to bytes, and calls frombuffer (src/PIL/Image.py:2890-2921). Their asymmetry reflects exporting Pillow data versus interpreting foreign array metadata, without proving that a unified API is impossible or less efficient."
+    },
+    {
+      "task_id": "import-e7f74b14f66a5d5f02bb9883",
+      "reference_sha256": "f27670b9db38b90fe318e1759985ee403a4b8521b4a01e4b03ec3f6d78ccbf44",
+      "question_sha256": "4f0d8812593e0b202ba915e32c8b64185d9225556c2056c0916a85452ba09ee3",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Optional format attributes not universal",
+          "verdict": "supported",
+          "reason": "Documentation explicitly says is_animated and n_frames may be undefined and supplies getattr defaults. Common image base API still exists; claim of no consistency applies to these optional attributes.",
+          "evidence": {
+            "path": "docs/reference/Image.rst",
+            "start_line": 342,
+            "end_line": 365
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    }
+  ]
+}

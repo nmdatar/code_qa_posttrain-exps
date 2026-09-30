@@ -8,7 +8,7 @@ from unittest.mock import patch, MagicMock
 
 from dataset_builder.environment import (
     DockerBackend, ModalBackend, EnvironmentError, EnvironmentRecipe, RunLimits,
-    _capture, build_environment,
+    _capture, build_environment, _export_snapshot,
 )
 
 
@@ -82,6 +82,54 @@ class BackendTests(unittest.TestCase):
         self.assertEqual(result["sandbox_id"], "sb-example")
         self.assertEqual(json.loads(sandbox.stdin.write.call_args.args[0])["stdin"], "private")
         sandbox.terminate.assert_called_once()
+
+    def test_modal_large_stdin_drains_chunks_before_eof(self):
+        modal = MagicMock()
+        sandbox = modal.Sandbox.create.return_value
+        sandbox.returncode = 0
+        sandbox.stdout.read.return_value = json.dumps({"exit_code":0,"stdout":"ok","stderr":""})
+        sandbox.object_id = "sb-large"
+        original = "source-hash" * 400000
+        with patch("dataset_builder.environment._modal_module", return_value=modal):
+            ModalBackend().run("im-large", ["python", "-"], stdin=original)
+        chunks = [call.args[0] for call in sandbox.stdin.write.call_args_list]
+        self.assertGreater(len(chunks),1)
+        self.assertTrue(all(len(chunk)<=65536 for chunk in chunks))
+        self.assertEqual(json.loads("".join(chunks))["stdin"],original)
+        self.assertEqual(sandbox.stdin.drain.call_count,len(chunks)+1)
+        sandbox.stdin.write_eof.assert_called_once()
+        sandbox.terminate.assert_called_once()
+
+
+class SnapshotLinkTests(unittest.TestCase):
+    def test_only_tracked_internal_file_links_can_be_materialized(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            repo, dest = root / "repo", root / "export"
+            repo.mkdir(); dest.mkdir()
+            def git(*args):
+                return subprocess.check_output(["git", "-C", str(repo), *args]).decode().strip()
+            git("init", "-q")
+            (repo / "config.js").write_text("export default {};\n")
+            (repo / "pkg").mkdir()
+            (repo / "pkg/root.js").symlink_to("../config.js")
+            git("add", ".")
+            git("-c", "user.name=Fixture", "-c", "user.email=f@example.test", "commit", "-qm", "fixture")
+            hashes, links = _export_snapshot(repo, git("rev-parse", "HEAD"), dest)
+            self.assertEqual(hashes["config.js"], hashes["pkg/root.js"])
+            self.assertFalse((dest / "pkg/root.js").is_symlink())
+            self.assertEqual(links["pkg/root.js"]["resolved_path"], "config.js")
+            (repo / "alias-dir").symlink_to("pkg")
+            git("add", "alias-dir")
+            git("-c", "user.name=Fixture", "-c", "user.email=f@example.test", "commit", "-qm", "directory link")
+            directory_hashes, directory_links = _export_snapshot(repo, git("rev-parse", "HEAD"))
+            self.assertEqual(directory_hashes["alias-dir/root.js"], hashes["config.js"])
+            self.assertTrue(directory_links["alias-dir"]["directory"])
+            (repo / "bad").symlink_to("/etc/passwd")
+            git("add", "bad")
+            git("-c", "user.name=Fixture", "-c", "user.email=f@example.test", "commit", "-qm", "bad")
+            with self.assertRaisesRegex(EnvironmentError, "symlink"):
+                _export_snapshot(repo, git("rev-parse", "HEAD"), dest)
 
 
 class ImageBuildTests(unittest.TestCase):

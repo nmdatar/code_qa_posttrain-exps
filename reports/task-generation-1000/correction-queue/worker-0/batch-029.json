@@ -1,0 +1,75 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-029.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/mwaskom--seaborn-3d3d715989d1",
+      "original_reference_sha256": "c1e158f071b8469104c2b2f697b3e8cc6140429bcd8546cad88b9a670b49f85e",
+      "question": "Where does bootstrap resampling data flow through the regression confidence interval computation pipeline in the functional plotting API?",
+      "question_sha256": "989177f77d10180f0d17a297c3ae84c0a64cf1ef15ae089f9a4cf165b21434c7",
+      "reference_answer": "regplot constructs a regression plotter whose fit_regression dispatches model-specific fitting and uses utils.ci(yhat_boots, ci, axis=0) for bands (seaborn/regression.py:188-227). For fast linear fitting, bootstrap resamples X/y to estimate coefficients, then grid.dot converts them to prediction samples (seaborn/regression.py:229-245). algorithms.bootstrap resamples rows jointly or delegates unit resampling (seaborn/algorithms.py:91-120). residplot sets ci=None and does not produce these bootstrap confidence bands (seaborn/regression.py:905-915); LOWESS also disables them.",
+      "reference_sha256": "f5cb65daebfe76111a3a1d272d65c6626c8126aaa2b529ac7c9c220b1d640a6e",
+      "repository": {
+        "commit": "3d3d715989d1a9cecc2b08fb23c695b6bb686754",
+        "family_id": "mwaskom/seaborn",
+        "url": "https://github.com/mwaskom/seaborn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/mwaskom--seaborn-3d3d715989d1a9cecc2b08fb23c695b6bb686754",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-40ab0a818d02f07d2acb3969"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/mwaskom--seaborn-3d3d715989d1",
+      "original_reference_sha256": "04e92d109d054517872dcc4be1ae92a1a0f93857807c05cf045f07ded2102044",
+      "question": "Why does seaborn maintain dual KDE implementations with different caching strategies for statistical computations?",
+      "question_sha256": "92b01b2dfc6c2a57538f87e218db987d5fe808328c314382a2372c62444bf4bc",
+      "reference_answer": "Legacy KDE.define_support can store an evaluation grid, but _eval_univariate still fits a KDE each evaluation (seaborn/_statistics.py:124-163). Modern KDE computes support in _transform then passes it to grouped fits, with common_grid controlling sharing (seaborn/_stats/density.py:157-194). Thus these are different grid-lifetime designs for different plotting interfaces, not caching versus recomputing all statistical work. Source does not establish the asserted performance-driven retention rationale.",
+      "reference_sha256": "c0e67d508d92ed42a99d2d05f0fc590916d77b080e525391e38b8063cecbb03e",
+      "repository": {
+        "commit": "3d3d715989d1a9cecc2b08fb23c695b6bb686754",
+        "family_id": "mwaskom/seaborn",
+        "url": "https://github.com/mwaskom/seaborn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/mwaskom--seaborn-3d3d715989d1a9cecc2b08fb23c695b6bb686754",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-6e0c412519893c0791719465"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/mwaskom--seaborn-3d3d715989d1",
+      "original_reference_sha256": "d5e0731ce8988b7efe3aa178d9ed72f3ddfac6feab2995c0955b83f5503f8644",
+      "question": "Where is the coordination logic implemented that integrates Mark, Stat, Scale, and Move components during the plot compilation process?",
+      "question_sha256": "7d265342c95c18728513592ade091c52971d88cef9d2cde79071b199893c6b09",
+      "reference_answer": "Plot._plot coordinates extraction, figure setup, coordinate scales, statistics, another scale pass, then per-layer drawing (seaborn/_core/plot.py:920-952). _compute_stats calls the Stat object as stat(df, groupby, orient, scales), invoking __call__ (seaborn/_core/plot.py:1230-1235). _plot_layer likewise calls each Move object, unscales coordinates, builds the split generator and invokes mark._plot (seaborn/_core/plot.py:1456-1474). The interfaces are __call__, not Stat.call or Move.call.",
+      "reference_sha256": "9eaf8a53af7200bc0a7a6ce6b45a16cfa0a9014c32b09f9e15770faa371afa41",
+      "repository": {
+        "commit": "3d3d715989d1a9cecc2b08fb23c695b6bb686754",
+        "family_id": "mwaskom/seaborn",
+        "url": "https://github.com/mwaskom/seaborn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/mwaskom--seaborn-3d3d715989d1a9cecc2b08fb23c695b6bb686754",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-ac11a79fc44d813d9acf463d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/mwaskom--seaborn-3d3d715989d1",
+      "original_reference_sha256": "8fd4755ef83bffaca2e1e50035d97e9265dcb68e1961dd5ae654f875af00841f",
+      "question": "Why does seaborn's documentation build system scale poorly during full rebuilds, requiring 20+ minutes for complete regeneration?",
+      "question_sha256": "f1d7efc90850c6dfa1ca0b364af98b5ee833017b097d24bd374d62aa023906f1",
+      "reference_answer": "Gallery generation iterates example scripts and writes their documentation (doc/sphinxext/gallery_generator.py:360-380). Individual examples execute when output is missing or older than source (doc/sphinxext/gallery_generator.py:177-182), so a clean rebuild repeats rendering work. This identifies plausible work to profile but does not establish 20+ minute timing, a dominant bottleneck, repeated backend initialization or broad invalidation from one source change. The cited Makefile:43-51 is the clean target, not proof of sequential build orchestration.",
+      "reference_sha256": "a788bcc1e44933f64f46fa8a8330c4df6e940e9c19e1482ba44373f942d186d9",
+      "repository": {
+        "commit": "3d3d715989d1a9cecc2b08fb23c695b6bb686754",
+        "family_id": "mwaskom/seaborn",
+        "url": "https://github.com/mwaskom/seaborn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/mwaskom--seaborn-3d3d715989d1a9cecc2b08fb23c695b6bb686754",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-f28460d09832bff77da6cfb5"
+    }
+  ]
+}

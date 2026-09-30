@@ -1,0 +1,92 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-069.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "original_reference_sha256": "4058b45099919968299450974a987c8d96dee4f77fd50dd934a4f60d7785beb1",
+      "question": "Why does the list comprehension in the plugin hook that converts the generator-based templater discovery into a list impact memory allocation efficiency compared to directly returning the generator?",
+      "question_sha256": "d765124ac1be5e92d922298f9de596f90587b122facd09c2779f0aad3190a3c8",
+      "reference_answer": "get_templaters consumes core_templaters into a list, allocating a container of references to existing templater classes, not creating the classes themselves (src/sqlfluff/core/plugin/lib.py:24-28). Returning a generator could defer enumeration, but get_templater_class fully consumes hook results into a name-to-class dictionary anyway (src/sqlfluff/core/config/fluffconfig.py:442-447). Therefore this call path would not gain early termination when looking up one name. The practical memory/performance significance of a four-entry list is not established.",
+      "reference_sha256": "2ccae46ec8da3a5e2dae2257a655772b767a1df1f507a03bbf9fd179684f196b",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-05efdeacba8b181cce5faa64"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "original_reference_sha256": "a5c54be905ea32850939f5c36dc888522a8b97589fb6c3dd01d7ec7fb5e0530a",
+      "question": "What is the relationship between the standalone header formatting function's use of StringIO text buffers and the output stream formatter class's responsibility for managing formatted output streams?",
+      "question_sha256": "51a4254b946f4e80fe0d2531a68a64a7c59dec5052125e037683983cdc0291e4",
+      "reference_answer": "format_linting_result_header uses StringIO only to construct and return a header string (src/sqlfluff/cli/formatters.py:62-66). OutputStreamFormatter additionally owns output delivery: _dispatch filters empty messages and writes to its OutputStream (lines 111-118). String construction and destination management are distinct responsibilities. A caller using click.echo bypasses that managed stream, but the nonempty header would not be suppressed by _filter_empty, and this alone does not establish a concurrency or redirection bug.",
+      "reference_sha256": "95b173312773a319012e52ffc5e13c985b724a2fd65f28985cd335a66a1dd23e",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-0bf96393934c3bf7b8f86373"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "original_reference_sha256": "6d1ef62f86b8a93f1d5765df333f5b9225b54ed6682080f4a672a068e7c3a8b3",
+      "question": "What architectural mechanism in the main linting class decouples SQL dialect-specific grammar definitions from the rule-based validation process?",
+      "question_sha256": "6e47602939232ba7c87ae8398a31c70307c2e2bbf3bffc41b4a73af9c8e64a89",
+      "reference_answer": "Linter separates dialect-configured parsing from rule traversal. Parser selects the configured dialect\u2019s root segment, builds a parse context, and calls root_parse to obtain a BaseSegment tree (src/sqlfluff/core/parser/parser.py:24-55). Rules consume the common segment interface and receive dialect context. This decouples rule orchestration from grammar execution without making the tree or every rule semantically dialect-independent.",
+      "reference_sha256": "c862e36b1cc5e77a29921a15e34d98002c46e8742f983e7246fc075059ec360c",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-0fefd75f2ce0dc24c243e662"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "original_reference_sha256": "c0ef745ab101a290c110135d3a7a6fba3fb19ba87ea4009ff9ede820f7ce97f6",
+      "question": "What is the longest-match priority algorithm in the grammar matching attribute of the top-level statement parsing segment that resolves ambiguity when multiple statement type patterns match the same input token sequence?",
+      "question_sha256": "e03009e2f537af1c2bb186b61666fa33937ca7770cc1ced2221805969169412c",
+      "reference_answer": "longest_match prunes options, uses cached or fresh matches, returns immediately for a complete match, otherwise retains a strictly longer result; equal lengths preserve the earlier option (src/sqlfluff/core/parser/match_algorithms.py:190-246). A following terminator can stop further search (lines 248-274). MatchResult.is_better_than compares only length (src/sqlfluff/core/parser/match_result.py:111-113), so the proposed clean/unclean ranking is not implemented.",
+      "reference_sha256": "1a6d63f5b91ddc1fdb63224a93ab1e4a12921ae7209bc625f212528156892852",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-52d3d31460a797c62480ea42"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "original_reference_sha256": "66995df8da8856e853a49f2026585439411bde5a32cee9972c717f6053803969",
+      "question": "How does the SELECT REPLACE clause segment's parsing grammar handle failures when the delimiter-based parser encounters malformed expression-alias pairs that violate expression or identifier grammar constraints?",
+      "question_sha256": "071344d77fe7b59d23ca7a10579396e223f917b0008c855493c0aeb00b4ff1eb",
+      "reference_answer": "ReplaceClauseSegment requires REPLACE followed by bracketed, delimited expression AS identifier sequences (src/sqlfluff/dialects/dialect_bigquery.py:1331-1346). In STRICT sequence mode, a required element failure returns an empty match; strict bracket matching also rejects unmatched remaining content (src/sqlfluff/core/parser/grammar/sequence.py:248-251,544-558). Thus malformed pairs can cause this clause match to fail. That local failure does not guarantee no UnparsableSegment in the overall parse: surrounding greedy/recovery grammars can represent rejected input as unparsable.",
+      "reference_sha256": "8a39da217d2e9c87078b0d37b09486a815be22e4ae3b6974ff8a8248b193510f",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-54b08cf47a74aa61472a3894"
+    }
+  ]
+}

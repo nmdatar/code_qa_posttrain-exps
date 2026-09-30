@@ -1,0 +1,368 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-58e96b20d7c00de2d98430fd",
+      "reference_sha256": "98b76376818308fa125f489dace307799bc74c5ada767e011125f4fc90fb4f4d",
+      "question_sha256": "2c5d883a14437d0f7e4916bb58a0810f4bff924d13f1df2a7def09bc1bbc8f52",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "find result controls tuple or None",
+          "verdict": "supported",
+          "reason": "Nonnegative location produces half-open range; otherwise None.",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/lexer.py",
+            "start_line": 172,
+            "end_line": 178
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-5e691f1c73fa131cac1a202e",
+      "reference_sha256": "9f2b33559669dd71affe0eee80b34f7e868097f9eff03a71e673abb5457f221f",
+      "question_sha256": "b60455df37d02af795ae5b2725d50017b7f39f1f7aaf4b682f5b1007999149a5",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Extraction and routing separated",
+          "verdict": "supported",
+          "reason": "Static helper extracts contextual indexes, eval routes by targets and wildcard policy.",
+          "evidence": {
+            "path": "src/sqlfluff/rules/layout/LT09.py",
+            "start_line": 86,
+            "end_line": 157
+          }
+        },
+        {
+          "claim": "Evaluator builds fixes",
+          "verdict": "supported",
+          "reason": "Consumes extracted targets and initializes fixes; purity refers to no mutation, not absence of conditional logic.",
+          "evidence": {
+            "path": "src/sqlfluff/rules/layout/LT09.py",
+            "start_line": 159,
+            "end_line": 180
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-62534c445cb3c79b509c2a5d",
+      "reference_sha256": "3aa7bc7ecda1981893feb449dec02e305796cc486251d63d24dcf72d90d51456",
+      "question_sha256": "d6743cbdb4cb9cceaebce5fc02e26480bbfdf346c648ce2a3d0f40d2947671f1",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Three phases prove idempotency",
+          "verdict": "unsupported",
+          "reason": "Checks exit statuses with selected rules; no second fix or output comparison.",
+          "evidence": {
+            "path": "test/rules/std_roundtrip_test.py",
+            "start_line": 15,
+            "end_line": 46
+          }
+        }
+      ],
+      "material_errors": [
+        "Overstates idempotency and all-rule guarantees."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "generic_roundtrip_test invokes lint with selected rules and expects exit 1, invokes fix and expects 0, then lints the modified file with the same rules and expects 0 (test/rules/std_roundtrip_test.py:15-46). This integration test verifies detection, persisted correction and subsequent compliance for that fixture and rule selection. It does not independently prove a second fix leaves bytes unchanged or that unrelated rules are satisfied."
+    },
+    {
+      "task_id": "import-626a4077fae1ce9404836f80",
+      "reference_sha256": "16c812a3fa6ce675f98308d9b5a7af2756db7d2913cb1568b4da1f335526eddc",
+      "question_sha256": "4db621649f73d0f58b0fc4c18536bc2185b725fd933a76d5ed603babd41edb9d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Context wraps segments",
+          "verdict": "supported",
+          "reason": "Properties return Segments preserving templated file.",
+          "evidence": {
+            "path": "src/sqlfluff/utils/functional/context.py",
+            "start_line": 7,
+            "end_line": 54
+          }
+        },
+        {
+          "claim": "Tuple query abstraction",
+          "verdict": "supported",
+          "reason": "Tuple subclass provides find/all/any/reversed.",
+          "evidence": {
+            "path": "src/sqlfluff/utils/functional/segments.py",
+            "start_line": 20,
+            "end_line": 71
+          }
+        },
+        {
+          "claim": "LT09 uses chained queries",
+          "verdict": "supported",
+          "reason": "Reduces manual traversal but retains semantic tree-shape knowledge; no complete structural decoupling.",
+          "evidence": {
+            "path": "src/sqlfluff/rules/layout/LT09.py",
+            "start_line": 86,
+            "end_line": 157
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-64756e21e714396edadc9f40",
+      "reference_sha256": "cc4c86a839f0325e2d17e36364e97deffea748e884c2d80dbdfdb9b88b7bd52c",
+      "question_sha256": "403b4adaa0636cc70d22af211666e6feefa254e67b5f84dc51622d68ce7c0790",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Warning routes through common output",
+          "verdict": "supported",
+          "reason": "Formats then dispatches.",
+          "evidence": {
+            "path": "src/sqlfluff/cli/formatters.py",
+            "start_line": 216,
+            "end_line": 218
+          }
+        },
+        {
+          "claim": "filter_empty is verbosity control",
+          "verdict": "contradicted",
+          "reason": "Only filters blank messages; warning has no verbosity gate.",
+          "evidence": {
+            "path": "src/sqlfluff/cli/formatters.py",
+            "start_line": 111,
+            "end_line": 118
+          }
+        }
+      ],
+      "material_errors": [
+        "Conflates empty-output filtering with verbosity."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "dispatch_dialect_warning calls format_dialect_warning then _dispatch (src/sqlfluff/cli/formatters.py:216-218). The former creates and colorizes the warning (596-604); the latter sends nonempty text to the configured output stream (111-118). This shares formatting and destination handling. _filter_empty filters whitespace-only messages, not verbosity, and this dispatcher has no verbosity condition."
+    },
+    {
+      "task_id": "import-67e3af3aa9e24ba6727bbc20",
+      "reference_sha256": "cb57bfbb9963219b898374c61b4a9b0393fa690f33be365c50d0ad9057615bd1",
+      "question_sha256": "5a2c90c1be75b37fb519e292c5f81e63f9ffdd9a513e8cceca575b1a7938ef4b",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Ordered REJECT LIMIT value and optional ERRORS",
+          "verdict": "supported",
+          "reason": "Sequence fixes positions; OneOf chooses numeric or UNLIMITED.",
+          "evidence": {
+            "path": "src/sqlfluff/dialects/dialect_exasol.py",
+            "start_line": 2039,
+            "end_line": 2051
+          }
+        },
+        {
+          "claim": "OneOf cardinality",
+          "verdict": "supported",
+          "reason": "Exactly one match by min/max settings.",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/grammar/anyof.py",
+            "start_line": 250,
+            "end_line": 277
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-69c5853cdbd5a1e19d27170b",
+      "reference_sha256": "b310215b60d98b5c243a354e0fbb38a9178a2267ff611ee56714d729192ab320",
+      "question_sha256": "fbebc31ddbd2266226b5e17693d4f9a46d1935b64da44391ecad4b1bfbfabc4b",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Hook aggregation",
+          "verdict": "supported",
+          "reason": "Collects and flattens registered hook dictionaries.",
+          "evidence": {
+            "path": "src/sqlfluff/core/rules/config_info.py",
+            "start_line": 88,
+            "end_line": 99
+          }
+        },
+        {
+          "claim": "Discovery and manager reuse",
+          "verdict": "supported",
+          "reason": "Loads entry points and caches manager; no hard-coded rule imports in aggregator. Broad never-import wording scoped to this architecture.",
+          "evidence": {
+            "path": "src/sqlfluff/core/plugin/host.py",
+            "start_line": 42,
+            "end_line": 105
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-6e1691ee7fe846d64e83e420",
+      "reference_sha256": "5e49340a16d7bb4625235faac0b588982309b6b54b991313e190a0ff13518980",
+      "question_sha256": "73890bb3221e64babccbb99a899844c9b866d29d9a6d6fb0743fe937ca8d6d9a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "SKIP gate at dispatcher",
+          "verdict": "supported",
+          "reason": "Explicit comment and gate verbosity >=2, consistent path/header gates.",
+          "evidence": {
+            "path": "src/sqlfluff/cli/formatters.py",
+            "start_line": 155,
+            "end_line": 175
+          }
+        },
+        {
+          "claim": "Formatting separate from verbosity",
+          "verdict": "supported",
+          "reason": "Formatting contains status/color conditionals but no verbosity; literal no conditional logic phrase is imprecise.",
+          "evidence": {
+            "path": "src/sqlfluff/cli/formatters.py",
+            "start_line": 402,
+            "end_line": 419
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-79a9e4122df26a7d4134f056",
+      "reference_sha256": "160d0c881ff7f9597d3972e7ceee6513c215db6b6213c1fcc1ebfd01d83b1845",
+      "question_sha256": "c1e3f9c6a1bc4a53a3b93fce801b13e67c4f14a2f80df47a0ec9b12c5b171d53",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Factories differ in ancestor cache use",
+          "verdict": "supported",
+          "reason": "Source explicitly calls parent path efficient and raws path less efficient.",
+          "evidence": {
+            "path": "src/sqlfluff/utils/reflow/depthmap.py",
+            "start_line": 126,
+            "end_line": 156
+          }
+        },
+        {
+          "claim": "Cached ancestor list",
+          "verdict": "supported",
+          "reason": "Property caches recursive ancestor lists; suggested filtering is conditional on membership and proposed, not implemented. Performance magnitude and shared-cache benefit need measurement.",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/segments/base.py",
+            "start_line": 363,
+            "end_line": 382
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-7dec6dd59552d0a40765e7aa",
+      "reference_sha256": "0b928d071f1796710cd7d280f70105b4d09a8e17c1fa931c72c8931b06ad4464",
+      "question_sha256": "5b8506e5c958530d6353bb452b27547c4fa6b48b3408f2d9111503173c087546",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Static helper and class dispatch",
+          "verdict": "partially_supported",
+          "reason": "Pure input sorting and cls call supported; historical necessity or impossibility of utility override not established.",
+          "evidence": {
+            "path": "src/sqlfluff/core/templaters/python.py",
+            "start_line": 453,
+            "end_line": 477
+          }
+        }
+      ],
+      "material_errors": [
+        "Presents speculative design reasons as established constraints; module helper needs no import within its own module."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "_sorted_occurrence_tuples is a static helper that expands occurrence lists and sorts by position then text (src/sqlfluff/core/templaters/python.py:453-462). _slice_template calls it through cls (464-477), which groups it with templater operations and permits subclass replacement through that lookup. It needs no instance state. These are observable consequences, not documented reasons excluding a standalone helper; a helper in the same module would not require an import."
+    },
+    {
+      "task_id": "import-7eaf5787c9b91b425422350c",
+      "reference_sha256": "57e95252e7c51d94c7877802bdcd31ec963431ce568d08a6b172d8d3a9e2dfc5",
+      "question_sha256": "0fa089d429eb6f5b2c9297aee77d284ea358c38f4f3c5512baf000b85b972543",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Helper location and contract",
+          "verdict": "supported",
+          "reason": "CliRunner invoke, stream assertions, exception handling and expected exit code.",
+          "evidence": {
+            "path": "src/sqlfluff/utils/testing/cli.py",
+            "start_line": 9,
+            "end_line": 43
+          }
+        },
+        {
+          "claim": "Dialect test delegates",
+          "verdict": "supported",
+          "reason": "Unknown dialect supplied with expected code2.",
+          "evidence": {
+            "path": "test/cli/commands_test.py",
+            "start_line": 110,
+            "end_line": 120
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-8363c002d98a6fbfa76ec336",
+      "reference_sha256": "19c39117225b8d93ece602854c952d8352732574c491bb20774ade247f9a1230",
+      "question_sha256": "5ab43d38e70d004e0dedc31a89ee6365fe0042efd4c74166723ebd099e68afd0",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Fixes preserved and serialized; conditional positions promoted",
+          "verdict": "supported",
+          "reason": "Reduce includes fixes; one-fix same-start guard hoists optional coordinates.",
+          "evidence": {
+            "path": "src/sqlfluff/core/errors.py",
+            "start_line": 286,
+            "end_line": 332
+          }
+        },
+        {
+          "claim": "Signature distinguishes raw/source edits",
+          "verdict": "supported",
+          "reason": "Includes source edit text and source range, deliberately excludes templated slice.",
+          "evidence": {
+            "path": "src/sqlfluff/core/errors.py",
+            "start_line": 349,
+            "end_line": 375
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

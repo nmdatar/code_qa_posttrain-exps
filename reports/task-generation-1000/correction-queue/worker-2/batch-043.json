@@ -1,0 +1,58 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-043.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "original_reference_sha256": "fac9ab7642d240388989586d309bb9194dbddf29ce43d47d7deb76b392ab3d82",
+      "question": "Where does the __next method's recursive traversal logic determine which child nodes to skip when maxchildren constraint is applied, and what is the mathematical relationship between the ceiling division operations that ensures symmetric truncation of the tree display?",
+      "question_sha256": "79b1811ebebaa2c03dcf68844c35e7b5ef84fd42edbf6a119894f2960ef74544",
+      "reference_answer": "RenderDataTree.__next selects child i when maxchildren is None, i < ceil(m/2), or i >= ceil(n-m/2), where n is child count and m=maxchildren (xarray/core/datatree_render.py:203-215). For integral limits with truncation, the head has ceil(m/2) children and the tail has floor(m/2), because ceil(n-m/2)=n-floor(m/2). Even limits split equally; odd limits favor the head by one. For n=10,m=3 it displays indices 0,1,9. An ellipsis is emitted at i=ceil(m/2) when n>m (lines 216-221).",
+      "reference_sha256": "88ffbd002b79cfb2ab2293b5fd1ac86281c541cefc68d62ec49375e118f2d9e9",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e627815de22e00d6cb225346"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "original_reference_sha256": "20f97b87a4c521bda8432d57f4112ded1fb230f04e4c93b64b15da5b0bb68b0d",
+      "question": "What is the separation of concerns established by the delegation pattern in idxmin's call to computation._calc_idxminmax between the DataArray reduction interface layer and the underlying computation abstraction layer?",
+      "question_sha256": "92071f0f525686b0a58b9806429e0d5fc46dafd9fcf1fba7d83f1c46f3958a71",
+      "reference_answer": "DataArray.idxmin supplies the public signature/documentation and delegates to _calc_idxminmax with an argmin lambda and its options (xarray/core/dataarray.py:6007-6014). The shared helper validates scalar/dimension/coordinate constraints, handles all-null slices for skipna, calls argmin, maps integer positions to coordinate labels, restores fill values and attributes, and returns the result (xarray/computation/computation.py:901-955). For chunked data it creates a chunked coordinate with one chunk spanning the selected dimension, rather than reproducing the data\u2019s chunk boundaries (lines 935-944).",
+      "reference_sha256": "6acbaf7d753b51cb7815167ede32a6c90ddc3297d7e2990aeccf0fd36aa15eae",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-f7452ed718749e6fc4879138"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "original_reference_sha256": "5de41fb8747bf56d9f872ae48a1f2a84c8ec99309c37d960a921b39a727f9af4",
+      "question": "What is the dependency mechanism of the __eq__ method's reliance on the isinstance and type built-ins that interact with the class hierarchy of AlwaysGreaterThan and AlwaysLessThan to ensure correct equality semantics when these classes are used in comparison operations throughout the xarray codebase?",
+      "question_sha256": "c91bac7846ddbf33fb3f6d3835d7ec38f7469fed8c382fe1f42232db48bf97d6",
+      "reference_answer": "Each sentinel implements __eq__ as isinstance(other, type(self)); ordinary same-class instances compare equal and the unrelated positive/negative sentinel classes do not (xarray/core/dtypes.py:17-37; xarray/namedarray/dtypes.py:14-34). isinstance permits subclass instances, so this is not an exact-type test. The classes are decorated with total_ordering and supply __gt__ or __lt__, respectively, to generate missing ordering methods. Equality is type-based rather than value-based; it does not create a general mathematical infinity ordering contract for arbitrary subclasses.",
+      "reference_sha256": "43e9f8acb3f2ff0e1243db707f051b786cae923ef10f93c7d67601cd30eb6326",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-fb337fd081738ae93191e803"
+    }
+  ]
+}

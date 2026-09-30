@@ -1,0 +1,92 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-046.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "4c4c52981138c1bb848af9ee6257540a564b6a9659d6cf1b1310f306e06a07c3",
+      "question": "Why does repeatedly instantiating the mock linter, AST walker, and test checker in the message filtering decorator test method degrade performance across thousands of similar test cases?",
+      "question_sha256": "a4b8e13fb2188e8dce558a22c937a76a500bbff5a2855dae4ae1d92e7b44ccaf",
+      "reference_answer": "The test constructs fresh mutable linter, walker, and checker state, registers callbacks, and walks a parsed module (tests/utils/unittest_ast_walker.py:18-58). ASTWalker initialization creates callback maps; add_checker scans dir(checker), filters visit/leave methods by enabled messages, and optionally registers defaults (pylint/utils/ast_walker.py:28-69). Repeating this incurs setup work, but the source does not establish significant degradation or a bottleneck across thousands of tests; that requires measurement.",
+      "reference_sha256": "1cfbe238407b670ebfc0768951f40596568a5287244001c2093f5cf029df51af",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-663562aa85f5980d33b86e52"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "560244d7f47b6d691a64183b4e3a3ff3c2512d6e6aa09171f5decf5131d585bc",
+      "question": "What is the scope resolution chain for the namedtuple class attribute used as return type annotation in the nested class that affects static type checking in importing modules?",
+      "question_sha256": "d7f01e5805c13c712a3896d0afd076f57679b9b74ef84a7110db30addc41c37c",
+      "reference_answer": "The fixture defines Coords in MyObject\u2019s class body before def my_method(self) -> Coords, inside nested_class_as_return_annotation (tests/functional/u/used/used_before_assignment_type_annotations.py:77-90). The return annotation uses the enclosing definition context, where the prior class binding is available; the method body\u2019s local scope is not the starting point. Pylint has a special return-annotation case that checks the enclosing class locals and whether the definition precedes the method (pylint/checkers/variables.py:2303-2316). This fixture checks avoidance of a false used-before-assignment diagnostic, not a general contract for importing modules or all type checkers.",
+      "reference_sha256": "92b60306579d192a0627ca1400f97521e9299b1fbae9639a8b99118d3304cb1d",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-7cfe9cbd7568ff28b7cc98f8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "5c6936c0f38dd6af69bd4d66f31b5009f9955432aca7d6e90fbd08e8817274c1",
+      "question": "Why does the example function's docstring structure that starts with a blank line relate to the empty first line validation rule in the docstring style checker extension module?",
+      "question_sha256": "b98758d7d8ce216cdf2cc259788528ab8830623d0dd19de8f819acbf673b0d09",
+      "reference_answer": "The example\u2019s opening triple quotes are immediately followed by a newline (doc/data/messages/d/docstring-first-line-empty/bad.py:1-9). DocStringStyleChecker tests the raw docstring\u2019s first character and emits docstring-first-line-empty when it is newline (pylint/extensions/docstyle.py:51-61). This is the extension\u2019s specific style rule; its implementation does not establish that PEP257 universally forbids a multiline docstring summary on the following line.",
+      "reference_sha256": "be79db8ec737ae36c86cf94e66c35d0c9eb2705d982fcc60dcbe0b99ce1e13c8",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-801079e1be71efa57bf1f97f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "0ca6eee6f269ae92db6cd44c4731e77076496259b5911807d32ac47a49d75ae2",
+      "question": "How should the termination predicate evaluation within the iteration loop be decoupled from the iterable consumption mechanism to enable independent testing of the termination predicate evaluation and the alternative path value emission?",
+      "question_sha256": "0b167b1b86be517145e1565d4b2c95ea9e9d4bd8a0a0aef9c2c766ad62759f74",
+      "reference_answer": "A possible refactor is to accept an iterable and predicate in a helper that stops at the first true predicate result, then yield the alternative only when the helper reports exhaustion. Preserve laziness, short-circuiting, empty-iterable behavior and exception propagation. The original fixture is at tests/functional/u/use/use_yield_from.py:42-47. Independent tests can cover the predicate itself, early-stop consumption, and alternative emission on exhaustion. This is a proposed design, not implemented in the repository. The use-yield-from checker does not document this testing rationale; its guards include comparison of loop target and yielded name (pylint/checkers/refactoring/refactoring_checker.py:1164-1186).",
+      "reference_sha256": "266d746192f3c42c2691b36d887fe9db25cee8bcb8ba0d4baa9caef334b5b362",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-8105484f8eb45e656f780a50"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "9634e98c6f51a8dfad00c8908e47509004888a8d24479ad1e27b90c49c3413a4",
+      "question": "Why does the inheritance chain from the base role class through the statement role class impact method resolution order computation performance when processing large batches of database query statement instances?",
+      "question_sha256": "7adfede2fb37c8f38571f782e5a9265486495ca79be8d8bf4eacf7956f6402d7",
+      "reference_answer": "The premise is not established. StatementRole simply inherits SQLRole (tests/regrtest_data/max_inferable_limit_for_classes/nodes/roles.py:73-74). The regression fixture uses it among many bases of ColumnElement, then derives FunctionElement and months_between; the file identifies a SQLAlchemy-inspired inference issue (tests/regrtest_data/max_inferable_limit_for_classes/main.py:1-38). This can exercise static class inference, but it contains no large database-query batch benchmark and does not demonstrate repeated uncached runtime MRO computation or quantify performance.",
+      "reference_sha256": "75990f250262dbbe7e129e0ef5185c9d2958985531484e2da6289ec738365a57",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-859938b31ac8420808074bdb"
+    }
+  ]
+}

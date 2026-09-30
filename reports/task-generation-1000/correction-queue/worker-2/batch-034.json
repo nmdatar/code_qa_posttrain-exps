@@ -1,0 +1,92 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-034.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "original_reference_sha256": "63fb0c289f293320c799127cd0cfe902366e9e7e04777f27969dbd4b296da3fd",
+      "question": "What is the dependency chain between the application loading helper, the Flask application instance, and the base Click testing runner that ensures proper CLI command execution in isolation?",
+      "question_sha256": "d942bc4392eae39b0b403271cb3ab14371bf3ae2662c1cca85ac620016c0e39f",
+      "reference_answer": "FlaskCliRunner subclasses Click CliRunner, stores the supplied Flask app, defaults the command to app.cli, and supplies ScriptInfo(create_app=lambda: self.app) unless obj was supplied (src/flask/testing.py:265-298). ScriptInfo.load_app calls that callback and caches the app (src/flask/cli.py:333-372). The runner delegates actual invocation and testing-environment management to Click; this does not promise process isolation or prevent arbitrary app-state side effects.",
+      "reference_sha256": "0c8cc1554be35d7f8557c58725eeab5de1f18741859289b46ecbd36eaf80f6f1",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-8bbd6b6d2f0243327dfae960"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "original_reference_sha256": "c462744eb5460844ba8fbb4efa3f248729c5b955b91be64d6e9f4c871e5b1cff",
+      "question": "How does the wrapper function that defers hash algorithm access until execution delay cryptographic availability validation until runtime to prevent import-time failures in restricted environments?",
+      "question_sha256": "96214d964c080f5f9d6c3d182619c66d0cea35a07f98ab3da94df039739aace6",
+      "reference_answer": "_lazy_sha1 accesses hashlib.sha1 inside the function body, so defining the function and assigning it as digest_method does not resolve SHA-1 during import. The docstring explicitly allows developers on FIPS builds to configure another digest before the wrapper is used (src/flask/sessions.py:290-307). get_signing_serializer passes the callable through signer_kwargs; the Flask code does not invoke it at serializer construction (src/flask/sessions.py:317-335).",
+      "reference_sha256": "55a172728b0e633bbda8e7c91db00ba70e034459d89555546afae0b25f583bf9",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-95eed9e6fa66f96180165c51"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "original_reference_sha256": "58c93368f78d3a47405483e9897d415ce91bc5d2ad2dfb09665448f37e310e14",
+      "question": "Why does the pass-through dictionary tag class's JSON conversion method apply recursive tagging only to dictionary values while avoiding tagging keys?",
+      "question_sha256": "e10ffd89e0654a6cee9f6ae13b4e1d04854c37bbe533619d8f8b23d4f2828866",
+      "reference_answer": "PassDict.to_json leaves each key k unchanged and calls serializer.tag(v) for each value. Its comment states the reason: JSON objects may only have string keys (src/flask/json/tag.py:125-128). Tagged representations can preserve supported non-JSON value types, but this code supplies no key-type preservation or arbitrary-key conversion.",
+      "reference_sha256": "97b05d7652865cf6bd3545e28b30e12118dd836da819773336692b276e0ade7e",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-9871e93f4251108030a47bb6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "original_reference_sha256": "351dffde3f110808d4d2f8c2094a578732144be2cacbeaad9ea9e32254a3a821",
+      "question": "How does the callback-based modification tracking in the session class that inherits from CallbackDict ensure consistency between in-memory session state and persisted cookie data across concurrent requests?",
+      "question_sha256": "9d54b9537a344df5ec48a69627b05d107ca1cf4655cad4c982cdc22922f56716",
+      "reference_answer": "It does not ensure consistency across concurrent requests. SecureCookieSession registers a callback that sets modified and accessed when its dictionary changes; nested mutable values require setting modified manually (src/flask/sessions.py:61-82). SessionInterface explicitly says concurrent requests may open and save in unspecified order (src/flask/sessions.py:141-146). The flag tracks a request session change; it is not a lock, merge mechanism, or cross-request consistency protocol.",
+      "reference_sha256": "954f85dc54b9d4f0374e2be2b00ee05c3bcd3e2c7618b2660e14f5c6e8b20c72",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-9a63abff5e099a311b325447"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "original_reference_sha256": "6235fbca456c2ead81dbb85d9476282220bdad4a4727d82a146d2aa80b7fdb85",
+      "question": "How does the namespace object that stores application-level data during an application context maintain thread-safety and context isolation when accessed concurrently through the contextvars mechanism?",
+      "question_sha256": "5ad3a4c2d0887aec8bb31abd720a80e8fcc4d516e42255f2a3a01331520a1753",
+      "reference_answer": "_AppCtxGlobals is a plain namespace backed by __dict__ (src/flask/ctx.py:29-65). Each newly created AppContext creates a g object; push binds that AppContext with _cv_app.set(self), and pop restores the preceding binding (src/flask/ctx.py:245-265). The g LocalProxy resolves the current binding\u2019s g attribute (src/flask/globals.py:24-33). Separately created and bound AppContexts therefore isolate namespaces. This does not make a shared AppContext or shared mutable values thread-safe or automatically clone them for every task.",
+      "reference_sha256": "9ab4617217fbacf45793ad86048e3be6ed6683107c473db23b0c3aa90062b6bb",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-a0217123c989a3104b83a176"
+    }
+  ]
+}

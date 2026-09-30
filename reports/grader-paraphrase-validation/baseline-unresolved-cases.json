@@ -1,0 +1,2575 @@
+[
+  {
+    "grade": {
+      "aggregation_version": "all-claims-v7",
+      "claim_count": 1,
+      "claims": [
+        {
+          "coverage": "absent",
+          "evidence_keys": [],
+          "id": "c1",
+          "material_error": false,
+          "reason": "The candidate answer asserts that indexing dispatch exhibits quadratic performance degradation. The provided source code (e5) shows a fallback loop iterating over dimensions (lines 1206-1207), which supports the existence of a loop, but the source contains no evidence regarding the computational complexity (O(n^2)) or performance characteristics of this operation. The claim about quadratic cost is an unsupported inference from the code structure without benchmark data or algorithmic analysis in the text.",
+          "verdict": "insufficient"
+        }
+      ],
+      "human_reviewed": false,
+      "independent_evaluation": false,
+      "material_error": false,
+      "reason": "Semantic assessment requires adjudication",
+      "rubric_hash": "e190fc20fc181c926c9bb84efdfa4dbe9722e1fb2b1b98bc3340c7b052f22d1f",
+      "score": null,
+      "semantic": {
+        "additional_claims": [
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "d147c513278abed2ac931c4a22f8d44f92048f7d9865cc5bb0ea4ffce61804c4"
+            ],
+            "id": "claim_1",
+            "material_error": false,
+            "reason": "The source code at lines 1202-1208 explicitly implements a 'manual orthogonal indexing' fallback when a NotImplementedError is caught, confirming the location of the logic described.",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "d147c513278abed2ac931c4a22f8d44f92048f7d9865cc5bb0ea4ffce61804c4"
+            ],
+            "id": "claim_2",
+            "material_error": false,
+            "reason": "The code structure (try/except NotImplementedError around self.array[key]) confirms that this path is taken when the underlying dask array cannot handle the key directly, supporting the claim about dask's inability to handle non-contiguous slices.",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "d147c513278abed2ac931c4a22f8d44f92048f7d9865cc5bb0ea4ffce61804c4"
+            ],
+            "id": "claim_3",
+            "material_error": false,
+            "reason": "Line 1206 shows a loop 'for axis, subkey in reversed(list(enumerate(key)))', and line 1207 shows progressive slicing 'value = value[...]', which matches the description of iterating and progressively slicing.",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "partial",
+            "evidence_keys": [
+              "d147c513278abed2ac931c4a22f8d44f92048f7d9865cc5bb0ea4ffce61804c4"
+            ],
+            "id": "claim_4",
+            "material_error": false,
+            "reason": "While the code shows progressive slicing which implies intermediate arrays, the source text does not explicitly state that 'heterogeneous chunk sizes' trigger 'inefficient rechunking' or 'materialization'. This is a plausible external inference about Dask's behavior but is not verified by the provided code snippet alone.",
+            "verdict": "insufficient"
+          },
+          {
+            "coverage": "absent",
+            "evidence_keys": [],
+            "id": "claim_5",
+            "material_error": false,
+            "reason": "The source code shows a loop over dimensions, which suggests linear complexity relative to the number of dimensions for the slicing operations themselves. The claim that this leads to 'O(n^2) behavior' is a specific performance assertion not supported by the static code provided; indeed, a simple loop over dimensions is typically O(n), making the O(n^2) claim potentially contradictory to the visible structure without further evidence of the cost of each slice.",
+            "verdict": "insufficient"
+          }
+        ],
+        "answer_mode": "answer",
+        "answerability_satisfied": false,
+        "assessment_complete": true,
+        "citation_links": [
+          {
+            "citation_id": "c1",
+            "claim_id": "claim_1",
+            "reason": "Citation c1 (lines 1203-1208) covers the manual orthogonal indexing fallback block.",
+            "supported": true
+          },
+          {
+            "citation_id": "c1",
+            "claim_id": "claim_2",
+            "reason": "The cited lines include the exception handling that defines the condition for this fallback.",
+            "supported": true
+          },
+          {
+            "citation_id": "c1",
+            "claim_id": "claim_3",
+            "reason": "The cited lines contain the loop and slicing logic.",
+            "supported": true
+          },
+          {
+            "citation_id": "c1",
+            "claim_id": "claim_4",
+            "reason": "The cited code shows the mechanism but does not contain text verifying the specific impact of 'heterogeneous chunk sizes' or 'rechunking' costs.",
+            "supported": false
+          },
+          {
+            "citation_id": "c1",
+            "claim_id": "claim_5",
+            "reason": "The cited code does not support the O(n^2) complexity claim; it only shows a loop over dimensions.",
+            "supported": false
+          },
+          {
+            "citation_id": "c1",
+            "claim_id": "c1",
+            "reason": "The citation supports the existence of the code but does not support the specific claim about 'quadratic cost' derived from it.",
+            "supported": false
+          }
+        ],
+        "critical_error": false,
+        "diagram": {
+          "assessed": false,
+          "complete": false,
+          "consistent": false,
+          "findings": [],
+          "material_error": false,
+          "readable": false,
+          "supported": false
+        },
+        "disagreements": [
+          "The candidate asserts 'quadratic performance degradation' (O(n^2)) based on a loop over dimensions. Static analysis of the provided code (a single loop over dimensions) suggests O(n) slicing operations, not O(n^2), unless the cost of each slice is itself linear in the number of dimensions or data size in a way not shown. The reference rubric accepts the claim as a required fact, but the provided evidence (source code) is insufficient to verify the quadratic nature, creating a conflict between the rubric's premise and the verifiable source content."
+        ],
+        "evidence_keys": [
+          "13e506f8ebebf061a56c7f1890a9676a3656c4126d88e4403c62b520ed2cdb0c",
+          "94bc0e951cc12d900bf0b398802d7ff0f830bb9b3c27955d08b38ddab4ca3b4a",
+          "d147c513278abed2ac931c4a22f8d44f92048f7d9865cc5bb0ea4ffce61804c4",
+          "repository_snapshot",
+          "source_98aa4764a30fc0134aca4362"
+        ],
+        "experiment_hash": "5f08460b430dcbf74db4966f22f2da7cae08b7ca8d4ecb05ee721101cd4c3413",
+        "extracted_claims": [
+          {
+            "id": "claim_1",
+            "source": "text",
+            "text": "The quadratic performance degradation occurs in the manual orthogonal indexing fallback."
+          },
+          {
+            "id": "claim_2",
+            "source": "text",
+            "text": "The performance issue arises when dask cannot handle non-contiguous slices directly."
+          },
+          {
+            "id": "claim_3",
+            "source": "text",
+            "text": "The code iterates over each dimension, progressively slicing the array."
+          },
+          {
+            "id": "claim_4",
+            "source": "text",
+            "text": "With heterogeneous chunk sizes, each intermediate slice may trigger inefficient rechunking or materialization of data across multiple chunks."
+          },
+          {
+            "id": "claim_5",
+            "source": "text",
+            "text": "The described mechanism leads to O(n^2) behavior as the number of dimensions increases."
+          }
+        ],
+        "false_execution_claim": false,
+        "judge_family": "qwen",
+        "judge_version": "all-claims-v7",
+        "needs_review": true,
+        "prompt_version": "1.0",
+        "required_claims": [
+          {
+            "coverage": "absent",
+            "evidence_keys": [],
+            "id": "c1",
+            "material_error": false,
+            "reason": "The candidate answer asserts that indexing dispatch exhibits quadratic performance degradation. The provided source code (e5) shows a fallback loop iterating over dimensions (lines 1206-1207), which supports the existence of a loop, but the source contains no evidence regarding the computational complexity (O(n^2)) or performance characteristics of this operation. The claim about quadratic cost is an unsupported inference from the code structure without benchmark data or algorithmic analysis in the text.",
+            "verdict": "insufficient"
+          }
+        ],
+        "schema_version": "1.0",
+        "snapshot_fingerprint": "dc95548b797157ba7048e4406b9e152851cbaa78d498513999017e7216245dd7",
+        "submission_hash": "8b874e4152aa38162cb58e9904d8b9db5a94505ea24e8e8b3d2798a8081ceb60",
+        "task_hash": "d1f1d2d9c4aa3f8452e5b43c37245a95c67f338e3a599697dc95ae30600ac307",
+        "uncited_claim_ids": []
+      },
+      "status": "unresolved",
+      "strict_score": null,
+      "tier": "unresolved",
+      "training_feedback": {
+        "components": {},
+        "eligible": false,
+        "reward": null,
+        "version": "positive-coverage-v4"
+      }
+    },
+    "kind": "baseline-evaluation",
+    "name": "ep-254587bfac1e4638a85f948930fa20e4",
+    "original_run_id": "01-baseline-qwen4b-qwen397-seed42-confirmation-all-claims-v3-modal-protocol-v4",
+    "original_split": "development",
+    "original_verification": {
+      "diagnostics": {
+        "calibrated": false,
+        "claim_count": 1,
+        "claims": [
+          {
+            "coverage": "absent",
+            "evidence_keys": [],
+            "id": "c1",
+            "material_error": false,
+            "reason": "The reference claim states that indexing dispatch does not prove quadratic cost. The provided evidence (e1, e2) shows a manual fallback loop iterating over dimensions, which is a plausible source of inefficiency, but the evidence contains no complexity analysis, benchmarks, or statements confirming or denying O(n^2) behavior. The answer asserts O(n^2) behavior as fact, while the reference claim suggests this is not proven by the dispatch logic alone. The evidence is insufficient to verify the truth value of the reference claim or the answer's specific complexity assertion.",
+            "verdict": "insufficient"
+          }
+        ],
+        "complete_prose_coverage_verified": false,
+        "evaluation_label": "experimental_full_claim_audit",
+        "independent_evaluation": false,
+        "judge_policy": "base:Qwen/Qwen3.5-397B-A17B",
+        "material_error": false,
+        "rubric_hash": "e190fc20fc181c926c9bb84efdfa4dbe9722e1fb2b1b98bc3340c7b052f22d1f",
+        "semantic": {
+          "additional_claims": [
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "d147c513278abed2ac931c4a22f8d44f92048f7d9865cc5bb0ea4ffce61804c4"
+              ],
+              "id": "claim_1",
+              "material_error": false,
+              "reason": "The answer states the degradation occurs in the manual orthogonal indexing fallback. Evidence e2 (lines 1203-1208) explicitly labels this block as '# manual orthogonal indexing' within the exception handler where the fallback occurs.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "13e506f8ebebf061a56c7f1890a9676a3656c4126d88e4403c62b520ed2cdb0c",
+                "d147c513278abed2ac931c4a22f8d44f92048f7d9865cc5bb0ea4ffce61804c4"
+              ],
+              "id": "claim_2",
+              "material_error": false,
+              "reason": "The answer claims the fallback is triggered when dask cannot handle non-contiguous slices. Evidence e1/e2 shows the code attempts `self.array[key]` and executes the fallback only upon catching `NotImplementedError`, which implies the underlying array (dask) did not support the operation directly.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "d147c513278abed2ac931c4a22f8d44f92048f7d9865cc5bb0ea4ffce61804c4"
+              ],
+              "id": "claim_3",
+              "material_error": false,
+              "reason": "The answer states the code iterates over each dimension. Evidence e2 line 1206 shows a loop: `for axis, subkey in reversed(list(enumerate(key))):`, confirming iteration over dimensions.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "partial",
+              "evidence_keys": [
+                "d147c513278abed2ac931c4a22f8d44f92048f7d9865cc5bb0ea4ffce61804c4"
+              ],
+              "id": "claim_4",
+              "material_error": false,
+              "reason": "The answer attributes inefficiency to 'inefficient rechunking or materialization' due to heterogeneous chunk sizes. While the code shows progressive slicing (e2), the provided evidence does not contain logic regarding rechunking triggers, chunk size heterogeneity effects, or materialization behavior. This is an external inference not grounded in the supplied text.",
+              "verdict": "insufficient"
+            },
+            {
+              "coverage": "absent",
+              "evidence_keys": [],
+              "id": "claim_5",
+              "material_error": false,
+              "reason": "The answer asserts O(n^2) behavior. The evidence shows a loop over dimensions (O(n) iterations), but provides no evidence that the operations inside the loop scale linearly with n or interact to produce quadratic complexity. The reference claim c1 explicitly notes that dispatch does not prove quadratic cost, and the evidence does not contradict this or prove the answer's specific complexity class.",
+              "verdict": "insufficient"
+            }
+          ],
+          "answer_mode": "answer",
+          "answerability_satisfied": true,
+          "assessment_complete": true,
+          "citation_links": [
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_1",
+              "reason": "Citation c1 (lines 1203-1208) directly covers the manual orthogonal indexing block mentioned in claim_1.",
+              "supported": true
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_2",
+              "reason": "Citation c1 includes the try/except block where NotImplementedError triggers the fallback, supporting the condition described in claim_2.",
+              "supported": true
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_3",
+              "reason": "Citation c1 contains the loop structure described in claim_3.",
+              "supported": true
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_4",
+              "reason": "Citation c1 shows the slicing loop but does not contain evidence regarding rechunking, materialization, or chunk size heterogeneity effects asserted in claim_4.",
+              "supported": false
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_5",
+              "reason": "Citation c1 shows the algorithm structure but does not provide complexity analysis or performance data to support the O(n^2) assertion in claim_5.",
+              "supported": false
+            }
+          ],
+          "critical_error": false,
+          "diagram": {
+            "assessed": false,
+            "complete": false,
+            "consistent": false,
+            "findings": [],
+            "material_error": false,
+            "readable": false,
+            "supported": false
+          },
+          "disagreements": [
+            "The reference claim c1 states 'Indexing dispatch does not prove quadratic cost', while the answer asserts 'O(n^2) behavior' as a definitive fact caused by the fallback. The provided evidence shows the fallback loop but lacks the necessary performance data or complexity proof to verify either the reference claim's caution or the answer's specific quadratic assertion. It is unclear if the answer's specific mechanism (rechunking/materialization) is correct or if the complexity is truly quadratic based solely on the provided code snippet."
+          ],
+          "evidence_keys": [
+            "13e506f8ebebf061a56c7f1890a9676a3656c4126d88e4403c62b520ed2cdb0c",
+            "5ee0c17b96a510e3a7296cb3f237a8ffc351cc2a7e6274997d97f24138fa4544",
+            "d147c513278abed2ac931c4a22f8d44f92048f7d9865cc5bb0ea4ffce61804c4",
+            "repository_snapshot"
+          ],
+          "experiment_hash": "9ee2a69dff55c94d929ca42fb55c82953d16530ed7608b0b50df755ad788e0f7",
+          "extracted_claims": [
+            {
+              "id": "claim_1",
+              "source": "text",
+              "text": "The quadratic performance degradation occurs in the manual orthogonal indexing fallback."
+            },
+            {
+              "id": "claim_2",
+              "source": "text",
+              "text": "The manual orthogonal indexing fallback is triggered when dask cannot handle non-contiguous slices directly."
+            },
+            {
+              "id": "claim_3",
+              "source": "text",
+              "text": "The code iterates over each dimension, progressively slicing the array."
+            },
+            {
+              "id": "claim_4",
+              "source": "text",
+              "text": "With heterogeneous chunk sizes, each intermediate slice may trigger inefficient rechunking or materialization of data across multiple chunks."
+            },
+            {
+              "id": "claim_5",
+              "source": "text",
+              "text": "The performance degradation leads to O(n^2) behavior as the number of dimensions increases."
+            }
+          ],
+          "false_execution_claim": false,
+          "judge_family": "qwen",
+          "judge_version": "all-claims-v3",
+          "needs_review": true,
+          "prompt_version": "1.0",
+          "required_claims": [
+            {
+              "coverage": "absent",
+              "evidence_keys": [],
+              "id": "c1",
+              "material_error": false,
+              "reason": "The reference claim states that indexing dispatch does not prove quadratic cost. The provided evidence (e1, e2) shows a manual fallback loop iterating over dimensions, which is a plausible source of inefficiency, but the evidence contains no complexity analysis, benchmarks, or statements confirming or denying O(n^2) behavior. The answer asserts O(n^2) behavior as fact, while the reference claim suggests this is not proven by the dispatch logic alone. The evidence is insufficient to verify the truth value of the reference claim or the answer's specific complexity assertion.",
+              "verdict": "insufficient"
+            }
+          ],
+          "schema_version": "1.0",
+          "snapshot_fingerprint": "dc95548b797157ba7048e4406b9e152851cbaa78d498513999017e7216245dd7",
+          "submission_hash": "8b874e4152aa38162cb58e9904d8b9db5a94505ea24e8e8b3d2798a8081ceb60",
+          "task_hash": "d1f1d2d9c4aa3f8452e5b43c37245a95c67f338e3a599697dc95ae30600ac307",
+          "uncited_claim_ids": []
+        },
+        "tier": "unresolved"
+      },
+      "reasons": [
+        "Semantic assessment requires adjudication"
+      ],
+      "retryable": false,
+      "reward": null,
+      "status": "unresolved",
+      "version": "all-claims-v3-judge-1df73364e5f394f07f917efe4444d498ce8c8da4bfeb88fb0322f79c16052f55"
+    },
+    "policy_id": "base:Qwen/Qwen3.5-4B",
+    "reward": null,
+    "source_sha256": "e5e21868c55ac88ce4124a4664109a6a67164ba33e88fa2f8eb7f5e6554f96fe",
+    "source_trajectory": "artifacts/experiment-01-v4-results/artifacts/experiments/01-baseline-qwen4b-qwen397-seed42-confirmation-all-claims-v3-modal-protocol-v4/trajectories/ep-254587bfac1e4638a85f948930fa20e4.json",
+    "task_id": "import-aa0876fa2b0671d67b3e4510",
+    "termination": "completed"
+  },
+  {
+    "grade": {
+      "aggregation_version": "all-claims-v7",
+      "claim_count": 1,
+      "claims": [
+        {
+          "coverage": "partial",
+          "evidence_keys": [
+            "91c7cb81d78f4ea33ab1ead3845dd0feb8fc241eaeaa7cd22ad2d48ea42a5500",
+            "a9b9e0e7a511262bc4ccb000ca5c1bce8061e36c72c0d3ef3d0609415173e1ca",
+            "796c2273ce12c719ebfb3f7cde585a2e9edaf97fa7571430ebf6dfbfb8837149"
+          ],
+          "id": "c1",
+          "material_error": true,
+          "reason": "The claim requires 'Parallel handoff precedes tracing at Process.start'. The evidence (e1, e3) shows `Process.start()` is called at line 290 within `generate_student_impls`. However, the function `create_and_collect_impl` (lines 279-281) executed in the new process only instantiates `StudentImplementation` and puts it in a queue; it does not invoke any tracing logic (e.g., `pybryt.check` or execution tracing). The answer asserts tracing results are received, but the provided source for the parallel path does not show tracing being initiated or results being traced in the child process before the handoff. The 'tracing' aspect of the claim is not supported by the provided evidence for the parallel execution path.",
+          "verdict": "insufficient"
+        }
+      ],
+      "human_reviewed": false,
+      "independent_evaluation": false,
+      "material_error": false,
+      "reason": "Semantic assessment requires adjudication",
+      "rubric_hash": "23abe966443da8c9316d4807e84efd026826d88ce38d6a7175695d384a427c28",
+      "score": null,
+      "semantic": {
+        "additional_claims": [
+          {
+            "coverage": "absent",
+            "evidence_keys": [],
+            "id": "claim_1",
+            "material_error": false,
+            "reason": "The answer claims control passes via `execute_notebook` in `pybryt/execution.py`. The provided evidence (e1-e6) is exclusively from `pybryt/student.py`. There is no evidence provided for `pybryt/execution.py` to verify this routing.",
+            "verdict": "insufficient"
+          },
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "a9b9e0e7a511262bc4ccb000ca5c1bce8061e36c72c0d3ef3d0609415173e1ca",
+              "91c7cb81d78f4ea33ab1ead3845dd0feb8fc241eaeaa7cd22ad2d48ea42a5500"
+            ],
+            "id": "claim_2",
+            "material_error": false,
+            "reason": "The answer states control passes to a `Process` object in `pybryt/student.py` at line 289. Evidence e3 (line 289) and e1 (context) confirm `p = Process(...)` is instantiated at line 289 in `pybryt/student.py`.",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "91c7cb81d78f4ea33ab1ead3845dd0feb8fc241eaeaa7cd22ad2d48ea42a5500",
+              "a9b9e0e7a511262bc4ccb000ca5c1bce8061e36c72c0d3ef3d0609415173e1ca"
+            ],
+            "id": "claim_3",
+            "material_error": false,
+            "reason": "The answer states the `Process` runs `create_and_collect_impl`. Evidence e1 (lines 278-304) shows `Process(target=create_and_collect_impl, ...)` at line 289, confirming the target function.",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "partial",
+            "evidence_keys": [
+              "91c7cb81d78f4ea33ab1ead3845dd0feb8fc241eaeaa7cd22ad2d48ea42a5500"
+            ],
+            "id": "claim_4",
+            "material_error": true,
+            "reason": "The answer claims the process uses a Queue to receive 'traced execution results'. Evidence e1 shows a Queue is used (lines 285, 300-302), but the data put into the queue (line 281) is `(impl, stu)` where `stu` is a `StudentImplementation` object. The evidence does not show 'traced execution results' (which would imply memory footprints or reference matches from `pybryt.check`) being generated or passed in this parallel path. The parallel path in the evidence only generates implementation objects, not execution traces.",
+            "verdict": "insufficient"
+          }
+        ],
+        "answer_mode": "answer",
+        "answerability_satisfied": false,
+        "assessment_complete": true,
+        "citation_links": [
+          {
+            "citation_id": "c1",
+            "claim_id": "claim_1",
+            "reason": "Citation c1 points to `pybryt/student.py` line 15 (import statement). The claim is about `execute_notebook` in `pybryt/execution.py`. The citation does not support the claim's content regarding the specific function or file.",
+            "supported": false
+          },
+          {
+            "citation_id": "c2",
+            "claim_id": "claim_2",
+            "reason": "Citation c2 points to `pybryt/student.py` line 289. The evidence e3 confirms line 289 contains the `Process` instantiation, supporting the claim.",
+            "supported": true
+          },
+          {
+            "citation_id": "c2",
+            "claim_id": "claim_3",
+            "reason": "Citation c2 (line 289) includes the `target=create_and_collect_impl` argument, supporting the claim that the process runs this function.",
+            "supported": true
+          },
+          {
+            "citation_id": "c2",
+            "claim_id": "claim_4",
+            "reason": "While line 289 is part of the block using a Queue, the specific claim about 'traced execution results' is not supported by the visible code in the citation range or the broader evidence e1, which shows only `StudentImplementation` objects being queued.",
+            "supported": false
+          }
+        ],
+        "critical_error": true,
+        "diagram": {
+          "assessed": false,
+          "complete": false,
+          "consistent": false,
+          "findings": [],
+          "material_error": false,
+          "readable": false,
+          "supported": false
+        },
+        "disagreements": [
+          "The reference claim c1 asserts 'Parallel handoff precedes tracing at Process.start'. The provided evidence for the parallel path (`generate_student_impls` with `parallel=True`) shows the child process running `create_and_collect_impl`, which only constructs a `StudentImplementation` object. It does not show any tracing logic (like `pybryt.check` or `create_collector`) being invoked in that child process. If tracing is supposed to happen there, the evidence is missing or the reference claim describes behavior not present in the provided snippet. Conversely, if the answer implies tracing results are returned, it contradicts the evidence showing only implementation objects are queued. This discrepancy between the reference claim's expectation of 'tracing' and the evidence's 'object generation' requires review."
+        ],
+        "evidence_keys": [
+          "796c2273ce12c719ebfb3f7cde585a2e9edaf97fa7571430ebf6dfbfb8837149",
+          "8220131dfbbe91d43362c409b72f0cfdba8a3ddcc240974b47675d827181e8ad",
+          "91c7cb81d78f4ea33ab1ead3845dd0feb8fc241eaeaa7cd22ad2d48ea42a5500",
+          "a9b9e0e7a511262bc4ccb000ca5c1bce8061e36c72c0d3ef3d0609415173e1ca",
+          "repository_snapshot",
+          "source_92056151e0d446dc08d4d449"
+        ],
+        "experiment_hash": "5f08460b430dcbf74db4966f22f2da7cae08b7ca8d4ecb05ee721101cd4c3413",
+        "extracted_claims": [
+          {
+            "id": "claim_1",
+            "source": "text",
+            "text": "Execution control passes from the tracing system via the `execute_notebook` function in `pybryt/execution.py`."
+          },
+          {
+            "id": "claim_2",
+            "source": "text",
+            "text": "Execution control passes to a `Process` object in `pybryt/student.py` at line 289."
+          },
+          {
+            "id": "claim_3",
+            "source": "text",
+            "text": "The `Process` object runs `create_and_collect_impl`."
+          },
+          {
+            "id": "claim_4",
+            "source": "text",
+            "text": "The process uses a `Queue` to receive the traced execution results back to the main thread."
+          }
+        ],
+        "false_execution_claim": true,
+        "judge_family": "qwen",
+        "judge_version": "all-claims-v7",
+        "needs_review": true,
+        "prompt_version": "1.0",
+        "required_claims": [
+          {
+            "coverage": "partial",
+            "evidence_keys": [
+              "91c7cb81d78f4ea33ab1ead3845dd0feb8fc241eaeaa7cd22ad2d48ea42a5500",
+              "a9b9e0e7a511262bc4ccb000ca5c1bce8061e36c72c0d3ef3d0609415173e1ca",
+              "796c2273ce12c719ebfb3f7cde585a2e9edaf97fa7571430ebf6dfbfb8837149"
+            ],
+            "id": "c1",
+            "material_error": true,
+            "reason": "The claim requires 'Parallel handoff precedes tracing at Process.start'. The evidence (e1, e3) shows `Process.start()` is called at line 290 within `generate_student_impls`. However, the function `create_and_collect_impl` (lines 279-281) executed in the new process only instantiates `StudentImplementation` and puts it in a queue; it does not invoke any tracing logic (e.g., `pybryt.check` or execution tracing). The answer asserts tracing results are received, but the provided source for the parallel path does not show tracing being initiated or results being traced in the child process before the handoff. The 'tracing' aspect of the claim is not supported by the provided evidence for the parallel execution path.",
+            "verdict": "insufficient"
+          }
+        ],
+        "schema_version": "1.0",
+        "snapshot_fingerprint": "bd2ca2c99e8c79d1bbe6e6105acba8b71f63871d9249b7a10130ee36911892f0",
+        "submission_hash": "0f2e6442d7dfda1c33d1bbad75b4113d56c02609fe7e2fbd3e5b75c1a42cec5e",
+        "task_hash": "7fb75947b7e2790ee9f2bc356c6d89ea9a39ec70137bc0abdab9f3d19f68cf0c",
+        "uncited_claim_ids": []
+      },
+      "status": "unresolved",
+      "strict_score": null,
+      "tier": "unresolved",
+      "training_feedback": {
+        "components": {},
+        "eligible": false,
+        "reward": null,
+        "version": "positive-coverage-v4"
+      }
+    },
+    "kind": "baseline-evaluation",
+    "name": "ep-772ef0208ce54855b646b607bd4b7741",
+    "original_run_id": "01-baseline-qwen4b-qwen397-seed42-confirmation-all-claims-v3-modal-protocol-v4",
+    "original_split": "development",
+    "original_verification": {
+      "diagnostics": {
+        "calibrated": false,
+        "claim_count": 1,
+        "claims": [
+          {
+            "coverage": "partial",
+            "evidence_keys": [
+              "91c7cb81d78f4ea33ab1ead3845dd0feb8fc241eaeaa7cd22ad2d48ea42a5500"
+            ],
+            "id": "c1",
+            "material_error": true,
+            "reason": "The claim states 'Parallel handoff precedes tracing at Process.start'. Evidence e1 (lines 278-304) shows that within the parallel block, the `Process` is created and started (line 289-290) to run `create_and_collect_impl`. Inside this function (lines 279-281), `StudentImplementation` is instantiated, which triggers the tracing (as per the `check` context manager logic implied in the codebase, though explicitly the `StudentImplementation` constructor runs the notebook). The handoff (Process.start) happens before the tracing *within the child process*, but the claim's phrasing 'handoff precedes tracing' is ambiguous. More critically, the provided answer claims control passes from `execute_notebook` in `pybryt/execution.py`. The evidence provided (e1, e2, e3, e4) is entirely from `pybryt/student.py` (specifically `generate_student_impls`). There is no evidence provided showing `execute_notebook` calling this or the tracing system handing off here. The tracing system (likely `pybryt.execution`) sets up the collector, but the parallel execution logic is in `generate_student_impls` in `student.py`. The specific claim about 'Process.start' preceding tracing is technically true for the child process lifecycle, but the context of 'handoff from tracing system' is not supported by the provided evidence which shows `generate_student_impls` managing the processes, not a direct handoff from a tracing function at that exact moment. Furthermore, the answer cites `execute_notebook` which is not in the evidence. The claim 'Parallel handoff precedes tracing at Process.start' is partially supported by the code structure (process starts, then runs code which traces), but the 'handoff from tracing system' part is not evidenced. However, the bigger issue is the answer's assertion of the flow from `execute_notebook`. Let's re-evaluate c1 based strictly on the text 'Parallel handoff precedes tracing at Process.start'. In e1, `p.start()` (line 290) happens. The target `create_and_collect_impl` creates `StudentImplementation` (line 280). `StudentImplementation` execution involves tracing. So the process starts before the tracing logic inside it runs. This part is supported. But the 'handoff from tracing system' is the questionable part. The rubric claim is 'Parallel handoff precedes tracing at Process.start'. If 'handoff' means starting the process, and 'tracing' means the execution of the traced code, then yes. But the answer links this to `execute_notebook`. The evidence does not show `execute_notebook`. The answer is making a claim about the caller (`execute_notebook`) which is not in the evidence. The required claim c1 itself is a bit abstract. Let's look at the answer's specific claims. The answer says 'Execution control passes from the tracing system via the `execute_notebook` function...'. This is a specific architectural claim. The evidence only shows `generate_student_impls`. We cannot verify `execute_notebook` calls this. Thus, the answer contains a material error regarding the source of the handoff. The required claim c1 'Parallel handoff precedes tracing at Process.start' is arguably 'supported' by e1 if we interpret 'handoff' as `Process.start` and 'tracing' as the work done inside. But the answer's elaboration is flawed. Wait, the instruction says 'If a required reference claim conflicts with source or its truth cannot be verified, set needs_review=true'. Can we verify 'Parallel handoff precedes tracing at Process.start'? e1 shows `Process.start` (line 290) then the target function runs `StudentImplementation`. Does `StudentImplementation` do tracing? The evidence e4 shows `check` context manager turns on tracing. `StudentImplementation` likely runs the notebook. It is reasonable to infer tracing happens inside. So c1 is likely 'supported'. However, the *Answer* makes specific claims (claim_1 to claim_4) that must be audited. Claim_1 says 'via execute_notebook in pybryt/execution.py'. No evidence for this. Claim_2 says 'line 289'. e3 confirms line 289 has `Process`. Claim_3 says 'runs create_and_collect_impl'. e3 confirms `target=create_and_collect_impl`. Claim_4 says 'uses Queue to receive...'. e1 lines 300-302 show `queue.get()`. So claims 2,3,4 are supported. Claim 1 is unsupported/insufficient. Since the answer asserts a specific flow from `execute_notebook` which is not in evidence, this is a material error in the answer's explanation, even if c1 is abstractly true. The prompt asks to assess required claims. c1: 'Parallel handoff precedes tracing at Process.start'. Evidence e1 shows `Process.start` (290) happens, then the child runs `create_and_collect_impl` which instantiates `StudentImplementation`. Does tracing happen before or after? The `check` context manager (e4) enables tracing. `StudentImplementation` execution would trigger the traced code. So the process starts, then the code (with tracing) runs. So 'handoff (start) precedes tracing (execution)' is supported. Verdict: supported. But wait, the answer says 'from the tracing system... to a Process'. The 'tracing system' isn't shown handing off. The `generate_student_impls` function is doing the forking. Is `generate_student_impls` part of the 'tracing system'? Unclear. But c1 is the rubric claim. I will mark c1 as 'supported' based on e1 showing the order of operations in the parallel block. The answer's extra detail about `execute_notebook` is an 'additional claim' issue or a citation error. Actually, if the answer says 'from execute_notebook' and we don't see that, is the answer wrong? Yes. But does that make c1 'contradicted'? No, c1 is about the timing relative to `Process.start`. The answer's description of the *source* is the problem. I will mark c1 as 'supported' but flag the answer's specific assertion about `execute_notebook` in additional_claims or citation_links as unsupported. Wait, the instructions say 'Mark additional material falsehoods'. The answer's claim_1 is 'Execution control passes ... via execute_notebook'. This is not in evidence. This is a material error in the answer. I need to capture this. I will add an additional claim for this.",
+            "verdict": "contradicted"
+          }
+        ],
+        "complete_prose_coverage_verified": false,
+        "evaluation_label": "experimental_full_claim_audit",
+        "independent_evaluation": false,
+        "judge_policy": "base:Qwen/Qwen3.5-397B-A17B",
+        "material_error": true,
+        "rubric_hash": "23abe966443da8c9316d4807e84efd026826d88ce38d6a7175695d384a427c28",
+        "semantic": {
+          "additional_claims": [
+            {
+              "coverage": "absent",
+              "evidence_keys": [],
+              "id": "claim_1",
+              "material_error": true,
+              "reason": "The answer asserts that execution control passes via the `execute_notebook` function in `pybryt/execution.py`. The provided evidence (e1-e5) contains only `pybryt/student.py` and does not include `pybryt/execution.py` or any reference to `execute_notebook`. Therefore, this specific pathway cannot be verified and constitutes an unsupported assertion about the code architecture.",
+              "verdict": "insufficient"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "a9b9e0e7a511262bc4ccb000ca5c1bce8061e36c72c0d3ef3d0609415173e1ca",
+                "91c7cb81d78f4ea33ab1ead3845dd0feb8fc241eaeaa7cd22ad2d48ea42a5500"
+              ],
+              "id": "claim_2",
+              "material_error": false,
+              "reason": "The answer states control passes to a `Process` object in `pybryt/student.py` at line 289. Evidence e3 explicitly shows line 289: `p = Process(target=create_and_collect_impl, ...)`.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "a9b9e0e7a511262bc4ccb000ca5c1bce8061e36c72c0d3ef3d0609415173e1ca",
+                "91c7cb81d78f4ea33ab1ead3845dd0feb8fc241eaeaa7cd22ad2d48ea42a5500"
+              ],
+              "id": "claim_3",
+              "material_error": false,
+              "reason": "The answer states the `Process` object runs `create_and_collect_impl`. Evidence e3 shows `target=create_and_collect_impl` in the Process constructor.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "91c7cb81d78f4ea33ab1ead3845dd0feb8fc241eaeaa7cd22ad2d48ea42a5500"
+              ],
+              "id": "claim_4",
+              "material_error": false,
+              "reason": "The answer states the process uses a `Queue` to receive results. Evidence e1 (lines 285, 300-302) shows the creation of a `Queue` and the main thread retrieving results from it using `queue.get()`.",
+              "verdict": "supported"
+            }
+          ],
+          "answer_mode": "answer",
+          "answerability_satisfied": true,
+          "assessment_complete": true,
+          "citation_links": [
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_1",
+              "reason": "Citation c1 points to line 15 of `pybryt/student.py` (import statement). This does not support the claim that `execute_notebook` in `pybryt/execution.py` is the source of the handoff.",
+              "supported": false
+            },
+            {
+              "citation_id": "c2",
+              "claim_id": "claim_2",
+              "reason": "Citation c2 points to line 289 of `pybryt/student.py`, which matches the claim about the `Process` object location.",
+              "supported": true
+            }
+          ],
+          "critical_error": false,
+          "diagram": {
+            "assessed": false,
+            "complete": false,
+            "consistent": false,
+            "findings": [],
+            "material_error": false,
+            "readable": false,
+            "supported": false
+          },
+          "disagreements": [],
+          "evidence_keys": [
+            "0a6e0ebe8a1438185155404467b38976b1def2583d704bdcec65cee9dafcec8c",
+            "8220131dfbbe91d43362c409b72f0cfdba8a3ddcc240974b47675d827181e8ad",
+            "91c7cb81d78f4ea33ab1ead3845dd0feb8fc241eaeaa7cd22ad2d48ea42a5500",
+            "a9b9e0e7a511262bc4ccb000ca5c1bce8061e36c72c0d3ef3d0609415173e1ca",
+            "repository_snapshot"
+          ],
+          "experiment_hash": "9ee2a69dff55c94d929ca42fb55c82953d16530ed7608b0b50df755ad788e0f7",
+          "extracted_claims": [
+            {
+              "id": "claim_1",
+              "source": "text",
+              "text": "Execution control passes from the tracing system via the `execute_notebook` function in `pybryt/execution.py`."
+            },
+            {
+              "id": "claim_2",
+              "source": "text",
+              "text": "Execution control passes to a `Process` object in `pybryt/student.py` at line 289."
+            },
+            {
+              "id": "claim_3",
+              "source": "text",
+              "text": "The `Process` object runs `create_and_collect_impl`."
+            },
+            {
+              "id": "claim_4",
+              "source": "text",
+              "text": "The process uses a `Queue` to receive the traced execution results back to the main thread."
+            }
+          ],
+          "false_execution_claim": false,
+          "judge_family": "qwen",
+          "judge_version": "all-claims-v3",
+          "needs_review": false,
+          "prompt_version": "1.0",
+          "required_claims": [
+            {
+              "coverage": "partial",
+              "evidence_keys": [
+                "91c7cb81d78f4ea33ab1ead3845dd0feb8fc241eaeaa7cd22ad2d48ea42a5500"
+              ],
+              "id": "c1",
+              "material_error": true,
+              "reason": "The claim states 'Parallel handoff precedes tracing at Process.start'. Evidence e1 (lines 278-304) shows that within the parallel block, the `Process` is created and started (line 289-290) to run `create_and_collect_impl`. Inside this function (lines 279-281), `StudentImplementation` is instantiated, which triggers the tracing (as per the `check` context manager logic implied in the codebase, though explicitly the `StudentImplementation` constructor runs the notebook). The handoff (Process.start) happens before the tracing *within the child process*, but the claim's phrasing 'handoff precedes tracing' is ambiguous. More critically, the provided answer claims control passes from `execute_notebook` in `pybryt/execution.py`. The evidence provided (e1, e2, e3, e4) is entirely from `pybryt/student.py` (specifically `generate_student_impls`). There is no evidence provided showing `execute_notebook` calling this or the tracing system handing off here. The tracing system (likely `pybryt.execution`) sets up the collector, but the parallel execution logic is in `generate_student_impls` in `student.py`. The specific claim about 'Process.start' preceding tracing is technically true for the child process lifecycle, but the context of 'handoff from tracing system' is not supported by the provided evidence which shows `generate_student_impls` managing the processes, not a direct handoff from a tracing function at that exact moment. Furthermore, the answer cites `execute_notebook` which is not in the evidence. The claim 'Parallel handoff precedes tracing at Process.start' is partially supported by the code structure (process starts, then runs code which traces), but the 'handoff from tracing system' part is not evidenced. However, the bigger issue is the answer's assertion of the flow from `execute_notebook`. Let's re-evaluate c1 based strictly on the text 'Parallel handoff precedes tracing at Process.start'. In e1, `p.start()` (line 290) happens. The target `create_and_collect_impl` creates `StudentImplementation` (line 280). `StudentImplementation` execution involves tracing. So the process starts before the tracing logic inside it runs. This part is supported. But the 'handoff from tracing system' is the questionable part. The rubric claim is 'Parallel handoff precedes tracing at Process.start'. If 'handoff' means starting the process, and 'tracing' means the execution of the traced code, then yes. But the answer links this to `execute_notebook`. The evidence does not show `execute_notebook`. The answer is making a claim about the caller (`execute_notebook`) which is not in the evidence. The required claim c1 itself is a bit abstract. Let's look at the answer's specific claims. The answer says 'Execution control passes from the tracing system via the `execute_notebook` function...'. This is a specific architectural claim. The evidence only shows `generate_student_impls`. We cannot verify `execute_notebook` calls this. Thus, the answer contains a material error regarding the source of the handoff. The required claim c1 'Parallel handoff precedes tracing at Process.start' is arguably 'supported' by e1 if we interpret 'handoff' as `Process.start` and 'tracing' as the work done inside. But the answer's elaboration is flawed. Wait, the instruction says 'If a required reference claim conflicts with source or its truth cannot be verified, set needs_review=true'. Can we verify 'Parallel handoff precedes tracing at Process.start'? e1 shows `Process.start` (line 290) then the target function runs `StudentImplementation`. Does `StudentImplementation` do tracing? The evidence e4 shows `check` context manager turns on tracing. `StudentImplementation` likely runs the notebook. It is reasonable to infer tracing happens inside. So c1 is likely 'supported'. However, the *Answer* makes specific claims (claim_1 to claim_4) that must be audited. Claim_1 says 'via execute_notebook in pybryt/execution.py'. No evidence for this. Claim_2 says 'line 289'. e3 confirms line 289 has `Process`. Claim_3 says 'runs create_and_collect_impl'. e3 confirms `target=create_and_collect_impl`. Claim_4 says 'uses Queue to receive...'. e1 lines 300-302 show `queue.get()`. So claims 2,3,4 are supported. Claim 1 is unsupported/insufficient. Since the answer asserts a specific flow from `execute_notebook` which is not in evidence, this is a material error in the answer's explanation, even if c1 is abstractly true. The prompt asks to assess required claims. c1: 'Parallel handoff precedes tracing at Process.start'. Evidence e1 shows `Process.start` (290) happens, then the child runs `create_and_collect_impl` which instantiates `StudentImplementation`. Does tracing happen before or after? The `check` context manager (e4) enables tracing. `StudentImplementation` execution would trigger the traced code. So the process starts, then the code (with tracing) runs. So 'handoff (start) precedes tracing (execution)' is supported. Verdict: supported. But wait, the answer says 'from the tracing system... to a Process'. The 'tracing system' isn't shown handing off. The `generate_student_impls` function is doing the forking. Is `generate_student_impls` part of the 'tracing system'? Unclear. But c1 is the rubric claim. I will mark c1 as 'supported' based on e1 showing the order of operations in the parallel block. The answer's extra detail about `execute_notebook` is an 'additional claim' issue or a citation error. Actually, if the answer says 'from execute_notebook' and we don't see that, is the answer wrong? Yes. But does that make c1 'contradicted'? No, c1 is about the timing relative to `Process.start`. The answer's description of the *source* is the problem. I will mark c1 as 'supported' but flag the answer's specific assertion about `execute_notebook` in additional_claims or citation_links as unsupported. Wait, the instructions say 'Mark additional material falsehoods'. The answer's claim_1 is 'Execution control passes ... via execute_notebook'. This is not in evidence. This is a material error in the answer. I need to capture this. I will add an additional claim for this.",
+              "verdict": "contradicted"
+            }
+          ],
+          "schema_version": "1.0",
+          "snapshot_fingerprint": "bd2ca2c99e8c79d1bbe6e6105acba8b71f63871d9249b7a10130ee36911892f0",
+          "submission_hash": "0f2e6442d7dfda1c33d1bbad75b4113d56c02609fe7e2fbd3e5b75c1a42cec5e",
+          "task_hash": "7fb75947b7e2790ee9f2bc356c6d89ea9a39ec70137bc0abdab9f3d19f68cf0c",
+          "uncited_claim_ids": [
+            "claim_3",
+            "claim_4"
+          ]
+        },
+        "tier": "failed"
+      },
+      "reasons": [
+        "Material falsehood, contradiction, or false execution claim"
+      ],
+      "retryable": false,
+      "reward": 0.0,
+      "status": "resolved",
+      "version": "all-claims-v3-judge-1df73364e5f394f07f917efe4444d498ce8c8da4bfeb88fb0322f79c16052f55"
+    },
+    "policy_id": "base:Qwen/Qwen3.5-4B",
+    "reward": null,
+    "source_sha256": "852034c8a7c9939ef8fa4c0ff5edac4604fb21593967a4d929de336768cde585",
+    "source_trajectory": "artifacts/experiment-01-v4-results/artifacts/experiments/01-baseline-qwen4b-qwen397-seed42-confirmation-all-claims-v3-modal-protocol-v4/trajectories/ep-772ef0208ce54855b646b607bd4b7741.json",
+    "task_id": "import-b1a8fbb5372b5ed05356b362",
+    "termination": "completed"
+  },
+  {
+    "grade": {
+      "aggregation_version": "all-claims-v7",
+      "claim_count": 1,
+      "claims": [
+        {
+          "coverage": "absent",
+          "evidence_keys": [
+            "source_6a251d30bd3a20f1d9b328f6"
+          ],
+          "id": "c1",
+          "material_error": false,
+          "reason": "The required claim 'Missing sentinel fill_value' asserts a defect or absence. The provided evidence (e9, lines 826-860) shows that the method `_getitem_with_mask` explicitly defines a `fill_value` argument with a default of `dtypes.NA`, which is then resolved to a dtype-specific value. The code does not exhibit a 'missing' sentinel; rather, it implements one. The answer describes the existing behavior correctly but does not address the specific assertion of 'missing' because the premise of the claim appears contradicted by the source code. As the claim seems to describe a non-existent error or requires context not present in the snippet to be valid (e.g., missing in a specific subclass or scenario not shown), the verdict is insufficient based on the provided evidence, and the claim itself may be defective.",
+          "verdict": "insufficient"
+        }
+      ],
+      "human_reviewed": false,
+      "independent_evaluation": false,
+      "material_error": false,
+      "reason": "Semantic assessment requires adjudication",
+      "rubric_hash": "b11dd9c7f851c90e3467af78f22a7ad30f8f565ce1a74b63f82bdea1f28990d6",
+      "score": null,
+      "semantic": {
+        "additional_claims": [
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "source_6a251d30bd3a20f1d9b328f6"
+            ],
+            "id": "claim_1",
+            "material_error": false,
+            "reason": "The answer states that 'fill_value' replaces elements where the index is -1. Evidence e9 (line 827 docstring: 'Index this Variable with -1 remapped to fill_value') and lines 853-859 (logic creating a mask for -1 and using `where` to insert `fill_value`) support this.",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "source_6a251d30bd3a20f1d9b328f6"
+            ],
+            "id": "claim_2",
+            "material_error": false,
+            "reason": "The answer states the default is `dtypes.NA`. Evidence e9 (line 826) shows the function signature `def _getitem_with_mask(self, key, fill_value=dtypes.NA):`.",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "source_6a251d30bd3a20f1d9b328f6"
+            ],
+            "id": "claim_3",
+            "material_error": false,
+            "reason": "The answer states `dtypes.NA` resolves to the appropriate fill value. Evidence e9 (lines 836-837) shows the logic: `if fill_value is dtypes.NA: fill_value = dtypes.get_fill_value(self.dtype)`.",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "source_6a251d30bd3a20f1d9b328f6"
+            ],
+            "id": "claim_4",
+            "material_error": false,
+            "reason": "The answer claims modifying the default changes handling to use the custom value. The code logic (lines 836-859) confirms that if `fill_value` is not `dtypes.NA`, the resolution step is skipped, and the custom value is used directly in the `where` operation (line 859).",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "source_6a251d30bd3a20f1d9b328f6"
+            ],
+            "id": "claim_5",
+            "material_error": false,
+            "reason": "The answer states this alters masking semantics. Since the mask identifies -1s and the `fill_value` determines what replaces them, changing the fill value directly alters the semantic result of the masking operation for those indices.",
+            "verdict": "supported"
+          }
+        ],
+        "answer_mode": "answer",
+        "answerability_satisfied": true,
+        "assessment_complete": true,
+        "citation_links": [
+          {
+            "citation_id": "c1",
+            "claim_id": "claim_1",
+            "reason": "Citation c1 (lines 826-860) covers the method definition and logic where -1 is remapped to fill_value.",
+            "supported": true
+          },
+          {
+            "citation_id": "c1",
+            "claim_id": "claim_2",
+            "reason": "Citation c1 includes line 826 which defines the default argument.",
+            "supported": true
+          },
+          {
+            "citation_id": "c1",
+            "claim_id": "claim_3",
+            "reason": "Citation c1 includes lines 836-837 which show the resolution logic.",
+            "supported": true
+          },
+          {
+            "citation_id": "c1",
+            "claim_id": "claim_4",
+            "reason": "Citation c1 includes the full logic block demonstrating the conditional usage of the custom fill_value.",
+            "supported": true
+          },
+          {
+            "citation_id": "c1",
+            "claim_id": "claim_5",
+            "reason": "Citation c1 supports the mechanism by which the semantics are altered.",
+            "supported": true
+          }
+        ],
+        "critical_error": false,
+        "diagram": {
+          "assessed": false,
+          "complete": false,
+          "consistent": false,
+          "findings": [],
+          "material_error": false,
+          "readable": false,
+          "supported": false
+        },
+        "disagreements": [
+          "The required claim 'c1' ('Missing sentinel fill_value') appears to be factually incorrect or contextually incomplete based on the provided evidence (e9), which shows the sentinel `fill_value` is present and implemented. The candidate answer correctly describes the existing implementation but cannot support a claim of 'missing' without further context implying a specific failure case not evident in the snippet. This suggests a potential defect in the reference claim rather than the candidate answer."
+        ],
+        "evidence_keys": [
+          "0e412ff577de06b98cd2611a163559fdb7dec33842cb463cbc4c7d2eec255b69",
+          "4d61ba5bfe3bbd4ed036968f13e2b0d068b8580434664d96e7691aa485e6880f",
+          "84a8b039d589b03a26bac8d7f10601dd98691266d73799291f739dc2542aa2cf",
+          "8a7dcfcc79dceb12510499374ff7655d53b622e24d65f96cb57f4045e661d137",
+          "e296731c6e4c6e001a81d20278e8d68ee41081750613e9858195f3636408b3f3",
+          "e3d4d63d44df2136b7daa33ffdea419eb81d73bdf4f3bd4a7d54e292c186bc59",
+          "ef684f6bd115bb623a90c55c666f2ca21de7ab21af23eb45198af3f8ea746e23",
+          "repository_snapshot",
+          "source_6a251d30bd3a20f1d9b328f6",
+          "source_83747931a3269b17a89b8e9e",
+          "source_890d100846b2d3068647a2b8"
+        ],
+        "experiment_hash": "5f08460b430dcbf74db4966f22f2da7cae08b7ca8d4ecb05ee721101cd4c3413",
+        "extracted_claims": [
+          {
+            "id": "claim_1",
+            "source": "text",
+            "text": "The 'fill_value' argument in _getitem_with_mask specifies the value used to replace elements where the index is -1 (mapped to a mask)."
+          },
+          {
+            "id": "claim_2",
+            "source": "text",
+            "text": "The default value for 'fill_value' is dtypes.NA."
+          },
+          {
+            "id": "claim_3",
+            "source": "text",
+            "text": "dtypes.NA resolves to the appropriate fill value for the variable's dtype (e.g., np.nan for floats)."
+          },
+          {
+            "id": "claim_4",
+            "source": "text",
+            "text": "Modifying the default behavior of 'fill_value' changes how negative indices are handled by replacing them with the custom fill_value instead of the dtype-specific missing value."
+          },
+          {
+            "id": "claim_5",
+            "source": "text",
+            "text": "Modifying the 'fill_value' default behavior alters the masking semantics for negative indexing."
+          }
+        ],
+        "false_execution_claim": false,
+        "judge_family": "qwen",
+        "judge_version": "all-claims-v7",
+        "needs_review": true,
+        "prompt_version": "1.0",
+        "required_claims": [
+          {
+            "coverage": "absent",
+            "evidence_keys": [
+              "source_6a251d30bd3a20f1d9b328f6"
+            ],
+            "id": "c1",
+            "material_error": false,
+            "reason": "The required claim 'Missing sentinel fill_value' asserts a defect or absence. The provided evidence (e9, lines 826-860) shows that the method `_getitem_with_mask` explicitly defines a `fill_value` argument with a default of `dtypes.NA`, which is then resolved to a dtype-specific value. The code does not exhibit a 'missing' sentinel; rather, it implements one. The answer describes the existing behavior correctly but does not address the specific assertion of 'missing' because the premise of the claim appears contradicted by the source code. As the claim seems to describe a non-existent error or requires context not present in the snippet to be valid (e.g., missing in a specific subclass or scenario not shown), the verdict is insufficient based on the provided evidence, and the claim itself may be defective.",
+            "verdict": "insufficient"
+          }
+        ],
+        "schema_version": "1.0",
+        "snapshot_fingerprint": "8373c90881db3e140e79d00275a41431902b5ebe41bce3b6d6291278c0b6aa0d",
+        "submission_hash": "43a4433f608dfc8e2ad5af1214f7302eca16d6e9187127f4a3a7e2f6037ca9d8",
+        "task_hash": "082811000890fdb32c87f3e778660385a28f347dcf38808f46ecb6bbe0c12acf",
+        "uncited_claim_ids": []
+      },
+      "status": "unresolved",
+      "strict_score": null,
+      "tier": "unresolved",
+      "training_feedback": {
+        "components": {},
+        "eligible": false,
+        "reward": null,
+        "version": "positive-coverage-v4"
+      }
+    },
+    "kind": "baseline-evaluation",
+    "name": "ep-aec736b5c3b145129d53c8bbd0f72618",
+    "original_run_id": "01-baseline-qwen4b-qwen397-seed42-confirmation-all-claims-v3-modal-protocol-v4",
+    "original_split": "development",
+    "original_verification": {
+      "diagnostics": {
+        "calibrated": false,
+        "claim_count": 1,
+        "claims": [
+          {
+            "coverage": "absent",
+            "evidence_keys": [
+              "ef684f6bd115bb623a90c55c666f2ca21de7ab21af23eb45198af3f8ea746e23",
+              "4d61ba5bfe3bbd4ed036968f13e2b0d068b8580434664d96e7691aa485e6880f"
+            ],
+            "id": "c1",
+            "material_error": false,
+            "reason": "The required claim 'Missing sentinel fill_value' asserts a defect or absence that is contradicted by the provided evidence. The code explicitly defines a default sentinel value (dtypes.NA) for the fill_value argument in the method signature and logic.",
+            "verdict": "insufficient"
+          }
+        ],
+        "complete_prose_coverage_verified": false,
+        "evaluation_label": "experimental_full_claim_audit",
+        "independent_evaluation": false,
+        "judge_policy": "base:Qwen/Qwen3.5-397B-A17B",
+        "material_error": false,
+        "rubric_hash": "bc774e2052699d0c059365eaf4aca3aefa97de3d2ab2a8aa693064f395dcb1f1",
+        "semantic": {
+          "additional_claims": [
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "ef684f6bd115bb623a90c55c666f2ca21de7ab21af23eb45198af3f8ea746e23",
+                "4d61ba5bfe3bbd4ed036968f13e2b0d068b8580434664d96e7691aa485e6880f"
+              ],
+              "id": "claim_1",
+              "material_error": false,
+              "reason": "The docstring in the evidence explicitly states: 'Index this Variable with -1 remapped to fill_value.', confirming that -1 indices are mapped to the fill value.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "ef684f6bd115bb623a90c55c666f2ca21de7ab21af23eb45198af3f8ea746e23",
+                "4d61ba5bfe3bbd4ed036968f13e2b0d068b8580434664d96e7691aa485e6880f"
+              ],
+              "id": "claim_2",
+              "material_error": false,
+              "reason": "The function signature in the evidence shows 'def _getitem_with_mask(self, key, fill_value=dtypes.NA):', confirming the default value.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "ef684f6bd115bb623a90c55c666f2ca21de7ab21af23eb45198af3f8ea746e23",
+                "4d61ba5bfe3bbd4ed036968f13e2b0d068b8580434664d96e7691aa485e6880f"
+              ],
+              "id": "claim_3",
+              "material_error": false,
+              "reason": "Lines 836-837 in the evidence show the logic: 'if fill_value is dtypes.NA: fill_value = dtypes.get_fill_value(self.dtype)', confirming the resolution behavior.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "ef684f6bd115bb623a90c55c666f2ca21de7ab21af23eb45198af3f8ea746e23",
+                "4d61ba5bfe3bbd4ed036968f13e2b0d068b8580434664d96e7691aa485e6880f"
+              ],
+              "id": "claim_4",
+              "material_error": false,
+              "reason": "The code logic demonstrates that if a custom fill_value is passed (not dtypes.NA), it bypasses the dtype-specific lookup and is used directly in the 'where' operation, altering the replacement value for masked indices.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "ef684f6bd115bb623a90c55c666f2ca21de7ab21af23eb45198af3f8ea746e23",
+                "4d61ba5bfe3bbd4ed036968f13e2b0d068b8580434664d96e7691aa485e6880f"
+              ],
+              "id": "claim_5",
+              "material_error": false,
+              "reason": "Since the fill value determines what data appears at masked positions (originally -1 indices), changing it inherently alters the semantic result of the masking operation.",
+              "verdict": "supported"
+            }
+          ],
+          "answer_mode": "answer",
+          "answerability_satisfied": true,
+          "assessment_complete": true,
+          "citation_links": [
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_1",
+              "reason": "Citation c1 covers lines 826-860, which include the docstring and implementation details supporting the claim about -1 remapping.",
+              "supported": true
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_2",
+              "reason": "Citation c1 includes line 826 where the default argument is defined.",
+              "supported": true
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_3",
+              "reason": "Citation c1 includes lines 836-837 where the resolution logic is implemented.",
+              "supported": true
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_4",
+              "reason": "Citation c1 covers the conditional logic and the final usage of fill_value, supporting the claim about behavior modification.",
+              "supported": true
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_5",
+              "reason": "Citation c1 provides the full context of the masking operation, supporting the semantic implication.",
+              "supported": true
+            }
+          ],
+          "critical_error": false,
+          "diagram": {
+            "assessed": false,
+            "complete": false,
+            "consistent": false,
+            "findings": [],
+            "material_error": false,
+            "readable": false,
+            "supported": false
+          },
+          "disagreements": [
+            "The required claim 'Missing sentinel fill_value' appears to be factually incorrect based on the provided source code, which explicitly defines a sentinel default (dtypes.NA). This creates a conflict between the reference rubric's assertion of a missing feature and the evidence of its existence, requiring adjudication on whether the rubric refers to a different context or is erroneous."
+          ],
+          "evidence_keys": [
+            "33e5dfe5a8255db587d80c30f8038cf5a4e70931d6344ed98141e9bfd90ae611",
+            "4d61ba5bfe3bbd4ed036968f13e2b0d068b8580434664d96e7691aa485e6880f",
+            "ef684f6bd115bb623a90c55c666f2ca21de7ab21af23eb45198af3f8ea746e23",
+            "repository_snapshot"
+          ],
+          "experiment_hash": "9ee2a69dff55c94d929ca42fb55c82953d16530ed7608b0b50df755ad788e0f7",
+          "extracted_claims": [
+            {
+              "id": "claim_1",
+              "source": "text",
+              "text": "The 'fill_value' argument in _getitem_with_mask specifies the value used to replace elements where the index is -1 (mapped to a mask)."
+            },
+            {
+              "id": "claim_2",
+              "source": "text",
+              "text": "The default value for 'fill_value' is dtypes.NA."
+            },
+            {
+              "id": "claim_3",
+              "source": "text",
+              "text": "dtypes.NA resolves to the appropriate fill value for the variable's dtype (e.g., np.nan for floats)."
+            },
+            {
+              "id": "claim_4",
+              "source": "text",
+              "text": "Modifying the default behavior of 'fill_value' changes how negative indices are handled by replacing them with the custom fill_value instead of the dtype-specific missing value."
+            },
+            {
+              "id": "claim_5",
+              "source": "text",
+              "text": "Modifying the default behavior of 'fill_value' alters the masking semantics for negative indexing."
+            }
+          ],
+          "false_execution_claim": false,
+          "judge_family": "qwen",
+          "judge_version": "all-claims-v3",
+          "needs_review": true,
+          "prompt_version": "1.0",
+          "required_claims": [
+            {
+              "coverage": "absent",
+              "evidence_keys": [
+                "ef684f6bd115bb623a90c55c666f2ca21de7ab21af23eb45198af3f8ea746e23",
+                "4d61ba5bfe3bbd4ed036968f13e2b0d068b8580434664d96e7691aa485e6880f"
+              ],
+              "id": "c1",
+              "material_error": false,
+              "reason": "The required claim 'Missing sentinel fill_value' asserts a defect or absence that is contradicted by the provided evidence. The code explicitly defines a default sentinel value (dtypes.NA) for the fill_value argument in the method signature and logic.",
+              "verdict": "insufficient"
+            }
+          ],
+          "schema_version": "1.0",
+          "snapshot_fingerprint": "8373c90881db3e140e79d00275a41431902b5ebe41bce3b6d6291278c0b6aa0d",
+          "submission_hash": "43a4433f608dfc8e2ad5af1214f7302eca16d6e9187127f4a3a7e2f6037ca9d8",
+          "task_hash": "082811000890fdb32c87f3e778660385a28f347dcf38808f46ecb6bbe0c12acf",
+          "uncited_claim_ids": []
+        },
+        "tier": "unresolved"
+      },
+      "reasons": [
+        "Semantic assessment requires adjudication"
+      ],
+      "retryable": false,
+      "reward": null,
+      "status": "unresolved",
+      "version": "all-claims-v3-judge-1df73364e5f394f07f917efe4444d498ce8c8da4bfeb88fb0322f79c16052f55"
+    },
+    "policy_id": "base:Qwen/Qwen3.5-4B",
+    "reward": null,
+    "source_sha256": "9c11ec0f897ec11aece6740e3468175dcb36a4a6ea436fec4e7797cb1c416c56",
+    "source_trajectory": "artifacts/experiment-01-v4-results/artifacts/experiments/01-baseline-qwen4b-qwen397-seed42-confirmation-all-claims-v3-modal-protocol-v4/trajectories/ep-aec736b5c3b145129d53c8bbd0f72618.json",
+    "task_id": "import-3d1f799050430b0e0b89003e",
+    "termination": "completed"
+  },
+  {
+    "error": "$.additional_claims[1].coverage: invalid enum value",
+    "error_type": "ValueError",
+    "kind": "baseline-evaluation",
+    "name": "ep-d3a335b6d8db418a8dabb9d9d3f0f4b1",
+    "original_run_id": "01-baseline-qwen4b-qwen397-seed42-confirmation-all-claims-v3-modal-protocol-v4",
+    "original_split": "development",
+    "original_verification": {
+      "diagnostics": {
+        "calibrated": false,
+        "claim_count": 1,
+        "claims": [
+          {
+            "coverage": "absent",
+            "evidence_keys": [
+              "123acbbe7910b80b1f2bf986efdac5a99afb76e7ee1d692f9ff205a10d78903b",
+              "6f57a7275fa3dc76c13f737b2df5106e9d3e5a1545bb1cfd8f68e8421e73a2e5",
+              "5a909ee0b7461ae19ee4fc7d88e58c8aba88a336f8da5089a491c00def59111b",
+              "d5b4a3ce3814760a6f738954617c70d4d39f070cd321e5aad22edfc2f09aa70a"
+            ],
+            "id": "c1",
+            "material_error": true,
+            "reason": "The answer claims the validation logic is in xarray/conventions.py within _update_cf_attributes. Evidence e1 and e4 clearly show the logic raising ValueError for conflicting _FillValue and missing_value is in xarray/coding/variables.py within the CFMaskCoder.encode method (lines 297-300). Evidence e2 and e6 show the cited lines in conventions.py relate to coordinate encoding, not fill value validation.",
+            "verdict": "contradicted"
+          }
+        ],
+        "complete_prose_coverage_verified": false,
+        "evaluation_label": "experimental_full_claim_audit",
+        "independent_evaluation": false,
+        "judge_policy": "base:Qwen/Qwen3.5-397B-A17B",
+        "material_error": true,
+        "rubric_hash": "9177ecfaa44984efe3ca8e98c9604b659b94c41d63c282188b0aba3da8246032",
+        "semantic": {
+          "additional_claims": [
+            {
+              "coverage": "absent",
+              "evidence_keys": [
+                "123acbbe7910b80b1f2bf986efdac5a99afb76e7ee1d692f9ff205a10d78903b",
+                "6f57a7275fa3dc76c13f737b2df5106e9d3e5a1545bb1cfd8f68e8421e73a2e5"
+              ],
+              "id": "claim_1",
+              "material_error": true,
+              "reason": "The claim states the logic is in xarray/conventions.py. Evidence e1 and e4 prove it is in xarray/coding/variables.py.",
+              "verdict": "contradicted"
+            },
+            {
+              "coverage": "absent",
+              "evidence_keys": [
+                "5a909ee0b7461ae19ee4fc7d88e58c8aba88a336f8da5089a491c00def59111b",
+                "6f57a7275fa3dc76c13f737b2df5106e9d3e5a1545bb1cfd8f68e8421e73a2e5",
+                "d5b4a3ce3814760a6f738954617c70d4d39f070cd321e5aad22edfc2f09aa70a"
+              ],
+              "id": "claim_2",
+              "material_error": true,
+              "reason": "The claim states the logic is in _update_cf_attributes. Evidence e2 and e6 show this function handles coordinates. Evidence e4 shows the logic is in CFMaskCoder.encode.",
+              "verdict": "contradicted"
+            },
+            {
+              "coverage": "absent",
+              "evidence_keys": [
+                "5388491980a5a453aacbe12c1ac546ce36f3203352ea7b90f85b6ac5c8b75bd9",
+                "d5b4a3ce3814760a6f738954617c70d4d39f070cd321e5aad22edfc2f09aa70a"
+              ],
+              "id": "claim_3",
+              "material_error": false,
+              "reason": "The claim states _update_cf_attributes is called by cf_encoder. While cf_encoder exists (e3), the provided evidence snippets (e2, e6) do not show the body of cf_encoder calling _update_cf_attributes. The snippet ends at the function definition.",
+              "verdict": "insufficient"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "123acbbe7910b80b1f2bf986efdac5a99afb76e7ee1d692f9ff205a10d78903b",
+                "6f57a7275fa3dc76c13f737b2df5106e9d3e5a1545bb1cfd8f68e8421e73a2e5"
+              ],
+              "id": "claim_4",
+              "material_error": false,
+              "reason": "The claim states the logic raises a ValueError if _FillValue and missing_value conflict. This is explicitly shown in evidence e1 and e4 (lines 297-300).",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "absent",
+              "evidence_keys": [
+                "5388491980a5a453aacbe12c1ac546ce36f3203352ea7b90f85b6ac5c8b75bd9",
+                "6f57a7275fa3dc76c13f737b2df5106e9d3e5a1545bb1cfd8f68e8421e73a2e5"
+              ],
+              "id": "claim_5",
+              "material_error": true,
+              "reason": "The claim states integration occurs at line 765 in cf_encoder. Evidence e3 shows line 765 is the function definition header, not the integration logic. Furthermore, the integration described (calling the wrong function in the wrong file) is incorrect based on e4.",
+              "verdict": "contradicted"
+            },
+            {
+              "coverage": "absent",
+              "evidence_keys": [
+                "6f57a7275fa3dc76c13f737b2df5106e9d3e5a1545bb1cfd8f68e8421e73a2e5"
+              ],
+              "id": "claim_6",
+              "material_error": true,
+              "reason": "The claim states cf_encoder calls _update_cf_attributes to process attributes for fill value validation. The actual validation happens in CFMaskCoder.encode (e4). The provided evidence does not support the call relationship described for this specific purpose, and the location is wrong.",
+              "verdict": "contradicted"
+            }
+          ],
+          "answer_mode": "answer",
+          "answerability_satisfied": true,
+          "assessment_complete": true,
+          "citation_links": [
+            {
+              "citation_id": "c1",
+              "claim_id": "c1",
+              "reason": "Citation c1 points to xarray/conventions.py lines 650-680. Evidence e2 and e6 show these lines contain coordinate encoding logic, not the conflicting fill value validation described in the claim.",
+              "supported": false
+            },
+            {
+              "citation_id": "c2",
+              "claim_id": "c1",
+              "reason": "Citation c2 points to line 765 in conventions.py. Evidence e3 shows this is merely the function definition of cf_encoder, not the implementation of the validation logic or its integration as described.",
+              "supported": false
+            }
+          ],
+          "critical_error": true,
+          "diagram": {
+            "assessed": false,
+            "complete": false,
+            "consistent": false,
+            "findings": [],
+            "material_error": false,
+            "readable": false,
+            "supported": false
+          },
+          "disagreements": [],
+          "evidence_keys": [
+            "123acbbe7910b80b1f2bf986efdac5a99afb76e7ee1d692f9ff205a10d78903b",
+            "5388491980a5a453aacbe12c1ac546ce36f3203352ea7b90f85b6ac5c8b75bd9",
+            "5a909ee0b7461ae19ee4fc7d88e58c8aba88a336f8da5089a491c00def59111b",
+            "6f57a7275fa3dc76c13f737b2df5106e9d3e5a1545bb1cfd8f68e8421e73a2e5",
+            "d5b4a3ce3814760a6f738954617c70d4d39f070cd321e5aad22edfc2f09aa70a",
+            "repository_snapshot"
+          ],
+          "experiment_hash": "9ee2a69dff55c94d929ca42fb55c82953d16530ed7608b0b50df755ad788e0f7",
+          "extracted_claims": [
+            {
+              "id": "claim_1",
+              "source": "text",
+              "text": "The validation logic that raises a ValueError when _FillValue conflicts with missing_value is implemented in xarray/conventions.py."
+            },
+            {
+              "id": "claim_2",
+              "source": "text",
+              "text": "The validation logic resides within the _update_cf_attributes function."
+            },
+            {
+              "id": "claim_3",
+              "source": "text",
+              "text": "The _update_cf_attributes function is called by cf_encoder."
+            },
+            {
+              "id": "claim_4",
+              "source": "text",
+              "text": "The validation logic raises a ValueError if _FillValue and missing_value conflict."
+            },
+            {
+              "id": "claim_5",
+              "source": "text",
+              "text": "The integration of validation occurs in cf_encoder at line 765."
+            },
+            {
+              "id": "claim_6",
+              "source": "text",
+              "text": "cf_encoder calls _update_cf_attributes to process attributes before encoding variables."
+            }
+          ],
+          "false_execution_claim": false,
+          "judge_family": "qwen",
+          "judge_version": "all-claims-v3",
+          "needs_review": false,
+          "prompt_version": "1.0",
+          "required_claims": [
+            {
+              "coverage": "absent",
+              "evidence_keys": [
+                "123acbbe7910b80b1f2bf986efdac5a99afb76e7ee1d692f9ff205a10d78903b",
+                "6f57a7275fa3dc76c13f737b2df5106e9d3e5a1545bb1cfd8f68e8421e73a2e5",
+                "5a909ee0b7461ae19ee4fc7d88e58c8aba88a336f8da5089a491c00def59111b",
+                "d5b4a3ce3814760a6f738954617c70d4d39f070cd321e5aad22edfc2f09aa70a"
+              ],
+              "id": "c1",
+              "material_error": true,
+              "reason": "The answer claims the validation logic is in xarray/conventions.py within _update_cf_attributes. Evidence e1 and e4 clearly show the logic raising ValueError for conflicting _FillValue and missing_value is in xarray/coding/variables.py within the CFMaskCoder.encode method (lines 297-300). Evidence e2 and e6 show the cited lines in conventions.py relate to coordinate encoding, not fill value validation.",
+              "verdict": "contradicted"
+            }
+          ],
+          "schema_version": "1.0",
+          "snapshot_fingerprint": "8373c90881db3e140e79d00275a41431902b5ebe41bce3b6d6291278c0b6aa0d",
+          "submission_hash": "b3d0e4a966ba0122995cc24ebf5b1f5ace14df1fc3bfe6a32efe1ef19c89de5c",
+          "task_hash": "57b3ece88b96133d318c014469b60b370e89d8408fbc0b1ddcecea3a6f1fac50",
+          "uncited_claim_ids": []
+        },
+        "tier": "failed"
+      },
+      "reasons": [
+        "Material falsehood, contradiction, or false execution claim"
+      ],
+      "retryable": false,
+      "reward": 0.0,
+      "status": "resolved",
+      "version": "all-claims-v3-judge-1df73364e5f394f07f917efe4444d498ce8c8da4bfeb88fb0322f79c16052f55"
+    },
+    "policy_id": "base:Qwen/Qwen3.5-4B",
+    "reward": null,
+    "source_sha256": "7bb420bdd4896e9a1b74132bc8f7e3bcb74ba8d99f82b752167db747067b329e",
+    "source_trajectory": "artifacts/experiment-01-v4-results/artifacts/experiments/01-baseline-qwen4b-qwen397-seed42-confirmation-all-claims-v3-modal-protocol-v4/trajectories/ep-d3a335b6d8db418a8dabb9d9d3f0f4b1.json",
+    "task_id": "import-ab6e4a25593aa93c9a2c8eff",
+    "termination": "completed"
+  },
+  {
+    "error": "Supported assertion lacks verified evidence keys",
+    "error_type": "ValueError",
+    "kind": "baseline-evaluation",
+    "name": "ep-df50faac7daa4dddab513a9b3a2fbec1",
+    "original_run_id": "01-baseline-qwen4b-qwen397-seed42-confirmation-all-claims-v3-modal-protocol-v4",
+    "original_split": "development",
+    "original_verification": {
+      "diagnostics": {
+        "calibrated": false,
+        "claim_count": 1,
+        "claims": [
+          {
+            "coverage": "partial",
+            "evidence_keys": [
+              "2d6dcddc73cd7ad8aa6bf9cc01f2d9b28bb10675673bd6b57b04ecff4fcd5ca7"
+            ],
+            "id": "c1",
+            "material_error": true,
+            "reason": "The answer claims the Frozen wrapper creates an 'immutable copy' and allocates a 'new dict object on every access'. Evidence e1 (line 702) shows `return Frozen(self._data_variables | self._coord_variables)`. The `|` operator on dictionaries creates a new merged dictionary, which is then wrapped. However, the `Frozen` wrapper itself (typically a mapping view or wrapper class in xarray) does not necessarily copy the data again; it wraps the result. More critically, the answer claims optimization via `@lru_cache` on a property. Properties in Python are descriptors that execute the function every time they are accessed unless the result is cached on the instance. Applying `@lru_cache` directly to a property getter is often ineffective or requires specific patterns (caching the result inside the property), and the answer suggests it as a direct decorator which is technically suspect for a property without further qualification. Furthermore, the claim that it allocates a new dict *because* of the Frozen wrapper is slightly off; the allocation comes from the merge operation `|`, not the `Frozen` wrapping itself. The `Frozen` class usually prevents mutation of the view. The statement 'allocating a new dict object on every access' is true due to the merge, but attributing it solely to the 'Frozen wrapper' creating a 'copy' conflates the merge with the freezing. The bigger issue is the optimization advice: `@lru_cache` on a property is not standard syntax without a custom descriptor or internal caching logic, making the advice potentially misleading or incorrect in this context.",
+            "verdict": "contradicted"
+          }
+        ],
+        "complete_prose_coverage_verified": false,
+        "evaluation_label": "experimental_full_claim_audit",
+        "independent_evaluation": false,
+        "judge_policy": "base:Qwen/Qwen3.5-397B-A17B",
+        "material_error": true,
+        "rubric_hash": "c4e0fe156da1adef452ad93cd39d9a4b8d150c6b15d33c9ce0af02516253c1fc",
+        "semantic": {
+          "additional_claims": [
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "2d6dcddc73cd7ad8aa6bf9cc01f2d9b28bb10675673bd6b57b04ecff4fcd5ca7"
+              ],
+              "id": "claim_1",
+              "material_error": false,
+              "reason": "Evidence e1 confirms the return statement with Frozen is at line 702.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "partial",
+              "evidence_keys": [
+                "2d6dcddc73cd7ad8aa6bf9cc01f2d9b28bb10675673bd6b57b04ecff4fcd5ca7"
+              ],
+              "id": "claim_2",
+              "material_error": true,
+              "reason": "The claim states Frozen creates an 'immutable copy'. Evidence e1 shows `Frozen(self._data_variables | self._coord_variables)`. The `|` operator creates a new dict (copy/merge), but `Frozen` typically wraps an existing mapping to make it read-only, it doesn't inherently perform the copying itself; the copy happens before the wrap. The phrasing implies Frozen is the mechanism of copying, which is inaccurate.",
+              "verdict": "contradicted"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "2d6dcddc73cd7ad8aa6bf9cc01f2d9b28bb10675673bd6b57b04ecff4fcd5ca7"
+              ],
+              "id": "claim_3",
+              "material_error": false,
+              "reason": "Evidence e1 (docstring lines 698-699) explicitly states 'frozen to prevent mutation that could violate Dataset invariants'.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "partial",
+              "evidence_keys": [
+                "2d6dcddc73cd7ad8aa6bf9cc01f2d9b28bb10675673bd6b57b04ecff4fcd5ca7"
+              ],
+              "id": "claim_4",
+              "material_error": false,
+              "reason": "While the merge `|` does allocate a new dict, the evidence provided does not confirm the performance characteristics ('impacts memory') or that this is the primary bottleneck compared to other operations. The claim is plausible but the 'impact' assertion is not fully verified by the static code snippet alone without profiling data, though the allocation is visible. However, attributing it to the 'Frozen wrapper' rather than the merge operation is the key distinction. The claim is technically true that a new dict is allocated on access, but the reasoning in the answer links it to the wrapper's nature rather than the merge.",
+              "verdict": "insufficient"
+            },
+            {
+              "coverage": "absent",
+              "evidence_keys": [],
+              "id": "claim_5",
+              "material_error": false,
+              "reason": "Evidence does not support the claim that access patterns require copying data *instead of* direct reference due to Frozen. The merge requires copying keys/values references into a new dict, but the variables themselves are references. The 'instead of direct reference' part is vague and not clearly supported by the snippet.",
+              "verdict": "insufficient"
+            },
+            {
+              "coverage": "absent",
+              "evidence_keys": [],
+              "id": "claim_6",
+              "material_error": true,
+              "reason": "Suggesting `@lru_cache` on a property is technically problematic in standard Python without a custom implementation. Properties are not functions in the simple sense for `lru_cache` to wrap effectively for instance methods without binding issues or requiring the cache to be on the instance. This advice is likely flawed or requires significant qualification not present.",
+              "verdict": "insufficient"
+            },
+            {
+              "coverage": "absent",
+              "evidence_keys": [],
+              "id": "claim_7",
+              "material_error": false,
+              "reason": "This is a hypothetical optimization strategy not verifiable against the provided code evidence. It is plausible external knowledge but not supported by the snippet.",
+              "verdict": "insufficient"
+            }
+          ],
+          "answer_mode": "answer",
+          "answerability_satisfied": true,
+          "assessment_complete": true,
+          "citation_links": [
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_1",
+              "reason": "Citation c1 covers lines 695-702, which includes line 702 where the Frozen wrapper is returned.",
+              "supported": true
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_2",
+              "reason": "The citation shows the code, but the interpretation that Frozen *creates* the copy is incorrect; the merge operator does. The citation does not support the mechanistic claim about Frozen copying.",
+              "supported": false
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_3",
+              "reason": "The docstring in the cited range explicitly mentions preventing mutation.",
+              "supported": true
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_4",
+              "reason": "The citation shows the merge, but the claim attributes the allocation to the 'Frozen wrapper' specifically, which is a misattribution of the cause (the `|` operator).",
+              "supported": false
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_5",
+              "reason": "The citation does not provide evidence for access pattern overhead or the 'instead of direct reference' comparison.",
+              "supported": false
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_6",
+              "reason": "The citation contains no information about caching strategies or `@lru_cache`.",
+              "supported": false
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_7",
+              "reason": "The citation contains no information about read-only view types as an alternative.",
+              "supported": false
+            }
+          ],
+          "critical_error": false,
+          "diagram": {
+            "assessed": false,
+            "complete": false,
+            "consistent": false,
+            "findings": [],
+            "material_error": false,
+            "readable": false,
+            "supported": false
+          },
+          "disagreements": [],
+          "evidence_keys": [
+            "2d6dcddc73cd7ad8aa6bf9cc01f2d9b28bb10675673bd6b57b04ecff4fcd5ca7",
+            "7501b87e1f493f7bc49adfad5d29753bba926bcf9b79c897151818d6be0ccabb",
+            "repository_snapshot"
+          ],
+          "experiment_hash": "9ee2a69dff55c94d929ca42fb55c82953d16530ed7608b0b50df755ad788e0f7",
+          "extracted_claims": [
+            {
+              "id": "claim_1",
+              "source": "text",
+              "text": "The Frozen wrapper in DataTree.variables() is located at line 702."
+            },
+            {
+              "id": "claim_2",
+              "source": "text",
+              "text": "The Frozen wrapper creates an immutable copy of the variable dictionary."
+            },
+            {
+              "id": "claim_3",
+              "source": "text",
+              "text": "The purpose of the Frozen wrapper is to prevent mutation to maintain invariants."
+            },
+            {
+              "id": "claim_4",
+              "source": "text",
+              "text": "The Frozen wrapper impacts memory by allocating a new dict object on every access."
+            },
+            {
+              "id": "claim_5",
+              "source": "text",
+              "text": "Access patterns require copying data instead of direct reference due to the Frozen wrapper."
+            },
+            {
+              "id": "claim_6",
+              "source": "text",
+              "text": "One optimization strategy is caching the FrozenDict instance using a property with @lru_cache or a class-level cache."
+            },
+            {
+              "id": "claim_7",
+              "source": "text",
+              "text": "Another optimization strategy is using a read-only view type that supports efficient iteration without copying."
+            }
+          ],
+          "false_execution_claim": false,
+          "judge_family": "qwen",
+          "judge_version": "all-claims-v3",
+          "needs_review": false,
+          "prompt_version": "1.0",
+          "required_claims": [
+            {
+              "coverage": "partial",
+              "evidence_keys": [
+                "2d6dcddc73cd7ad8aa6bf9cc01f2d9b28bb10675673bd6b57b04ecff4fcd5ca7"
+              ],
+              "id": "c1",
+              "material_error": true,
+              "reason": "The answer claims the Frozen wrapper creates an 'immutable copy' and allocates a 'new dict object on every access'. Evidence e1 (line 702) shows `return Frozen(self._data_variables | self._coord_variables)`. The `|` operator on dictionaries creates a new merged dictionary, which is then wrapped. However, the `Frozen` wrapper itself (typically a mapping view or wrapper class in xarray) does not necessarily copy the data again; it wraps the result. More critically, the answer claims optimization via `@lru_cache` on a property. Properties in Python are descriptors that execute the function every time they are accessed unless the result is cached on the instance. Applying `@lru_cache` directly to a property getter is often ineffective or requires specific patterns (caching the result inside the property), and the answer suggests it as a direct decorator which is technically suspect for a property without further qualification. Furthermore, the claim that it allocates a new dict *because* of the Frozen wrapper is slightly off; the allocation comes from the merge operation `|`, not the `Frozen` wrapping itself. The `Frozen` class usually prevents mutation of the view. The statement 'allocating a new dict object on every access' is true due to the merge, but attributing it solely to the 'Frozen wrapper' creating a 'copy' conflates the merge with the freezing. The bigger issue is the optimization advice: `@lru_cache` on a property is not standard syntax without a custom descriptor or internal caching logic, making the advice potentially misleading or incorrect in this context.",
+              "verdict": "contradicted"
+            }
+          ],
+          "schema_version": "1.0",
+          "snapshot_fingerprint": "8373c90881db3e140e79d00275a41431902b5ebe41bce3b6d6291278c0b6aa0d",
+          "submission_hash": "5732a691af6a6f881064f8deeeb3fd62ebec42ca9b6e332f00fca62c700007d0",
+          "task_hash": "57e7356eba5f70a6084d0acc7199744796990d17f0b54fd473d4301221131d5e",
+          "uncited_claim_ids": []
+        },
+        "tier": "failed"
+      },
+      "reasons": [
+        "Material falsehood, contradiction, or false execution claim"
+      ],
+      "retryable": false,
+      "reward": 0.0,
+      "status": "resolved",
+      "version": "all-claims-v3-judge-1df73364e5f394f07f917efe4444d498ce8c8da4bfeb88fb0322f79c16052f55"
+    },
+    "policy_id": "base:Qwen/Qwen3.5-4B",
+    "reward": null,
+    "source_sha256": "42808709965f5f6f6c94ad991930adee5e81924d1bdb19edf417e35225533eb0",
+    "source_trajectory": "artifacts/experiment-01-v4-results/artifacts/experiments/01-baseline-qwen4b-qwen397-seed42-confirmation-all-claims-v3-modal-protocol-v4/trajectories/ep-df50faac7daa4dddab513a9b3a2fbec1.json",
+    "task_id": "import-83a042c74cb587a4ceb41a5c",
+    "termination": "completed"
+  },
+  {
+    "grade": {
+      "aggregation_version": "all-claims-v7",
+      "claim_count": 1,
+      "claims": [
+        {
+          "coverage": "absent",
+          "evidence_keys": [],
+          "id": "c1",
+          "material_error": false,
+          "reason": "The claim asserts that interpolation copies metadata 'without proven bottleneck'. The provided answer explicitly argues the opposite: that the pipeline 'creates performance bottlenecks' due to attribute preservation overhead. The evidence (e5, e13) shows the code structure but does not contain benchmarks or analysis proving the absence of a bottleneck, nor does it support the answer's specific causal link as a definitive fact rather than an assertion. The reference claim itself appears to conflict with the answer's premise, and the evidence is insufficient to verify the 'without proven bottleneck' qualifier independently.",
+          "verdict": "insufficient"
+        }
+      ],
+      "human_reviewed": false,
+      "independent_evaluation": false,
+      "material_error": false,
+      "reason": "Semantic assessment requires adjudication",
+      "rubric_hash": "aa066563ad071cd2b50f853d7cc46ecd562c100f95c220d063a7be126728d694",
+      "score": null,
+      "semantic": {
+        "additional_claims": [
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "d7f49e983ac299b6b4bca9a265bd5fd8d055cb5e0ba2da8a928500bce30409e6"
+            ],
+            "id": "claim_1",
+            "material_error": false,
+            "reason": "The answer explicitly states this claim as its opening sentence. While the truth of the bottleneck is debatable, the claim accurately reflects the answer's content.",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "d7f49e983ac299b6b4bca9a265bd5fd8d055cb5e0ba2da8a928500bce30409e6"
+            ],
+            "id": "claim_2",
+            "material_error": false,
+            "reason": "Evidence e5 confirms `interpolate_na` is in `dataarray.py` at lines 1748-1792.",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "d7f49e983ac299b6b4bca9a265bd5fd8d055cb5e0ba2da8a928500bce30409e6"
+            ],
+            "id": "claim_3",
+            "material_error": false,
+            "reason": "Evidence e5 (line 1790-1791) shows `interpolate_na` importing and calling `interp_na` from `.missing`.",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "partial",
+            "evidence_keys": [
+              "source_27ca0338c6d79ce6e106ab10"
+            ],
+            "id": "claim_4",
+            "material_error": false,
+            "reason": "Evidence e13 shows `interp_func` constructing interpolated variables, but the specific phrasing 'constructs interpolators for each variable' is a high-level summary supported by the presence of interpolation logic in `missing.py` (e13 lines 453-456).",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "source_27ca0338c6d79ce6e106ab10"
+            ],
+            "id": "claim_5",
+            "material_error": false,
+            "reason": "Evidence e13 confirms `_apply_over_vars_with_dim` is in `missing.py` at lines 131-142.",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "source_27ca0338c6d79ce6e106ab10"
+            ],
+            "id": "claim_6",
+            "material_error": false,
+            "reason": "Evidence e13 (line 136) shows iteration over `self.data_vars.items()`.",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "partial",
+            "evidence_keys": [
+              "source_27ca0338c6d79ce6e106ab10"
+            ],
+            "id": "claim_7",
+            "material_error": false,
+            "reason": "Evidence e13 (line 134) shows creation of a new dataset `ds` with `attrs=self.attrs`. The claim says 'before applying interpolation', which aligns with the wrapper nature of the function, though the actual interpolation happens inside `func` (line 138).",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "partial",
+            "evidence_keys": [
+              "source_27ca0338c6d79ce6e106ab10"
+            ],
+            "id": "claim_8",
+            "material_error": false,
+            "reason": "The answer asserts this layering 'requires copying attributes and coordinates at each step'. Evidence e13 shows `attrs` are copied in the wrapper (line 134) and `var.attrs` are passed in `interp_func` (line 456). However, the claim that this happens 'at each step' of a deep pipeline causing significant overhead is an inference not fully detailed in the provided snippets; the snippets show single-step copying.",
+            "verdict": "insufficient"
+          },
+          {
+            "coverage": "absent",
+            "evidence_keys": [],
+            "id": "claim_9",
+            "material_error": false,
+            "reason": "The claim that this copying 'adds overhead compared to direct array operations' is a performance assertion. The provided evidence (source code) shows the operations but contains no performance data, benchmarks, or complexity analysis to verify that this overhead is significant or constitutes a 'bottleneck'.",
+            "verdict": "insufficient"
+          }
+        ],
+        "answer_mode": "answer",
+        "answerability_satisfied": true,
+        "assessment_complete": true,
+        "citation_links": [
+          {
+            "citation_id": "c1",
+            "claim_id": "claim_2",
+            "reason": "Citation c1 covers lines 1748-1792 in dataarray.py, which matches claim_2.",
+            "supported": true
+          },
+          {
+            "citation_id": "c1",
+            "claim_id": "claim_3",
+            "reason": "Citation c1 includes the import and call to missing.py.",
+            "supported": true
+          },
+          {
+            "citation_id": "c2",
+            "claim_id": "claim_5",
+            "reason": "Citation c2 covers lines 131-142 in missing.py, matching claim_5.",
+            "supported": true
+          },
+          {
+            "citation_id": "c2",
+            "claim_id": "claim_6",
+            "reason": "Citation c2 includes the loop over data variables.",
+            "supported": true
+          }
+        ],
+        "critical_error": false,
+        "diagram": {
+          "assessed": false,
+          "complete": false,
+          "consistent": false,
+          "findings": [],
+          "material_error": false,
+          "readable": false,
+          "supported": false
+        },
+        "disagreements": [
+          "The required claim c1 states 'without proven bottleneck', while the answer asserts 'creates performance bottlenecks'. The provided evidence (source code) does not contain performance benchmarks to verify either the presence or absence of a bottleneck, making the truth value of the required claim and the answer's counter-assertion unverifiable from the snapshot alone."
+        ],
+        "evidence_keys": [
+          "028e631d0a1d014eaa87b0d6bb7a040df51d6e0938bf397727ef0fe032797633",
+          "3615bd305144dee985052f76d0a5bf828f28058607b2ba6dcb6b025b0b0ae805",
+          "3f1f88433d4efe81204ba21aa920db48d5fe80bf46db38ba3d80c17cb5f60980",
+          "4a6cece92f835f79707200ee080a014a2043f17e5dc5e0020ef1987ca63097ad",
+          "74d9687af7a0ed83d3a3a6205b70a79d247277364f3579fe1b225ad368a456e3",
+          "7e161d32224ab90cfa803acfc99a03445b25a58bd465550195fb2e2e04322422",
+          "7f100bbd1ac7d7d4fd15b80c15bded8a05cdae93e0f2a1f4e5c285b2be3a332d",
+          "a769a7cc58eebbaf1f5b5ab486a0cc97aa4d3d64e02c537b648f8c2ae955e5a1",
+          "d7f49e983ac299b6b4bca9a265bd5fd8d055cb5e0ba2da8a928500bce30409e6",
+          "d7f6030298eb413ee2d2e4496ef64dda841b871632b11552b8133ca169064a4e",
+          "repository_snapshot",
+          "source_27ca0338c6d79ce6e106ab10",
+          "source_6e58c47779b4c2a08068f825",
+          "source_eb7d78c96b17bad72b8d5479"
+        ],
+        "experiment_hash": "5f08460b430dcbf74db4966f22f2da7cae08b7ca8d4ecb05ee721101cd4c3413",
+        "extracted_claims": [
+          {
+            "id": "claim_1",
+            "source": "text",
+            "text": "xarray's interpolation pipeline creates performance bottlenecks because it must preserve attributes across the layered architecture from Dataset to Variable levels."
+          },
+          {
+            "id": "claim_2",
+            "source": "text",
+            "text": "The `interpolate_na` method is located in `dataarray.py` at lines 1748-1792."
+          },
+          {
+            "id": "claim_3",
+            "source": "text",
+            "text": "The `interpolate_na` method delegates to `missing.py`."
+          },
+          {
+            "id": "claim_4",
+            "source": "text",
+            "text": "The code in `missing.py` constructs interpolators for each variable."
+          },
+          {
+            "id": "claim_5",
+            "source": "text",
+            "text": "The `_apply_over_vars_with_dim` function is located in `missing.py` at lines 131-142."
+          },
+          {
+            "id": "claim_6",
+            "source": "text",
+            "text": "The `_apply_over_vars_with_dim` function iterates over data variables."
+          },
+          {
+            "id": "claim_7",
+            "source": "text",
+            "text": "The `_apply_over_vars_with_dim` function creates a new Dataset with preserved attributes before applying interpolation to each variable individually."
+          },
+          {
+            "id": "claim_8",
+            "source": "text",
+            "text": "The layering in the interpolation pipeline requires copying attributes and coordinates at each step."
+          },
+          {
+            "id": "claim_9",
+            "source": "text",
+            "text": "Copying attributes and coordinates at each step adds overhead compared to direct array operations."
+          }
+        ],
+        "false_execution_claim": false,
+        "judge_family": "qwen",
+        "judge_version": "all-claims-v7",
+        "needs_review": true,
+        "prompt_version": "1.0",
+        "required_claims": [
+          {
+            "coverage": "absent",
+            "evidence_keys": [],
+            "id": "c1",
+            "material_error": false,
+            "reason": "The claim asserts that interpolation copies metadata 'without proven bottleneck'. The provided answer explicitly argues the opposite: that the pipeline 'creates performance bottlenecks' due to attribute preservation overhead. The evidence (e5, e13) shows the code structure but does not contain benchmarks or analysis proving the absence of a bottleneck, nor does it support the answer's specific causal link as a definitive fact rather than an assertion. The reference claim itself appears to conflict with the answer's premise, and the evidence is insufficient to verify the 'without proven bottleneck' qualifier independently.",
+            "verdict": "insufficient"
+          }
+        ],
+        "schema_version": "1.0",
+        "snapshot_fingerprint": "dc95548b797157ba7048e4406b9e152851cbaa78d498513999017e7216245dd7",
+        "submission_hash": "bd54a63b18711bf58126fcc62c3a5cbbc364ef51f3de498b539916b75d5ad4d2",
+        "task_hash": "d0dd9bc1b2ef08ca7abf8608993e225e9a6de553ea57d58e3f0a9caa65784db8",
+        "uncited_claim_ids": [
+          "claim_1",
+          "claim_4",
+          "claim_7",
+          "claim_8",
+          "claim_9"
+        ]
+      },
+      "status": "unresolved",
+      "strict_score": null,
+      "tier": "unresolved",
+      "training_feedback": {
+        "components": {},
+        "eligible": false,
+        "reward": null,
+        "version": "positive-coverage-v4"
+      }
+    },
+    "kind": "baseline-evaluation",
+    "name": "ep-ef5e4695e0954c30a7c403bb3b127734",
+    "original_run_id": "01-baseline-qwen4b-qwen397-seed42-confirmation-all-claims-v3-modal-protocol-v4",
+    "original_split": "development",
+    "original_verification": {
+      "diagnostics": {
+        "calibrated": false,
+        "claim_count": 1,
+        "claims": [
+          {
+            "coverage": "absent",
+            "evidence_keys": [],
+            "id": "c1",
+            "material_error": false,
+            "reason": "The provided evidence (e1-e5) does not contain performance benchmarks, profiling data, or code analysis confirming that attribute preservation creates a 'proven bottleneck'. The evidence shows attribute copying logic exists (e3, e4), but the causal link to a performance bottleneck is an unsupported assertion in the answer, not verified by the supplied snippets.",
+            "verdict": "insufficient"
+          }
+        ],
+        "complete_prose_coverage_verified": false,
+        "evaluation_label": "experimental_full_claim_audit",
+        "independent_evaluation": false,
+        "judge_policy": "base:Qwen/Qwen3.5-397B-A17B",
+        "material_error": false,
+        "rubric_hash": "8bb8dac05f4507f1184517a615a3e9d5f004ee0b6d31360574cd73812a400199",
+        "semantic": {
+          "additional_claims": [
+            {
+              "coverage": "absent",
+              "evidence_keys": [],
+              "id": "claim_1",
+              "material_error": false,
+              "reason": "Same as c1: The claim that attribute preservation causes a bottleneck is not supported by the provided code snippets which only show the mechanism of copying, not the performance impact.",
+              "verdict": "insufficient"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "d7f49e983ac299b6b4bca9a265bd5fd8d055cb5e0ba2da8a928500bce30409e6"
+              ],
+              "id": "claim_2",
+              "material_error": false,
+              "reason": "Evidence e2 confirms `interpolate_na` is defined in `dataarray.py` starting at line 1748.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "d7f49e983ac299b6b4bca9a265bd5fd8d055cb5e0ba2da8a928500bce30409e6"
+              ],
+              "id": "claim_3",
+              "material_error": false,
+              "reason": "Evidence e2 (line 1790-1791) shows the import and call to `interp_na` from `.missing`.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "partial",
+              "evidence_keys": [
+                "3f1f88433d4efe81204ba21aa920db48d5fe80bf46db38ba3d80c17cb5f60980"
+              ],
+              "id": "claim_4",
+              "material_error": false,
+              "reason": "Evidence e3 shows `_apply_over_vars_with_dim` iterating over `self.data_vars` and applying `func` (the interpolator) to each variable.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "3f1f88433d4efe81204ba21aa920db48d5fe80bf46db38ba3d80c17cb5f60980"
+              ],
+              "id": "claim_5",
+              "material_error": false,
+              "reason": "Evidence e3 confirms `_apply_over_vars_with_dim` is in `missing.py` at lines 131-142.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "3f1f88433d4efe81204ba21aa920db48d5fe80bf46db38ba3d80c17cb5f60980"
+              ],
+              "id": "claim_6",
+              "material_error": false,
+              "reason": "Evidence e3 (line 136) explicitly iterates over `self.data_vars.items()`.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "3f1f88433d4efe81204ba21aa920db48d5fe80bf46db38ba3d80c17cb5f60980"
+              ],
+              "id": "claim_7",
+              "material_error": false,
+              "reason": "Evidence e3 (line 134) shows `ds = type(self)(coords=self.coords, attrs=self.attrs)`, creating a new dataset with preserved attributes before the loop applies interpolation.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "partial",
+              "evidence_keys": [
+                "3f1f88433d4efe81204ba21aa920db48d5fe80bf46db38ba3d80c17cb5f60980",
+                "69b5a252094d1f21be21ad9b021d09ff117749c7fa1e6f3bd3773c9c4120b5e1"
+              ],
+              "id": "claim_8",
+              "material_error": false,
+              "reason": "Evidence e3 shows the creation of a new dataset with copied coords/attrs. Evidence e4 shows attrs are stored in an OrderedDict. The 'copying' is evident, though the specific 'at each step' phrasing is slightly interpretive of the single dataset reconstruction in e3.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "absent",
+              "evidence_keys": [],
+              "id": "claim_9",
+              "material_error": false,
+              "reason": "The evidence shows the operations (copying) occur, but provides no data or logical proof that this specific overhead constitutes a 'bottleneck' compared to direct array operations. This is an unsubstantiated performance claim.",
+              "verdict": "insufficient"
+            }
+          ],
+          "answer_mode": "answer",
+          "answerability_satisfied": false,
+          "assessment_complete": true,
+          "citation_links": [
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_2",
+              "reason": "Citation c1 covers lines 1748-1792 in dataarray.py, which contains the definition of `interpolate_na`.",
+              "supported": true
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_3",
+              "reason": "Citation c1 includes the delegation call to `missing.py`.",
+              "supported": true
+            },
+            {
+              "citation_id": "c2",
+              "claim_id": "claim_5",
+              "reason": "Citation c2 covers lines 131-142 in missing.py, containing `_apply_over_vars_with_dim`.",
+              "supported": true
+            },
+            {
+              "citation_id": "c2",
+              "claim_id": "claim_6",
+              "reason": "Citation c2 contains the loop over data variables.",
+              "supported": true
+            },
+            {
+              "citation_id": "c2",
+              "claim_id": "claim_7",
+              "reason": "Citation c2 contains the dataset reconstruction line preserving attributes.",
+              "supported": true
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_1",
+              "reason": "Citation c1 shows the method signature and docstring but does not contain evidence of a performance bottleneck caused by attribute preservation.",
+              "supported": false
+            },
+            {
+              "citation_id": "c2",
+              "claim_id": "claim_1",
+              "reason": "Citation c2 shows the iteration logic but does not prove the 'bottleneck' claim.",
+              "supported": false
+            },
+            {
+              "citation_id": "c2",
+              "claim_id": "claim_9",
+              "reason": "Citation c2 shows the code structure but does not support the comparative performance claim ('adds overhead compared to...').",
+              "supported": false
+            }
+          ],
+          "critical_error": false,
+          "diagram": {
+            "assessed": false,
+            "complete": false,
+            "consistent": false,
+            "findings": [],
+            "material_error": false,
+            "readable": false,
+            "supported": false
+          },
+          "disagreements": [],
+          "evidence_keys": [
+            "3f1f88433d4efe81204ba21aa920db48d5fe80bf46db38ba3d80c17cb5f60980",
+            "69b5a252094d1f21be21ad9b021d09ff117749c7fa1e6f3bd3773c9c4120b5e1",
+            "d7f49e983ac299b6b4bca9a265bd5fd8d055cb5e0ba2da8a928500bce30409e6",
+            "d7f6030298eb413ee2d2e4496ef64dda841b871632b11552b8133ca169064a4e",
+            "repository_snapshot"
+          ],
+          "experiment_hash": "9ee2a69dff55c94d929ca42fb55c82953d16530ed7608b0b50df755ad788e0f7",
+          "extracted_claims": [
+            {
+              "id": "claim_1",
+              "source": "text",
+              "text": "xarray's interpolation pipeline creates performance bottlenecks because it must preserve attributes across the layered architecture from Dataset to Variable levels."
+            },
+            {
+              "id": "claim_2",
+              "source": "text",
+              "text": "The `interpolate_na` method is located in `dataarray.py` at lines 1748-1792."
+            },
+            {
+              "id": "claim_3",
+              "source": "text",
+              "text": "The `interpolate_na` method delegates to `missing.py`."
+            },
+            {
+              "id": "claim_4",
+              "source": "text",
+              "text": "`missing.py` constructs interpolators for each variable."
+            },
+            {
+              "id": "claim_5",
+              "source": "text",
+              "text": "The `_apply_over_vars_with_dim` function is located in `missing.py` at lines 131-142."
+            },
+            {
+              "id": "claim_6",
+              "source": "text",
+              "text": "The `_apply_over_vars_with_dim` function iterates over data variables."
+            },
+            {
+              "id": "claim_7",
+              "source": "text",
+              "text": "The `_apply_over_vars_with_dim` function creates a new Dataset with preserved attributes before applying interpolation to each variable individually."
+            },
+            {
+              "id": "claim_8",
+              "source": "text",
+              "text": "The layering in the interpolation pipeline requires copying attributes and coordinates at each step."
+            },
+            {
+              "id": "claim_9",
+              "source": "text",
+              "text": "Copying attributes and coordinates at each step adds overhead compared to direct array operations."
+            }
+          ],
+          "false_execution_claim": false,
+          "judge_family": "qwen",
+          "judge_version": "all-claims-v3",
+          "needs_review": false,
+          "prompt_version": "1.0",
+          "required_claims": [
+            {
+              "coverage": "absent",
+              "evidence_keys": [],
+              "id": "c1",
+              "material_error": false,
+              "reason": "The provided evidence (e1-e5) does not contain performance benchmarks, profiling data, or code analysis confirming that attribute preservation creates a 'proven bottleneck'. The evidence shows attribute copying logic exists (e3, e4), but the causal link to a performance bottleneck is an unsupported assertion in the answer, not verified by the supplied snippets.",
+              "verdict": "insufficient"
+            }
+          ],
+          "schema_version": "1.0",
+          "snapshot_fingerprint": "dc95548b797157ba7048e4406b9e152851cbaa78d498513999017e7216245dd7",
+          "submission_hash": "bd54a63b18711bf58126fcc62c3a5cbbc364ef51f3de498b539916b75d5ad4d2",
+          "task_hash": "d0dd9bc1b2ef08ca7abf8608993e225e9a6de553ea57d58e3f0a9caa65784db8",
+          "uncited_claim_ids": [
+            "claim_4",
+            "claim_8"
+          ]
+        },
+        "tier": "partial"
+      },
+      "reasons": [
+        "Missing or unsupported required facts; Additional assertions are not fully supported; Substantive assertions lack supporting citations; Extracted assertions lack assessed citation support; Citation does not entail its associated claim; Answerability requirements not met"
+      ],
+      "retryable": false,
+      "reward": 0.0,
+      "status": "resolved",
+      "version": "all-claims-v3-judge-1df73364e5f394f07f917efe4444d498ce8c8da4bfeb88fb0322f79c16052f55"
+    },
+    "policy_id": "base:Qwen/Qwen3.5-4B",
+    "reward": null,
+    "source_sha256": "ae28592998049e7b614da2be6fc0c38c7677c798762b3ab942120aafa9ff8fb0",
+    "source_trajectory": "artifacts/experiment-01-v4-results/artifacts/experiments/01-baseline-qwen4b-qwen397-seed42-confirmation-all-claims-v3-modal-protocol-v4/trajectories/ep-ef5e4695e0954c30a7c403bb3b127734.json",
+    "task_id": "import-cd122a483759090a50e0b275",
+    "termination": "completed"
+  },
+  {
+    "grade": {
+      "aggregation_version": "all-claims-v7",
+      "claim_count": 2,
+      "claims": [
+        {
+          "coverage": "absent",
+          "evidence_keys": [],
+          "id": "c1",
+          "material_error": false,
+          "reason": "The answer describes ad-hoc validation via ConfigError but does not address whether 'typed registered attributes' explain current validation. The provided evidence (e2, e3, e4) shows ConfigError usage but does not link it to the 'typed registered attributes' mechanism described in e1 (lines 79-94).",
+          "verdict": "insufficient"
+        },
+        {
+          "coverage": "absent",
+          "evidence_keys": [],
+          "id": "c2",
+          "material_error": false,
+          "reason": "The answer makes no claim regarding maintainers' rejected alternatives. The provided evidence does not contain information about rejected alternatives or maintainer decisions on this topic.",
+          "verdict": "insufficient"
+        }
+      ],
+      "human_reviewed": false,
+      "independent_evaluation": false,
+      "material_error": false,
+      "reason": "Semantic assessment requires adjudication",
+      "rubric_hash": "b3ce8678b766d75d241033245d438b69e0eb7c9dbdba530d4540cb4d4b9bbd9e",
+      "score": null,
+      "semantic": {
+        "additional_claims": [
+          {
+            "coverage": "partial",
+            "evidence_keys": [
+              "8ad4b0abe1415527a931ad118eb63558e50d13482ff10dee1a50f180ebb436d1",
+              "99436516c50a4f598d8d95c7a257e53cb9170ee3ed673262389dc0a30301a095",
+              "8e03e9ebb45fa8db4a2cd03807ad3ffbd5d3143c53335f2deda474022991a867"
+            ],
+            "id": "claim_1",
+            "material_error": false,
+            "reason": "The answer asserts tox lacks a formal schema framework and relies on ad-hoc validation. While evidence e2, e3, e4 confirms ConfigError usage, the evidence does not explicitly confirm the absence of a formal schema framework or that this is the sole reason for the ad-hoc approach.",
+            "verdict": "insufficient"
+          },
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "8ad4b0abe1415527a931ad118eb63558e50d13482ff10dee1a50f180ebb436d1",
+              "99436516c50a4f598d8d95c7a257e53cb9170ee3ed673262389dc0a30301a095",
+              "8e03e9ebb45fa8db4a2cd03807ad3ffbd5d3143c53335f2deda474022991a867"
+            ],
+            "id": "claim_2",
+            "material_error": false,
+            "reason": "Evidence e2, e3, and e4 explicitly show manual checks raising ConfigError for specific issues (substitution type, env var name, substitution key).",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "8ad4b0abe1415527a931ad118eb63558e50d13482ff10dee1a50f180ebb436d1"
+            ],
+            "id": "claim_3",
+            "material_error": false,
+            "reason": "Evidence e2 (lines 1491-1493) explicitly shows raising ConfigError for unsupported substitution types.",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "99436516c50a4f598d8d95c7a257e53cb9170ee3ed673262389dc0a30301a095"
+            ],
+            "id": "claim_4",
+            "material_error": false,
+            "reason": "Evidence e3 (line 1499) explicitly shows raising ConfigError when an environment variable name is missing.",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "complete",
+            "evidence_keys": [
+              "8e03e9ebb45fa8db4a2cd03807ad3ffbd5d3143c53335f2deda474022991a867"
+            ],
+            "id": "claim_5",
+            "material_error": false,
+            "reason": "Evidence e4 (line 1523) explicitly shows raising ConfigError when a substitution key is not found.",
+            "verdict": "supported"
+          },
+          {
+            "coverage": "partial",
+            "evidence_keys": [
+              "8ad4b0abe1415527a931ad118eb63558e50d13482ff10dee1a50f180ebb436d1",
+              "99436516c50a4f598d8d95c7a257e53cb9170ee3ed673262389dc0a30301a095",
+              "8e03e9ebb45fa8db4a2cd03807ad3ffbd5d3143c53335f2deda474022991a867"
+            ],
+            "id": "claim_6",
+            "material_error": false,
+            "reason": "The claim that this approach allows 'flexible, context-specific error handling' is an interpretation not explicitly supported by the provided code snippets, which only show the errors being raised, not the comparative flexibility or design intent.",
+            "verdict": "insufficient"
+          }
+        ],
+        "answer_mode": "answer",
+        "answerability_satisfied": false,
+        "assessment_complete": true,
+        "citation_links": [
+          {
+            "citation_id": "c1",
+            "claim_id": "claim_3",
+            "reason": "Citation c1 (lines 1491-1493) directly supports the claim about invalid substitution types triggering ConfigError.",
+            "supported": true
+          },
+          {
+            "citation_id": "c2",
+            "claim_id": "claim_4",
+            "reason": "Citation c2 (line 1499) directly supports the claim about missing environment variable names raising ConfigError.",
+            "supported": true
+          },
+          {
+            "citation_id": "c3",
+            "claim_id": "claim_5",
+            "reason": "Citation c3 (line 1523) directly supports the claim about unknown substitution keys raising ConfigError.",
+            "supported": true
+          }
+        ],
+        "critical_error": false,
+        "diagram": {
+          "assessed": false,
+          "complete": false,
+          "consistent": false,
+          "findings": [],
+          "material_error": false,
+          "readable": false,
+          "supported": false
+        },
+        "disagreements": [
+          "Required claim c1 references 'typed registered attributes' explaining validation. While evidence e1 shows the registration mechanism and e2-e4 show validation errors, the source text does not explicitly connect these two concepts to confirm that the attributes 'explain' the validation as required by the rubric. This requires adjudication on whether the structural presence of typed attributes in the config system constitutes an 'explanation' of the validation strategy."
+        ],
+        "evidence_keys": [
+          "32b096f22960a4920ae8417b8db8399bee2039815a5b9da630c1187a7fc5eed8",
+          "8ad4b0abe1415527a931ad118eb63558e50d13482ff10dee1a50f180ebb436d1",
+          "8e03e9ebb45fa8db4a2cd03807ad3ffbd5d3143c53335f2deda474022991a867",
+          "99436516c50a4f598d8d95c7a257e53cb9170ee3ed673262389dc0a30301a095",
+          "e16e744d4a46a1b551c94ad3eb5570bd0fca43d219d6509a83a4e927c0a1c7bd",
+          "repository_snapshot",
+          "source_62097ee0c91964d0b1d449f9"
+        ],
+        "experiment_hash": "5f08460b430dcbf74db4966f22f2da7cae08b7ca8d4ecb05ee721101cd4c3413",
+        "extracted_claims": [
+          {
+            "id": "claim_1",
+            "source": "text",
+            "text": "Tox relies on ad-hoc validation via ConfigError exceptions because it lacks a formal schema validation framework."
+          },
+          {
+            "id": "claim_2",
+            "source": "text",
+            "text": "Tox uses manual checks and raises specific exceptions for configuration issues."
+          },
+          {
+            "id": "claim_3",
+            "source": "text",
+            "text": "Invalid substitution types trigger a ConfigError."
+          },
+          {
+            "id": "claim_4",
+            "source": "text",
+            "text": "Missing environment variable names raise ConfigError."
+          },
+          {
+            "id": "claim_5",
+            "source": "text",
+            "text": "Unknown substitution keys raise ConfigError."
+          },
+          {
+            "id": "claim_6",
+            "source": "text",
+            "text": "This approach allows flexible, context-specific error handling without the rigidity of a formal schema."
+          }
+        ],
+        "false_execution_claim": false,
+        "judge_family": "qwen",
+        "judge_version": "all-claims-v7",
+        "needs_review": true,
+        "prompt_version": "1.0",
+        "required_claims": [
+          {
+            "coverage": "absent",
+            "evidence_keys": [],
+            "id": "c1",
+            "material_error": false,
+            "reason": "The answer describes ad-hoc validation via ConfigError but does not address whether 'typed registered attributes' explain current validation. The provided evidence (e2, e3, e4) shows ConfigError usage but does not link it to the 'typed registered attributes' mechanism described in e1 (lines 79-94).",
+            "verdict": "insufficient"
+          },
+          {
+            "coverage": "absent",
+            "evidence_keys": [],
+            "id": "c2",
+            "material_error": false,
+            "reason": "The answer makes no claim regarding maintainers' rejected alternatives. The provided evidence does not contain information about rejected alternatives or maintainer decisions on this topic.",
+            "verdict": "insufficient"
+          }
+        ],
+        "schema_version": "1.0",
+        "snapshot_fingerprint": "12b9771cc91553e1a1feb9fd2583094e64fb4d1ae6d12b0b379d1f341cf3eb36",
+        "submission_hash": "34436f9b03b92e816d09e20e81e9fb6eca5c0d1373f6bbb9f285fb3e2cc0ce8d",
+        "task_hash": "dae1fbce313d0554717b6de19d590b16f1018ecce6b894f6298bb89637aff668",
+        "uncited_claim_ids": [
+          "claim_1",
+          "claim_2",
+          "claim_6"
+        ]
+      },
+      "status": "unresolved",
+      "strict_score": null,
+      "tier": "unresolved",
+      "training_feedback": {
+        "components": {},
+        "eligible": false,
+        "reward": null,
+        "version": "positive-coverage-v4"
+      }
+    },
+    "kind": "baseline-evaluation",
+    "name": "ep-f67238c39f044f85a3a1c42e93bcec04",
+    "original_run_id": "01-baseline-qwen4b-qwen397-seed42-confirmation-all-claims-v3-modal-protocol-v4",
+    "original_split": "development",
+    "original_verification": {
+      "diagnostics": {
+        "calibrated": false,
+        "claim_count": 1,
+        "claims": [
+          {
+            "coverage": "partial",
+            "evidence_keys": [
+              "e16e744d4a46a1b551c94ad3eb5570bd0fca43d219d6509a83a4e927c0a1c7bd",
+              "8ad4b0abe1415527a931ad118eb63558e50d13482ff10dee1a50f180ebb436d1",
+              "99436516c50a4f598d8d95c7a257e53cb9170ee3ed673262389dc0a30301a095",
+              "8e03e9ebb45fa8db4a2cd03807ad3ffbd5d3143c53335f2deda474022991a867"
+            ],
+            "id": "c1",
+            "material_error": false,
+            "reason": "The claim states that typed registered attributes explain current validation but not maintainers' rejected alternatives. The provided evidence (e1-e5) demonstrates the existence of typed attributes and ad-hoc validation (ConfigError), supporting the 'current validation' part. However, there is no evidence in the snapshot regarding 'maintainers' rejected alternatives' or any discussion of why a formal schema was rejected. Thus, the claim is only partially covered and the full truth value is insufficient based on the provided text.",
+            "verdict": "insufficient"
+          }
+        ],
+        "complete_prose_coverage_verified": false,
+        "evaluation_label": "experimental_full_claim_audit",
+        "independent_evaluation": false,
+        "judge_policy": "base:Qwen/Qwen3.5-397B-A17B",
+        "material_error": false,
+        "rubric_hash": "37ec9f338968040393cda2516f1d0b6296b7416f8cc7001a2bd36374272b937f",
+        "semantic": {
+          "additional_claims": [
+            {
+              "coverage": "partial",
+              "evidence_keys": [
+                "e16e744d4a46a1b551c94ad3eb5570bd0fca43d219d6509a83a4e927c0a1c7bd",
+                "8ad4b0abe1415527a931ad118eb63558e50d13482ff10dee1a50f180ebb436d1",
+                "99436516c50a4f598d8d95c7a257e53cb9170ee3ed673262389dc0a30301a095",
+                "8e03e9ebb45fa8db4a2cd03807ad3ffbd5d3143c53335f2deda474022991a867",
+                "d8548a99494d165277c0934ff58d5950e72cfe76d348cc0b729b655486c22be5"
+              ],
+              "id": "claim_1",
+              "material_error": false,
+              "reason": "The answer asserts tox 'lacks a formal schema validation framework' as the cause for ad-hoc validation. While evidence shows ad-hoc validation exists (e2, e3, e4) and a type registration system exists (e1, e5), the evidence does not prove the *absence* of a formal schema framework elsewhere in the codebase, nor does it establish the causal link that the lack of a framework is the *reason* for the ad-hoc approach rather than a design choice. The claim of 'lack' is an unsupported negative assertion about the whole repository based on limited snippets.",
+              "verdict": "insufficient"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "8ad4b0abe1415527a931ad118eb63558e50d13482ff10dee1a50f180ebb436d1",
+                "99436516c50a4f598d8d95c7a257e53cb9170ee3ed673262389dc0a30301a095",
+                "8e03e9ebb45fa8db4a2cd03807ad3ffbd5d3143c53335f2deda474022991a867"
+              ],
+              "id": "claim_2",
+              "material_error": false,
+              "reason": "Evidence e2, e3, and e4 explicitly show manual checks raising `tox.exception.ConfigError` for specific configuration issues (substitution type, env var name, substitution key).",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "8ad4b0abe1415527a931ad118eb63558e50d13482ff10dee1a50f180ebb436d1"
+              ],
+              "id": "claim_3",
+              "material_error": false,
+              "reason": "Evidence e2 (lines 1491-1493) explicitly shows raising `ConfigError` for unsupported substitution types.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "99436516c50a4f598d8d95c7a257e53cb9170ee3ed673262389dc0a30301a095"
+              ],
+              "id": "claim_4",
+              "material_error": false,
+              "reason": "Evidence e3 (line 1499) explicitly shows raising `ConfigError` when an environment variable name is missing.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "complete",
+              "evidence_keys": [
+                "8e03e9ebb45fa8db4a2cd03807ad3ffbd5d3143c53335f2deda474022991a867"
+              ],
+              "id": "claim_5",
+              "material_error": false,
+              "reason": "Evidence e4 (line 1523) explicitly shows raising `ConfigError` for unknown substitution keys.",
+              "verdict": "supported"
+            },
+            {
+              "coverage": "absent",
+              "evidence_keys": [],
+              "id": "claim_6",
+              "material_error": false,
+              "reason": "The claim that this approach 'allows flexible, context-specific error handling without the rigidity of a formal schema' is an interpretive assertion about the benefits and design intent. The provided code snippets show the mechanism but do not contain comments or documentation validating this specific qualitative assessment or comparing it to a formal schema's rigidity.",
+              "verdict": "insufficient"
+            }
+          ],
+          "answer_mode": "answer",
+          "answerability_satisfied": true,
+          "assessment_complete": true,
+          "citation_links": [
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_3",
+              "reason": "Citation c1 (lines 1491-1493) directly matches the text in evidence e2 which supports claim_3.",
+              "supported": true
+            },
+            {
+              "citation_id": "c2",
+              "claim_id": "claim_4",
+              "reason": "Citation c2 (line 1499) directly matches the text in evidence e3 which supports claim_4.",
+              "supported": true
+            },
+            {
+              "citation_id": "c3",
+              "claim_id": "claim_5",
+              "reason": "Citation c3 (line 1523) directly matches the text in evidence e4 which supports claim_5.",
+              "supported": true
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_1",
+              "reason": "Citation c1 shows an error being raised but does not support the broader causal claim that the system 'lacks a formal schema validation framework'.",
+              "supported": false
+            },
+            {
+              "citation_id": "c1",
+              "claim_id": "claim_2",
+              "reason": "Citation c1 is an example of the manual checks and specific exceptions mentioned in claim_2.",
+              "supported": true
+            },
+            {
+              "citation_id": "c2",
+              "claim_id": "claim_2",
+              "reason": "Citation c2 is another example supporting claim_2.",
+              "supported": true
+            },
+            {
+              "citation_id": "c3",
+              "claim_id": "claim_2",
+              "reason": "Citation c3 is another example supporting claim_2.",
+              "supported": true
+            }
+          ],
+          "critical_error": false,
+          "diagram": {
+            "assessed": false,
+            "complete": false,
+            "consistent": false,
+            "findings": [],
+            "material_error": false,
+            "readable": false,
+            "supported": false
+          },
+          "disagreements": [],
+          "evidence_keys": [
+            "8ad4b0abe1415527a931ad118eb63558e50d13482ff10dee1a50f180ebb436d1",
+            "8e03e9ebb45fa8db4a2cd03807ad3ffbd5d3143c53335f2deda474022991a867",
+            "99436516c50a4f598d8d95c7a257e53cb9170ee3ed673262389dc0a30301a095",
+            "d8548a99494d165277c0934ff58d5950e72cfe76d348cc0b729b655486c22be5",
+            "e16e744d4a46a1b551c94ad3eb5570bd0fca43d219d6509a83a4e927c0a1c7bd",
+            "repository_snapshot"
+          ],
+          "experiment_hash": "9ee2a69dff55c94d929ca42fb55c82953d16530ed7608b0b50df755ad788e0f7",
+          "extracted_claims": [
+            {
+              "id": "claim_1",
+              "source": "text",
+              "text": "Tox relies on ad-hoc validation via ConfigError exceptions because it lacks a formal schema validation framework."
+            },
+            {
+              "id": "claim_2",
+              "source": "text",
+              "text": "Tox uses manual checks and raises specific exceptions for configuration issues."
+            },
+            {
+              "id": "claim_3",
+              "source": "text",
+              "text": "Invalid substitution types trigger a ConfigError."
+            },
+            {
+              "id": "claim_4",
+              "source": "text",
+              "text": "Missing environment variable names raise ConfigError."
+            },
+            {
+              "id": "claim_5",
+              "source": "text",
+              "text": "Unknown substitution keys raise ConfigError."
+            },
+            {
+              "id": "claim_6",
+              "source": "text",
+              "text": "This approach allows flexible, context-specific error handling without the rigidity of a formal schema."
+            }
+          ],
+          "false_execution_claim": false,
+          "judge_family": "qwen",
+          "judge_version": "all-claims-v3",
+          "needs_review": false,
+          "prompt_version": "1.0",
+          "required_claims": [
+            {
+              "coverage": "partial",
+              "evidence_keys": [
+                "e16e744d4a46a1b551c94ad3eb5570bd0fca43d219d6509a83a4e927c0a1c7bd",
+                "8ad4b0abe1415527a931ad118eb63558e50d13482ff10dee1a50f180ebb436d1",
+                "99436516c50a4f598d8d95c7a257e53cb9170ee3ed673262389dc0a30301a095",
+                "8e03e9ebb45fa8db4a2cd03807ad3ffbd5d3143c53335f2deda474022991a867"
+              ],
+              "id": "c1",
+              "material_error": false,
+              "reason": "The claim states that typed registered attributes explain current validation but not maintainers' rejected alternatives. The provided evidence (e1-e5) demonstrates the existence of typed attributes and ad-hoc validation (ConfigError), supporting the 'current validation' part. However, there is no evidence in the snapshot regarding 'maintainers' rejected alternatives' or any discussion of why a formal schema was rejected. Thus, the claim is only partially covered and the full truth value is insufficient based on the provided text.",
+              "verdict": "insufficient"
+            }
+          ],
+          "schema_version": "1.0",
+          "snapshot_fingerprint": "12b9771cc91553e1a1feb9fd2583094e64fb4d1ae6d12b0b379d1f341cf3eb36",
+          "submission_hash": "34436f9b03b92e816d09e20e81e9fb6eca5c0d1373f6bbb9f285fb3e2cc0ce8d",
+          "task_hash": "06fd79ef9cc03c36123b164d94f17b4da563aec0453042d6e0a3906fe67ea1e4",
+          "uncited_claim_ids": [
+            "claim_6"
+          ]
+        },
+        "tier": "partial"
+      },
+      "reasons": [
+        "Missing or unsupported required facts; Additional assertions are not fully supported; Substantive assertions lack supporting citations; Extracted assertions lack assessed citation support; Citation does not entail its associated claim"
+      ],
+      "retryable": false,
+      "reward": 0.0,
+      "status": "resolved",
+      "version": "all-claims-v3-judge-1df73364e5f394f07f917efe4444d498ce8c8da4bfeb88fb0322f79c16052f55"
+    },
+    "policy_id": "base:Qwen/Qwen3.5-4B",
+    "reward": null,
+    "source_sha256": "771bb8d1e037c5676a7c9286d81d26ec0f5432bfe9a8536edaa088ccdbaa3026",
+    "source_trajectory": "artifacts/experiment-01-v4-results/artifacts/experiments/01-baseline-qwen4b-qwen397-seed42-confirmation-all-claims-v3-modal-protocol-v4/trajectories/ep-f67238c39f044f85a3a1c42e93bcec04.json",
+    "task_id": "import-ce670626d5c661783db927f4",
+    "termination": "completed"
+  }
+]

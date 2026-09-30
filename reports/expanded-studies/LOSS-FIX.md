@@ -1,0 +1,7 @@
+# Verified loss-check fix and continuation
+
+A forward-only diagnostic reproduced the failure on the cached batch at checkpoint2: provider loss -0.1444428313698154 versus token-derived -0.07222141599705811 (almost exactly twice). The SDK splits large requests and sums chunk metrics; the precise server-side source of duplication is not established. Sequential forward-only requests on the same weighted row multiset passed the existing strict tolerance on every chunk (errors around1e-9). Probe artifacts: forward-diagnostics/.
+
+Fix: deterministic bounded requests (at most32rows and1MiB conservativepayload, respecting any smaller SDK limits), sequential forward/backward with validation on every response, original global row weights unchanged, one optimizer update after all chunks. Gradients accumulate across requests. No tolerance increase, dropped rows, per-chunk optimizer updates or reward changes.40focused tests passed.
+
+The user explicitly requested continuing the run after the observed failure. Batch3 never dispatched an optimizer call. A fresh trainer restores immutable checkpoint2 including optimizer state, running baseline, task cursor and RNG into new output expanded-direct-seed42-v2-continued. Poisoned trainer remains abandoned. Old failed output and checkpoint stay unchanged. Generation restarts at the next uncommitted batch; failed attempt costs/outcomes remain disclosed. The target remains32total scheduled batches with2already acknowledged. Budget remains the existing private$1800 ledger within$5000additional.

@@ -1,0 +1,58 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 1,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-033.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "original_reference_sha256": "3a11a144354971b6ddecdd9f9a1bf8c41b8f07781ee54674baa9b4199cf78d9d",
+      "question": "Why does unconditionally setting the session access tracking attribute in dictionary access methods impact signed cookie string conversion performance during frequent read operations?",
+      "question_sha256": "8b54bc0e10d841d99d7d21f1f638cfe77270dab3adbff453127bebd7edc2ec42",
+      "reference_answer": "SecureCookieSession access methods mark accessed so save_session can add Vary: Cookie (src/flask/sessions.py:362-364). That flag does not determine serialization: should_set_cookie checks modified or permanent with SESSION_REFRESH_EACH_REQUEST (259-261); only then does save_session dump/sign the session (383-387). Read-only permanent sessions may be refreshed by policy, but that cost is not caused by unconditionally setting accessed.",
+      "reference_sha256": "6155bbf57db4e28639771c55eb05009771b6df6031d929f701d05f5961f9e30b",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-6dc2da81340708145f2188d0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "original_reference_sha256": "484a7b929befe389be723a8e74d84762080b13df2b408c6cb2838c23ccfa0942",
+      "question": "How does the decorator that copies request contexts handle isolation of lightweight concurrent execution contexts while preserving session data across execution boundaries?",
+      "question_sha256": "04194a94959c980cc514df9de2c8adbbb5cb7b8979cfef07c8c20a527576f955",
+      "reference_answer": "copy_current_request_context captures ctx.copy once and runs the wrapped function under that context (src/flask/ctx.py:179-193). RequestContext.copy creates a new context object but shares the request, environ and current session (337-355). Context-local bindings are distinct, but mutable request/session data are not isolated; the docstring specifically warns that thread access to the shared request must be locked.",
+      "reference_sha256": "b43830c0afe8c21eb21a3d40025c228ae1d142229ab85a871e8e81f53e094484",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-75067f6e8485dbf168747a9e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "original_reference_sha256": "65e89dc2523b0a9422093acaf25daa1cb3529840d9f2f2c5c5724741eb7e990c",
+      "question": "Why does the linear traversal of the exception class hierarchy in _find_error_handler create performance overhead when handling errors in applications with deep exception inheritance chains and multiple registered error handlers?",
+      "question_sha256": "91d26a56d31b1758ee4636522488a5602c4301d5847fb08bfb10ccffb8c36e2f",
+      "reference_answer": "_find_error_handler loops over at most two code categories, blueprint/app scopes, then exception MRO for nonempty maps, returning the first match (src/flask/sansio/app.py:831-846). A no-match worst case is O(B*M) dictionary lookups for B scopes and M MRO entries under usual dictionary assumptions. Handler count does not multiply this directly. Deep hierarchies can add work, but a measured bottleneck is not established, and reversing MRO would change specificity semantics. Caching would need keys and invalidation that preserve scope/code precedence.",
+      "reference_sha256": "bb7bfce716acdbcf36841d9a58a1dee56e6b2c952d41b05aa5d9a9e4d902c418",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-84c901ed4005931ea617ed3c"
+    }
+  ]
+}

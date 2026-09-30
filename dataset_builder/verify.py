@@ -20,6 +20,9 @@ def passed_execution(result):
 def verify_bundle(bundle, backend=None):
     root = Path(bundle)
     manifest = json.loads((root / "manifest.json").read_text())
+    required = {"public/tasks.jsonl", "public/environment.json", "private/tasks.jsonl", "private/assertions.jsonl", "private/source-spec.json"}
+    if not required.issubset(manifest["artifacts"]):
+        raise ValueError("Incomplete artifact manifest")
     for relative, expected in manifest["artifacts"].items():
         p = root / relative
         if not p.resolve().is_relative_to(root.resolve()):
@@ -32,9 +35,29 @@ def verify_bundle(bundle, backend=None):
     built = json.loads((root / "environment-build/result.json").read_text())
     if built["status"] != "ready" or built["commit"] != environment["repository"]["commit"]:
         raise ValueError("Environment not ready or wrong commit")
+    if built.get("source_environment_sha256") != canonical_hash(environment):
+        raise ValueError("Built environment recipe binding mismatch")
     validate_bundle(public, private, [environment])
     checkout = Path(environment["snapshot_path"])
     snapshot(checkout, environment["repository"]["commit"])
+    from .environment import _export_snapshot
+    hashes, links = _export_snapshot(checkout, environment["repository"]["commit"])
+    if built.get("snapshot_files") != hashes:
+        raise ValueError("Built environment snapshot binding mismatch")
+    expected_probes = {(t["id"], p["id"]): p for t in private for p in t["probes"]}
+    assertion_records = read_jsonl(root / "private/assertions.jsonl")
+    actual_probes = {}
+    for t in assertion_records:
+        for p in t["assertions"]:
+            key = (t["task_id"], p["id"])
+            if key in actual_probes:
+                raise ValueError("Duplicate assertion")
+            actual_probes[key] = p
+    if set(actual_probes) != set(expected_probes):
+        raise ValueError("Assertion and TaskSpec probe sets differ")
+    for key, p in actual_probes.items():
+        if hashlib.sha256(p["expected_stdout"].encode()).hexdigest() != expected_probes[key]["expected_stdout_sha256"]:
+            raise ValueError("Assertion expected output differs from TaskSpec")
     for task in private:
         for claim in task["claims"]:
             for evidence in claim["evidence"]:
@@ -48,7 +71,7 @@ def verify_bundle(bundle, backend=None):
     limits = RunLimits(timeout_seconds=30, memory_mb=512, cpus=1, output_bytes=65536)
     image_id = built.get("image_id", built.get("image_digest"))
     records = []
-    for task in read_jsonl(root / "private/assertions.jsonl"):
+    for task in assertion_records:
         for assertion in task["assertions"]:
             try:
                 observed = backend.run(image_id, ["python", "-"], limits, stdin=assertion["code"])

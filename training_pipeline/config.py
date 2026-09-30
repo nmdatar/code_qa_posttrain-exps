@@ -103,7 +103,11 @@ def validate_config(c):
     if not isinstance(c['stages'], list) or not c['stages']:
         raise ConfigurationError('At least one training stage required')
     for s in c['stages']:
-        exact(s, ['kind', 'max_updates', 'max_batches', 'batch_size', 'learning_rate'], ['group_size', 'temperature', 'optimizer', 'baseline'])
+        exact(s, ['kind', 'max_updates', 'max_batches', 'batch_size', 'learning_rate'], ['group_size', 'temperature', 'optimizer', 'baseline', 'stability'])
+        if 'stability' in s:
+            exact(s['stability'], [], ['mask_overlong', 'scale_tool_width'])
+            if s['kind'] not in ('grpo', 'reinforce') or any(type(v) is not bool for v in s['stability'].values()):
+                raise ConfigurationError('Stability flags require boolean RL options')
         if s['kind'] not in {'sft', 'grpo', 'reinforce'}:
             raise ConfigurationError('Unsupported training strategy')
         for k in ('max_updates', 'max_batches', 'batch_size'):
@@ -129,7 +133,16 @@ def validate_config(c):
             raise ConfigurationError('Baseline is only supported for REINFORCE')
     if type(c.get('group_retries', 1)) is not int or c.get('group_retries', 1) < 0:
         raise ConfigurationError('group_retries must be a nonnegative integer')
-    exact(c['environment'], ['kind'], ['release', 'manifest_sha256', 'calibration', 'calibration_sha256', 'modal_prices', 'protocol_version', 'grading_version', 'tool_read_policy', 'tool_action_policy', 'judge_evidence_policy', 'solver_tools', 'scoring_policy'])
+    exact(c['environment'], ['kind'], ['release', 'manifest_sha256', 'calibration', 'calibration_sha256', 'modal_prices', 'protocol_version', 'grading_version', 'tool_read_policy', 'tool_action_policy', 'judge_evidence_policy', 'solver_tools', 'scoring_policy', 'tool_parallelism', 'invalid_action_policy'])
+    if c['environment'].get('invalid_action_policy', 'retry-v1') not in ('retry-v1', 'zero-v1'):
+        raise ConfigurationError('Unknown invalid action policy')
+    if 'invalid_action_policy' in c['environment'] and c['environment']['kind'] != 'collection':
+        raise ConfigurationError('Invalid action policy requires collection')
+    parallelism = c['environment'].get('tool_parallelism', 1)
+    if type(parallelism) is not int or not 1 <= parallelism <= 8:
+        raise ConfigurationError('tool_parallelism must be an integer from 1 to 8')
+    if 'tool_parallelism' in c['environment'] and c['environment']['kind'] != 'collection':
+        raise ConfigurationError('tool_parallelism requires collection environment')
     for key, allowed in [('scoring_policy', ('strict-v1', 'correctness-only-v1')),
                          ('solver_tools', ('structured-v1', 'bash-only-v1')),
                          ('tool_action_policy', ('strict-v1', 'action-alias-v1')),

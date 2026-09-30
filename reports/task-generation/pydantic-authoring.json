@@ -1,0 +1,149 @@
+{
+  "schema_version": "1.0",
+  "created_at": "2026-09-28T21:42:01.305257+00:00",
+  "repository": {
+    "url": "https://github.com/pydantic/pydantic",
+    "commit": "bb6da4cfbb1f559885ea2fa207ec93853bfeac64",
+    "family_id": "pydantic-ecosystem",
+    "license": "MIT",
+    "license_path": "LICENSE"
+  },
+  "split": "development",
+  "spec_path": "examples/dataset_sources/pydantic-generation-v2.json",
+  "author_kind": "codex_subagent",
+  "model_version": null,
+  "human_reviewed": false,
+  "training_export_allowed": false,
+  "status": "author_verified_candidates_pending_independent_review",
+  "environment_reuse": {
+    "image_id": "im-XrhkLS2V0pJRfnyKrlZ4RW",
+    "recipe_and_budgets_unchanged": true
+  },
+  "tasks": [
+    {
+      "task_id": "pydantic-typed-extras-runtime-policy",
+      "mechanisms": [
+        "typed-extra-schema",
+        "extra-field-special",
+        "call-policy-controls",
+        "schema-not-rebuilt",
+        "storage-vs-serialization"
+      ],
+      "required_claim_count": 5,
+      "quality_rationale": "Intersects schema-build policy, per-call overrides, storage and serialization; checks a concrete nonobvious failure of assumed equivalence.",
+      "execution": {
+        "stdout": "{\"bad_key\": [[[\"long\"], \"string_too_long\"]], \"bad_value\": [[[\"foo\"], \"int_parsing\"]], \"field_names\": [\"count\"], \"forbid\": [[[\"foo\"], \"extra_forbidden\"]], \"ignore\": {\"count\": 1}, \"override_allow_on_ignore\": {\"attribute\": \"bad\", \"dump\": {\"count\": 1}, \"extra\": {\"long\": \"bad\"}}, \"strict\": [[[\"foo\"], \"int_type\"]], \"typed\": {\"count\": 1, \"foo\": 2}}\n",
+        "stderr": "",
+        "exit_code": 0,
+        "timed_out": false,
+        "truncated": false,
+        "duration_seconds": 0.257812404,
+        "sandbox_id": "sb-4T6fF9G4fopnyHGb97lXMP",
+        "provisioning_and_run_seconds": 2.6232028750237077
+      }
+    },
+    {
+      "task_id": "pydantic-factory-data-signature-order",
+      "mechanisms": [
+        "validated-data-input",
+        "default-result-validation",
+        "signature-sensitive",
+        "failure-skips-factory",
+        "explicit-value-skips-default",
+        "field-order-boundary"
+      ],
+      "required_claim_count": 6,
+      "quality_rationale": "Intersects exact callable signature detection, declaration ordering, default validation and error short-circuiting.",
+      "execution": {
+        "stdout": "{\"called_on_invalid\": false, \"default\": [\"6\", \"str\"], \"explicit\": [8, true], \"factory_inputs\": [{\"a\": 3}, {\"a\": 3}], \"invalid\": [[[\"a\"], \"int_parsing\"], [[\"b\"], \"default_factory_not_called\"]], \"optional\": 99, \"reordered\": \"KeyError\", \"validated_default\": [6, \"int\"]}\n",
+        "stderr": "",
+        "exit_code": 0,
+        "timed_out": false,
+        "truncated": false,
+        "duration_seconds": 0.257716795,
+        "sandbox_id": "sb-jXwUoHJiN7j93fJTkYldEi",
+        "provisioning_and_run_seconds": 2.8349641249515116
+      }
+    },
+    {
+      "task_id": "pydantic-alias-choice-unused-inputs",
+      "mechanisms": [
+        "precedence-unused",
+        "path-name-fallback",
+        "invalid-present-not-fallback",
+        "runtime-name-selection",
+        "serializer-separate",
+        "entrypoint-guard"
+      ],
+      "required_claim_count": 6,
+      "quality_rationale": "Intersects alias priority, missing versus invalid input, unused extras, serializer aliases and explicit runtime-argument guard.",
+      "execution": {
+        "stdout": "{\"both\": [[[\"payload\"], \"extra_forbidden\"], [[\"value\"], \"extra_forbidden\"]], \"disabled\": \"PydanticUserError\", \"empty_path_with_name\": {\"value\": 3}, \"ignore\": {\"value\": 1}, \"invalid_first\": [[[\"legacy\"], \"int_parsing\"]], \"name\": {\"value\": 3}, \"name_only_override\": {\"value\": 3}, \"path\": {\"value\": 2}, \"serialization\": {\"out\": 1}, \"serialization_not_input\": [[[\"legacy\"], \"missing\"], [[\"out\"], \"extra_forbidden\"]]}\n",
+        "stderr": "",
+        "exit_code": 0,
+        "timed_out": false,
+        "truncated": false,
+        "duration_seconds": 0.21700324499999998,
+        "sandbox_id": "sb-rAwj2v3bof9PB5C7pXqPur",
+        "provisioning_and_run_seconds": 2.1984681251924485
+      }
+    }
+  ],
+  "duplicates_screened": {
+    "compared_against": [
+      "pydantic-frozen-copy-8960",
+      "PY-02 surface typed extras question",
+      "all three tasks in this candidate batch"
+    ],
+    "method": "Manual mechanism-level comparison of prompts and required claims, not a full corpus near-duplicate audit.",
+    "outcome": "No copy/revalidation questions; three distinct mechanisms. PY-02 expanded into policy/schema/serializer interaction rather than merely asking how to annotate extras."
+  },
+  "optimizations": [
+    {
+      "change": "Reuse pinned snapshot, exact recipe, installed dependencies and existing ready Modal image.",
+      "effect": "No repository clone or image rebuild per task."
+    },
+    {
+      "change": "Author multiple counterfactuals in one deterministic probe per task.",
+      "effect": "Three final successful sandbox matrices cover multiple distinct branches each."
+    },
+    {
+      "change": "Restrict reference source scope to Python schema generation and existing pinned tests.",
+      "effect": "Avoid unnecessary Rust source checkout while explicitly marking core behavior as observed."
+    }
+  ],
+  "effort": {
+    "authoring_elapsed_seconds": null,
+    "token_usage": null,
+    "billed_cost": null,
+    "final_probe_provisioning_and_run_seconds": 7.656635125167668,
+    "additional_probe_count": 1,
+    "additional_probe_reason": "Initial typed-extra probe only inspected dump; added separate extra storage and attribute inspection after observing that runtime allow extras were omitted by normal serialization."
+  },
+  "limitations": [
+    "Author-side execution validates expected output but is not independent reference construction.",
+    "Question-only difficulty control and blind investigations not performed for this new batch.",
+    "Tasks are generated from public source/tests and may be familiar to pretrained models; no hardness claim.",
+    "No training admission or benchmark overlap clearance.",
+    "Code citations support dispatch/schema paths; all exact core-runtime counterfactual outcomes are additionally supported by recorded sandbox matrices."
+  ],
+  "probe_revision_history": [
+    {
+      "task_id": "pydantic-typed-extras-runtime-policy",
+      "revision": 1,
+      "sandbox_id": "sb-1O50kueD4C6a7jPMMLJpTh",
+      "exit_code": 0,
+      "stderr": "",
+      "observed_override_dump": {
+        "count": 1
+      },
+      "finding": "Successful execution unexpectedly omitted the runtime-allowed extra from model_dump; dump alone could not distinguish absent storage from serializer behavior.",
+      "correction": "Added __pydantic_extra__ and .long inspection to final matrix; observed long=bad stored and accessible while ordinary serialization omits it.",
+      "provisioning_and_run_seconds": 3.9872405419591814
+    },
+    {
+      "revision": "final",
+      "finding": "All three final matrices exited 0 with empty stderr and no truncation or timeout. Full observations recorded under tasks[].execution."
+    }
+  ]
+}

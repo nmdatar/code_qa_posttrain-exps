@@ -1,0 +1,518 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-82fd8320b1be",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 456,
+            "file_sha256": "4680064df4fe52c08dac181a6ccfd21fea8d6bb1e14ee96a80b39074407b54ab",
+            "path": "xarray/core/missing.py",
+            "start_line": 456
+          },
+          {
+            "end_line": 2239,
+            "file_sha256": "869e9b0e6f484b567ca82c6f5cfbbec0033972a3fcebb4ae8e21ae3fc8ec0945",
+            "path": "xarray/core/dataset.py",
+            "start_line": 2132
+          },
+          {
+            "end_line": 780,
+            "file_sha256": "869e9b0e6f484b567ca82c6f5cfbbec0033972a3fcebb4ae8e21ae3fc8ec0945",
+            "path": "xarray/core/dataset.py",
+            "start_line": 779
+          },
+          {
+            "end_line": 291,
+            "file_sha256": "5bea376ff71c29b4b57de454d17546c54dfdedeebc67956fa0027f69240bc53f",
+            "path": "xarray/backends/rasterio_.py",
+            "start_line": 284
+          },
+          {
+            "end_line": 388,
+            "file_sha256": "ac142e028f5941eb4985a9020d2aaa807b9539eb46616e36d1c7e69fe2ec92c4",
+            "path": "xarray/tests/test_interp.py",
+            "start_line": 368
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does xarray's interpolation system preserve CRS and other geospatial attributes during Dataset.interp() operations through its variable-level and dataset-level attribute propagation mechanisms?",
+      "question_sha256": "0f539c43d5be08640f2def706b1c5006d58855c764b442de76b1c03f6cdd9103",
+      "reference_answer": "Xarray's interpolation system preserves CRS and other geospatial attributes through a two-tier attribute propagation mechanism that operates at both variable and dataset levels.\n\nAt the variable level, the missing.interp() function (xarray/core/missing.py: line 456) explicitly preserves attributes by creating the interpolated Variable result with attrs=var.attrs, ensuring that CRS and other metadata stored in variable attributes survive the interpolation process. This mechanism handles cases where CRS information is attached to individual data variables.\n\nAt the dataset level, Dataset.interp() (xarray/core/dataset.py: line 2132-2239) employs _replace_with_new_dims() to construct the interpolated dataset (line 2220-2221, 2238-2239), which internally calls the _replace() method. The _replace() method (xarray/core/dataset.py: line 779-780) implements default attribute preservation by copying the original dataset's attributes using copy.copy(self._attrs) when no explicit attributes parameter is provided. This ensures that dataset-level metadata, including global CRS information, is maintained throughout the interpolation operation.\n\nThe rasterio backend demonstrates this attribute-based CRS storage approach (xarray/backends/rasterio_.py: line 284-291), where CRS information is stored as string attributes using riods.crs.to_proj4() with riods.crs.to_string() as a fallback method in a try-except block.\n\nThe effectiveness of this dual preservation mechanism is verified through comprehensive test coverage in test_dataset() (xarray/tests/test_interp.py: line 368-388), which explicitly validates both dataset-level attribute preservation (assert interpolated.attrs['foo'] == 'var') and variable-level attribute preservation (assert interpolated['var1'].attrs['buz'] == 'var2') during interpolation operations.",
+      "reference_sha256": "817477b2e19308cdd7be81eb7bd4a8a907c02f4254169104ccda4165fb8d2c14",
+      "repository": {
+        "commit": "82fd8320b1be7a434effd247baf07004b66b802f",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-82fd8320b1be7a434effd247baf07004b66b802f",
+      "task_id": "import-275369560076404671ccbe96"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-82fd8320b1be",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 89,
+            "file_sha256": "63324220d277f9818aa95da099d0be22034c276a1cd733bfa56246b04776ef7f",
+            "path": "xarray/backends/api.py",
+            "start_line": 36
+          },
+          {
+            "end_line": 66,
+            "file_sha256": "63324220d277f9818aa95da099d0be22034c276a1cd733bfa56246b04776ef7f",
+            "path": "xarray/backends/api.py",
+            "start_line": 50
+          },
+          {
+            "end_line": 277,
+            "file_sha256": "c552c23ebce1e85a0a4dd129ef92f44aa8abd1df59c156576892b228461c33fa",
+            "path": "xarray/backends/netCDF4_.py",
+            "start_line": 277
+          },
+          {
+            "end_line": 72,
+            "file_sha256": "b87045cc2bb359e304ec5c337c8335b9508f709130b54ce558c709198100ed4a",
+            "path": "xarray/backends/h5netcdf_.py",
+            "start_line": 72
+          },
+          {
+            "end_line": 36,
+            "file_sha256": "a498a32d52726c9a4fc9fddbbd83c791fefe2aefd111dc5de60844ecb399a8cc",
+            "path": "xarray/backends/cfgrib_.py",
+            "start_line": 36
+          },
+          {
+            "end_line": 107,
+            "file_sha256": "63324220d277f9818aa95da099d0be22034c276a1cd733bfa56246b04776ef7f",
+            "path": "xarray/backends/api.py",
+            "start_line": 92
+          },
+          {
+            "end_line": 490,
+            "file_sha256": "2b7a0e5ed767efd46612cec3df1b379cc91202b04d9d9f580525c146d2a27664",
+            "path": "xarray/core/utils.py",
+            "start_line": 484
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does xarray's backend engine selection system use lazy import checking and magic number detection instead of pre-loading all available backends at module initialization?",
+      "question_sha256": "aea0ef63d8bd967cd9fc4fd6ef5107ab7ec4a05d56346870e978a96566e2e0f6",
+      "reference_answer": "Xarray defers backend imports by performing them inside engine-selection helpers that run only when a backend is needed. For remote URIs and netCDF, _get_default_engine_remote_uri and _get_default_engine_netcdf try netCDF4 first and fall back to pydap or scipy if available, while _get_default_engine_gz requires scipy (xarray/backends/api.py: line 36-89). For GRIB, _get_default_engine_grib checks whether Nio or cfgrib can be imported so it can raise a helpful error if neither is available (xarray/backends/api.py: line 50-66). Individual backend classes also import their dependencies inside constructors or open methods, keeping optional libraries out of module import time (xarray/backends/netCDF4_.py: line 277, 303, xarray/backends/h5netcdf_.py: line 72, xarray/backends/cfgrib_.py: line 36).\n\nFor bytes or file-like objects, _get_engine_from_magic_number reads only the first 8 bytes to decide between scipy (CDF) and h5netcdf (HDF5 signature), which avoids loading backends just to detect format (xarray/backends/api.py: line 92-107, 448-452). Lightweight helpers like is_remote_uri and is_grib_path use simple string checks to steer selection without heavy imports (xarray/core/utils.py: line 484-490).",
+      "reference_sha256": "58bcec95f610ae3687c01a92a33bda71917627eaef81484f3a5e39a45a908cba",
+      "repository": {
+        "commit": "82fd8320b1be7a434effd247baf07004b66b802f",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-82fd8320b1be7a434effd247baf07004b66b802f",
+      "task_id": "import-38e5b69915296d87bcbe2319"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-82fd8320b1be",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 222,
+            "file_sha256": "5bea376ff71c29b4b57de454d17546c54dfdedeebc67956fa0027f69240bc53f",
+            "path": "xarray/backends/rasterio_.py",
+            "start_line": 220
+          },
+          {
+            "end_line": 291,
+            "file_sha256": "5bea376ff71c29b4b57de454d17546c54dfdedeebc67956fa0027f69240bc53f",
+            "path": "xarray/backends/rasterio_.py",
+            "start_line": 284
+          },
+          {
+            "end_line": 342,
+            "file_sha256": "5bea376ff71c29b4b57de454d17546c54dfdedeebc67956fa0027f69240bc53f",
+            "path": "xarray/backends/rasterio_.py",
+            "start_line": 341
+          },
+          {
+            "end_line": 3418,
+            "file_sha256": "c913d8780cd2059aa0de4201563d3968bcfa6a4769d9711d00550c48a7617a84",
+            "path": "xarray/tests/test_backends.py",
+            "start_line": 3418
+          },
+          {
+            "end_line": 3396,
+            "file_sha256": "c913d8780cd2059aa0de4201563d3968bcfa6a4769d9711d00550c48a7617a84",
+            "path": "xarray/tests/test_backends.py",
+            "start_line": 3396
+          },
+          {
+            "end_line": 3759,
+            "file_sha256": "c913d8780cd2059aa0de4201563d3968bcfa6a4769d9711d00550c48a7617a84",
+            "path": "xarray/tests/test_backends.py",
+            "start_line": 3752
+          },
+          {
+            "end_line": 584,
+            "file_sha256": "4ba76985c4f4bcc440eb46fb984e9186154e74c7c4a6ecaed8c0ebd205fe3591",
+            "path": "xarray/core/dataarray.py",
+            "start_line": 580
+          },
+          {
+            "end_line": 182,
+            "file_sha256": "d5a944e1712df4a65d3bc97b9e5808479b1447528efaba711ac0264316672f6d",
+            "path": "xarray/core/common.py",
+            "start_line": 175
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the architecture of coordinate reference system (CRS) representation and conversion in xarray's rasterio backend?",
+      "question_sha256": "e8c27d20d9f65380be9b4b81f302bdfb749dbb501408faeceaa3715b2d136b16",
+      "reference_answer": "The CRS handling in xarray's rasterio backend is centralized in open_rasterio. If the caller passes a WarpedVRT, the function first captures the VRT parameters, including CRS serialized via vrt.crs.to_string(), and reopens the dataset with WarpedVRT so downstream reads use the VRT settings (xarray/backends/rasterio_.py: line 220-222, 238).\n\nWhen building the output attributes, it checks whether the rasterio dataset has a CRS and serializes it to a string, preferring riods.crs.to_proj4() and falling back to riods.crs.to_string() if that attribute isn't available (xarray/backends/rasterio_.py: line 284-291). That serialized value is stored as attrs['crs'] on the returned DataArray (xarray/backends/rasterio_.py: line 341-342), and if no CRS exists it is omitted (xarray/tests/test_backends.py: line 3418).\n\nTests confirm the stored CRS is a string for typical rasters (xarray/tests/test_backends.py: line 3396, 3447) and that VRT CRS is preserved via da.crs, which is attribute-style access that includes attrs (xarray/tests/test_backends.py: line 3752-3759, xarray/core/dataarray.py: line 580-584, xarray/core/common.py: line 175-182).",
+      "reference_sha256": "5a25c029a24312fdf91f44b13595ef31225d326e44312306e484029f70cb0993",
+      "repository": {
+        "commit": "82fd8320b1be7a434effd247baf07004b66b802f",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-82fd8320b1be7a434effd247baf07004b66b802f",
+      "task_id": "import-458ffd8ac8b79f910276065e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-82fd8320b1be",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 291,
+            "file_sha256": "5bea376ff71c29b4b57de454d17546c54dfdedeebc67956fa0027f69240bc53f",
+            "path": "xarray/backends/rasterio_.py",
+            "start_line": 284
+          },
+          {
+            "end_line": 222,
+            "file_sha256": "5bea376ff71c29b4b57de454d17546c54dfdedeebc67956fa0027f69240bc53f",
+            "path": "xarray/backends/rasterio_.py",
+            "start_line": 220
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "5bea376ff71c29b4b57de454d17546c54dfdedeebc67956fa0027f69240bc53f",
+            "kind": "file_reference",
+            "line_count": 359,
+            "path": "xarray/backends/rasterio_.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where are the CRS format conversion methods (PROJ.4 vs WKT string) defined and implemented in xarray's rasterio backend?",
+      "question_sha256": "d48f32dbc716f60b001d58d5073ce3d23d07785826aec389f0f663c57de63103",
+      "reference_answer": "The CRS format conversion logic is implemented in the open_rasterio function in xarray/backends/rasterio_.py. When constructing the output attributes, the code checks whether the rasterio dataset has a CRS and serializes it to a string by first attempting to call riods.crs.to_proj4() to obtain a PROJ.4 representation, and if this method is unavailable (raising AttributeError), falling back to riods.crs.to_string(), which returns a WKT representation; the resulting CRS string is stored in the returned DataArray\u2019s attributes under the crs key (xarray/backends/rasterio_.py: line 284\u2013291, 341\u2013342). A second CRS serialization occurs when the input is a WarpedVRT, in which case vrt.crs.to_string() is used when building the VRT parameters so that the virtual raster\u2019s CRS is preserved during reopening (xarray/backends/rasterio_.py: line 220\u2013222).",
+      "reference_sha256": "bf935fa84c946c3a35e9e97c39e353955b4912684adcf4c059ff995e6feeb5f8",
+      "repository": {
+        "commit": "82fd8320b1be7a434effd247baf07004b66b802f",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-82fd8320b1be7a434effd247baf07004b66b802f",
+      "task_id": "import-65a2fbcce26ca2301616d77b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-82fd8320b1be",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 283,
+            "file_sha256": "4ba76985c4f4bcc440eb46fb984e9186154e74c7c4a6ecaed8c0ebd205fe3591",
+            "path": "xarray/core/dataarray.py",
+            "start_line": 283
+          },
+          {
+            "end_line": 167,
+            "file_sha256": "f7e75c91789bac223d6d236520be2be5f56aad2c394bd745bdeca56a13896bf0",
+            "path": "xarray/core/coordinates.py",
+            "start_line": 167
+          },
+          {
+            "end_line": 630,
+            "file_sha256": "4ba76985c4f4bcc440eb46fb984e9186154e74c7c4a6ecaed8c0ebd205fe3591",
+            "path": "xarray/core/dataarray.py",
+            "start_line": 630
+          },
+          {
+            "end_line": 1205,
+            "file_sha256": "869e9b0e6f484b567ca82c6f5cfbbec0033972a3fcebb4ae8e21ae3fc8ec0945",
+            "path": "xarray/core/dataset.py",
+            "start_line": 1205
+          },
+          {
+            "end_line": 155,
+            "file_sha256": "f7e75c91789bac223d6d236520be2be5f56aad2c394bd745bdeca56a13896bf0",
+            "path": "xarray/core/coordinates.py",
+            "start_line": 155
+          },
+          {
+            "end_line": 47,
+            "file_sha256": "4ba76985c4f4bcc440eb46fb984e9186154e74c7c4a6ecaed8c0ebd205fe3591",
+            "path": "xarray/core/dataarray.py",
+            "start_line": 47
+          },
+          {
+            "end_line": 43,
+            "file_sha256": "c3061ed6832cc78197118c32e6cb647cb11a237afa3fe670d7f00eab70ca3f44",
+            "path": "xarray/core/variable.py",
+            "start_line": 43
+          },
+          {
+            "end_line": 1849,
+            "file_sha256": "c3061ed6832cc78197118c32e6cb647cb11a237afa3fe670d7f00eab70ca3f44",
+            "path": "xarray/core/variable.py",
+            "start_line": 1834
+          },
+          {
+            "end_line": 51,
+            "file_sha256": "f7e75c91789bac223d6d236520be2be5f56aad2c394bd745bdeca56a13896bf0",
+            "path": "xarray/core/coordinates.py",
+            "start_line": 23
+          },
+          {
+            "end_line": 231,
+            "file_sha256": "f7e75c91789bac223d6d236520be2be5f56aad2c394bd745bdeca56a13896bf0",
+            "path": "xarray/core/coordinates.py",
+            "start_line": 230
+          },
+          {
+            "end_line": 552,
+            "file_sha256": "4ba76985c4f4bcc440eb46fb984e9186154e74c7c4a6ecaed8c0ebd205fe3591",
+            "path": "xarray/core/dataarray.py",
+            "start_line": 542
+          },
+          {
+            "end_line": 203,
+            "file_sha256": "f7e75c91789bac223d6d236520be2be5f56aad2c394bd745bdeca56a13896bf0",
+            "path": "xarray/core/coordinates.py",
+            "start_line": 186
+          },
+          {
+            "end_line": 126,
+            "file_sha256": "869e9b0e6f484b567ca82c6f5cfbbec0033972a3fcebb4ae8e21ae3fc8ec0945",
+            "path": "xarray/core/dataset.py",
+            "start_line": 103
+          },
+          {
+            "end_line": 90,
+            "file_sha256": "f7e75c91789bac223d6d236520be2be5f56aad2c394bd745bdeca56a13896bf0",
+            "path": "xarray/core/coordinates.py",
+            "start_line": 60
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the expected state and behavior of coordinate objects after they are attached to DataArray and Dataset instances in xarray's labeled array system?",
+      "question_sha256": "5bf020c75cc158b61c4ca6f4ea29aa2d5632893ca36a4799ae1d2dc4084c0897",
+      "reference_answer": "When coordinates are attached, xarray normalizes them into Variable objects and stores them on the parent object: DataArray keeps an OrderedDict in _coords and Dataset keeps all variables in _variables with coordinate names tracked in _coord_names (xarray/core/dataarray.py: line 283, xarray/core/coordinates.py: line 167). The public coords property exposes these via DataArrayCoordinates and DatasetCoordinates mapping views (xarray/core/dataarray.py: line 630, xarray/core/dataset.py: line 1205, xarray/core/coordinates.py: line 155).\n\nDuring DataArray construction, _infer_coords_and_dims validates that coordinate dimensions are a subset of the array's dimensions and that sizes match; it also converts 1-D dimension coordinates into IndexVariable objects via as_variable(...).to_index_variable() when the coord name matches a dimension (xarray/core/dataarray.py: line 47, 93, xarray/core/variable.py: line 43, 106). IndexVariable enforces one-dimensional, immutable index storage (xarray/core/variable.py: line 1834-1849).\n\nCoordinate containers implement mapping semantics via AbstractCoordinates and keep iteration order aligned with the parent's variables (xarray/core/coordinates.py: line 23-51). DataArrayCoordinates.__getitem__ routes through _getitem_coord, which supports virtual variables and MultiIndex levels (xarray/core/coordinates.py: line 230-231, xarray/core/dataarray.py: line 542-552).\n\nUpdates to coordinates go through _update_coords, which recalculates dimensions with calculate_dimensions and updates coordinate state for Datasets or enforces 'no new dims' for DataArrays (xarray/core/coordinates.py: line 186-203, 233-243, xarray/core/dataset.py: line 103-126). Coordinates can be converted to a pandas Index or MultiIndex via AbstractCoordinates.to_index, which builds indexes from the parent's dimension indexes (xarray/core/coordinates.py: line 60-90).",
+      "reference_sha256": "b5371c23a1d7d3b6b47f3fee2fd9a927b53fc43564b8efd2a707fae0afef9c67",
+      "repository": {
+        "commit": "82fd8320b1be7a434effd247baf07004b66b802f",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-82fd8320b1be7a434effd247baf07004b66b802f",
+      "task_id": "import-7848efdcebd046b062320a67"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-82fd8320b1be",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 449,
+            "file_sha256": "c3061ed6832cc78197118c32e6cb647cb11a237afa3fe670d7f00eab70ca3f44",
+            "path": "xarray/core/variable.py",
+            "start_line": 449
+          },
+          {
+            "end_line": 760,
+            "file_sha256": "3619d44f185be64d475a50a14658e40e0dd1838601d8922764d64651a1da6602",
+            "path": "xarray/core/indexing.py",
+            "start_line": 760
+          },
+          {
+            "end_line": 1183,
+            "file_sha256": "3619d44f185be64d475a50a14658e40e0dd1838601d8922764d64651a1da6602",
+            "path": "xarray/core/indexing.py",
+            "start_line": 1183
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does xarray's chunked array indexing exhibit quadratic performance degradation when accessing non-contiguous slices across multiple dimensions with heterogeneous chunk sizes?",
+      "question_sha256": "4580eb62571e62276fedb2d275de0569a6945903bad537ea080a7565a2ecc6b9",
+      "reference_answer": "Non-contiguous, multi-dimensional selections are often classified as vectorized indexing in _broadcast_indexes, which triggers _broadcast_indexes_vectorized to convert indexers to Variables, broadcast them to compatible shapes, and build a VectorizedIndexer (with possible reordering) before indexing (xarray/core/variable.py: line 449, 565, 599). That extra broadcasting step grows with the number and dimensionality of indexers.\n\nWhen a backend doesn't natively support vectorized indexing, explicit_indexing_adapter decomposes the vectorized indexer into a backend indexer plus a NumPy indexer, loading a subslice first and then applying in-memory indexing (xarray/core/indexing.py: line 760, 815).\n\nFor chunked dask arrays, DaskIndexingAdapter uses vindex for vectorized indexers and tries direct outer indexing; if dask can't handle the outer indexer, it falls back to manual axis-by-axis indexing, creating multiple successive indexing steps (xarray/core/indexing.py: line 1183). These layered steps (broadcasting, backend slicing, in-memory indexing, and sometimes axis-by-axis fallback) explain why non-contiguous, multi-dimensional selections can scale poorly compared to simple contiguous slices.",
+      "reference_sha256": "8321a5d92e81b15dbfbc450f69c569a6ec9c3177ea5a78ecf274c039f70b3761",
+      "repository": {
+        "commit": "82fd8320b1be7a434effd247baf07004b66b802f",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-82fd8320b1be7a434effd247baf07004b66b802f",
+      "task_id": "import-aa0876fa2b0671d67b3e4510"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-82fd8320b1be",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1153,
+            "file_sha256": "4ba76985c4f4bcc440eb46fb984e9186154e74c7c4a6ecaed8c0ebd205fe3591",
+            "path": "xarray/core/dataarray.py",
+            "start_line": 1153
+          },
+          {
+            "end_line": 2211,
+            "file_sha256": "869e9b0e6f484b567ca82c6f5cfbbec0033972a3fcebb4ae8e21ae3fc8ec0945",
+            "path": "xarray/core/dataset.py",
+            "start_line": 2211
+          },
+          {
+            "end_line": 456,
+            "file_sha256": "4680064df4fe52c08dac181a6ccfd21fea8d6bb1e14ee96a80b39074407b54ab",
+            "path": "xarray/core/missing.py",
+            "start_line": 456
+          },
+          {
+            "end_line": 724,
+            "file_sha256": "c3061ed6832cc78197118c32e6cb647cb11a237afa3fe670d7f00eab70ca3f44",
+            "path": "xarray/core/variable.py",
+            "start_line": 724
+          },
+          {
+            "end_line": 2220,
+            "file_sha256": "869e9b0e6f484b567ca82c6f5cfbbec0033972a3fcebb4ae8e21ae3fc8ec0945",
+            "path": "xarray/core/dataset.py",
+            "start_line": 2220
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does xarray's interpolation pipeline create performance bottlenecks when preserving attributes across the layered architecture from Dataset to Variable levels?",
+      "question_sha256": "33486384f118572395d75c5230cf4701f7dfb8ba9d68d9795c7bb714bceaae96",
+      "reference_answer": "The interpolation pipeline preserves attributes by creating new objects at multiple layers, and those object constructions copy attribute mappings. DataArray.interp converts to a temporary Dataset via _to_temp_dataset (with shallow_copy=False, so it does not copy variables at that stage) and then calls Dataset.interp (xarray/core/dataarray.py: line 1153, 350).\n\nInside Dataset.interp, each numeric variable is passed to missing.interp, which constructs a new Variable with attrs=var.attrs (xarray/core/dataset.py: line 2211, xarray/core/missing.py: line 456). The Variable attrs setter copies the mapping into a new OrderedDict (xarray/core/variable.py: line 724), so every interpolated variable gets a fresh attribute dict.\n\nAt the dataset level, _replace_with_new_dims is invoked (twice in the interp flow) and _replace copies the dataset's attrs via copy.copy(self._attrs) when attrs aren't explicitly provided (xarray/core/dataset.py: line 2220, 2238, 779). With many variables or large attribute dicts, these repeated shallow copies and object constructions add overhead, which is the main attribute-preservation cost in the interpolation pipeline.",
+      "reference_sha256": "412855d44222b33d97ba8f8c4160758c0583126943e71a632ed9a939d742945f",
+      "repository": {
+        "commit": "82fd8320b1be7a434effd247baf07004b66b802f",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-82fd8320b1be7a434effd247baf07004b66b802f",
+      "task_id": "import-cd122a483759090a50e0b275"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-82fd8320b1be",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 291,
+            "file_sha256": "5bea376ff71c29b4b57de454d17546c54dfdedeebc67956fa0027f69240bc53f",
+            "path": "xarray/backends/rasterio_.py",
+            "start_line": 284
+          },
+          {
+            "end_line": 356,
+            "file_sha256": "d7c0653d452a07fe7817b35b14de2a3a4083c9b12ee4df9d7a889b823208948e",
+            "path": "doc/whats-new.rst",
+            "start_line": 355
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does xarray's rasterio backend prioritize PROJ4 string representation over WKT for CRS serialization in its coordinate reference system architecture?",
+      "question_sha256": "13bb76b20ec123a58a9546a88053c98becd1d57a7125ecf9c5ceb1643997ea1c",
+      "reference_answer": "Xarray explicitly prefers PROJ.4 in open_rasterio: it attempts riods.crs.to_proj4() and only falls back to riods.crs.to_string() when that method isn't available (xarray/backends/rasterio_.py: line 284-291). This priority was introduced to fix a regression where open_rasterio returned WKT CRS strings with rasterio 1.0.14+; the release notes call out the fix from WKT output to PROJ.4 for issue #2715 (doc/whats-new.rst: line 355-356). The fallback preserves compatibility with CRS objects or rasterio versions that do not expose to_proj4().",
+      "reference_sha256": "a9288bc8dfbeeaef0e02e750c25bb8207f8b8ef3cd0288e9ab3e0c5dbcbb0d6a",
+      "repository": {
+        "commit": "82fd8320b1be7a434effd247baf07004b66b802f",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-82fd8320b1be7a434effd247baf07004b66b802f",
+      "task_id": "import-db1cf0b778ee847c54934db3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-82fd8320b1be",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 31,
+            "file_sha256": "c3061ed6832cc78197118c32e6cb647cb11a237afa3fe670d7f00eab70ca3f44",
+            "path": "xarray/core/variable.py",
+            "start_line": 30
+          },
+          {
+            "end_line": 8,
+            "file_sha256": "cf1e728570d76c4eeb2f75556ddb639a6f331e6a8b2cd1428a045d37fdf7b7cc",
+            "path": "xarray/core/pycompat.py",
+            "start_line": 8
+          },
+          {
+            "end_line": 157,
+            "file_sha256": "c3061ed6832cc78197118c32e6cb647cb11a237afa3fe670d7f00eab70ca3f44",
+            "path": "xarray/core/variable.py",
+            "start_line": 157
+          },
+          {
+            "end_line": 433,
+            "file_sha256": "3619d44f185be64d475a50a14658e40e0dd1838601d8922764d64651a1da6602",
+            "path": "xarray/core/indexing.py",
+            "start_line": 433
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the complete list of supported non-numpy array backend types defined and registered in xarray's duck typing system?",
+      "question_sha256": "d0b202f866e5e735ac4676450e50342b5c7e876a84eee03a875adbb59180a94e",
+      "reference_answer": "The canonical list is NON_NUMPY_SUPPORTED_ARRAY_TYPES in xarray/core/variable.py: line 30-31, where it is defined as a tuple combining indexing.ExplicitlyIndexed, pd.Index, and dask_array_type. The dask_array_type tuple is set in xarray/core/pycompat.py: line 8 by conditionally importing dask.array.Array (empty tuple if dask is unavailable). This list is registered for duck typing by being used in as_compatible_data to accept those array-like inputs without coercing to NumPy (xarray/core/variable.py: line 157). The ExplicitlyIndexed mixin is defined in xarray/core/indexing.py: line 433.",
+      "reference_sha256": "6261345effc800ca60116e3d0ab7e2cce9835028829aedb80906f0e52cdebf08",
+      "repository": {
+        "commit": "82fd8320b1be7a434effd247baf07004b66b802f",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-82fd8320b1be7a434effd247baf07004b66b802f",
+      "task_id": "import-e17a060d3341b67f50564305"
+    }
+  ]
+}

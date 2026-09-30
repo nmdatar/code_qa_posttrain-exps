@@ -1,0 +1,92 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 1,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-060.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "89e0f8fa079692fbef85a2d40d7f6a4c688ed97acc52b4403c230e56b09d5aab",
+      "question": "Why does the Pipeline class explicitly reject the sample_weight parameter during fit when the underlying estimator does not declare support for it through metadata routing?",
+      "question_sha256": "dcec51daa2f42ec53a69c6e8bab6409812feff003d9b038d86b7d2291ad732bf",
+      "reference_answer": "Pipeline routing validates metadata against the routing graph, not just the final estimator. validate_metadata rejects names routed to no object (sklearn/utils/_metadata_requests.py:1110-1124). At a consumer, True forwards a requested value, False ignores it, and None records a supplied value as unrequested for an error (lines 461-474). Intermediate steps may request sample_weight even when the final estimator does not. Explicit requests avoid silently passing metadata to the wrong consumer; missing support and an unset request are distinct cases.",
+      "reference_sha256": "abbb8fe5b64a7a5893e80b677415cf64b716640f30848f7eb8c130ef98137042",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-13e632d561c0b1740b2074fa"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "eebcdce5d3fcb0b23c3f196bdc5a20e5cf21d9bbccb264d877c9d5e250495e70",
+      "question": "How does the NearestCentroid class leverage the available_if decorator pattern to conditionally expose decision_function, predict_proba, and predict_log_proba methods only for euclidean metrics, and what are the implications for API consistency across different metric configurations?",
+      "question_sha256": "1f6d2e05e974d2b3ebd48de0c5c849ae2fdc8688aec3113b8dd3f7b71b8934ff",
+      "reference_answer": "NearestCentroid wraps decision_function, predict_proba and predict_log_proba with available_if(_check_euclidean_metric); the predicate checks metric == \"euclidean\" (sklearn/neighbors/_nearest_centroid.py:337-350). The descriptor raises AttributeError when the predicate fails, so hasattr on a Manhattan-configured instance is false (sklearn/utils/_available_if.py:27-44). This makes availability metric-dependent. The discriminant implementation is designed for Euclidean scoring; squaring a non-Euclidean distance is mathematically possible but does not establish the same model.",
+      "reference_sha256": "815008550a57e4736659b62830688b62cbcfc519d1a821b2284ccc1e16e7e519",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-1af9fb0fba15575c4a366234"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "e7dca4fbe0423228799f5e1d9fef2c157b05043d80cef447cd7c5e7a425f9cc5",
+      "question": "Where in the codebase do functions conditionally invoke the _CVObjects constraint validation logic, and how does the constraint's is_satisfied_by method propagate validation results through the parameter validation framework?",
+      "question_sha256": "7966ceb13259e03e8b2f9421388e5d98e9e7b7615040ce836e59d6522818626a",
+      "reference_answer": "The \"cv_object\" constraint expands to _CVObjects, whose predicate accepts any of its integer>=2, split/get_n_splits, iterable-not-string, or None alternatives (sklearn/utils/_param_validation.py:735-744). validate_parameter_constraints accepts a parameter when one constraint passes and otherwise raises InvalidParameterError. BaseEstimator._validate_params directly delegates to that validator (sklearn/base.py:463-475); _fit_context supplies the skip-validation and fitted-partial_fit guards before calling it (lines 1351-1359). Thus the boolean is consumed by validation rather than returned as the fit result.",
+      "reference_sha256": "ff0588f6860f01a5d57cdebf7d7704d0401ccaff45059feb3723bed168d5224a",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-1ba513c05f25d8f0d106a05c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "2578cd0b61858491ae1fac6b7beb3fe0516053a046d3778da69a2044cb6ce548",
+      "question": "What is the semantic mismatch created by the conditional logic in the fit method's type checking mechanism between the declared accept_large_sparse=True parameter and the actual runtime behavior when processing sparse data with 64-bit indices?",
+      "question_sha256": "98e1ea15089224b44739aecbee824e4b3ac4eb165340d7c856034c5b36982fc3",
+      "reference_answer": "There is no mismatch with a default argument contract: LogisticRegression.fit explicitly supplies accept_large_sparse=solver not in [\"liblinear\", \"sag\", \"saga\"] to validate_data (sklearn/linear_model/_logistic.py:1249-1257). Those solvers therefore reject unsupported large sparse indices, while the other paths allow them. A validator default of True does not promise that every estimator using the validator accepts 64-bit indices.",
+      "reference_sha256": "115244dd3bbb7932848f966cbba811124ab18cdfe732bc044a081339601d3b10",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-1c055f43bc6d8dc15a443d12"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "723619c85f619b6d26b5d68a59b656f9e8199896bf88675ad3ad7257303d3a54",
+      "question": "Why does the exception handling mechanism in OpenMLError impact the performance of HTTP error recovery operations when processing large-scale dataset downloads with retry logic?",
+      "question_sha256": "ad86ca0a8372a29f65c64035e4649d038a74a9cb9e8ad88772461db021df9c59",
+      "reference_answer": "HTTP 412 is treated as an OpenML application error, so the network retry wrapper immediately re-raises it rather than sleeping and retrying (sklearn/datasets/_openml.py:97-113). The JSON API helper converts it to OpenMLError (lines 246-255). Name/version lookup can then try a deactivated-dataset URL (lines 337-350), adding another request when the fallback is needed. These are concrete control-flow and network-cost implications; the code provides no measurement that Python exception overhead is significant at scale and does not establish cascading failure behavior.",
+      "reference_sha256": "8360d00480eedf1904e111cb994c76cec743e5ada8fa1b78c5558b00d78b1b17",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-2b68938f4832c48ae2956b42"
+    }
+  ]
+}

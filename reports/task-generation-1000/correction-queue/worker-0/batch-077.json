@@ -1,0 +1,92 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-077.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "original_reference_sha256": "3a9a002eccfe03b9411830bf8b2ab3ca5e5235592d5a465146509b783206541d",
+      "question": "What is the mechanism in the normalization constant property that ensures the combined probability mass function integrates to unity given the partial sum of reciprocal integers and the natural logarithm ratio term?",
+      "question_sha256": "f83d13c427b511f7bbc9bacd350e9d3af31f393cdf6a9de2bb8458fa27c2d078",
+      "reference_answer": "Writing m=round(k/R), Z computes 1+(R/k)(sum(i=1..m-1,1/i)+log(R/delta)). The 1 is the ideal-soliton total, while the other terms sum the two tau branches; division by Z normalizes their combined total when those branches lie within 1..k and Z is valid. This is normalization of a sum, not termwise cancellation. The parameter checks do not ensure 1<=m<=k, so the code does not establish the question's unconditional guarantee (sympy/stats/frv_types.py:767-818).",
+      "reference_sha256": "30e663bc6a744449820ffd0612443edcca0487c942fb9c3e8e5854f94d9517de",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-0b52b26ca874d4d1c1cbcdf9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "original_reference_sha256": "c3ee8eda3c783a882e7c002f3bf0e9c63cc72bc230d5009cbdbbbe67e9d1add1",
+      "question": "Why does the option class that handles algebraic field extensions coordinate between its normalization method and its domain creation method to transform extension arguments into an algebraic field domain while maintaining consistency with mutually exclusive options?",
+      "question_sha256": "5c08eff4ce6594175a5bc78b06acee4bc0dc8731f596b2c82250577832713422",
+      "reference_answer": "Extension.preprocess maps True/1 to automatic extension detection, rejects False/0, wraps a scalar in a set, and deduplicates nonempty iterables. Postprocess expands explicit generators into QQ.algebraic_field and stores the domain. Options validates exclusions before postprocessing, preventing conflicting non-None settings such as domain or modulus (sympy/polys/polyoptions.py:143-185,549-573). There is an edge case: an empty iterable normalizes to None but postprocess still attempts to unpack it; this path does not guarantee a valid field.",
+      "reference_sha256": "12e634fb4afceb9a5631fe47014fd97f941c35d2c43f7f97e35d2e4275297d31",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-1388db5ba5326ce135a43752"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "original_reference_sha256": "b9eee9427b97491d82ed2659ed93ee9f83112c62343a35ef9d7e87d8cb382b65",
+      "question": "How does the abstract base class for muscle activation dynamics models decouple symbolic equation representation from numerical solver implementations using abstract property interfaces?",
+      "question_sha256": "936d4fc5c69f1fba692d69bdcc9d5282adccde05c619adcfe52ee268ddf2c3ba",
+      "reference_answer": "ActivationBase requires symbolic state, input, and parameter matrices (state_vars/x, input_vars/r, constants/p), an order, and M and F for M*x'=F. Its rhs method supplies the derivative-side representation for downstream use, not a time-integrated trajectory. Concrete models supply expressions through that interface, so code generation or solver adapters can obtain equations without hard-coding each model. Symbolic constants have an explicit ordering for numeric substitution (sympy/physics/biomechanics/activation.py:107-256). Numerical evaluation/integration still requires an appropriate adapter.",
+      "reference_sha256": "4f32b2aa70ba8a465fecf152023f78fd0faa8347f949cec94c486b81f2db0988",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-2f228b75418088bf281e50c8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "original_reference_sha256": "ec09dd65d84d72294d1fc85311e675cb568a2833ed156ffb99b68c47478ffd29",
+      "question": "Why does repeated instantiation of the continuous probability distribution class representing Gaussian distributions with mean and standard deviation parameters in the method that returns the probability distribution for a given time index in the continuous-time stochastic process class that models Brownian motion impact memory allocation patterns?",
+      "question_sha256": "a969e05873dd58e9bf79d5bb8a383f390f6ff15860cd9cd3be397e85c9282c5c",
+      "reference_answer": "WienerProcess.distribution calls NormalDistribution(0,sqrt(key)) on each invocation, with no cache in this method (sympy/stats/stochastic_process_types.py:2298-2302). ContinuousTimeStochasticProcess.__call__ includes that distribution in a StochasticPSpace and returns a RandomIndexedSymbol (same file:310-324). Repeated calls therefore repeat construction work; retaining many results can retain their object graphs. This does not by itself imply a leak, inevitable linear live-memory growth, or a significant performance bottleneck; those depend on result retention and workload measurement.",
+      "reference_sha256": "299a29a2923cda473ef199c1f2399c3291647512b5b3708f411dafb9f1981cfe",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-3063534b24598db94cc883e4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "original_reference_sha256": "8929dcc332d224b1de83361b00d40d793b93fc48aed9a1f6f1a932dcf0463bf7",
+      "question": "What are the interdependencies between the expression transformation methods that convert between circular and hyperbolic function families in the elementary functions module?",
+      "question_sha256": "3b2da0e6dd5e4cf95553a83ebe368f68f3abadb145250c00ce104399edeadac4",
+      "reference_answer": "The rewrite hooks construct identities using other function classes: sinh(z) becomes -I*sin(I*z), cosh(z) becomes cos(I*z,evaluate=False), and tanh(z) becomes -I*tan(I*z,evaluate=False) (sympy/functions/elementary/hyperbolic.py:300-301,495-496,753-754). Related hooks express functions through phase shifts, half arguments, or reciprocals (same file:306-318,501-513,759-766). These are dependencies on constructors and identities, not automatic calls to the target's reverse rewrite hook. evaluate=False suppresses constructor evaluation where used, preserving the desired expression form; it does not prove the claimed infinite bidirectional rewrite cycles.",
+      "reference_sha256": "d0362844142a0099c015f7f3c7e9164f2fb0d7be789efbfa20fe1417a7caf1c6",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-36d4f43b8fc8a4d753b3acb4"
+    }
+  ]
+}

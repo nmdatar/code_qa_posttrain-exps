@@ -1,0 +1,438 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1694,
+            "file_sha256": "3bdf852a07dc41b721568c4cfcd7e139c6250697f09633d37242a6b18ed1fa93",
+            "path": "pylint/checkers/variables.py",
+            "start_line": 1675
+          },
+          {
+            "end_line": 188,
+            "file_sha256": "545cb4c1be12e957779ccf44fb21aec0b99ea9fb82a32dd047c0610e244d3231",
+            "path": "tests/functional/u/unused/unused_variable.py",
+            "start_line": 180
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What cascading effects would occur if modifications to the exception handling pattern for sibling exception handlers propagate through the unused variable checker's analysis pipeline?",
+      "question_sha256": "6b568f667ced94d87d6f9217e6cbc5752172c85e8caf702fc81b4e3f46e9e9e1",
+      "reference_answer": "Based on my exploration of the pylint repository, modifications to the exception handling pattern for sibling exception handlers would create cascading effects through the unused variable checker's analysis pipeline in several ways:\n\n1. **Exception Handler Name Tracking**: The checker maintains `_except_handler_names_queue` (a LIFO queue) in the `VariablesChecker` class to track exception handler names and detect redefinitions. The `visit_excepthandler()` and `leave_excepthandler()` methods (lines 1675-1694 in `variables.py`) use this queue to report `redefined-outer-name` messages when exception variable names match outer exception handlers. Changes to how sibling handlers are processed would affect this queue management and the scope detection logic.\n\n2. **Uncertain Node Filtering**: The `_uncertain_nodes_in_except_blocks()` method (lines 828-895) filters out nodes that should be treated as uncertain when evaluating exception blocks. This method checks if nodes are in except blocks of try statements and determines execution certainty based on return statements, else blocks, and control flow. The logic at lines 1124-1131 specifically checks for sibling exception handlers attached to try ancestors. Modifications to sibling handler semantics would require updates to this uncertainty analysis.\n\n3. **Variable Consumption Analysis**: The `NamesConsumer` class tracks variable definitions and consumption throughout the analysis. The `get_next_to_consume()` method (lines 559-647) filters out assignments in ExceptHandlers that the current node is not contained in, assuming they may fail. Changes to sibling handler patterns would affect how variables are marked as consumed or uncertain in the consumption tracking system.\n\n4. **Dependent Linting Rules**: Several rules would require updates:\n   - **`redefined-outer-name`** (W0621): Currently detects when exception variable names hide names from outer scopes or except handlers. The `visit_excepthandler()` method checks the queue against outer exception handlers. Sibling handler changes would affect what constitutes a \"redefinition.\"\n   - **`unused-variable`** (W0612): The checker has special handling for exception variables (lines 2846-2849) that skips reporting unused variables if the name appears in the exception handler's nodes. Sibling handler semantics would affect this special case logic.\n   - **`possibly-unused-variable`**: Similar considerations apply for variables that might be used conditionally.\n\n5. **Control Flow Analysis**: The `_uncertain_nodes_in_try_blocks_when_evaluating_except_blocks()` method (lines 1089-1135) determines which nodes are uncertain when evaluating code in except handlers. It specifically checks for sibling exception handlers (line 1124: \"except handler that is a sibling attached to the try ancestor\"). Changes to sibling handler semantics would directly impact this control flow analysis.\n\n6. **Test Suite Impact**: The test function `sibling_except_handlers()` in `tests/functional/u/unused/unused_variable.py` (lines 180-188) tests the current behavior with two sibling try-except blocks using the same exception variable name. Any modifications would require updating this test and potentially adding new test cases.\n\nThe cascading effects would propagate through the entire variable analysis pipeline because exception handlers are fundamental to determining variable usage certainty, scope boundaries, and control flow paths in the static analysis.",
+      "reference_sha256": "26b282dcdd03b4667556e1ca0268d7ef8f1e29fb020dd381757a2835b51e491d",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-86af6df9e0aec46c0c8b4ab7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "2936decb02b52378cf7c401bf73653226af85feb82e4bc4a0a6cd0f323c11605",
+            "kind": "file_reference",
+            "line_count": 374,
+            "path": "pylint/utils/utils.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How would you refactor the configuration option value formatter to implement parameter validation and type checking while maintaining backward compatibility with existing callers that pass arbitrary object types?",
+      "question_sha256": "0449fe3e0ecc35e5776cb4e3d9a28f1e0143b7d3f807f2be2b26c1fa8ccd79c6",
+      "reference_answer": "Based on my exploration of the pylint repository, the configuration option value formatter (`_format_option_value` in `pylint/utils/utils.py`) currently accepts `Any` and handles multiple types through runtime checks. To refactor it with parameter validation and type checking while maintaining backward compatibility:\n\n**Current Implementation:**\nThe function (lines 275-293) uses `isinstance()` checks and `hasattr()` to handle:\n- Python version tuples\n- Lists and tuples (recursively)\n- Dictionaries\n- Regex patterns (via `hasattr(value, \"match\")`)\n- Boolean values (for yes/no options)\n- Strings (with special handling for whitespace)\n\n**Refactoring Approach:**\n\n1. **Add type hints with Union types**: Replace `value: Any` with a Union of expected types (e.g., `str | int | bool | list | dict | re.Pattern | tuple`), keeping `Any` as a fallback for backward compatibility.\n\n2. **Implement gradual type narrowing**: Use `isinstance()` checks (already present) but add explicit type validation at the function entry, logging warnings for unexpected types while still processing them to maintain compatibility.\n\n3. **Use Protocol or TypedDict for optdict**: The `optdict` parameter could be more strictly typed to ensure the \"type\" key is validated.\n\n4. **Add runtime type validation with warnings**: Before processing, validate the value type against `optdict.get(\"type\")` if specified, but don't raise errors\u2014emit deprecation warnings for invalid types to guide migration.\n\n5. **Maintain backward compatibility**: Keep the current behavior for all existing callers by:\n   - Accepting `Any` type but internally narrowing types\n   - Handling unexpected types gracefully (convert to string as fallback)\n   - Using `typing.overload` to provide better type hints for common cases while keeping the implementation flexible\n\n6. **Consider using `typing.TypeGuard`**: Implement type guard functions to safely narrow types during validation.\n\nThe function is called from `_ini_format()` (line 329) and help text generation (line 146), so any changes must preserve the current string output format for all input types to maintain backward compatibility with existing configuration files and help text generation.",
+      "reference_sha256": "4b487f56386078b4cd883187bd0892c784947084ae2ab26e7b9949bd51379ca3",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-8a21e83c420ca7de27c9d4eb"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2261,
+            "file_sha256": "233b4d19610a473837b4306fd937d3e618c3dfda5be2fb964559024b6e3a0a73",
+            "path": "pylint/checkers/classes/class_checker.py",
+            "start_line": 2261
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does explicitly calling a parent constructor via a dotted module path handle method resolution order in multi-level inheritance hierarchies?",
+      "question_sha256": "45831b25887e3a806da15c353a7c60d2c386602c2f4b1b52b0ee8c08080922ae",
+      "reference_answer": "When a class explicitly calls a parent constructor using a dotted module path (e.g., `module.Class.__init__(self)`), the pylint checker handles method resolution order (MRO) by:\n\n1. **Inference of the dotted name**: The checker uses `expr.expr.infer()` to resolve the dotted module path to the actual class object (see `class_checker.py` line 2261). This allows it to identify which class's `__init__` is being called, even when accessed through a module path.\n\n2. **Direct ancestor checking**: The checker verifies whether the inferred class is in the direct ancestors list using `klass_node.ancestors(recurs=False)` (line 2285). The `recurs=False` parameter means it only checks immediate parent classes, not the full inheritance chain.\n\n3. **MRO bypass detection**: When the parent class is part of a multi-level inheritance hierarchy, explicitly calling it via a dotted path can bypass intermediate classes in the MRO. For example, if `Child` inherits from `Parent` which inherits from `Grandparent`, calling `Grandparent.__init__(self)` directly skips `Parent.__init__()`, breaking the cooperative multiple inheritance protocol.\n\n4. **Warning generation**: If the inferred class is not in the direct ancestors (i.e., it's a grandparent or more distant ancestor), the checker emits the \"non-parent-init-called\" warning (W0233), indicating that the call bypasses the standard MRO chain.\n\nThe implementation in `_check_init()` method (lines 2237-2307) shows that:\n- It first builds a list of ancestors that should be called using `_ancestors_to_call()`, which only includes direct ancestors (line 2435)\n- When an explicit `__init__` call is found, it infers the class and checks if it's in the direct ancestors\n- If not found in direct ancestors, it flags this as bypassing the MRO protocol\n\nThis approach means that dotted ancestor initialization does not respect the full MRO chain when the parent class has its own inheritance hierarchy - it only validates against immediate parents, potentially missing intermediate initialization steps that would normally be handled by `super()` calls following the C3 linearization order.",
+      "reference_sha256": "377b6b3f87eceefc638c28115e52fcd5fdd701086ca016ddd17f4f6bb6ff50d9",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-91513317ac2f27c08a69449a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 231,
+            "file_sha256": "da78ade5c47fba4b5fde2c84bf6c3b4054110b9a17f1085c8dd8e8c0b23ced48",
+            "path": "pylint/constants.py",
+            "start_line": 231
+          },
+          {
+            "end_line": 403,
+            "file_sha256": "f1c95c78a1a73360dbd1275a9e333eb47f318c7e18ace8b77e1c5c588595becf",
+            "path": "pylint/checkers/classes/special_methods_checker.py",
+            "start_line": 374
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "f1c95c78a1a73360dbd1275a9e333eb47f318c7e18ace8b77e1c5c588595becf",
+            "kind": "file_reference",
+            "line_count": 403,
+            "path": "pylint/checkers/classes/special_methods_checker.py"
+          },
+          {
+            "file_sha256": "c5254f9added00d0b8eb492ed6d6a94d6515975912c5218ee71cb629aff5a1b9",
+            "kind": "file_reference",
+            "line_count": 103,
+            "path": "tests/functional/i/invalid/invalid_getnewargs/invalid_getnewargs_ex_returned.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the memory overhead of the pickle protocol reconstruction method validated by the classes checker during repeated instantiation impact garbage collection cycles and heap fragmentation when thousands of instances are created and destroyed?",
+      "question_sha256": "f95030704de6b4e61f02e8793aa810f8b19091c902a0379bbc4fe3cbfbcd5f21",
+      "reference_answer": "Based on my exploration of the pylint repository, this question addresses Python runtime behavior during object unpickling, not pylint's static analysis.\n\n**What pylint does with `__getnewargs_ex__`:**\nPylint's `SpecialMethodsChecker` (in `pylint/checkers/classes/special_methods_checker.py`) validates that `__getnewargs_ex__` returns a tuple containing `(tuple, dict)`, as required by Python's pickle protocol. The checker uses `_check_getnewargs_ex()` to verify the return type through static analysis.\n\n**Regarding the memory overhead question:**\nThe repository does not document or analyze runtime memory behavior, GC cycles, or heap fragmentation related to `__getnewargs_ex__`. Pylint is a static analyzer focused on code correctness, not runtime performance.\n\n**Technical context from the codebase:**\n- `__getnewargs_ex__` is listed in `EXTRA_DUNDER_METHODS` in `pylint/constants.py` (line 231)\n- It's validated by `SpecialMethodsChecker._check_getnewargs_ex()` (lines 374-403 in `special_methods_checker.py`)\n- The method is part of Python's pickle protocol and is called during object unpickling to provide arguments for `__new__()`\n- Test cases in `tests/functional/i/invalid/invalid_getnewargs/invalid_getnewargs_ex_returned.py` show examples of correct and incorrect implementations\n\n**Answer to the rewritten question:**\nThe memory overhead occurs because `__getnewargs_ex__` is invoked during unpickling for each instance. When thousands of instances are created and destroyed in succession:\n1. Each unpickling calls `__getnewargs_ex__` to get reconstruction arguments\n2. These calls create temporary tuples and dictionaries that must be garbage collected\n3. Rapid creation/destruction can cause GC pressure and heap fragmentation due to frequent allocations and deallocations\n4. The overhead accumulates when the method returns large tuples/dicts or when instantiation happens in tight loops\n\nThis is a Python runtime behavior, not something pylint analyzes. Pylint only ensures the method's return type is correct for the pickle protocol.",
+      "reference_sha256": "2f4a0e48677372fb4bc23aaf3b073506f7f19db021b64aaaa2ae06390c797fbe",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-994d9447e1017b59169f8976"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1804,
+            "file_sha256": "233b4d19610a473837b4306fd937d3e618c3dfda5be2fb964559024b6e3a0a73",
+            "path": "pylint/checkers/classes/class_checker.py",
+            "start_line": 1799
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "c07a890849799fb0bf47e69dc57f284890921cf24a39f1697cb2b969bee9e530",
+            "kind": "file_reference",
+            "line_count": 241,
+            "path": "tests/functional/a/assigning/assigning_non_slot.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does a base class without a slot restriction declaration interact with the attribute assignment validation checker when inherited by subclasses that define slot restrictions or include the dynamic attribute dictionary in their slot restrictions?",
+      "question_sha256": "96c739a65b6ad5e41009173a46a3e8a55df740ed4b3bb106050ebce0d7160e58",
+      "reference_answer": "When a base class without `__slots__` is inherited by a subclass that defines `__slots__`, the attribute assignment validation is skipped.\n\nThe validation logic is in `_check_in_slots` in `pylint/checkers/classes/class_checker.py` (lines 1799-1804). It checks ancestors via `klass.ancestors()`; if any ancestor lacks `__slots__` (excluding \"Generic\" and \"object\"), it returns early and skips validation:\n\n```python\n# If any ancestor doesn't use slots, the slots\n# defined for this class are superfluous.\nif any(\n    \"__slots__\" not in ancestor.locals\n    and ancestor.name not in (\"Generic\", \"object\")\n    for ancestor in klass.ancestors()\n):\n    return\n```\n\nThis means subclasses of a base without `__slots__` can assign any attributes without triggering \"assigning-non-slot\" warnings, even if the subclass defines `__slots__`.\n\nSimilarly, `_check_declare_non_slot` (lines 885-927) stops validation if any base lacks `__slots__` (line 906):\n\n```python\n# if any base doesn't have __slots__, attributes can be set dynamically, so stop\nif not self._has_valid_slots(ancestor):\n    return\n```\n\nIf a subclass includes `__dict__` in its `__slots__`, assignments are allowed regardless of ancestor slots (lines 1807-1809):\n\n```python\n# If we have a '__dict__' in slots, then\n# assigning any name is valid.\nif not any(slot.value == \"__dict__\" for slot in slots):\n```\n\nThis is demonstrated in `tests/functional/a/assigning/assigning_non_slot.py`: `Good(Empty)` defines `__slots__ = ['a']` but can assign `self.missing = 42` without a warning because `Empty` has no `__slots__`.\n\nFor redefined slots, `_check_redefined_slots` (lines 1618-1642) only checks ancestors that have `__slots__` via `node.local_attr_ancestors(\"__slots__\")`, so a base without `__slots__` doesn't contribute to redefinition checks.",
+      "reference_sha256": "01e1e2235870fe54c03a2a98f18f2ecce2cba643ebcd048c2039bc83b89fff1f",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-a46f6d512ea50e905597fe19"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 184,
+            "file_sha256": "4752ceea192dbca59dc113a93599805de3748ba55ed367dcbf19f8803438e2db",
+            "path": "tests/functional/c/contextmanager_generator_missing_cleanup.py",
+            "start_line": 184
+          },
+          {
+            "end_line": 149,
+            "file_sha256": "b4966ad06ecfb4030ee495e3c090841c25148c0129a8fb462d883f5b7bf77805",
+            "path": "pylint/checkers/base/function_checker.py",
+            "start_line": 37
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the yield statement in the context manager function that assigns a context variable and yields it without cleanup establish a data dependency between the variable assignment and the control flow suspension point?",
+      "question_sha256": "f0687f5fa48ef50bbfb00987acc45152158f4746b57c460588c44f512570527d",
+      "reference_answer": "The yield statement establishes the data dependency at the point where it references the variable in its expression. In the context manager function `good_cm_no_cleanup()` (located at line 184 in `tests/functional/c/contextmanager_generator_missing_cleanup.py`), the yield statement `yield contextvar` creates a data dependency because:\n\n1. **Assignment point** (line 182): `contextvar = \"acquired context\"` assigns a value to the variable\n2. **Dependency establishment point** (line 184): `yield contextvar` references the variable, creating a read-after-write dependency\n3. **Suspension point**: The same yield statement is where execution suspends when the generator is consumed as a context manager\n\nThe data dependency is established at the yield statement itself because it directly references `contextvar` in its expression. This creates a control flow dependency where:\n- The assignment must execute before the yield (data dependency)\n- The yield serves as both the point where the variable's value is read and where control flow is suspended (control dependency)\n\nWhen this generator is consumed as a context manager via Python's `contextlib.contextmanager` decorator:\n- The `__enter__` method executes code up to and including the yield statement\n- At the yield, execution suspends and the yielded value (`contextvar`) is returned to the caller\n- The `__exit__` method would resume execution after the yield, but since there's no cleanup code, execution simply ends\n\nThe checker implementation in `pylint/checkers/base/function_checker.py` (lines 37-149) analyzes this pattern to detect when context managers used inside generator functions may not properly clean up, specifically checking if the context manager's yield is the last statement (indicating no cleanup code exists after the suspension point).",
+      "reference_sha256": "fca0a81f5cac5f2d10e8605bd401d90915db17afdee8cc1e67593f062851cb76",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-ac791a2632040cfe3bd3203b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 205,
+            "file_sha256": "efae1fac52db10aaf48e4a2c9552a00768888c6ca9e8296a15670498a4d4c99c",
+            "path": "pylint/extensions/_check_docs_utils.py",
+            "start_line": 205
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "63a5eab36e91a9b98bc4018be7f57744ac2c52d48b238a299af3682c60efff74",
+            "kind": "file_reference",
+            "line_count": 698,
+            "path": "pylint/extensions/docparams.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where are the linting functions that invoke docstring parameter checking logic to detect missing type annotations for parameters without type hints?",
+      "question_sha256": "0c1320f614de8b3422c6348bfb882d43bf1cb45565c47025453f0404dd5765dc",
+      "reference_answer": "The linting functions that invoke docstring parameter checking logic to detect missing type annotations are located in the `DocstringParameterChecker` class in `./pylint/extensions/docparams.py`.\n\nThe validation flow follows this sequence:\n\n1. **Entry point**: `visit_functiondef` method (line 193) \u2014 Called when pylint visits a function definition node. It processes the docstring and delegates to parameter checking methods.\n\n2. **Orchestration**: `check_functiondef_params` method (line 221) \u2014 Coordinates parameter checking for functions and methods, handling special cases for constructors, then calls the main validation method.\n\n3. **Main validation**: `check_arguments_in_docstring` method (line 509) \u2014 This is the core function that performs the docstring parameter checking logic:\n   - Line 577: Extracts parameters documented in the docstring using `doc.match_param_docs()`, which returns two sets: `params_with_doc` (parameters with documentation) and `params_with_type` (parameters with type documentation in the docstring).\n   - Line 591: Updates `params_with_type` by adding parameters that have type annotations in the function signature using `utils.args_with_annotation(arguments_node)`. This function (defined in `_check_docs_utils.py` line 205) extracts parameter names that have type annotations from the AST arguments node.\n   - Lines 597-599: Calculates `missing_type_doc` by finding the difference between expected argument names and parameters with type documentation (from either docstring or signature annotations).\n   - Lines 619-625: Invokes `_compare_missing_args` with the message ID \"missing-type-doc\" to generate warnings for parameters missing type annotations.\n\n4. **Message generation**: `_compare_missing_args` method (line 401) \u2014 Compares expected argument names with found argument names and generates the \"missing-type-doc\" message if parameters are missing type documentation.\n\nFor the specific test case `test_missing_func_params_with_annotations_in_google_docstring`, parameter `z` has a type annotation in the Google-style docstring (`z (int): bar`) but no type annotation in the function signature. The detection works as follows:\n- `match_param_docs()` extracts `z` into `params_with_type` because it has a type in the docstring.\n- `args_with_annotation()` does not add `z` because it lacks a type annotation in the signature.\n- However, the check at line 597 compares `expected_argument_names` (which includes `z`) against `params_with_type` (which includes `z` from the docstring), so `z` would not be flagged as missing.\n\nActually, reviewing the logic more carefully: the check at line 597-599 calculates `missing_type_doc = (expected_argument_names - params_with_type)`. Since `params_with_type` includes both docstring types (from line 577) and signature annotations (from line 591), if `z` has a type in the docstring, it will be in `params_with_type` and won't be flagged as missing. The checker validates that type information exists either in the docstring or in the signature annotations.",
+      "reference_sha256": "007b6ae55e121a2b339dc2d157176c8645e5613d58a9fafed456a8d8a5d6f4bd",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-aeee82d6ae99e6f31875f273"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 123,
+            "file_sha256": "661f5575ea4eda40735bbf0a6596d777eadb6a60cb7f9cdeed38cde2b781c1ec",
+            "path": "pylint/checkers/misc.py",
+            "start_line": 104
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How should the regex pattern compilation logic in the initialization method that configures fixme detection patterns in the encoding validation checker be refactored to separate pattern construction from compilation?",
+      "question_sha256": "3cc1ee259a949840f48418194c0a19dd4a7e4a6c42acab250995a618bdc9e4bf",
+      "reference_answer": "The regex pattern compilation logic in the `open` method of the `EncodingChecker` class (located in `pylint/checkers/misc.py`, lines 104-123) should be refactored by extracting pattern construction into separate factory methods and deferring compilation.\n\n**Current Implementation:**\nThe `open` method currently mixes pattern construction and compilation:\n1. **Pattern construction** (lines 107-120): Builds regex pattern strings by:\n   - Joining escaped note tags from configuration (`self.linter.config.notes`)\n   - Optionally appending a custom regex pattern (`self.linter.config.notes_rgx`)\n   - Creating three distinct pattern strings: `comment_regex`, `docstring_regex`, and `multiline_docstring_regex`\n\n2. **Pattern compilation** (lines 112, 116, 121-122): Immediately compiles each pattern string using `re.compile()` with the `re.I` flag\n\n**Recommended Refactoring:**\n1. **Extract pattern construction methods:**\n   - `_build_notes_pattern()`: Constructs the base notes pattern string (lines 107-109)\n   - `_build_comment_pattern(notes)`: Builds the comment regex pattern string (line 111)\n   - `_build_docstring_pattern(notes)`: Builds the docstring regex pattern string (line 115)\n   - `_build_multiline_docstring_pattern(notes)`: Builds the multiline docstring pattern string (line 120)\n\n2. **Extract pattern compilation method:**\n   - `_compile_fixme_patterns()`: Takes pattern strings and returns compiled patterns, or compile patterns lazily when first used\n\n3. **Refactor `open` method:**\n   - Call the factory methods to construct patterns\n   - Compile patterns separately (or lazily)\n\n**Architectural Benefits:**\n- **Separation of concerns**: Pattern construction logic (string building) is isolated from compilation (regex object creation)\n- **Testability**: Pattern strings can be tested independently of compilation\n- **Reusability**: Pattern construction methods can be reused or extended\n- **Maintainability**: Changes to pattern construction don't affect compilation logic and vice versa\n- **Lazy compilation**: Patterns could be compiled on first use rather than during initialization\n\nThe patterns are used in `process_tokens` (lines 150-180) to match fixme notes in comments and docstrings during token processing.",
+      "reference_sha256": "040ad76b2083bd13f5a5d15e156e364709796eb198c7b275a27e27ec9d256119",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-b58cc28fd96964f1ca2b0f39"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "430ee5d2f37fdba3933a91f7c8d39380741845108617fb146f97a7cdb6c95e95",
+            "kind": "file_reference",
+            "line_count": 58,
+            "path": "pylint/checkers/ellipsis_checker.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where does the control flow in the method that checks ellipsis constants branch differently when the grandparent node is a class definition versus a function definition?",
+      "question_sha256": "5796810153a3462583374f4bc43e459f8af7b3605c1301b5f36909eff86e228f",
+      "reference_answer": "The control flow in `visit_const` does not explicitly branch differently when `node.parent.parent` is a `ClassDef` versus a `FunctionDef`. Both are handled in the same condition.\n\nThe relevant code is in `pylint/checkers/ellipsis_checker.py`, in the `visit_const` method of the `EllipsisChecker` class (lines 34-54). The method checks if an ellipsis constant is unnecessary.\n\nThe condition at lines 43-53 evaluates:\n1. Whether the node is an Ellipsis type (`node.pytype() == \"builtins.Ellipsis\"`)\n2. Whether the parent is an `Expr` node (`isinstance(node.parent, nodes.Expr)`)\n3. Whether either:\n   - The grandparent is a `ClassDef` or `FunctionDef` and has a `doc_node` (docstring), OR\n   - The grandparent's body has more than one element (`len(node.parent.parent.body) > 1`)\n\nBoth `ClassDef` and `FunctionDef` are checked together in the same `isinstance` call: `isinstance(node.parent.parent, (nodes.ClassDef, nodes.FunctionDef))`. There is no separate branching logic that treats them differently.\n\nBefore `add_message` is called (line 54), the data transformations that occur are:\n- Type checking: `node.pytype()` returns the Python type string\n- Parent relationship checks: verifying `node.parent` is an `Expr` and `node.parent.parent` is either `ClassDef` or `FunctionDef`\n- Attribute access: checking `node.parent.parent.doc_node` (docstring presence)\n- Length calculation: `len(node.parent.parent.body)` to count body elements\n\nThese transformations apply the same way whether the grandparent is a `ClassDef` or `FunctionDef`, since both node types have `doc_node` and `body` attributes. The logic treats them identically in this checker.",
+      "reference_sha256": "da062cbd0d6d3720c700371089261b876399852b20e100defc12bde073744bd3",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-b6580d8dd346d6ba320ab8d5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 139,
+            "file_sha256": "da9c6bd8bb8b92d5d6a8e5591eaeb0b7c8ce7b3116dc45798dbd9121d0392193",
+            "path": "pylint/checkers/base/name_checker/checker.py",
+            "start_line": 105
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "b35dd5ff3835ff33cba89a7c66ae03811d97fdd2aa4f9bb2c1d64c16900bd838",
+            "kind": "file_reference",
+            "line_count": 35,
+            "path": "tests/functional/n/name/name_preset_snake_case.py"
+          },
+          {
+            "file_sha256": "5bc3e54d5c99f8b373f7804be8df8840a4b37146231dbdacf6bd9b53b2667f69",
+            "kind": "file_reference",
+            "line_count": 20,
+            "path": "tests/functional/n/name/name_good_bad_names_regex.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the property method that provides controlled access to a private attribute serve as a controlled accessor in the encapsulation pattern demonstrated by the test class?",
+      "question_sha256": "be82512f41f17392401e6ff6bafcb220698065bc40ebf43e44cbbcfaf0b8d165",
+      "reference_answer": "The property method serves as a controlled accessor in the encapsulation pattern because it:\n\n1. **Provides controlled access to private data**: The property method accesses `_my_secret_x` (a private attribute indicated by the underscore prefix), which cannot be directly accessed from outside the class. This enforces encapsulation by hiding the internal implementation.\n\n2. **Transforms data before exposure**: In the test files (`tests/functional/n/name/name_preset_snake_case.py` and `tests/functional/n/name/name_good_bad_names_regex.py`), the property method returns `self._my_secret_x * 2`, applying a transformation before exposing the value. This demonstrates controlled access where the internal representation differs from the public interface.\n\n3. **Enables validation and control**: By using the `@property` decorator, the class can control how the private attribute is accessed. Future modifications could add validation, logging, or computation without changing the public interface.\n\n4. **Pylint's special handling**: In pylint's name checker (`pylint/checkers/base/name_checker/checker.py`, lines 105-139), property methods are treated as \"attr\" (attributes) rather than \"method\" for naming validation purposes. The `_determine_function_name_type` function checks if a method is decorated with `@property` and returns \"attr\" as the name type, meaning property methods are validated against attribute naming conventions, not method naming conventions. This reflects how properties are used in Python\u2014they appear as attributes to users but are implemented as methods.\n\nThis encapsulation pattern is demonstrated in the test classes to verify that pylint correctly identifies property methods and validates their names according to attribute naming rules rather than method naming rules.",
+      "reference_sha256": "88d9a87f51f468ac7318c5f7b05c368562345130fdec8efe92db7193fe448783",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-b8b2ff405066d0b29d909b7d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 38,
+            "file_sha256": "2dcc4df69ef976a3f4a56e8cb35bcfe14d6f14506e02035b13c033bcbcb1e518",
+            "path": "pylint/extensions/private_import.py",
+            "start_line": 38
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the lazy initialization pattern using a boolean flag in the private import checker that prevents redundant type annotation scanning across multiple import statements?",
+      "question_sha256": "c7848ed7b09e23efb2391837b5f55b005a28478f0ca8d3e6c69c290a17951677",
+      "reference_answer": "The lazy initialization pattern in the private import checker uses a boolean flag (`populated_annotations`) initialized to `False` in the `PrivateImportChecker.__init__` method (line 38 of `pylint/extensions/private_import.py`). This flag is checked in the `_get_type_annotation_names` method (lines 114-132) before performing expensive type annotation scanning.\n\nThe pattern works as follows:\n\n1. **Initial state**: When the checker is instantiated, `populated_annotations` is set to `False`, and `all_used_type_annotations` (a dictionary mapping type annotation names to booleans) is initialized as an empty dict (line 37).\n\n2. **Lazy population**: When `_get_type_annotation_names` is called with a non-empty `names` list and `populated_annotations` is `False` (line 120), it triggers a one-time population by calling `_populate_type_annotations(node.root(), self.all_used_type_annotations)` (line 121). This method recursively traverses the entire AST to collect all names used as type annotations throughout the file.\n\n3. **Flag setting**: After the initial population, `populated_annotations` is set to `True` (line 122), ensuring that subsequent calls to `_get_type_annotation_names` (which occur for each import statement) skip the expensive AST traversal.\n\n4. **Efficiency**: This prevents redundant scanning because `_get_type_annotation_names` is called multiple times during linting\u2014once for each `visit_import` (line 46) and multiple times for each `visit_importfrom` (lines 69, 75-76). Without this pattern, the entire AST would be scanned for type annotations on every import statement, which would be computationally expensive for files with many imports.\n\nThe `all_used_type_annotations` dictionary stores mappings where the key is a type annotation name and the value is a boolean indicating whether that name is used exclusively as a type annotation (True) or has other non-annotation usages (False). This information is used to filter out private imports that are only used for type annotations, which are considered acceptable according to PEP 8 guidance.",
+      "reference_sha256": "bcfca2ced9bcbd4542f06c50de9740b37341f945791e4c7f3d85a764a0c4dfe4",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-ba0d7851c915dd194a1d19ae"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 104,
+            "file_sha256": "ce4c18e188357ce54a04e90589ed843e526efb42e392d19643fe6e0ebb899b28",
+            "path": "tests/functional/s/slots_checks.py",
+            "start_line": 96
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "4334ac3fa2292681aef10708c32a8f7077ffb476899d2073f47b0ec66e63cc19",
+            "kind": "file_reference",
+            "line_count": 11,
+            "path": "tests/functional/r/regression_02/regression_too_many_arguments_2335.py"
+          },
+          {
+            "file_sha256": "ce4c18e188357ce54a04e90589ed843e526efb42e392d19643fe6e0ebb899b28",
+            "kind": "file_reference",
+            "line_count": 203,
+            "path": "tests/functional/s/slots_checks.py"
+          },
+          {
+            "file_sha256": "cc8f66c0086a7666b33ee7b72f09dd4af787960729782ea91a82237c092da8ab",
+            "kind": "file_reference",
+            "line_count": 18,
+            "path": "tests/functional/i/iterable_context_py3.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "checkers/utils.py",
+            "reason": "not_tracked",
+            "reference": "checkers/utils.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "How should a class-creating type design iteration protocol methods to separate construction logic from iteration behavior while allowing inheriting classes to override either independently?",
+      "question_sha256": "201394e312d3b78dd6fa1120fe2279f082ac92a303c7b2e42fb67a21cc3dd61b",
+      "reference_answer": "Based on the pylint codebase, a class-creating type (metaclass) should design iteration protocol methods by separating them from class construction logic using distinct method implementations and delegation patterns.\n\n**Separation of Concerns:**\n1. **Class Construction Logic**: Implemented in `__new__` and `__init__` methods of the metaclass, handling how classes are created (as seen in examples like `regression_too_many_arguments_2335.py` where `NodeCheckMetaClass` overrides `__new__`).\n\n2. **Iteration Protocol Methods**: Implemented as separate methods like `__iter__` on the metaclass itself (as demonstrated in `slots_checks.py` where `Metaclass` defines `__iter__(cls)` that yields values).\n\n**Design Pattern:**\nThe codebase shows that metaclasses can implement protocol methods directly (e.g., `def __iter__(cls)` in the metaclass), which makes the class itself iterable. The construction logic (`__new__`/`__init__`) handles class creation separately.\n\n**Independent Override Capability:**\n- Inheriting classes can override instance-level `__iter__` methods without affecting the metaclass's class creation logic\n- The metaclass's `__new__`/`__init__` methods remain independent of protocol method implementations\n- This separation is evident in the codebase where metaclasses with `__iter__` (like in `iterable_context_py3.py`) allow classes using them to have independent iteration behavior\n\n**Implementation Approach:**\nThe pylint codebase demonstrates this pattern in files like `slots_checks.py` (lines 96-104), where `Metaclass` implements `__iter__` as a class method, separate from any class construction logic. The utility functions in `checkers/utils.py` (functions like `_supports_iteration_protocol`) check for protocol support independently of class creation mechanisms.\n\nThis design ensures that:\n- Class construction logic in `__new__`/`__init__` can be modified independently\n- Iteration behavior via `__iter__` can be overridden in subclasses without coupling to construction logic\n- The two concerns remain decoupled, allowing flexible inheritance hierarchies",
+      "reference_sha256": "3ab9977be576cf604d323110a90d0ea956805555390aeb83427bbd25f810d86d",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-bbdf63b62e82327064fb12b5"
+    }
+  ]
+}

@@ -1,0 +1,294 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-8993b4bacfe092b77bd92be9",
+      "reference_sha256": "c6cc3893525851f976f62c9c28279ab919e0497faf6841121c1438f2aa0fdc6a",
+      "question_sha256": "e9370f9292a1bf8b0f048905425c4c47b76a1ee6a0a3f6a68cbf3c736c95610b",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Registry is inline module bootstrap and determines IPython version behavior",
+          "verdict": "unsupported",
+          "reason": "Registry reads backend entry points and checks matplotlib_inline distribution version, not IPython bootstrap/version.",
+          "evidence": {
+            "path": "lib/matplotlib/backends/registry.py",
+            "start_line": 128,
+            "end_line": 163
+          }
+        }
+      ],
+      "material_errors": [
+        "Misidentifies registry entry-point discovery as external inline module bootstrap; IPython 8.24 boundary not established."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "In this repository BackendRegistry._read_entry_points discovers matplotlib.backend entries and synthesizes inline -> matplotlib_inline.backend_inline for installed matplotlib_inline versions below 0.1.7 lacking that entry (lib/matplotlib/backends/registry.py:128-163). _validate_and_store_entry_points stores the module:// mapping (165-184). This is backend registration, not the external matplotlib_inline module\u2019s bootstrap, and it does not choose identifiers by IPython version; that part cannot be established from this source."
+    },
+    {
+      "task_id": "import-8deba21ecfe58c872a8456d6",
+      "reference_sha256": "d90f74a0ab6bef5ebe4e6dd71e0c191b5f127a859d9a8ab0fc591a1479466935",
+      "question_sha256": "d0f302dd449a3d1f90eaf06204c74cd9c93a1d54513ea46ca34cf9ba3abcd75c",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Tick visibility branch uses major orientation for both tick kinds",
+          "verdict": "supported",
+          "reason": "Exact nested condition and angle-dependent alternate padding match.",
+          "evidence": {
+            "path": "lib/mpl_toolkits/axisartist/axis_artist.py",
+            "start_line": 1005,
+            "end_line": 1021
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-93dbd2c63ceae301bb0818a7",
+      "reference_sha256": "43d3a263f18ed91e0b447dcc6ddcc47e0fd5f661cf63d4eb8caa1d8a78d4e059",
+      "question_sha256": "ec8ae0a7b42a83aa12d1d56f1a712bb24dd001fd3bbf47959cd1dae6b27a90b9",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Test checks closed contours and separate hole subpath",
+          "verdict": "supported",
+          "reason": "Vertices/codes and to_polygons assertions cover all three cases; C++ defers hole interpretation to renderer at _tri.cpp:692-704.",
+          "evidence": {
+            "path": "lib/matplotlib/tests/test_triangulation.py",
+            "start_line": 1377,
+            "end_line": 1403
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-a030935bc12b7aa9dbcb410d",
+      "reference_sha256": "eaaa7e747bb7745a597b4985cf4da8da12b4b6389d2bf9f7ffdf7e41d776bf74",
+      "question_sha256": "fad200aa5d5c9e9304d4dea645adf720e58dad622b4d07960ee547eed8bd5b5f",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Formatter setters accept only Formatter instances",
+          "verdict": "contradicted",
+          "reason": "Strings become StrMethodFormatter and non-TickHelper callables become FuncFormatter.",
+          "evidence": {
+            "path": "lib/matplotlib/axis.py",
+            "start_line": 1949,
+            "end_line": 1958
+          }
+        }
+      ],
+      "material_errors": [
+        "Overstates accepted API types; strings and callables are deliberately supported."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "Axis._set_formatter converts strings to StrMethodFormatter and callable objects other than TickHelper instances to FuncFormatter, then validates other inputs as Formatter (lib/matplotlib/axis.py:1949-1958). Excluding other TickHelper callables specifically prevents a Locator from slipping through as a formatter. Locator setters enforce Locator types. This separates responsibilities while retaining the supported string/callable formatter convenience API."
+    },
+    {
+      "task_id": "import-a0f7771e25a4b68fc3a6a2b6",
+      "reference_sha256": "e9ce07b48eddf16b069ad635306e083708f3472fe1e12ea5ddea16547cbf1611",
+      "question_sha256": "c3f92266163bb9f134b6fce7c1d45acfb92904f7712270038a465ba2645f96d6",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Center property dynamically transforms data coordinates",
+          "verdict": "supported",
+          "reason": "Setter retains data and property getter uses ax.transData.transform.",
+          "evidence": {
+            "path": "galleries/examples/text_labels_and_annotations/angle_annotation.py",
+            "start_line": 148,
+            "end_line": 170
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-a322ec379eb5deb49b538467",
+      "reference_sha256": "7fbeb7f1024fc282735d620b8b6e44fa9dfcf6d73a5c1d565a524a48b875c88d",
+      "question_sha256": "dae977dddc885304c3e77cf03ad74d54faebd88da05f24b80646a5f2dcb86f7d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "SVG glyph coordinates scaled to integral FreeType units and inverse transform",
+          "verdict": "supported",
+          "reason": "Comment documents integral-unit purpose and exact reciprocal scales preserve visual dimensions; broader fidelity language is rationale rather than measured guarantee.",
+          "evidence": {
+            "path": "lib/matplotlib/backends/backend_svg.py",
+            "start_line": 1024,
+            "end_line": 1035
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-a42f31c1342a9ba178a03431",
+      "reference_sha256": "c5a0bab416e8bd61dbd6f90834f6fe14070115d63ffd035b30d5f050ff17970b",
+      "question_sha256": "b80888a87ce887d36d79c476418094e6202bf7c48e2b0b952576fbdd5fb9ae5b",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Unset engine capability raises NotImplementedError",
+          "verdict": "supported",
+          "reason": "Both properties explicitly reject None.",
+          "evidence": {
+            "path": "lib/matplotlib/layout_engine.py",
+            "start_line": 64,
+            "end_line": 95
+          }
+        },
+        {
+          "claim": "Compatibility exception allows invalid switch or leaves inconsistent engine",
+          "verdict": "unsupported",
+          "reason": "Reads values and compatibility before assignment; failure aborts rather than permits switch.",
+          "evidence": {
+            "path": "lib/matplotlib/figure.py",
+            "start_line": 2724,
+            "end_line": 2738
+          }
+        }
+      ],
+      "material_errors": [
+        "Speculates that failing compatibility check permits incompatible switch; no evidence of inconsistent engine assignment."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "Leaving either LayoutEngine capability as None makes its corresponding property raise NotImplementedError (lib/matplotlib/layout_engine.py:64-95). Callers needing those properties, such as colorbar selection, subplot adjustment and engine compatibility checks, consequently abort unless they catch the error. set_layout_engine(\"none\") reads both properties while constructing its placeholder, and compatibility checks read colorbar_gridspec before switching (lib/matplotlib/figure.py:2659-2676,2724-2738). This is a fail-fast subclass contract, not evidence that an incompatible switch succeeds."
+    },
+    {
+      "task_id": "import-a4f671a8d170db8bd6760b6e",
+      "reference_sha256": "6836971ade254022c880885f1f4e8c426964bbe36a495b56c993c86b13e96a49",
+      "question_sha256": "57be125c0b0029ab2dc2a08b44b9df792b8cda8a55cd4cde9a3b9f63440dca91",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Font setter synchronizes font_class for standard styles",
+          "verdict": "supported",
+          "reason": "rm/it/bf/bfit set both; other font names change only _font.",
+          "evidence": {
+            "path": "lib/matplotlib/_mathtext.py",
+            "start_line": 1766,
+            "end_line": 1774
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-af0ae4ee30f11b34dfeebcd3",
+      "reference_sha256": "4c95a2728255ce8eff316c0be1dd04c592639a61fb75b2c834c9a37b0d1b342f",
+      "question_sha256": "f73cb1aeeaf6119918e623f64eb12753706d82c8cc3f2c656afc6ca30fadd54b",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Try-except is measured significant rendering bottleneck",
+          "verdict": "unsupported",
+          "reason": "Only delegation and AttributeError fallback shown; no benchmark or interpreter-independent setup overhead evidence.",
+          "evidence": {
+            "path": "lib/matplotlib/colorizer.py",
+            "start_line": 393,
+            "end_line": 397
+          }
+        }
+      ],
+      "material_errors": [
+        "Unproven hot-path significance; no proposed optimization actually supplied."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "get_alpha delegates to super().get_alpha() and returns 1 if AttributeError is raised (lib/matplotlib/colorizer.py:393-397). The code alone does not establish a significant rendering bottleneck. Profile the actual hierarchy and Python version before changing it. Any optimization must preserve AttributeError fallback from both method lookup and execution; simply replacing the try block with an existence check can change that behavior. Without measured evidence, retaining this small fallback is the source-supported choice."
+    },
+    {
+      "task_id": "import-bd12b4bba6477ccf397da3df",
+      "reference_sha256": "c041fa2cca3142f874e059632c2efe51505463df0dfda7cc485343b2a6110eed",
+      "question_sha256": "ea3ff184818321085267e5d7a8f31c8db944bb6e1deab69060345c72c64772f5",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "NonAffineForTest defined in test_transforms.py",
+          "verdict": "supported",
+          "reason": "Wrapper class and three setup instantiations match.",
+          "evidence": {
+            "path": "lib/matplotlib/tests/test_transforms.py",
+            "start_line": 579,
+            "end_line": 613
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-c083e2386ac62f7220b91ad0",
+      "reference_sha256": "af3df2d946b7f44c83118bc3ba095273c79a0c1d5176227d06390e3e3a020ad0",
+      "question_sha256": "8c2f378bb26a9bd77a744f5891842392adf5c20db74459f60b1c700f5fe06614",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Grid labels stored in lon_labels/lat_labels",
+          "verdict": "contradicted",
+          "reason": "Labels are per-tick label entries inside lon/lat ticks side lists.",
+          "evidence": {
+            "path": "lib/mpl_toolkits/axisartist/grid_finder.py",
+            "start_line": 201,
+            "end_line": 221
+          }
+        }
+      ],
+      "material_errors": [
+        "Incorrect grid schema key names."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "FixedAxisArtistHelper.get_tick_iterators reads _grid_info[\"lon\" or \"lat\"][\"ticks\"][side], then yields each tick\u2019s loc and label (lib/mpl_toolkits/axisartist/grid_helper_curvelinear.py:115-134). GridFinder creates those nested dictionaries and attaches labels directly to ticks (lib/mpl_toolkits/axisartist/grid_finder.py:201-221). AxisArtist consumes the yielded data to set tick locations/angles and label locations/text (lib/mpl_toolkits/axisartist/axis_artist.py:937-948). Changing this shared schema therefore requires coordinated updates or can change displayed ticks or raise missing-key/type errors."
+    },
+    {
+      "task_id": "import-caef4a7fc0ec85d7abd2326f",
+      "reference_sha256": "6c9cdb42282d850bed3abb4de1ba6eb88f78253a772b5d1f5a0c60ed21bb241c",
+      "question_sha256": "08a274c0b23b95628cb5036a2afa017cec667084699f2768e2a2fd903d4ca8b5",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "DejaVuSerif fallback is StixFonts via UnicodeFonts lookup",
+          "verdict": "supported",
+          "reason": "Initializer picks StixFonts for serif; DejaVu lookup delegates to parent.",
+          "evidence": {
+            "path": "lib/matplotlib/_mathtext.py",
+            "start_line": 675,
+            "end_line": 710
+          }
+        },
+        {
+          "claim": "Missing glyph invokes configured fallback",
+          "verdict": "supported",
+          "reason": "Checks char index and falls back when not found.",
+          "evidence": {
+            "path": "lib/matplotlib/_mathtext.py",
+            "start_line": 627,
+            "end_line": 644
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-083.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/ethereum--web3.py-305b3c30812f",
+      "original_reference_sha256": "bdb2243d99ef7a733d286a7ddb0701522ab6adef7cfc18e5d8ce6fdb6babd260",
+      "question": "What architecture does web3.py use to implement EIP-712 typed data signing with domain separator validation for authentication message standards?",
+      "question_sha256": "c33b82ed27e37ca0b303df2f65c57dde13077e2637a5f48b4fbb0af053f84701",
+      "reference_answer": "Web3 exposes an eth_account Account instance through BaseEth.account (web3/eth/base_eth.py:12,48-55), so local account functionality is delegated to that dependency. The repository also exposes the eth_signTypedData RPC route; its documentation warns about client support at this revision (docs/web3.eth.rst:929-933). This establishes the delegation boundary, but domain-separator validation details belong to eth-account and cannot be inferred solely from this Account assignment or typed-message test fixtures.",
+      "reference_sha256": "0fdd5702467396eca2710d611f8cee8a09d50ad215b8d88a232b1fc9106560ff",
+      "repository": {
+        "commit": "305b3c30812f516dce33537ec054a9c6c64a3603",
+        "family_id": "ethereum/web3.py",
+        "url": "https://github.com/ethereum/web3.py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/ethereum--web3.py-305b3c30812f516dce33537ec054a9c6c64a3603",
+      "source_inventory_mode": "git_objects_primary",
+      "source_scope": "Primary repository regular Git blobs only; symbolic links are target metadata and submodules are unavailable pinned metadata. No repository execution.",
+      "task_id": "import-f148ffd42684f22f2be2db0d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/ethereum--web3.py-305b3c30812f",
+      "original_reference_sha256": "a7b642610e6340af422c38314830bb6c566857bd27da06d8cc5cf2c79e54e393",
+      "question": "Why does the AsyncHTTPProvider's middleware pipeline architecture create performance bottlenecks under high-concurrency request loads?",
+      "question_sha256": "300de762088e21bed6e61b837a6f9b0ca5a9ceb6fec121404e2b7b0f6a92d7bc",
+      "reference_answer": "The premise is not established. async_combine_middlewares constructs a nested callable chain (web3/middleware/__init__.py:110-124); ordered processing within a request does not serialize separate coroutines. Optional async cache middleware awaits the network request before locking only the cache update (web3/middleware/async_cache.py:60-88). Async retry awaits make_request and sleeps a fixed backoff_factor between eligible retries, allowing the event loop to run other tasks (web3/middleware/exception_retry_request.py:147-160). Middleware work, lock contention and retries can add costs, but throughput bottlenecks require profiling. AutoProvider discovery is a separate provider path, not an inherent AsyncHTTPProvider stage.",
+      "reference_sha256": "a01da73a647afe6018d88be4530ba17cc121d88aa8bbb006197e0c16ec8c41e4",
+      "repository": {
+        "commit": "305b3c30812f516dce33537ec054a9c6c64a3603",
+        "family_id": "ethereum/web3.py",
+        "url": "https://github.com/ethereum/web3.py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/ethereum--web3.py-305b3c30812f516dce33537ec054a9c6c64a3603",
+      "source_inventory_mode": "git_objects_primary",
+      "source_scope": "Primary repository regular Git blobs only; symbolic links are target metadata and submodules are unavailable pinned metadata. No repository execution.",
+      "task_id": "import-086985ef9320324683f46757"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/ethereum--web3.py-305b3c30812f",
+      "original_reference_sha256": "73ef78779f10c2204d47162a8f868e634a7bdbbbe1528468f1086a7d91b9c2a3",
+      "question": "Why does web3.py implement a tiered dependency pinning strategy with both minimal and upper bounds for core dependencies like hexbytes, websockets, and lru-dict while using exact pinning for development tools?",
+      "question_sha256": "fefb9568cf9096741e2b9e061be973d12166ff25a0a35f1be77fb04ca4e69a2a",
+      "reference_answer": "At this revision hexbytes>=0.1.0, lru-dict>=1.1.6 and websockets>=10.0.0 have lower bounds without upper bounds (setup.py:70-86). Development dependencies mix policies: flake8 and types-protobuf are exact pins, while black, isort, mypy and many others have lower bounds; towncrier has a range (12-42). Exact pins constrain selected versions while lower bounds permit newer releases, but these declarations do not document why each bound was selected or ensure reproducibility of the whole environment. The release note records removal of GPL pylru and qualified MIT compliance (docs/releases.rst:3000), not a general pinning policy.",
+      "reference_sha256": "ac311bbe2b292d5fc355785ca6358592644ebf5e46985a228862e284c25f90f4",
+      "repository": {
+        "commit": "305b3c30812f516dce33537ec054a9c6c64a3603",
+        "family_id": "ethereum/web3.py",
+        "url": "https://github.com/ethereum/web3.py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/ethereum--web3.py-305b3c30812f516dce33537ec054a9c6c64a3603",
+      "source_inventory_mode": "git_objects_primary",
+      "source_scope": "Primary repository regular Git blobs only; symbolic links are target metadata and submodules are unavailable pinned metadata. No repository execution.",
+      "task_id": "import-bbb612bb21eac73528cb7405"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/ethereum--web3.py-305b3c30812f",
+      "original_reference_sha256": "3cbf3ef15dcef54e67156628f2aaf8597f3e25cd546b7a854f1395229b7126bb",
+      "question": "Where is the AF_UNIX socket path validation logic implemented that generates 'AF_UNIX path too long' errors in the IPC provider system?",
+      "question_sha256": "b6a173a4daae62a47b741bbbbb1fb0615a84bfa6eb99813f166d543b6fcc7231",
+      "reference_answer": "The relevant Web3 call site is get_ipc_socket in web3/providers/ipc.py:35-47: on non-Windows systems it creates an AF_UNIX socket and calls sock.connect(ipc_path). There is no explicit path-length check there. The validation/error comes from the underlying socket implementation; this repository does not establish which runtime layer produces the message or a portable maximum path length. Windows uses NamedPipe instead.",
+      "reference_sha256": "67b7037d06bbc8386c0949983f962bac505c564f434b5e09f72716df0c05b04b",
+      "repository": {
+        "commit": "305b3c30812f516dce33537ec054a9c6c64a3603",
+        "family_id": "ethereum/web3.py",
+        "url": "https://github.com/ethereum/web3.py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/ethereum--web3.py-305b3c30812f516dce33537ec054a9c6c64a3603",
+      "source_inventory_mode": "git_objects_primary",
+      "source_scope": "Primary repository regular Git blobs only; symbolic links are target metadata and submodules are unavailable pinned metadata. No repository execution.",
+      "task_id": "import-02c6c5cc4b784ea0532e687c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/ethereum--web3.py-305b3c30812f",
+      "original_reference_sha256": "0d4abca5b717277a54a9d48f19413f0aec859fbbb7531ed418a71467a9450ffa",
+      "question": "Where does the authentication credential flow integrate with the retry middleware system when connecting to cloud blockchain providers like AWS Managed Blockchain?",
+      "question_sha256": "5fc8d8eda7c7c61a72136944e92459978461d7950e98e24a00d2eb467b57330a",
+      "reference_answer": "HTTPProvider stores request_kwargs and forwards them on each make_request. get_request_kwargs adds default headers only when callers supplied no headers; it does not merge custom headers with defaults (web3/providers/rpc.py:62,72-92). AsyncHTTPProvider follows the same pattern (web3/providers/async_rpc.py:63,73-93). Retry middleware repeats the wrapped request for eligible methods/errors, so configured request arguments are reused (web3/middleware/exception_retry_request.py:147-160). This is generic HTTP plumbing; these paths do not implement AWS credential discovery, signing, token renewal, or a guarantee that expired credentials remain valid.",
+      "reference_sha256": "8fe0fe3a6c42c6e5c801893985b3c1cbd47bb1e6d083162d6f900ef088ed0c78",
+      "repository": {
+        "commit": "305b3c30812f516dce33537ec054a9c6c64a3603",
+        "family_id": "ethereum/web3.py",
+        "url": "https://github.com/ethereum/web3.py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/ethereum--web3.py-305b3c30812f516dce33537ec054a9c6c64a3603",
+      "source_inventory_mode": "git_objects_primary",
+      "source_scope": "Primary repository regular Git blobs only; symbolic links are target metadata and submodules are unavailable pinned metadata. No repository execution.",
+      "task_id": "import-497e8b0fa73f92992db09da6"
+    }
+  ]
+}

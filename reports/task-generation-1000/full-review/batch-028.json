@@ -1,0 +1,218 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-03a0a982ac26306b5232df42",
+      "reference_sha256": "19aee95461551dd078bd75259cf56591a7108d37a2f549f324fbd7d980c11232",
+      "question_sha256": "5ea91045b3f45eb0994e34d2a442f0a705af5c31121276197ee3e331c0d77097",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "TOC parser trims wrapper and builds hierarchy using parent stack",
+          "verdict": "supported",
+          "reason": "Per-line parser extracts anchor; ul boundaries push/pop; first root active.",
+          "evidence": {
+            "path": "mkdocs/toc.py",
+            "start_line": 79,
+            "end_line": 113
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-305c458fcdca03858feccc88",
+      "reference_sha256": "b0fc23bc28ba9706cf44234cb63f4d5c3f6e5474c07191b7df365faa3dd8cbae",
+      "question_sha256": "adfe1ab8114dc85c173ebc23a8d2c98a3a6a35735458e489b57b74c737c279dd",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Navigation traversal quadratic in supported depth",
+          "verdict": "contradicted",
+          "reason": "Only zero/one ancestor created; arbitrary depth-five example is unsupported and O(n*d) is not necessarily quadratic.",
+          "evidence": {
+            "path": "mkdocs/nav.py",
+            "start_line": 226,
+            "end_line": 241
+          }
+        }
+      ],
+      "material_errors": [
+        "Confuses supported two-level structural limitation with arbitrary-depth quadratic scaling."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "The pinned navigation generator creates top-level pages or headers with direct page children and rejects configuration entries beyond its supported tuple lengths (mkdocs/nav.py:197-241). walk_pages follows next_page once per page and updates active/context state (44-64). With the generated structure\u2019s bounded ancestor depth, this is linear in page count for those operations. Deep hierarchy support is a structural limitation here; the source does not demonstrate quadratic traversal or measured rendering failure."
+    },
+    {
+      "task_id": "import-541ca7fd1b492e9f5907fdd9",
+      "reference_sha256": "eead85f11bb001e0abf6edb7e71ae9fea26a7bb4e61b0545a79de05618f757bd",
+      "question_sha256": "cea7612c66aa468bcac25598a48f48f045e9d103e31afe462741f4b137d820b9",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Configuration performs unconditional full directory discovery",
+          "verdict": "supported",
+          "reason": "Always walks docs_dir and sorts filenames; uses collected values only when config values absent.",
+          "evidence": {
+            "path": "mkdocs/config.py",
+            "start_line": 113,
+            "end_line": 142
+          }
+        },
+        {
+          "claim": "Linear cost proves enterprise sites unsuitable",
+          "verdict": "unsupported",
+          "reason": "No workload measurements justify suitability claim; sort costs are omitted from simplistic complexity.",
+          "evidence": {
+            "path": "mkdocs/config.py",
+            "start_line": 119,
+            "end_line": 142
+          }
+        }
+      ],
+      "material_errors": [
+        "Unmeasured performance/general suitability conclusion."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "validate_config walks docs_dir and sorts each directory\u2019s filenames even when pages/extra_css/extra_javascript are already supplied; discovered lists are only assigned for None values (mkdocs/config.py:113-142). This repeated filesystem and filename-processing work can grow with site size and is a candidate for optimization. The code does not establish a measured bottleneck or a general maximum usable site size."
+    },
+    {
+      "task_id": "import-591d83ece1e38a84e346bc6b",
+      "reference_sha256": "60088608f41aa07d1bc06bca715ff141943c21bd21f71844dfe16b0bb628cebd",
+      "question_sha256": "aa3bc4886785418c931d34fe679784eff42cdc0e09678e133bd42e50eab35bab",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Setup conditionally constrains Markdown on Python 2.6",
+          "verdict": "supported",
+          "reason": "PY26 selects >=2.3.1,<2.5; other versions use >=2.3.1. requirements.txt:3 differs; compatibility wrappers are Python compatibility rather than guaranteed Markdown API adaptation.",
+          "evidence": {
+            "path": "setup.py",
+            "start_line": 8,
+            "end_line": 24
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-897afbb814dd1dee6c1ae1ed",
+      "reference_sha256": "66ae8d42112246d81397af5ee234f22b51a58b574b036df7867859116d89b13b",
+      "question_sha256": "e8d94c33264c27c608292cf04fa3368d49ec6288c20ed4afa6c5edb52d77ed7d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Build reads UTF-8, processes text and encodes output UTF-8",
+          "verdict": "supported",
+          "reason": "Explicit input decode, conversion, template render and final JSON/HTML encoding support pipeline.",
+          "evidence": {
+            "path": "mkdocs/build.py",
+            "start_line": 161,
+            "end_line": 202
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-93d76cc7835d29839157f2fb",
+      "reference_sha256": "edba427dc3348872aa86d8a0897a945fff289a00857e4ec73a5f8b8b2be8ab8e",
+      "question_sha256": "b594a852f63511bdd37b0b6787968822dcf96115e2a4a6696e541387fe94d11f",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Setup requirements override incompatible tox requirements",
+          "verdict": "unsupported",
+          "reason": "All testenvs include requirements.txt, whose Markdown>=2.5 conflicts with py26 setup bound. No precedence escape is configured.",
+          "evidence": {
+            "path": "tox.ini",
+            "start_line": 7,
+            "end_line": 13
+          }
+        }
+      ],
+      "material_errors": [
+        "Invented dependency-resolution priority reconciles mutually incompatible constraints."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "setup.py selects Markdown>=2.3.1,<2.5 on Python 2.6 and >=2.3.1 otherwise (setup.py:10-23). requirements.txt requires Markdown>=2.5, and tox includes that file for its test environments, including py26 (tox.ini:2-12). These constraints conflict for Python 2.6; the repository does not show a rule making setup.py automatically override or ignore requirements.txt. They should not be described as a reliably coordinated dual-constraint solution."
+    },
+    {
+      "task_id": "import-b986885d44dc9d7c66e6b565",
+      "reference_sha256": "a5e14ab254bfc845d318f382e9b061b114856a8c0172a804386a1f3fb8177dcf",
+      "question_sha256": "9fc4a706a20f0617a0f75be026a29dcf326c4150f7e7c1597bf68b84698ba3a9",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Centralizing path functions necessarily creates circular dependencies",
+          "verdict": "unsupported",
+          "reason": "Function receives nav as argument, so dependency need does not establish unavoidable import cycle.",
+          "evidence": {
+            "path": "mkdocs/relative_path_ext.py",
+            "start_line": 54,
+            "end_line": 88
+          }
+        }
+      ],
+      "material_errors": [
+        "Architectural inevitability and startup-only validation unsupported."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "Path handling is divided by responsibility: config.py checks docs/site directory relationships (104-111), utils.normalise_path converts NT separators to POSIX form (219-227), and relative_path_ext.path_to_url uses supplied navigation context to validate and rewrite content links (54-88). This explains the current separation of concerns. It does not prove centralization would necessarily create circular imports; passing context explicitly remains possible."
+    },
+    {
+      "task_id": "import-d0e69c6074e453b163cf664c",
+      "reference_sha256": "dbf34d454537397f4c392fca1f5f02951e1c8096a2c747fc959299f0cca02975",
+      "question_sha256": "ffa87a1c74f55e14dcd363271860e7f9563a570c482082b4bb38aa8e076b8f9a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "URLContext and traversal produce relative theme links",
+          "verdict": "supported",
+          "reason": "Current page resets base path; make_relative handles root and suffix using relpath. Global context sets base/home URLs at build.py:84-85.",
+          "evidence": {
+            "path": "mkdocs/nav.py",
+            "start_line": 44,
+            "end_line": 104
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-e4267054871c6c8986c42411",
+      "reference_sha256": "c225a2343caf961eec6407e3bf5dcfdd43cc557448d8730b8275659bdea777a7",
+      "question_sha256": "e1d0ffd14872e848574b4544bc86bc672c962ddb6151e0053ff395cf0b185674",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "JSON context excludes build datetime instead of custom serialization",
+          "verdict": "supported",
+          "reason": "Only content/title/url/language are dumped; global build_date_utc at 98 is omitted.",
+          "evidence": {
+            "path": "mkdocs/build.py",
+            "start_line": 192,
+            "end_line": 202
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

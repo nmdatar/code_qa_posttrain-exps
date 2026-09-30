@@ -1,0 +1,126 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-002.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "original_reference_sha256": "9fee78db747eb668c934ae22568fcf663462988cb9f98132786604b5e97428f1",
+      "question": "What performance overhead does the unit validation decorator in the astropy units module introduce when validating unit equivalence through repeated attribute lookups and method calls in high-frequency function invocations?",
+      "question_sha256": "3b6a2164b9e1fd9c950be747c894b2fc5aee059df009b2b16946fa06babae57b",
+      "reference_answer": "The decorator resolves allowed targets and checks arg.unit.is_equivalent until one matches (astropy/units/decorators.py:27-39,52-70). is_equivalent normalizes equivalencies and resolves the other Unit (astropy/units/core.py:984-1003). These are per-call operations, but physical type IDs are cached (astropy/units/core.py:675-684); the source does not establish a numeric overhead or an expensive decomposition on every invocation. Registry copying is avoided when equivalencies are empty (astropy/units/decorators.py:307-313).",
+      "reference_sha256": "070ee40b48d6cbeb4896506a92b7108ea907b98d2bdf70bc9568de53990cfaf2",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-5081c7a07cb61102da8ceaa2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "original_reference_sha256": "9ee818ed20787c26e576f1fe4364d2a08b7ec119020d11e8bb2dbd15e9efe308",
+      "question": "Why does the test class that performs binary serialization roundtrips in the VOTable test suite incur performance overhead from repeatedly creating new in-memory binary stream objects during conversions between XML and binary representations of astronomical table data?",
+      "question_sha256": "63675c3cec768c04e8cf2441a7740f33888cb366b0569c61dd0d6a97de10ee63",
+      "reference_answer": "Each binary table serialization allocates a BytesIO, appends converter output, and base64-encodes its complete contents (astropy/io/votable/tree.py:3460-3495). The test setups additionally create an output BytesIO and parse it after serialization, and test_null_integer_binary serializes again (astropy/io/votable/tests/test_vo.py:748-805). This entails buffer allocation and encoding work, but these sources do not measure the cost or establish that constructing BytesIO dominates it; class setup is not run once per inherited test.",
+      "reference_sha256": "aca34ff1140e9781abcc22e53ffaecb4f710dccfa758e4018be58c164df42c4b",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-51908f53409ef8e2456cb935"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "original_reference_sha256": "748bab21d20924333ccb933af7e8c27cb27411bdfbb38b70cc331a76e3438bcc",
+      "question": "How does the class-level initialization method in the test class that validates remote URL functionality for leap second data manipulate the Earth rotation and reference systems service configuration to prevent the bundled IERS-B Earth orientation data table from loading during test execution?",
+      "question_sha256": "f5a1d35e2515e7ea574ecbab4f5ac8de16ef081cecbb42d6898d245bef6ff576",
+      "reference_answer": "TestRemoteURLs.setup_class sets iers.conf.auto_download = True, with a comment that this is needed so IERS_B will not be loaded and cause failures; teardown restores False (astropy/utils/iers/tests/test_leap_second.py:206-214). This describes the test configuration change, not a general guarantee that IERS-B can never load: IERS_Auto._substitute_iers_b explicitly calls IERS_B.open (astropy/utils/iers/iers.py:960-968).",
+      "reference_sha256": "06580645d8eebb3ef09e0b1d7c9371feed9fde885fcbdb16ec74108406ca9b2b",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-58cadb2010d3a9d51b537cf3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "original_reference_sha256": "3da1c1cb7b1614582b0c36d61fdd36c4d4f96cb386b90cb10e302aaf383337ba",
+      "question": "Why does the function that validates unified content descriptor strings enforce stricter standard compliance when the configuration flag for VOTable version 1.2 or later is enabled?",
+      "question_sha256": "11790bfd3adfc33ab16190b22b99df36c42e7f9d82be2dbe760c0aefe281bfbd",
+      "reference_answer": "When version_1_1_or_later is enabled, check_ucd passes the version_1_2_or_later flag to controlled-vocabulary and colon parsing options (astropy/io/votable/tree.py:366-378). The parser documents controlled vocabulary as required by VOTable 1.2; for the ivoa namespace it checks primary and secondary word roles. Other namespaces are not checked against that vocabulary (astropy/io/votable/ucd.py:80-87,134-150). Colon support is enabled here, but this does not show that namespaces were introduced in 1.2.",
+      "reference_sha256": "fdc13cd8d5b385860b75ea4903633123eb45258af6441646a8d5f937729067b3",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-610bfed3ebb2260ac674efff"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "original_reference_sha256": "b47abbeed802d3a414fb4726268b124a851dafc5ec421c7a14efd86cb7f7702c",
+      "question": "Why does the time delta format class that represents time intervals as human-readable strings with quantity components use two separate Julian Date components (an integer part and a fractional part) instead of a single floating-point representation?",
+      "question_sha256": "90e0f577005265a172163463f2f26289b1bcaf63cd1a892f12f81c780e368750",
+      "reference_answer": "The two parts retain small fractional contributions alongside large day counts. set_jds separates years/days from hour/minute/second terms and normalizes them using day_frac (astropy/time/formats.py:2424-2428), whose result is an integer and fractional remainder (astropy/time/utils.py:19-27). Multi-component output uses two_sum and its remainder before extracting hours, minutes, and seconds (astropy/time/formats.py:2460-2470). This reduces precision loss; it does not guarantee exactness in every output format, since single-unit output sums the two parts (astropy/time/formats.py:2440-2453).",
+      "reference_sha256": "de2f499157a6412bef550f75924487a15385f6cf3448af1bcbbbc36521864529",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-614e8b37e92c057f02250d82"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "original_reference_sha256": "705b34dff3c1746db25d5be972efb69540918b131c257e4bb5d55883f0a6f8d4",
+      "question": "How does the converter class for single-precision complex VOTable datatypes use its numpy dtype format string attribute to convert complex values to bytes for binary format serialization?",
+      "question_sha256": "53fdcc492039b904e49711ef506e02c44a57723150491d47e3efec9d713b15bc",
+      "reference_answer": "FloatComplex declares format=\"c8\", a pair of single-precision components (astropy/io/votable/converters.py:1097-1103). Numeric initialization derives an 8-byte size and >c8 binary-read dtype (astropy/io/votable/converters.py:706-720). The inherited binoutput returns null bytes for a mask; otherwise it ensures big-endian byte order and calls value.tobytes() (astropy/io/votable/converters.py:823-828). It relies on the incoming NumPy value having the appropriate dtype; binoutput does not itself cast through self.format.",
+      "reference_sha256": "d30e6352d6e40145a4f74992fc9441f45c99ddd935a68045641449d75a853aab",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-661d7757d93ae62508d09dd2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "original_reference_sha256": "8a5b0ec67337e0a805e3d6b01ab9331e0a996a97d0c029f5e0e27cd88569fe42",
+      "question": "What is the semantic interpretation of the three-dimensional cartesian velocity differential object returned by the function that updates coordinate differentials to match a velocity reference while preserving spatial position when the parameter controlling whether the result remains in the original coordinate frame is False?",
+      "question_sha256": "53560869ffcdde532cd5f4467dcea78e9dc9403de8ed0942f140534f33e43ced",
+      "reference_answer": "The function returns a coordinate frame, not a bare CartesianDifferential. It transforms both inputs to ICRS, attaches the reference Cartesian differentials to the original ICRS position, then transforms that coordinate to velocity_reference when preserve_observer_frame is False. The returned frame uses CartesianRepresentation and CartesianDifferential (astropy/coordinates/spectral_coordinate.py:103-124). Its differential describes motion co-moving with the reference while retaining the original spatial location (astropy/coordinates/spectral_coordinate.py:80-87).",
+      "reference_sha256": "69c17c1e9ffb964dd0ea2b1f7b8d8da82393b091bdcfc53feebb66a6fbd45c88",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-6af0b4540b3975856c3368f8"
+    }
+  ]
+}

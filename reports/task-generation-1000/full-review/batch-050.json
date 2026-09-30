@@ -1,0 +1,274 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-5761caea32fe6ff2d4b8eec2",
+      "reference_sha256": "2afb81d827cc507c0c8e57b879a9a4dff4c33122d2af1fd7596341bdb69ab2eb",
+      "question_sha256": "a3971f92aca6324dc2aa9c74c01013d8c93ab06f991564d1e447f4b29126ffab",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "At-file parser reads collection targets",
+          "verdict": "supported",
+          "reason": "Writes newline-separated paths and confirms exact list after @file parse; argparser437 enables standard mechanism.",
+          "evidence": {
+            "path": "testing/test_parseopt.py",
+            "start_line": 134,
+            "end_line": 139
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-6127bc260aa18c1e7d49ab9f",
+      "reference_sha256": "2cf144bf075020ae27aa47ee87b9dec09c17637703adc5b00777653e717935ea",
+      "question_sha256": "a7b77622f4e39d1f6fbf5d67daa3efc25cd7b2638017ff1ac9ca1422ec548372",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Register helper before import for assertion rewrite",
+          "verdict": "supported",
+          "reason": "Package init registers helper before plugin imports it; design distinction is dependency module not automatically selected for rewriting.",
+          "evidence": {
+            "path": "testing/test_assertion.py",
+            "start_line": 328,
+            "end_line": 341
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-62815b023043da7f92e71091",
+      "reference_sha256": "3922b10802fdc2be2f3d47137109345820b7a32a8848e69dc36dbf7c54017b6f",
+      "question_sha256": "c5a7f80224eab6ca22ec28ffa4b19a9644f9b064b80f3da3300eca873ed8bce3",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Pytester item creation precedes mark evaluation",
+          "verdict": "supported",
+          "reason": "getitem collects and returns requested item; skipping168-193 reads marks and setup243-246 executes skip.",
+          "evidence": {
+            "path": "src/_pytest/pytester.py",
+            "start_line": 1254,
+            "end_line": 1274
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-631d2eff63731114bc8fbe2a",
+      "reference_sha256": "e04395861252d587afbe38baab5dd2b153132a9f2a192833830807b09739f3c9",
+      "question_sha256": "7805600e33a6a76e7d37b90c31e3390ee2994e10aa7fe39fb78440c8da3de454",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "hasmarkup bound in test",
+          "verdict": "supported",
+          "reason": "Assignment True precedes bold output and ANSI assertions.",
+          "evidence": {
+            "path": "testing/io/test_terminalwriter.py",
+            "start_line": 158,
+            "end_line": 167
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-6eb252a9807d12bd2e517e08",
+      "reference_sha256": "3d1b681cda7740b737ad55da3dcf10260cf4844b6eba3aa51a675fe1078d6825",
+      "question_sha256": "42f173496e5d17a52282cba4df95600fdfef2029bd88bf7603ec3bc246843687",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Early rewrite bailout gates spec lookup",
+          "verdict": "supported",
+          "reason": "Initial basename mutation forces continued lookup, with filename patterns and explicit marks also able to prevent bailout; find_spec100-105 gates call.",
+          "evidence": {
+            "path": "src/_pytest/assertion/rewrite.py",
+            "start_line": 196,
+            "end_line": 225
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-6feca8b1665f61ec6f045bdd",
+      "reference_sha256": "cb4138457048673e5c2b6b37f2dcd199582f76d6bcc12bb16900875f5acf9e2b",
+      "question_sha256": "759f33092110c8b43093ffb3a77d863f1ab545f87f4631b3de25086f4373d82b",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Import caching guarantees identity across path changes",
+          "verdict": "partially_supported",
+          "reason": "Cache lookup is name-based, not physical-file global identity; different resolution names may import same file twice. Prepend/append mismatch has documented skips.",
+          "evidence": {
+            "path": "src/_pytest/pathlib.py",
+            "start_line": 535,
+            "end_line": 566
+          }
+        }
+      ],
+      "material_errors": [
+        "Cache lookup is name-based, not physical-file global identity; different resolution names may import same file twice. Prepend/append mismatch has documented skips."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "importlib mode first resolves a package name and checks sys.modules, attempts a spec import, then falls back to a path-derived name with another cache check (src/_pytest/pathlib.py:535-566). It does not scan cached modules by physical path, so changed name resolution can produce separate module objects. prepend/append modes adjust sys.path, import by name, and generally compare __file__ to the requested path; __init__.py returns early and PY_IGNORE_IMPORTMISMATCH=1 disables the check (src/_pytest/pathlib.py:568-612). Repeated identical names reuse the cache; arbitrary sys.path changes do not guarantee physical-file identity."
+    },
+    {
+      "task_id": "import-7284ea763c016c3c59a0002e",
+      "reference_sha256": "91429dd6b59a34593b805c2582495e3cd38f3883d6616ed913741823381a206a",
+      "question_sha256": "ce8c77f03f3cc031921b191e07d7de7703569c389f0c50873fdba38d85a16c56",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Internal error line splitting and single-line optimization",
+          "verdict": "partially_supported",
+          "reason": "Current formatting accurately explained but requested single-line alternative omitted.",
+          "evidence": {
+            "path": "src/_pytest/terminal.py",
+            "start_line": 560,
+            "end_line": 563
+          }
+        }
+      ],
+      "material_errors": [
+        "Current formatting accurately explained but requested single-line alternative omitted."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "pytest_internalerror converts excrepr to text, splits on newline, and prefixes every resulting line with INTERNALERROR> before write_line (src/_pytest/terminal.py:560-563). If the representation were guaranteed to contain no newline, it could instead call self.write_line('INTERNALERROR> ' + str(excrepr)) once and return True, eliminating split and iteration. Keep the loop for the actual potentially multiline representation; no meaningful performance gain is established."
+    },
+    {
+      "task_id": "import-744fe693da73e6ef247fa831",
+      "reference_sha256": "3623e6c8777ec048ea34e089369dd7246623056543e8bdebecca8f20bf7a4380",
+      "question_sha256": "4f8e0197c39f152deae533b8aa2f7883b135135a29deade61a01b02fd87266ff",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Failed expired-lock unlink returns True",
+          "verdict": "unsupported",
+          "reason": "Return True is inside suppress block after unlink, so suppressed unlink failure falls through to False; status failure returns before unlink, not simultaneous execution.",
+          "evidence": {
+            "path": "src/_pytest/pathlib.py",
+            "start_line": 310,
+            "end_line": 335
+          }
+        }
+      ],
+      "material_errors": [
+        "Return True is inside suppress block after unlink, so suppressed unlink failure falls through to False; status failure returns before unlink, not simultaneous execution."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "ensure_deletable returns False for a symlink, catches OSError from lock.is_file and Exception from lock.stat, and otherwise checks expiration (src/_pytest/pathlib.py:310-327). For an expired lock, unlink and return True are both inside suppress(OSError); if unlink raises, execution skips that return and reaches False (src/_pytest/pathlib.py:328-335). A status-check failure returns early before unlink. This contains expected cleanup races conservatively; it is not an absolute promise that every possible exception is caught."
+    },
+    {
+      "task_id": "import-802ac921f87b8addde5b16f7",
+      "reference_sha256": "14695773e5c6c639164c7b7c2ff37aa94030b9664b4f3ed72eb9af71042edf28",
+      "question_sha256": "0241ce40f59c38dc283f187a90136adb3c9cba771e587a24970deb55fecf5b00",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Skip result separates evaluation and execution",
+          "verdict": "supported",
+          "reason": "Dataclass reason default, skipif condition evaluation and skip construction all visible; setup244-246 raises exception with reason.",
+          "evidence": {
+            "path": "src/_pytest/skipping.py",
+            "start_line": 161,
+            "end_line": 193
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-819acbbe82bad7f50db44ec1",
+      "reference_sha256": "d804119a28482976ed51a129719f6744e0b59390baa143993e4637e5632a3e66",
+      "question_sha256": "50001fdbdfc48b506c96f39dca6677a4192cf9b60c54d33d7bfd05dd0cf0c71b",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Nose marker safe lookup and strict identity",
+          "verdict": "supported",
+          "reason": "safe_getattr already supplies access boundary; keeping isnosetest delegating with is True preserves inherited detection. Additional extraction is proposal not required behavior.",
+          "evidence": {
+            "path": "src/_pytest/python.py",
+            "start_line": 347,
+            "end_line": 373
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-86e86ea76209f61f907f1726",
+      "reference_sha256": "880e270e3f212e5c6dc5bf8623eadd1afac924973e3020088cfce9c6da1a53cc",
+      "question_sha256": "9b898db05fcd5fefc8fc41b0d8feb6da42caa164018e97e8c0261dfe570bbf95",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Legacy path conversion fixture lifecycle",
+          "verdict": "partially_supported",
+          "reason": "Conversion is fixture setup, not outside setup; no exception suppression exists here and wrong-directory isolation impacts require additional hypothetical fallback behavior.",
+          "evidence": {
+            "path": "src/_pytest/legacypath.py",
+            "start_line": 318,
+            "end_line": 320
+          }
+        }
+      ],
+      "material_errors": [
+        "Conversion is fixture setup, not outside setup; no exception suppression exists here and wrong-directory isolation impacts require additional hypothetical fallback behavior."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "tmpdir converts the already supplied tmp_path with legacy_path and returns it (src/_pytest/legacypath.py:318-320). This occurs during tmpdir fixture setup after its dependency is resolved. It changes the path API, not the directory allocated upstream. The code has no silent-failure handler: a conversion exception propagates as setup failure. If a hypothetical converter instead returned an invalid value, consumers could fail, but directory reuse or cross-test interference does not follow automatically; that would depend on additional consumer fallback behavior."
+    },
+    {
+      "task_id": "import-8924de6cee1bd80f03e07152",
+      "reference_sha256": "dd42d0152498242b54286e65f12b466a4b42752887d3b3941c7d8d384037f7d7",
+      "question_sha256": "787f149c428b9cfad93ac3d71106b0fc022cda52dac9317bd959a77dcfa3283a",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Representation fallback always succeeds",
+          "verdict": "partially_supported",
+          "reason": "Fallback itself formats obj and can raise; nested exception formatting is not guarded indefinitely. KeyboardInterrupt/SystemExit intentionally propagate.",
+          "evidence": {
+            "path": "src/_pytest/_io/saferepr.py",
+            "start_line": 7,
+            "end_line": 25
+          }
+        }
+      ],
+      "material_errors": [
+        "Fallback itself formats obj and can raise; nested exception formatting is not guarded indefinitely. KeyboardInterrupt/SystemExit intentionally propagate."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "_try_repr_or_str tries repr and, for ordinary failures, formats a type-named string using the object; control exceptions are reraised (src/_pytest/_io/saferepr.py:7-13). _format_repr_exception catches failure to render the original exception and tries the inner exception under an 'unpresentable exception' label before assembling the placeholder (src/_pytest/_io/saferepr.py:16-25). These layers handle common broken repr/str cases, but do not guarantee success: formatting the inner exception can also fail and is not wrapped in another fallback here."
+    }
+  ]
+}

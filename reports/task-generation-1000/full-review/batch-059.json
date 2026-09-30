@@ -1,0 +1,211 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-b04ae6e1b695f33eeae9e5d2",
+      "reference_sha256": "dc6ab8c9653cd979e92cfe19e334a31657472e1bd87702732218c46e87b8fa78",
+      "question_sha256": "9c67dc9b736beaa92bfea77d555cd4032df516bf3c73bf5b14ba365cda2fe0b8",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Monitor concurrently overwrites restart state before spawn",
+          "verdict": "unsupported",
+          "reason": "Normal monitor calls _poll_monitor synchronously then _sync_states; _poll_monitor invokes synchronous restart before returning. Claimed interleaving is unproven.",
+          "evidence": {
+            "path": "sanic/worker/manager.py",
+            "start_line": 287,
+            "end_line": 295
+          }
+        }
+      ],
+      "material_errors": [
+        "Normal monitor calls _poll_monitor synchronously then _sync_states; _poll_monitor invokes synchronous restart before returning. Claimed interleaving is unproven."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The described race is not demonstrated by the normal control flow. monitor calls _poll_monitor and only afterward _sync_states (sanic/worker/manager.py:287-295); _poll_monitor invokes self.restart synchronously (sanic/worker/manager.py:480-498). WorkerProcess.restart sets RESTARTING, terminates if required, then spawns and starts (sanic/worker/process.py:109-129), while spawn permits IDLE or RESTARTING (sanic/worker/process.py:147-155). An unsupported concurrent caller could require separate investigation, but absence of a lock alone does not establish that the monitor interrupts this sequence or causes stuck workers."
+    },
+    {
+      "task_id": "import-b886dccbfa355d52998c7a80",
+      "reference_sha256": "3932e4ad9ec26fcc27faceab5674ecedf46b86b9dda761e3e428a6bc6447b56f",
+      "question_sha256": "7750fa82024e277eff605f6d4e21f9dd69c8a58bcfdab1a461e2e8f71fdbabfb",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "HTTP header parser builds Request",
+          "verdict": "supported",
+          "reason": "Progressive delimiter search, size check, surrogateescape decoding, method/version parsing, normalized headers, websocket detection and request construction directly present.",
+          "evidence": {
+            "path": "sanic/http/http1.py",
+            "start_line": 178,
+            "end_line": 247
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-bf149121cb76684a05f92945",
+      "reference_sha256": "64404b876d0f1797c3ab906ff72a2970ad0ff6f8881a7a05056c635b014b79f6",
+      "question_sha256": "b7c85276b5a4b708e470c7547592a25f2dc2a97531442474878e01c90536f68f",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Server event dispatch uses trigger_events indirectly",
+          "verdict": "partially_supported",
+          "reason": "App._server_event awaits dispatch, not trigger_events; reference joins distinct event paths.",
+          "evidence": {
+            "path": "sanic/app.py",
+            "start_line": 2432,
+            "end_line": 2459
+          }
+        }
+      ],
+      "material_errors": [
+        "App._server_event awaits dispatch, not trigger_events; reference joins distinct event paths."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "AsyncioServer lifecycle methods delegate to app._server_event (sanic/server/async_server.py:38-52,98-104). That coroutine builds a server signal name and awaits app.dispatch, reversing shutdown handlers (sanic/app.py:2432-2459). The synchronous runner's finally sequence awaits before_stop, invokes optional cleanup, awaits after_stop, then closes resources (sanic/server/runners.py:176-192). WorkerManager manages processes rather than inheriting AsyncioServer. trigger_events is a separate callback helper (sanic/server/events.py:11-35); it is not called by the displayed app._server_event implementation."
+    },
+    {
+      "task_id": "import-bf84144d154c5e33ddafded1",
+      "reference_sha256": "7f4245dcf3f399a17d929a0eb0dbf5874bf2920259151738f6487fb36ddecf19",
+      "question_sha256": "c7158318b262f2073b406d78f0119e19c2be85031cd45d87431815d8c99ced86",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Environment opt-outs superior to dependency groups",
+          "verdict": "partially_supported",
+          "reason": "Opt-out mechanics/platform guards are real, but comparative superiority and WorkerManager performance rationale not evidenced.",
+          "evidence": {
+            "path": "setup.py",
+            "start_line": 151,
+            "end_line": 159
+          }
+        }
+      ],
+      "material_errors": [
+        "Opt-out mechanics/platform guards are real, but comparative superiority and WorkerManager performance rationale not evidenced."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "This pin includes ujson and uvloop as default requirements subject to non-Windows CPython markers (setup.py:97-104). SANIC_NO_UJSON and SANIC_NO_UVLOOP remove them during setup (setup.py:151-159), providing an opt-out from defaults rather than an extras-based opt-in. That supports installations and tests without those extensions. The source establishes this packaging policy, not that environment variables are universally more transparent or that WorkerManager specifically gains measured performance from them."
+    },
+    {
+      "task_id": "import-dae5c3bd405e1e44920c9dcf",
+      "reference_sha256": "4595a3b3dfdd08191d8422c03d5084d2e63f3e9d7b204c1dfe41f92faff30ea7",
+      "question_sha256": "1f5a41a73baa293aea01ae94808c88b960b86dcaf7997a7043bd864342355306",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Static mixins form a diamond",
+          "verdict": "partially_supported",
+          "reason": "StaticHandleMixin does not inherit StaticMixin/BaseMixin; shared metaclass is not a diamond inheritance edge.",
+          "evidence": {
+            "path": "sanic/mixins/static.py",
+            "start_line": 167,
+            "end_line": 169
+          }
+        }
+      ],
+      "material_errors": [
+        "StaticHandleMixin does not inherit StaticMixin/BaseMixin; shared metaclass is not a diamond inheritance edge."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "StaticMixin inherits BaseMixin and defines public static registration plus an unimplemented _apply_static hook (sanic/mixins/static.py:24-32). StaticHandleMixin separately implements that hook by calling _register_static (sanic/mixins/static.py:167-174). BaseSanic includes StaticMixin (sanic/base/root.py:18-26), and Sanic lists StaticHandleMixin before BaseSanic (sanic/app.py:116-122), so MRO selects the concrete hook. This is mixin composition and hook specialization; the two static mixins do not themselves form the claimed diamond."
+    },
+    {
+      "task_id": "import-dcdbb224d447895f2675826d",
+      "reference_sha256": "8ddc4ca903132676217f87d628331462a9f1b16d0cdc6d78a23ddef44e518646",
+      "question_sha256": "a2f229aeaa378624156185ef7606512a38b0a1daf4b813f29e8f0409a1f00c13",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Page CSS responsive implementation",
+          "verdict": "supported",
+          "reason": "Viewport query scales rem base and padding; CSS metaclass9-35 loads and combines styles through MRO.",
+          "evidence": {
+            "path": "sanic/pages/styles/BasePage.css",
+            "start_line": 60,
+            "end_line": 69
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-e316bff6ecfed59956cf0f6c",
+      "reference_sha256": "4b23ca0bdc62f8429616a46f9bba807888c662bfbd3d75c7b1ead0c3029b460a",
+      "question_sha256": "505123562138445ac50335be0fad7c697a35d646370a7214836b974ecc5439e0",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Protected decorator executes as request middleware",
+          "verdict": "partially_supported",
+          "reason": "Example is a handler wrapper, not registered request middleware or built-in coordinated JWT validation.",
+          "evidence": {
+            "path": "guide/content/en/guide/how-to/authentication.md",
+            "start_line": 49,
+            "end_line": 76
+          }
+        }
+      ],
+      "material_errors": [
+        "Example is a handler wrapper, not registered request middleware or built-in coordinated JWT validation."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The guide implements application-level check_token using request.token and jwt.decode with SECRET and HS256, returning False for missing/invalid tokens (guide/content/en/guide/how-to/authentication.md:49-60). protected wraps the route handler, awaits it only after authentication, and otherwise returns 401 (guide/content/en/guide/how-to/authentication.md:62-76). This runs when the decorated handler is called; it is not itself registered as Sanic request middleware, and core Sanic does not automatically coordinate JWT validation across middleware layers."
+    },
+    {
+      "task_id": "import-e63c78d867d2555aecb057f3",
+      "reference_sha256": "356a1017d0419b628f99200bad9f235ca836de1477c910ccd11b9617c672d4ef",
+      "question_sha256": "f7485c55584b5fa7f3708e5c0bca7988e03dbac2a8007247059f2defcc5f77d1",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Timeouts local to protocol worker loop",
+          "verdict": "supported",
+          "reason": "Stage-dependent timeout errors and scheduling are protocol-local; no cross-process WorkerManager timeout operation shown. Automatic restart of every failure is not established.",
+          "evidence": {
+            "path": "sanic/server/protocols/http_protocol.py",
+            "start_line": 187,
+            "end_line": 227
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-f474915d5eb21168ff5ede92",
+      "reference_sha256": "7e8bb662908035ca47f2db2433d2b919b4647cea3b443b9d0fdd887343a778d0",
+      "question_sha256": "a61ab062db9b7423003e05f8c25ffa38c11539ea73035a91bfbcfffa083fe0d2",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Windows signal workaround versus Unix loop handlers",
+          "verdict": "supported",
+          "reason": "Comment explicitly explains I/O blocking signal reception; flag and periodic task implement workaround; runners166-173 chooses platform branch.",
+          "evidence": {
+            "path": "sanic/compat.py",
+            "start_line": 162,
+            "end_line": 183
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    }
+  ]
+}

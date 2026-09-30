@@ -1,0 +1,462 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 544,
+            "file_sha256": "eea5d44816ff3d3df9d3cd508dfb1e4bc86246537cb76607d7ef8d2a6e78b2fb",
+            "path": "xarray/tests/test_backends.py",
+            "start_line": 532
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the architectural role of the test_dataset_caching skip decorator in the multi-backend testing hierarchy, and how does it reflect fundamental differences in the data access layer between eager and lazy evaluation strategies?",
+      "question_sha256": "6597a04971f8124cf1443fe618bd75795ceecbb5edc6942f05679b7c6237f693",
+      "reference_answer": "The skip marker that excludes dataset caching verification plays a key architectural role in the multi-backend testing hierarchy by marking a boundary between eager and lazy evaluation strategies in the data access layer.\n\n**Architectural Context:**\nThe test method `test_dataset_caching` is defined in `DatasetIOBase` (lines 532-544 in `test_backends.py`), the base class for all backend I/O tests. It verifies that file-based backends use `MemoryCachedArray` for eager caching: when data is accessed via `.values`, it should be cached in memory (the `_in_memory` flag becomes `True`). When `cache=False`, it uses `CopyOnWriteArray` instead and doesn't cache.\n\n**The Skip Marker's Role:**\nThe skip marker `@pytest.mark.skip(reason=\"caching behavior differs for dask\")` appears in two dask-wrapped backend test classes:\n- `TestNetCDF4ViaDaskData` (line 2322), which inherits from `TestNetCDF4Data`\n- `TestH5NetCDFViaDaskData` (line 4626), which inherits from `TestH5NetCDFData`\n\nThese classes wrap their parent backends with dask chunks (`chunks=-1` in `open_kwargs`), converting eager numpy arrays into lazy dask arrays.\n\n**Fundamental Differences:**\n1. **Eager evaluation (base classes)**: Uses `MemoryCachedArray` (from `xarray.core.indexing`), which wraps backend arrays and caches them in memory after first access. The test verifies that `_in_memory` transitions from `False` to `True` after accessing `.values`.\n\n2. **Lazy evaluation (dask-wrapped classes)**: Uses `DaskIndexingAdapter` instead, which wraps dask arrays. Dask arrays remain lazy until explicitly computed with `.compute()`. The `TestDask` class (lines 5179-5184) has its own implementation that verifies dask arrays remain `_in_memory=False` even after accessing `.values`.\n\n**Architectural Significance:**\nThe skip marker signals that the caching test from the base class cannot apply to dask-wrapped backends because:\n- The data access layer fundamentally differs: eager backends can cache file data in memory, while lazy backends defer computation\n- The test hierarchy uses inheritance to share common tests, but must skip tests that assume eager evaluation semantics\n- This reflects a design boundary where the same backend (e.g., NetCDF4) behaves differently when wrapped with dask chunks\n\nThe marker thus documents an architectural constraint: the multi-backend testing framework must account for evaluation strategy differences, not just backend implementation differences.",
+      "reference_sha256": "68acb74d49959fefb00f8bdc80a00740fefba8bb2d5664c2b39251f61fc77b55",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-36260be563ab9a1bfac856a0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 545,
+            "file_sha256": "357f6454d10ae8532fa59f5c5b0d4f963081170960f28f15d22a22bd00deccc9",
+            "path": "xarray/core/duck_array_ops.py",
+            "start_line": 491
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "xarray/core/_aggregations.py",
+              "xarray/namedarray/_aggregations.py"
+            ],
+            "end_line": 3641,
+            "path": "_aggregations.py",
+            "reason": "ambiguous_basename",
+            "reference": "_aggregations.py",
+            "start_line": 3635
+          },
+          {
+            "candidates": [
+              "asv_bench/benchmarks/dataset.py",
+              "xarray/core/dataset.py"
+            ],
+            "end_line": 6826,
+            "path": "dataset.py",
+            "reason": "ambiguous_basename",
+            "reference": "dataset.py",
+            "start_line": 6711
+          }
+        ]
+      },
+      "question": "Where does the cumprod function's data flow handle the propagation of NaN values through the cumulative product computation when skipna transitions from True to False, and what intermediate state changes occur in the numeric_only filtering before the reduce operation executes?",
+      "question_sha256": "6a998ccc7984fec2a3ce4e405de3f4c8b317ed1a4702dba90de0fdebf4d4b663",
+      "reference_answer": "The cumulative product reduction handles missing numeric values when the skip missing values parameter changes from enabled to disabled in the `_create_nan_agg_method` function located in `./xarray/core/duck_array_ops.py` (lines 491-545).\n\n**Execution Path:**\n1. When `cumprod()` is called on a DataArray or Dataset, it invokes `self.reduce(duck_array_ops.cumprod, dim=dim, skipna=skipna, ...)` (line 3635-3641 in `_aggregations.py`).\n\n2. For Dataset objects, the `reduce` method in `dataset.py` (lines 6711-6826) first performs `numeric_only` filtering (lines 6793-6803) before calling the reduction function. This filtering removes non-numeric variables based on dtype checks: `np.issubdtype(var.dtype, np.number) or (var.dtype == np.bool_)`.\n\n3. The filtered variables then call `var.reduce(func, ...)` which flows through `Variable.reduce()` \u2192 `NamedArray.reduce()` \u2192 `duck_array_ops.cumprod()`.\n\n4. `duck_array_ops.cumprod()` (line 802-804) calls `_nd_cum_func(cumprod_1d, array, axis, **kwargs)`, which iteratively applies `cumprod_1d` along each specified axis.\n\n5. **Critical Location**: `cumprod_1d` is created by `_create_nan_agg_method(\"cumprod\", invariant_0d=True)` (line 566). The function selection logic in `_create_nan_agg_method` (lines 508-527) determines how missing values are handled:\n\n   - **When `skipna=True` or `skipna=None`** (and dtype is float/complex/object): The function selects `nanops.nancumprod` (line 521), which uses `nputils.nancumprod` to handle NaNs by skipping them during computation.\n\n   - **When `skipna=False`**: The function selects `xp.cumprod` (line 527), which is numpy's native `cumprod` function. This propagates NaN values through the cumulative product computation - once a NaN is encountered, all subsequent values in the cumulative product become NaN.\n\n**NaN Propagation Behavior:**\nThe transition from `skipna=True` to `skipna=False` changes the underlying function from `nancumprod` (which masks NaNs) to `cumprod` (which propagates NaNs). This occurs at the function selection point in `_create_nan_agg_method` before the actual computation, meaning the choice of NaN-handling strategy is determined at this location in the execution path.\n\n**Intermediate State Changes:**\nBefore the reduce operation executes, the `numeric_only` filtering in `Dataset.reduce()` (lines 6793-6803) creates an intermediate state where:\n- Non-numeric variables (strings, objects that aren't numeric) are excluded from the reduction\n- Only variables with numeric dtypes (`np.number`) or boolean dtypes (`np.bool_`) proceed to the actual reduction\n- This filtering happens synchronously before any reduction function is called, creating a filtered variable dictionary that is then processed\n\nThe actual NaN propagation handling occurs later in the execution path at the `_create_nan_agg_method` function selection logic, which determines whether to use NaN-aware or NaN-propagating cumulative product functions based on the `skipna` parameter value.",
+      "reference_sha256": "18c63a09e4eecdaab1a5eac6e458261ab41dfd30f1fddede663fc39a707c3cbe",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-39d95e9396abbd507c034b6a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2685,
+            "file_sha256": "597654505291e5df53df404bb28b01b45d2e93a03d01d7fbde39257884355fdc",
+            "path": "xarray/core/variable.py",
+            "start_line": 2682
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the IndexVariable API enforce dimensionality constraints during initialization, and what mechanism ensures that multi-dimensional data structures are rejected while maintaining backward compatibility with the parent Variable class?",
+      "question_sha256": "2ad046a6faf0f55fef3c2ae3127efe8a6b1fefd1aed253749eb5cecbadf9faf4",
+      "reference_answer": "The wrapper class for pandas Index objects enforces one-dimensional constraints by checking the number of dimensions after calling the parent class constructor. Specifically, in the `__init__` method (lines 2682-2685 in `xarray/core/variable.py`), the class first calls `super().__init__(dims, data, attrs, encoding, fastpath)` to initialize using the parent Variable class constructor, which allows the object to be created with any dimensionality. Then, immediately after parent initialization, it performs a validation check: `if self.ndim != 1: raise ValueError(f\"{type(self).__name__} objects must be 1-dimensional\")`.\n\nThis enforcement mechanism works by:\n1. **Deferred validation**: The parent Variable class constructor is called first (line 2683), which successfully initializes the object regardless of dimensionality. This allows the parent class to handle all standard initialization logic (setting dimensions, data, attributes, encoding).\n\n2. **Post-initialization check**: After the parent constructor completes, the `ndim` property (which represents the number of dimensions) is checked. If `self.ndim != 1`, a ValueError is raised with the message indicating that objects of this type must be 1-dimensional (lines 2684-2685).\n\n3. **Backward compatibility**: The class maintains compatibility with the parent Variable class through the `_finalize_indexing_result` method (lines 2738-2743). When indexing operations result in multi-dimensional data, this method detects it (`if getattr(data, \"ndim\", 0) != 1`) and returns a Variable instance instead of an IndexVariable, ensuring that multi-dimensional results are handled gracefully without breaking the 1-dimensional constraint.\n\nThe constraint is documented in the class docstring (lines 2669-2671), which states: \"IndexVariable preserve loaded values in the form of a pandas.Index instead of a NumPy array. Hence, their values are immutable and must always be one-dimensional.\"\n\nThis design ensures that IndexVariable objects can only represent 1-dimensional coordinate data (as required for pandas Index objects), while still inheriting all the functionality of the Variable class through proper initialization sequencing.",
+      "reference_sha256": "67bc5f4ac355f2dcc96b8d7fe523a68c4bc7522a22a25fee1b955cda08a7d31b",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-3a37a88a0155ca4965fabbc6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1414,
+            "file_sha256": "cc1a41e926680cf21c5525380667734dd0fd032d7098253bf5a80f77eb6fc73d",
+            "path": "xarray/core/indexing.py",
+            "start_line": 1414
+          },
+          {
+            "end_line": 148,
+            "file_sha256": "9aaa04a5ab42a9773f2457afede90d8c8a1b92585d861ce6d587aa37796e3c54",
+            "path": "xarray/tests/test_variable.py",
+            "start_line": 148
+          },
+          {
+            "end_line": 83,
+            "file_sha256": "9aaa04a5ab42a9773f2457afede90d8c8a1b92585d861ce6d587aa37796e3c54",
+            "path": "xarray/tests/test_variable.py",
+            "start_line": 83
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the semantic meaning of the 'fill_value' argument in the _getitem_with_mask method in the context of the VariableSubclassobjects test class, and how does modifying its default behavior affect the masking semantics for negative indices?",
+      "question_sha256": "a08f0f00206fb09052442597e9ff0417b8993f037ce6be0a4f9ee2c44b8377a4",
+      "reference_answer": "The `fill_value` argument in `_getitem_with_mask` specifies the replacement value used for positions where negative indices (-1) are encountered during indexing operations.\n\n**Semantic Meaning:**\n\n1. **Default Behavior**: When `fill_value` is `dtypes.NA` (the default), it gets automatically converted to a dtype-appropriate missing value via `dtypes.get_fill_value(self.dtype)`. For example:\n   - Floating-point dtypes \u2192 `np.nan`\n   - Integer dtypes \u2192 `np.nan` (after promotion to float)\n   - Timedelta dtypes \u2192 `np.timedelta64(\"NaT\")`\n   - Datetime dtypes \u2192 `np.datetime64(\"NaT\")`\n   - Complex dtypes \u2192 `np.nan + np.nan * 1j`\n   - Object dtypes \u2192 `np.nan`\n\n2. **Masking Semantics**: The method treats `-1` in indexers as a sentinel value indicating \"missing\" or \"out-of-bounds\" positions. The masking process works as follows:\n   - The `create_mask` function (in `xarray/core/indexing.py:1414`) creates a boolean mask identifying positions where `-1` appears in the indexer\n   - The mask is applied using `duck_array_ops.where(duck_array_ops.logical_not(mask), data, fill_value)`, which replaces masked positions with the `fill_value`\n\n3. **Custom Fill Values**: When a custom `fill_value` is provided (as shown in the test at `test_variable.py:148`), it overrides the default dtype-appropriate missing value. For example:\n   ```python\n   v._getitem_with_mask([0, -1, 1], fill_value=-99)  # Returns [0, -99, 1]\n   ```\n   This demonstrates that the `-1` in the indexer is replaced with `-99` in the result.\n\n4. **Context in VariableSubclassobjects**: The `VariableSubclassobjects` test class (defined at `xarray/tests/test_variable.py:83`) inherits from `NamedArraySubclassobjects` and `ABC`, serving as a base class for testing Variable subclasses. The `test_getitem_with_mask` method (line 140) exercises this functionality, verifying that:\n   - Negative indices produce the default fill value (`np.nan`) when no custom `fill_value` is specified\n   - Custom `fill_value` arguments correctly replace masked positions\n   - The method handles various indexer types (scalars, lists, slices, multi-dimensional indexers)\n\nThe semantic meaning is that `fill_value` controls what value appears in the output array at positions corresponding to `-1` values in the input indexer, allowing customization of how \"missing\" or \"invalid\" index positions are represented in the indexed result.",
+      "reference_sha256": "74bfbaa0af12002a95984dc72cb312783507ab333f152e173d4f34d8bd9fc627",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-3d1f799050430b0e0b89003e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 360,
+            "file_sha256": "19ad3b404c5fcf8274dc7996fd94990546072924d6376bb4a7d52cca156d4f78",
+            "path": "xarray/core/groupby.py",
+            "start_line": 345
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the validation logic in ResolvedGrouper.__post_init__ raise ValueError for chunked arrays when using UniqueGrouper without explicit labels or BinGrouper with integer bins, and how does this constraint relate to the lazy evaluation model of xarray?",
+      "question_sha256": "abf9d46932f4ed773d1dfdb84f469a7410db509d599ebb3c094e70dccb5775ef",
+      "reference_answer": "The validation logic in `ResolvedGrouper.__post_init__` (located in `./xarray/core/groupby.py`, lines 345-360) raises `ValueError` for chunked arrays in two specific cases to preserve xarray's lazy evaluation model:\n\n1. **UniqueGrouper without explicit labels** (lines 349-352): When grouping by a chunked array using `UniqueGrouper` without providing the `labels` parameter, the validation raises `ValueError` with the message \"Please pass `labels` to UniqueGrouper when grouping by a chunked array.\" The code comment on line 348 explains: \"This requires a pass to discover the groups present.\" Without explicit labels, the system would need to scan the entire chunked array to discover all unique values, which would force eager evaluation and load the data into memory, breaking the lazy evaluation model.\n\n2. **BinGrouper with integer bins** (lines 354-360): When grouping by a chunked array using `BinGrouper` with `bins` specified as an integer (rather than explicit bin edges), the validation raises `ValueError` with the message \"Please pass explicit bin edges to BinGrouper using the ``bins`` kwarg when grouping by a chunked array.\" The code comment on line 353 explains: \"this requires a pass to compute the bin edges.\" When `bins` is an integer, pandas' `pd.cut` function needs to compute the bin edges by finding the min and max values of the data, which requires scanning the entire chunked array and would force eager evaluation.\n\n**Relationship to lazy evaluation model:**\n\nXarray's lazy evaluation model allows operations on chunked arrays (like dask arrays) to be deferred until computation is explicitly requested via `.compute()` or `.load()`. Chunked arrays are not fully loaded into memory, and operations are built as a computation graph. \n\nThe validation constraint ensures that groupby operations remain lazy-compatible by requiring users to provide explicit metadata (labels for unique grouping, bin edges for binning) that would otherwise require a full pass over the data. This prevents operations that would inadvertently trigger eager evaluation, maintaining the lazy evaluation paradigm where data is only loaded when explicitly requested.\n\nThe validation check occurs at lines 345-347, which detects chunked arrays using `is_chunked_array(self.group.variable._data)`. This check ensures that the lazy evaluation model is preserved by catching cases where the grouping operation would require materializing the chunked array before the user explicitly requests computation.",
+      "reference_sha256": "b9621233d5f2a9348855f401ebbf5df5d667aa5e2854001c6361b098818f5963",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-45ebf2152f06a1fe17e788b5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 828,
+            "file_sha256": "376c1de29dfa669cea2dd6f8c22f05a6faf0d934850d6842f590829602810170",
+            "path": "xarray/computation/rolling.py",
+            "start_line": 816
+          },
+          {
+            "end_line": 546,
+            "file_sha256": "64984835a25f60621ca9f9b1ce51d6780095b9f7c0d95d93fa2769bcaefd0c6b",
+            "path": "xarray/tests/test_rolling.py",
+            "start_line": 546
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does DatasetRolling selectively create DataArrayRolling objects only for data variables that contain rolling dimensions, rather than creating rolling objects for all data variables uniformly?",
+      "question_sha256": "29b305d97775c91e7caf6721d53c5685d396bd34520bd9098eab2f1c3fd11c5c",
+      "reference_answer": "The rolling window wrapper for multi-variable datasets (DatasetRolling) creates rolling window wrappers for single-variable arrays (DataArrayRolling) only for variables that contain the dimensions being rolled along, rather than creating them for all variables uniformly, because:\n\n1. **Semantic correctness**: Rolling operations can only be applied along dimensions that exist in a variable. A variable without the rolling dimensions cannot be rolled along those dimensions. Creating a DataArrayRolling object for such a variable would be semantically incorrect and potentially error-prone.\n\n2. **Performance and memory efficiency**: Creating DataArrayRolling objects only when needed avoids unnecessary object creation and memory overhead. Variables without rolling dimensions don't need rolling state or window calculations.\n\n3. **Implementation design**: The implementation in `DatasetRolling.__init__` (lines 816-828 in `xarray/computation/rolling.py`) explicitly checks whether each data variable contains any of the rolling dimensions:\n\n```python\nfor key, da in self.obj.data_vars.items():\n    # keeps rollings only for the dataset depending on self.dim\n    dims, center = [], {}\n    for i, d in enumerate(self.dim):\n        if d in da.dims:\n            dims.append(d)\n            center[d] = self.center[i]\n\n    if dims:\n        w = {d: windows[d] for d in dims}\n        self.rollings[key] = DataArrayRolling(da, w, min_periods, center)\n```\n\nOnly when `dims` is non-empty (meaning the variable has at least one rolling dimension) is a DataArrayRolling object created and stored in `self.rollings`.\n\n4. **Handling of non-rolled variables**: When operations are applied via `_dataset_implementation` (lines 830-846), variables without rolling dimensions are simply copied:\n\n```python\nif any(d in da.dims for d in self.dim):\n    reduced[key] = func(self.rollings[key], keep_attrs=keep_attrs, **kwargs)\nelse:\n    reduced[key] = self.obj[key].copy()\n```\n\nThis design ensures that variables without the rolling dimensions are preserved unchanged in the result, which is the correct behavior since they cannot be rolled.\n\n5. **Test evidence**: The test suite (in `xarray/tests/test_rolling.py`, line 546) demonstrates this behavior with a Dataset containing both `\"da\"` (with the rolling dimension) and `\"da_not_rolled\"` (without it), confirming that only the variable with the rolling dimension gets processed through rolling operations.\n\nThis selective creation is a deliberate design choice that ensures correctness, efficiency, and proper handling of heterogeneous datasets where not all variables share the same dimensions.",
+      "reference_sha256": "5f3925c981e62bbd37250a7a0e051fb7854d3410283af1c055c75d4ac49a2adf",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-4b27ea46cbf0143f17806877"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 6206,
+            "file_sha256": "6ea9e6404763a739a2f269837901dfae577463f088ab3ed35357ce1887df36f9",
+            "path": "xarray/tests/test_dataset.py",
+            "start_line": 6206
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "fb56ab39f72e87639fa66eef101559d44124773137d2bbf6106cd8f0e70b5736",
+            "kind": "file_reference",
+            "line_count": 10400,
+            "path": "xarray/core/dataset.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where in the codebase does the in-place addition operation in test_dataset_dataset_math preserve object identity while ensuring mathematical correctness across broadcasting scenarios with subsampled datasets?",
+      "question_sha256": "4372f567c36d129646355d132250c4d3e315a6376d7affbd7d0e96603993db14",
+      "reference_answer": "The in-place addition method that preserves object identity during broadcasting with subsampled datasets is implemented in `xarray/core/dataset.py` in the `_inplace_binary_op` method (lines 7616-7638).\n\nThe method handles broadcasting and preserves identity as follows:\n\n1. Broadcasting/alignment (line 7628): When the other operand is a Dataset or DataArray, it calls `other.reindex_like(self, copy=False)` to align dimensions and coordinates for broadcasting, ensuring mathematical correctness with subsampled datasets.\n\n2. Binary operation calculation (line 7630): It calls `self._calculate_binary_op(g, other, inplace=True)` to compute the result, where `g` is the non-in-place version of the operator (converted via `ops.inplace_to_noninplace_op(f)`).\n\n3. In-place modification preserving identity (lines 7631-7637): It calls `self._replace_with_new_dims()` with `inplace=True`, which internally calls `_replace()` (lines 795-843). When `inplace=True`, `_replace()` directly modifies the object's internal state (`self._variables`, `self._coord_names`, `self._dims`, `self._attrs`, `self._indexes`) without creating a new object (lines 813-826), preserving the object's identity.\n\n4. Return self (line 7638): The method returns `self`, ensuring the same object instance is returned.\n\nThe test `test_dataset_dataset_math` (in `xarray/tests/test_dataset.py` at line 6206) verifies this behavior at lines 6218-6222, where it checks that `id(actual)` remains the same after `actual += ds`. The related test `test_dataset_math_auto_align` (lines 6255-6259) demonstrates this with subsampled datasets, where `actual += other` (with `other = ds.isel(y=slice(2))`) correctly handles broadcasting while preserving object identity.\n</start_of_answer>",
+      "reference_sha256": "8055fa6e92d73457bdca48fcedcd9d69743f5652826c295f9cfa3fa311a11c27",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-5ed26c4b97f128fc7501d0a1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 229,
+            "file_sha256": "c287090d858fa429fb47bc5d76bc495a1e3d62b884fdec646974222e9e8c7ed5",
+            "path": "xarray/backends/common.py",
+            "start_line": 222
+          },
+          {
+            "end_line": 135,
+            "file_sha256": "80e2ac7c744b01cebc0ac77eb44e8ff885607e8e8f11d9480bda02996c4be8ba",
+            "path": "xarray/backends/h5netcdf_.py",
+            "start_line": 112
+          },
+          {
+            "end_line": 4521,
+            "file_sha256": "eea5d44816ff3d3df9d3cd508dfb1e4bc86246537cb76607d7ef8d2a6e78b2fb",
+            "path": "xarray/tests/test_backends.py",
+            "start_line": 4500
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does H5NetCDFStore handle group access differently when initialized with a pre-opened h5netcdf.File object versus the group parameter, and what potential data consistency issues could arise from these two initialization patterns?",
+      "question_sha256": "b0f7d92586fb284fea753ed7610eeccc6bbe06ae1291de6a9191b916dba35e44",
+      "reference_answer": "The store class handles group access differently based on initialization:\n\n**Pattern 1: Initialization with a pre-opened file/group object (without group parameter)**\nWhen initialized with a pre-opened `h5netcdf.File` or `h5netcdf.Group` object and no `group` parameter, the class calls `find_root_and_group()` (defined in `xarray/backends/common.py:222-229`). This function:\n- Traverses up the parent chain from the provided object to find the root File\n- Builds the group path from the hierarchy by collecting names from each level\n- Returns both the root File and the computed group path (e.g., `\"/g\"` for a group named \"g\")\n\nThe root File is then wrapped in a `DummyFileManager`, and the computed group path is stored in `self._group`.\n\n**Pattern 2: Initialization with a File object and group parameter**\nWhen initialized with a pre-opened `h5netcdf.File` object and an explicit `group` parameter (string path), the class:\n- Uses the File object directly as the root (no traversal)\n- Stores the provided group string path in `self._group` (e.g., `\"g\"` without leading slash)\n- Wraps the File in a `DummyFileManager`\n\n**Key differences:**\n1. **Path resolution timing**: Pattern 1 resolves the group path at initialization by traversing the hierarchy. Pattern 2 uses the provided string path, which is resolved later during access via `_nc4_require_group()`.\n2. **Path format**: Pattern 1 may include a leading slash (e.g., `\"/g\"`), while Pattern 2 uses the string as provided. However, `_nc4_require_group()` (used in `_acquire()`) strips leading slashes, so both work.\n3. **Root reference**: Pattern 1 extracts the root from the Group's parent chain, while Pattern 2 uses the File directly.\n\n**Potential data consistency issues:**\n1. **Stale group reference**: In Pattern 1, if the Group object's position in the hierarchy changes after initialization (e.g., if the file is modified externally), the stored group path might point to a different or invalid location.\n2. **Root file lifecycle**: Pattern 1 captures the root File at initialization. If the original Group object's parent chain changes or the file is reopened, the stored root reference may become inconsistent.\n3. **Path mismatch**: If a Group object is passed but its computed path doesn't match an explicitly provided path string, the two patterns could access different groups even for the same logical group.\n\nThe implementation in `xarray/backends/h5netcdf_.py:112-135` shows these patterns, and both are tested in `xarray/tests/test_backends.py:4500-4521` to ensure they produce equivalent results for the same group.",
+      "reference_sha256": "5c2e34bae47625152a79dd57d6ea700b2dd0b803003c8f2243132fba56101bd9",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-6070dbef5616f9b0e1b81356"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1598,
+            "file_sha256": "fb56ab39f72e87639fa66eef101559d44124773137d2bbf6106cd8f0e70b5736",
+            "path": "xarray/core/dataset.py",
+            "start_line": 1598
+          },
+          {
+            "end_line": 366,
+            "file_sha256": "a3785f10b7a429678ae344da4f254400c952570b6faa91ab7f1062c3480496a5",
+            "path": "xarray/testing/assertions.py",
+            "start_line": 366
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "a87f09e2d0d9761c5decc6b15553114d96430704cf044700f34db09d0efabeea",
+            "kind": "file_reference",
+            "line_count": 2548,
+            "path": "xarray/tests/test_datatree.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What are the external module dependencies that TestGetItem relies upon to validate the correctness of DataTree indexing operations, and how do these dependencies constrain the test's ability to verify equivalence?",
+      "question_sha256": "4db40113b933967fa7915ec8ff425f0caa245b324894ea0b708f39932e5c5619",
+      "reference_answer": "The test class that validates hierarchical dataset indexing operations (TestGetItem in `xarray/tests/test_datatree.py`) relies on the following external module dependencies for equivalence checking:\n\n1. **pandas** - Used by `assert_identical()` (from `xarray.testing.assertions`) which validates equivalence by calling `Dataset.identical()` and `DataTree.identical()`. The `Dataset.identical()` method (in `xarray/core/dataset.py`, line 1598) uses pandas Index comparisons via `self.xindexes.to_pandas_indexes()` (line 1686) to verify coordinate and index equivalence. The assertions module (line 365) specifically checks that coordinate variables use `pd.Index` objects and validates them using `pd_index.equals(var._data.array)` (line 367).\n\n2. **numpy** - Required throughout xarray for array operations and data comparisons. The equivalence checking relies on numpy array operations for comparing data values, dimensions, and coordinate arrays.\n\n3. **pytest** - The testing framework used to structure and execute the tests, including `pytest.raises()` for exception testing and `pytest.mark.xfail()` for expected failures.\n\n**How these dependencies constrain equivalence verification:**\n\nThe test's ability to verify equivalence is constrained by:\n- **Pandas Index semantics**: Equivalence checking depends on pandas' `Index.equals()` method, which may not detect all types of differences (e.g., index metadata, certain dtype differences). The code comment at line 366 in `assertions.py` notes \"TODO: check identity instead of equality?\" suggesting limitations in the current comparison approach.\n- **Index coercion requirements**: The `Dataset.indexes` property (line 1675) requires that all indexes can be coerced to `pandas.Index` objects, meaning the test cannot verify equivalence for indexes that don't support pandas conversion.\n- **Attribute comparison**: The `Dataset.identical()` method uses `utils.dict_equiv()` for attribute comparison, which may have limitations in how deeply nested or complex attributes are compared.\n\nThe test validates indexing operations by comparing results using `assert_identical()`, which ensures that indexed results match expected DataArray or DataTree objects with identical structure, coordinates, attributes, and data values as defined by xarray's equivalence semantics.",
+      "reference_sha256": "661afa5d2438394e5500df958824ff7b8c90ebffd600c1e52631d5d10959b7ac",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-63788ad64cc80e41936988fb"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 65,
+            "file_sha256": "a99b0595d73531976e5a7909b8b35ee48321c724db8b891386b2d4c0e22978f2",
+            "path": "xarray/backends/lru_cache.py",
+            "start_line": 60
+          },
+          {
+            "end_line": 19,
+            "file_sha256": "0457e5c6f4e0fb27bd6a14c069eb661967998ef211e443735ad5aeff6c531de7",
+            "path": "xarray/backends/file_manager.py",
+            "start_line": 19
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the conditional invocation of the _on_evict callback within _enforce_size_limit's control flow affect the data state transitions of evicted cache entries, and what implicit ordering constraints does the popitem(last=False) operation impose on the sequence of data transformations?",
+      "question_sha256": "fe47d3e27832d8cc6ef2f6df1cc4b72e4c73921e0512f34f2332edf86713ed7a",
+      "reference_answer": "The conditional callback invocation affects state transitions of evicted entries immediately after the item is removed from the OrderedDict but before the method completes its iteration loop.\n\nIn the `_enforce_size_limit` method (lines 60-65 of `xarray/backends/lru_cache.py`), the control flow is:\n\n```python\ndef _enforce_size_limit(self, capacity: int) -> None:\n    \"\"\"Shrink the cache if necessary, evicting the oldest items.\"\"\"\n    while len(self._cache) > capacity:\n        key, value = self._cache.popitem(last=False)\n        if self._on_evict is not None:\n            self._on_evict(key, value)\n```\n\nThe critical point is that the conditional invocation occurs **after** `popitem(last=False)` removes the entry from the cache (line 63) but **before** the while loop continues or the method returns (lines 64-65). This timing is significant because:\n\n1. **State transition location**: The entry is no longer in the cache when the callback executes. The item has been removed from the OrderedDict, so it's in a \"removed but not yet processed\" state.\n\n2. **Data state transitions**: In the actual usage within xarray (see `xarray/backends/file_manager.py` line 19), the callback is `lambda k, v: v.close()`, which closes file handles. The state transition (from \"open file in cache\" to \"closed file removed from cache\") happens at this exact point - the file object is closed while it's no longer accessible through the cache.\n\n3. **Control flow significance**: The conditional check `if self._on_evict is not None:` means the state transition only occurs if a callback was provided. If no callback exists, entries are simply removed without any additional state processing, creating two different code paths with different state transition behaviors.\n\n4. **Ordering constraint**: The `popitem(last=False)` operation removes items from the beginning of the OrderedDict (oldest first), ensuring evictions follow FIFO order. The callback is invoked for each evicted item in this same order, maintaining consistent state transition sequencing.\n\nThis design ensures that resources (like file handles) are properly cleaned up at the moment they become inaccessible through the cache, preventing resource leaks while maintaining thread safety through the cache's locking mechanism.",
+      "reference_sha256": "9d844d357bb1b903789dbdbd905c6c354a81e159e881de8d27c24da9eded562a",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-6499bff264a4ce5471ce2427"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 52,
+            "file_sha256": "fa4f52a85ad0d2f38d87fa494d1ee0ed36ce136b5728218c2cb61c3dbd227967",
+            "path": "xarray/core/datatree_render.py",
+            "start_line": 52
+          },
+          {
+            "end_line": 1158,
+            "file_sha256": "a90df850d7f73924add3126d4effb453430aa589f9b4bb7d5ba547aaa4a7c82c",
+            "path": "xarray/core/formatting.py",
+            "start_line": 1158
+          },
+          {
+            "end_line": 181,
+            "file_sha256": "fa4f52a85ad0d2f38d87fa494d1ee0ed36ce136b5728218c2cb61c3dbd227967",
+            "path": "xarray/core/datatree_render.py",
+            "start_line": 181
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "asv_bench/benchmarks/datatree.py",
+              "xarray/core/datatree.py"
+            ],
+            "end_line": 823,
+            "path": "datatree.py",
+            "reason": "ambiguous_basename",
+            "reference": "datatree.py",
+            "start_line": 823
+          }
+        ]
+      },
+      "question": "Where does the control flow in ContStyle's __init__ method propagate the three Unicode string parameters through the parent class initialization to determine the visual rendering structure of tree nodes in the DataTree output?",
+      "question_sha256": "6482cbb063f4ed8962a702027c8e5505e2e577942a4f78129be406df3179690e",
+      "reference_answer": "The control flow propagates through the following path:\n\n1. **ContStyle.__init__ method** (line 52 in `xarray/core/datatree_render.py`): The initialization method calls `super().__init__()` at line 76, passing three Unicode string parameters:\n   - `\"\\u2502   \"` (vertical line character: \u2502)\n   - `\"\\u251c\\u2500\\u2500 \"` (continued branch: \u251c\u2500\u2500)\n   - `\"\\u2514\\u2500\\u2500 \"` (last branch: \u2514\u2500\u2500)\n\n2. **AbstractStyle.__init__ method** (line 26): The parent class initialization receives these three parameters as `vertical`, `cont`, and `end`, and stores them as instance attributes:\n   - `self.vertical = vertical` (line 35)\n   - `self.cont = cont` (line 36)\n   - `self.end = end` (line 37)\n\n3. **Usage in RenderDataTree.__item method** (lines 223-235): These stored attributes are accessed via the `style` parameter to construct the visual tree structure:\n   - `style.vertical` is used to create vertical lines for continued branches (line 230)\n   - `style.cont` is used for continued branches (line 232)\n   - `style.end` is used for the last branch in a level (line 232)\n\n4. **Integration with DataTree output** (via `datatree_repr` in `xarray/core/formatting.py`, line 1158): The `RenderDataTree` class uses a `ContStyle` instance by default (line 181 in `datatree_render.py`), and the `pre` and `fill` values generated from these Unicode strings are used to format the tree output in `datatree_repr` (lines 1180-1187), which is called by `DataTree.__repr__` (line 823 in `datatree.py`).\n\nThe three Unicode string parameters determine the visual appearance of tree nodes: vertical lines for depth continuation, continued branch markers (\u251c\u2500\u2500), and final branch markers (\u2514\u2500\u2500) in the hierarchical tree structure output.",
+      "reference_sha256": "4c0cf913fa0e28d9ab968b310d2d3c5644eac048f4cced0170c44d6ab581167b",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-6688bc78875d18bf296dffb7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 65,
+            "file_sha256": "88969d626b5d9a9e700be6c73476af0fb8724684a18bc23db924f94a0b40509b",
+            "path": "xarray/tests/test_strategies.py",
+            "start_line": 60
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "1b080c0dfc4af5273ac9e1884f0e58c26edfd479dfa39817dd170774b5fd2bb8",
+            "kind": "file_reference",
+            "line_count": 512,
+            "path": "xarray/testing/strategies.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the dimension_sizes strategy API handle the constraint propagation between min_dims, max_dims, and dim_names parameters to ensure generated dimension dictionaries satisfy all constraints simultaneously?",
+      "question_sha256": "aaff42c438659d2d0efc75791d53a0b0a47e0a05949640f6d5f747c7741fa32c",
+      "reference_answer": "The `dimension_sizes` function in `xarray/testing/strategies.py` handles constraint propagation by delegating to Hypothesis's `st.dictionaries` strategy, which coordinates the constraints.\n\nImplementation (lines 141-185):\n```python\ndef dimension_sizes(\n    *,\n    dim_names: st.SearchStrategy[Hashable] = names(),\n    min_dims: int = 0,\n    max_dims: int = 3,\n    min_side: int = 1,\n    max_side: int | None = None,\n) -> st.SearchStrategy[Mapping[Hashable, int]]:\n    if max_side is None:\n        max_side = min_side + 3\n\n    return st.dictionaries(\n        keys=dim_names,\n        values=st.integers(min_value=min_side, max_value=max_side),\n        min_size=min_dims,\n        max_size=max_dims,\n    )\n```\n\nConstraint propagation mechanism:\n1. `st.dictionaries` draws keys from the `dim_names` strategy until it has at least `min_dims` entries (via `min_size=min_dims`).\n2. It stops drawing when it reaches `max_dims` entries (via `max_size=max_dims`).\n3. Each key is drawn from `dim_names`, so all keys satisfy that strategy's constraints.\n4. The final dictionary size is between `min_dims` and `max_dims`, and all keys come from `dim_names`.\n\nExample from tests (lines 60-65 in `test_strategies.py`):\n```python\n@given(st.data(), st.tuples(st.integers(0, 10), st.integers(0, 10)).map(sorted))\ndef test_number_of_dims(self, data, ndims):\n    min_dims, max_dims = ndims\n    dim_sizes = data.draw(dimension_sizes(min_dims=min_dims, max_dims=max_dims))\n    assert min_dims <= len(dim_sizes) <= max_dims\n```\n\nAnother example (lines 67-72) shows `dim_names` constraints are also satisfied:\n```python\n@given(st.data())\ndef test_restrict_names(self, data):\n    capitalized_names = st.text(st.characters(), min_size=1).map(str.upper)\n    dim_sizes = data.draw(dimension_sizes(dim_names=capitalized_names))\n    for dim in dim_sizes.keys():\n        assert dim.upper() == dim\n```\n\nAll constraints are satisfied simultaneously because `st.dictionaries` enforces `min_size`/`max_size` while drawing keys from the provided strategy, ensuring the dictionary size respects `min_dims`/`max_dims` and all keys satisfy `dim_names`.",
+      "reference_sha256": "586131a2c7bf3a21ed9326139fffb1af373d4b783dac29f9858dced524a8374c",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-731c605f25721122eff417f6"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# Generic AgentRunner parallel tool calls
+
+Parallel calls are opt-in, default off (`max_parallel_tool_calls=1`), and capped at 8. The research CLI enables both native model parsing and runner admission with `--max-parallel-tool-calls 4`. Programmatic and remote JSON users must set the same field on both the model adapter configuration and `RunLimits` / `limits`; otherwise the stricter layer rejects the batch. Remote HTTP and Tinker model configurations accept this field. This is separate from the collection/training protocol.
+
+`ToolCallBatch` contains 2–8 independent calls. Only tools whose `ToolSpec.parallel_safe` is explicitly true are admitted. Built-in source-reading tools opt in; tests and execution probes do not. Every member's scope, arguments, identifier and total call allowance are validated before workers start. Budget reservation is all-or-nothing. Results, artifact writes and trajectory events are committed by the parent in input order; tool outputs can therefore reference shared content-addressed artifacts without concurrent writes.
+
+The implementation requires POSIX `fork`, complementing the generic harness's existing POSIX main-thread signal deadlines. Worker timeouts terminate and reap all workers. Plugins are trusted code: marking a plugin parallel-safe promises independent read-only operations, no background children, and no dependence on inherited thread-owned or SDK resources. Model SDKs are used only in the parent. Windows and arbitrary threaded/plugin execution are not supported by this path.
+
+`tool_seconds` retains cumulative completed call durations, which can overlap. `tool_wall_seconds` measures elapsed dispatch wall time including worker startup/cleanup. On interrupted batches, individual durations are unavailable; `tool_seconds` records elapsed interrupted batch time, so it is not a complete compute measurement. Episode `elapsed_seconds` remains total latency.
+
+Offline verification covers actual worker overlap, parent-ordered artifact commits, deadline cleanup, invalid batch admission without worker execution, native parsing, complete-batch context compaction, CLI wiring and existing generic harness regressions. No paid/provider calls are needed for these checks.

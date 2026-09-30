@@ -1,0 +1,454 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/omni-us--jsonargparse-dd0f9e3767fc",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 152,
+            "file_sha256": "4f161245b92103259cf22f5211872628465dd6594297e88d80b7d5f26d1626d4",
+            "path": "jsonargparse/_typehints.py",
+            "start_line": 152
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the inheritance hierarchy of ActionTypeHint and its dependencies on the Action base class within jsonargparse's argument parsing system?",
+      "question_sha256": "744009ab946eda38aa619feefd85d05ebbeaeb37b97b6ce6d84e02bb7b7d1a41",
+      "reference_answer": "The inheritance structure of ActionTypeHint is rooted in the standard Python argparse module. Specifically, ActionTypeHint is defined in jsonargparse/_typehints.py at line 152, where it inherits from the Action class. This Action class is sourced from jsonargparse._actions, which itself imports the base Action directly from argparse. This creates a linear hierarchy starting from the base object, moving to argparse.Action, and finally to jsonargparse.typehints.ActionTypeHint.\n\nActionTypeHint functions as a specialized extension of the Action base class, designed to manage complex type hints and nested configurations. Its initialization process involves an override of the **init** method to accommodate parameters like typehint and enable_path. However, it maintains a critical dependency on the base class by calling super().**init**(**kwargs), which sets up standard attributes such as option_strings, dest, nargs, const, default, type, choices, required, help, and metavar. The system relies on these inherited attributes, particularly dest and default, to govern argument destinations and default values.\n\nThe most significant override occurs in the **call** method, which is the standard interface the parser triggers when encountering an argument. ActionTypeHint maintains the required signature\u2014handling the parser, namespace, values, and option_string\u2014but injects custom logic for type validation and adaptation. Instead of simple storage, it uses the self._typehint attribute to process values before updating the namespace or configuration object. It also references base attributes like self.nargs to check for specific argument counts (such as ? or 0) and uses self.option_strings for identification. Because it inherits from Action, the class remains fully compatible with the argparse.ArgumentParser system, allowing it to be registered as an action for arguments seamlessly.",
+      "reference_sha256": "58d68e0f980bff5c438f849fe30b4d3793c99bb67718094e26b15e70f7fdbb8a",
+      "repository": {
+        "commit": "dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+        "family_id": "omni-us/jsonargparse",
+        "url": "https://github.com/omni-us/jsonargparse"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/omni-us--jsonargparse-dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+      "task_id": "import-14cad048bf474ce991c30785"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/omni-us--jsonargparse-dd0f9e3767fc",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 213,
+            "file_sha256": "eacd17252b31f3d9008420547a653e62766115c13cd4a0bb62f8cd66ae84ab91",
+            "path": "jsonargparse/_actions.py",
+            "start_line": 191
+          },
+          {
+            "end_line": 158,
+            "file_sha256": "f929ea30e055d15bb82e245a1fb41e5beafc2c35b11c3a3dc4c5c5b86bc327ca",
+            "path": "jsonargparse/_util.py",
+            "start_line": 132
+          },
+          {
+            "end_line": 116,
+            "file_sha256": "1aaa7a7df460257916c52e9802b50a2230099d26f42a19c90199495952fae942",
+            "path": "jsonargparse/_loaders_dumpers.py",
+            "start_line": 107
+          },
+          {
+            "end_line": 683,
+            "file_sha256": "f929ea30e055d15bb82e245a1fb41e5beafc2c35b11c3a3dc4c5c5b86bc327ca",
+            "path": "jsonargparse/_util.py",
+            "start_line": 678
+          },
+          {
+            "end_line": 1301,
+            "file_sha256": "51a7cb0e398c84ba09096fb649e69fdd191b395cbe172e2bb53c85264323c514",
+            "path": "jsonargparse/_core.py",
+            "start_line": 1241
+          },
+          {
+            "end_line": 154,
+            "file_sha256": "f929ea30e055d15bb82e245a1fb41e5beafc2c35b11c3a3dc4c5c5b86bc327ca",
+            "path": "jsonargparse/_util.py",
+            "start_line": 153
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does configuration file content flow through the parsing pipeline when ActionConfigFile processes nested configuration references?",
+      "question_sha256": "c1a12726385ddc98fde8bece6efaf1e3d6b056116261bf7db5b1aa6cb9e85db4",
+      "reference_answer": "Configuration file content flows through a structured multi-stage pipeline when ActionConfigFile processes nested configuration references. The process begins with ActionConfigFile.apply_config method (jsonargparse/_actions.py: line 191-213) which calls parse_value_or_config from _util.py (line 132-158). This function creates a Path object and attempts to load the content via load_value (jsonargparse/_loaders_dumpers.py: line 107-116). The load_value function selects the appropriate loader from the loaders dictionary (line 82-85), choosing either yaml_load or jsonnet_load based on the parser mode. During parsing, relative path context is established through cfg_path.relative_path_context() (jsonargparse/_util.py: line 678-683), which uses change_to_path_dir (line 274-301) and the current_path_dir ContextVar to manage working directory context for nested file references. The parsed configuration dictionary is then processed through parser._apply_actions (jsonargparse/_core.py: line 1241-1301) with the appropriate parent_key context, where each configuration key is matched against parser actions and validated. Finally, the processed configuration merges with existing namespace values via merge_config. Throughout this entire flow, the __path__ metadata (jsonargparse/_util.py: line 153-154) tracks the original configuration file location, enabling proper resolution of nested configuration references and maintaining file provenance information for error reporting and debugging purposes.",
+      "reference_sha256": "e294120617b0e1e0f689b0e9095d55289843500813db8489bfaec4438e5411c6",
+      "repository": {
+        "commit": "dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+        "family_id": "omni-us/jsonargparse",
+        "url": "https://github.com/omni-us/jsonargparse"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/omni-us--jsonargparse-dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+      "task_id": "import-3c226b839a191b337414c390"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/omni-us--jsonargparse-dd0f9e3767fc",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 552,
+            "file_sha256": "c856f3beaecad3b1d4456547d369d628c49769b2ff11b0538b10ffbc755f5143",
+            "path": "jsonargparse/_signatures.py",
+            "start_line": 37
+          },
+          {
+            "end_line": 170,
+            "file_sha256": "51a7cb0e398c84ba09096fb649e69fdd191b395cbe172e2bb53c85264323c514",
+            "path": "jsonargparse/_core.py",
+            "start_line": 94
+          },
+          {
+            "end_line": 1508,
+            "file_sha256": "51a7cb0e398c84ba09096fb649e69fdd191b395cbe172e2bb53c85264323c514",
+            "path": "jsonargparse/_core.py",
+            "start_line": 180
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What subclasses and inheritance relationships exist in jsonargparse's core parsing architecture between ActionsContainer, SignatureArguments, and ArgumentParser?",
+      "question_sha256": "c9da793d8c5ac2d4d9be97030cbdc2eec1f3cbf32b93e55327562aa70908768c",
+      "reference_answer": "The core parsing architecture is defined through a clear inheritance hierarchy connecting SignatureArguments, ActionsContainer, and ArgumentParser.\nSignatureArguments, defined in jsonargparse/_signatures.py (lines 37\u2013552), is a mixin class that inherits directly from object and provides the logic for automatically generating command-line arguments from Python type hints and callable signatures, including methods such as add_class_arguments, add_method_arguments, and add_function_arguments.\nActionsContainer, defined in jsonargparse/_core.py (lines 94\u2013170), serves as the bridge between jsonargparse\u2019s extended functionality and Python\u2019s built-in argparse system, and it inherits from both SignatureArguments and argparse._ActionsContainer via the declaration class ActionsContainer(SignatureArguments, argparse._ActionsContainer).\nThrough inheritance from SignatureArguments, ActionsContainer gains signature introspection and argument-generation capabilities, while inheritance from argparse._ActionsContainer allows it to function as a standard container for arguments, making it the common base for both the main parser and argument groups such as _ArgumentGroup.\nArgumentParser, defined in jsonargparse/_core.py (lines 180\u20131508) and exposed as the primary public interface, is the main parsing class and inherits from ActionsContainer and argparse.ArgumentParser, along with additional mixins such as ParserDeprecations or LoggerProperty depending on the version.\nCrucially, ActionsContainer (and thus SignatureArguments) appears before argparse.ArgumentParser in the method resolution order, which allows ArgumentParser to override standard argparse behavior, such as add_argument, while seamlessly incorporating jsonargparse\u2019s signature-based and type-hint-driven argument processing.\nAs a result, both the top-level ArgumentParser and any argument groups it creates, which also inherit from ActionsContainer, share the same enhanced ability to add and validate arguments derived directly from class or function signatures.",
+      "reference_sha256": "c9ef168f7df14105f3491d655f67c86f1c44ae419700abcfd7ba0e7d0d8f6888",
+      "repository": {
+        "commit": "dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+        "family_id": "omni-us/jsonargparse",
+        "url": "https://github.com/omni-us/jsonargparse"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/omni-us--jsonargparse-dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+      "task_id": "import-697d3ee35f66f6005c502892"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/omni-us--jsonargparse-dd0f9e3767fc",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 909,
+            "file_sha256": "51a7cb0e398c84ba09096fb649e69fdd191b395cbe172e2bb53c85264323c514",
+            "path": "jsonargparse/_core.py",
+            "start_line": 894
+          },
+          {
+            "end_line": 578,
+            "file_sha256": "eacd17252b31f3d9008420547a653e62766115c13cd4a0bb62f8cd66ae84ab91",
+            "path": "jsonargparse/_actions.py",
+            "start_line": 578
+          },
+          {
+            "end_line": 987,
+            "file_sha256": "51a7cb0e398c84ba09096fb649e69fdd191b395cbe172e2bb53c85264323c514",
+            "path": "jsonargparse/_core.py",
+            "start_line": 937
+          },
+          {
+            "end_line": 641,
+            "file_sha256": "51a7cb0e398c84ba09096fb649e69fdd191b395cbe172e2bb53c85264323c514",
+            "path": "jsonargparse/_core.py",
+            "start_line": 613
+          },
+          {
+            "end_line": 1318,
+            "file_sha256": "51a7cb0e398c84ba09096fb649e69fdd191b395cbe172e2bb53c85264323c514",
+            "path": "jsonargparse/_core.py",
+            "start_line": 1303
+          },
+          {
+            "end_line": 590,
+            "file_sha256": "eacd17252b31f3d9008420547a653e62766115c13cd4a0bb62f8cd66ae84ab91",
+            "path": "jsonargparse/_actions.py",
+            "start_line": 583
+          },
+          {
+            "end_line": 759,
+            "file_sha256": "eacd17252b31f3d9008420547a653e62766115c13cd4a0bb62f8cd66ae84ab91",
+            "path": "jsonargparse/_actions.py",
+            "start_line": 759
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the configuration merging logic implemented when default_config_files are processed for subcommands with repeated keys?",
+      "question_sha256": "9c9e454ecd27426f4820b8a6b726d0c40dd1e24159279339a129c44299705ce2",
+      "reference_answer": "The configuration merging logic for default_config_files with subcommands and repeated keys is implemented across several interconnected methods. The core process begins in ArgumentParser._get_default_config_files() (jsonargparse/_core.py: line 894-909), which collects configuration files from both parent parsers and the current parser using the parent_parsers context variable (jsonargparse/_actions.py: line 578). This method iterates through parent parsers stored in the parent_parsers ContextVar, extracting default config file patterns and creating tuples of (key, file_path) pairs. The actual loading and merging occurs in ArgumentParser.get_defaults() (jsonargparse/_core.py: line 937-987), which processes each default config file by calling _load_config_parser_mode with a key parameter to handle nested subcommand structures. The fix for repeated keys was implemented by modifying _load_config_parser_mode (jsonargparse/_core.py: line 613-641) to accept an optional key parameter and extract the relevant section from the config dictionary using cfg_dict.get(key, {}) when the key is specified. This prevents conflicts when the same key appears at different levels of the subcommand hierarchy. The merge process itself is handled by ArgumentParser.merge_config() (jsonargparse/_core.py: line 1303-1318), which clones the target configuration and updates it with values from the source configuration. The parent_parsers context is maintained through parent_parsers_context (jsonargparse/_actions.py: line 583-590) and utilized during subcommand handling in _ActionSubCommands.handle_subcommands() (jsonargparse/_actions.py: line 759), ensuring that nested subcommand configurations are properly scoped and merged without key conflicts.",
+      "reference_sha256": "09f97ba84ce51c83321de8a1767826929790148a59ae90311b72d44d8f307e3c",
+      "repository": {
+        "commit": "dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+        "family_id": "omni-us/jsonargparse",
+        "url": "https://github.com/omni-us/jsonargparse"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/omni-us--jsonargparse-dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+      "task_id": "import-ab3b7c4537df54e0e07fc7f7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/omni-us--jsonargparse-dd0f9e3767fc",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 616,
+            "file_sha256": "eacd17252b31f3d9008420547a653e62766115c13cd4a0bb62f8cd66ae84ab91",
+            "path": "jsonargparse/_actions.py",
+            "start_line": 615
+          },
+          {
+            "end_line": 773,
+            "file_sha256": "eacd17252b31f3d9008420547a653e62766115c13cd4a0bb62f8cd66ae84ab91",
+            "path": "jsonargparse/_actions.py",
+            "start_line": 755
+          },
+          {
+            "end_line": 480,
+            "file_sha256": "51a7cb0e398c84ba09096fb649e69fdd191b395cbe172e2bb53c85264323c514",
+            "path": "jsonargparse/_core.py",
+            "start_line": 452
+          },
+          {
+            "end_line": 1354,
+            "file_sha256": "51a7cb0e398c84ba09096fb649e69fdd191b395cbe172e2bb53c85264323c514",
+            "path": "jsonargparse/_core.py",
+            "start_line": 1320
+          },
+          {
+            "end_line": 38,
+            "file_sha256": "c0f870e44d416919dd8e85753e7b87a672261d95dcedc1d74da2e137fe44131d",
+            "path": "jsonargparse/_parameter_resolvers.py",
+            "start_line": 29
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "eacd17252b31f3d9008420547a653e62766115c13cd4a0bb62f8cd66ae84ab91",
+            "kind": "file_reference",
+            "line_count": 773,
+            "path": "jsonargparse/_actions.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 942,
+            "line_count": 941,
+            "path": "jsonargparse/_parameter_resolvers.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "jsonargparse/_parameter_resolvers.py",
+            "resolved_path": "jsonargparse/_parameter_resolvers.py",
+            "start_line": 905
+          }
+        ]
+      },
+      "question": "Why does the parameter resolution pipeline in nested subcommand hierarchies experience performance degradation when default_env=True is combined with complex type annotations?",
+      "question_sha256": "4d1ec1e630826bd0b7b32028e960bd3cca5569cb531776176b579bc6e5fc4a26",
+      "reference_answer": "The performance degradation occurs due to cascading environment variable resolution that scales multiplicatively with subcommand nesting depth. When default_env=True is set, the _actions.py propagates this setting to child parsers through inheritance (jsonargparse/_actions.py: line 615-616), causing each subcommand level to independently process environment variables. The handle_subcommands method recursively invokes parse_env for each nested subcommand (jsonargparse/_actions.py: line 755-773), triggering the full environment variable resolution pipeline at every level. During environment variable processing in _load_env_vars (jsonargparse/_core.py: line 452-480), each environment variable triggers _check_value_key for type validation (jsonargparse/_core.py: line 1320-1354), which invokes the complex type annotation resolution system. This system utilizes the ParamData annotation framework (jsonargparse/_parameter_resolvers.py: line 29-38) and performs AST-based signature parameter resolution (jsonargparse/_parameter_resolvers.py: line 905-942) for complex type annotations. The multiplicative effect creates O(n*m*t) complexity where n is the nesting depth, m is the number of environment variables, and t is the type annotation complexity, rather than the expected linear processing. This results in performance degradation due to redundant type annotation parsing and environment variable validation at each hierarchical level.",
+      "reference_sha256": "8bc2ebdbb330fbaa86927f94c9885923be9ea05f8bd9ba6f6d641691ec7a7ab0",
+      "repository": {
+        "commit": "dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+        "family_id": "omni-us/jsonargparse",
+        "url": "https://github.com/omni-us/jsonargparse"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/omni-us--jsonargparse-dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+      "task_id": "import-ae7e313ea85b55938194f7fa"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/omni-us--jsonargparse-dd0f9e3767fc",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 49,
+            "file_sha256": "1aaa7a7df460257916c52e9802b50a2230099d26f42a19c90199495952fae942",
+            "path": "jsonargparse/_loaders_dumpers.py",
+            "start_line": 32
+          },
+          {
+            "end_line": 33,
+            "file_sha256": "1aaa7a7df460257916c52e9802b50a2230099d26f42a19c90199495952fae942",
+            "path": "jsonargparse/_loaders_dumpers.py",
+            "start_line": 32
+          },
+          {
+            "end_line": 43,
+            "file_sha256": "9a5e460b0b9f2d04830da2736568126daac442c4bd229f9ea472b7e060454e7d",
+            "path": "jsonargparse_tests/test_loaders_dumpers.py",
+            "start_line": 29
+          },
+          {
+            "end_line": 115,
+            "file_sha256": "1aaa7a7df460257916c52e9802b50a2230099d26f42a19c90199495952fae942",
+            "path": "jsonargparse/_loaders_dumpers.py",
+            "start_line": 107
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does jsonargparse implement a custom YAML loader with modified implicit resolvers for floating-point number detection instead of using the standard PyYAML DefaultLoader?",
+      "question_sha256": "95679596c9baa23e11b670182a41ce74a91cb8931017393babd5dea448ea600f",
+      "reference_answer": "jsonargparse implements a custom YAML loader to address fundamental incompatibilities between standard PyYAML behavior and command-line interface requirements. The standard PyYAML DefaultLoader creates two critical problems for CLI usage. First, it lacks proper scientific notation support - values like '1e-3' or '123e4' are treated as strings rather than floats (jsonargparse/_loaders_dumpers.py: line 32-49). The custom loader removes PyYAML's standard float resolver and replaces it with an enhanced pattern that includes the clause '[-+]?(?:[0-9][0-9_]*)(?:[eE][-+]?[0-9]+)' to properly recognize scientific notation without requiring decimal points. Second, standard PyYAML aggressively converts CLI-like strings into unintended data structures - '{text}' becomes the mapping {'text': None} and 'Foo:' becomes {'Foo': None} (jsonargparse/_loaders_dumpers.py: line 32-33, jsonargparse_tests/test_loaders_dumpers.py: line 29-43). The custom implementation removes the implicit resolvers for timestamps and uses the remove_implicit_resolver function to disable these problematic conversions. Additionally, the load_value function provides a safety mechanism through its simple_types parameter (jsonargparse/_loaders_dumpers.py: line 107-115) - when simple_types=False, if the YAML loader produces basic types (int, float, bool, str), the original string value is returned instead, ensuring that command-line arguments maintain their literal form when type conversion is not explicitly desired.",
+      "reference_sha256": "c44ad3568dba603935716efa775b3a29a6515a2884ab3d330df729ff7c34517c",
+      "repository": {
+        "commit": "dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+        "family_id": "omni-us/jsonargparse",
+        "url": "https://github.com/omni-us/jsonargparse"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/omni-us--jsonargparse-dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+      "task_id": "import-d0937269105948d01e8d37c7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/omni-us--jsonargparse-dd0f9e3767fc",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 577,
+            "file_sha256": "4f161245b92103259cf22f5211872628465dd6594297e88d80b7d5f26d1626d4",
+            "path": "jsonargparse/_typehints.py",
+            "start_line": 577
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does jsonargparse's validation framework handle discriminated unions of dataclass-like classes during argument parsing and type adaptation?",
+      "question_sha256": "9d851a7c0f721416dd313086ec32bd21c69d110664e148e7337698b84153eb7a",
+      "reference_answer": "The jsonargparse validation framework handles discriminated unions of dataclass-like classes through a sophisticated multi-step process orchestrated by the adapt_typehints function (in jsonargparse/_typehints.py Line 577). When encountering a Union type, the framework iterates through each subtype sequentially, attempting to validate the input value against each possibility until one succeeds or all fail. The core discrimination mechanism relies on two key type predicates: is_dataclass_like determines if a type qualifies as dataclass-like (supporting standard dataclasses, Pydantic BaseModel, attrs classes, and @final classes), while is_subclass_typehint identifies regular subclass types that require the class_path/init_args pattern. For dataclass-like types in unions, the framework accepts direct field values as dictionaries or Namespace objects and uses get_class_parser to create specialized parsers that handle the validation and conversion. These parsers can parse_object from the input data, applying defaults and type coercion as needed. In contrast, subclass-style unions require a structured format with class_path for the import path and optional init_args for constructor parameters. When all subtypes in a union fail validation, raise_union_unexpected_value aggregates the individual exception messages and provides comprehensive error feedback about which subtypes were attempted and why they failed. The ActionTypeHint._check_type method serves as the primary entry point, calling adapt_typehints with appropriate context including configuration state and enabling path-based loading when applicable.",
+      "reference_sha256": "2acb7eb3cf3c19c5dfac66a43e6fd1178e9bc38f990bc9cf5359ff8a1d836163",
+      "repository": {
+        "commit": "dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+        "family_id": "omni-us/jsonargparse",
+        "url": "https://github.com/omni-us/jsonargparse"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/omni-us--jsonargparse-dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+      "task_id": "import-d4dbcf1fa92b9feadbf73603"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/omni-us--jsonargparse-dd0f9e3767fc",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 902,
+            "file_sha256": "c0f870e44d416919dd8e85753e7b87a672261d95dcedc1d74da2e137fe44131d",
+            "path": "jsonargparse/_parameter_resolvers.py",
+            "start_line": 856
+          },
+          {
+            "end_line": 103,
+            "file_sha256": "f7992fb2753cf4b04e3e35f1f51a1911cc0b439eccf7108c6f32959ee1fcbca3",
+            "path": "jsonargparse/_common.py",
+            "start_line": 81
+          },
+          {
+            "end_line": 815,
+            "file_sha256": "c0f870e44d416919dd8e85753e7b87a672261d95dcedc1d74da2e137fe44131d",
+            "path": "jsonargparse/_parameter_resolvers.py",
+            "start_line": 804
+          },
+          {
+            "end_line": 837,
+            "file_sha256": "c0f870e44d416919dd8e85753e7b87a672261d95dcedc1d74da2e137fe44131d",
+            "path": "jsonargparse/_parameter_resolvers.py",
+            "start_line": 826
+          },
+          {
+            "end_line": 853,
+            "file_sha256": "c0f870e44d416919dd8e85753e7b87a672261d95dcedc1d74da2e137fe44131d",
+            "path": "jsonargparse/_parameter_resolvers.py",
+            "start_line": 840
+          },
+          {
+            "end_line": 439,
+            "file_sha256": "c0f870e44d416919dd8e85753e7b87a672261d95dcedc1d74da2e137fe44131d",
+            "path": "jsonargparse/_parameter_resolvers.py",
+            "start_line": 431
+          },
+          {
+            "end_line": 782,
+            "file_sha256": "c0f870e44d416919dd8e85753e7b87a672261d95dcedc1d74da2e137fe44131d",
+            "path": "jsonargparse/_parameter_resolvers.py",
+            "start_line": 479
+          },
+          {
+            "end_line": 801,
+            "file_sha256": "c0f870e44d416919dd8e85753e7b87a672261d95dcedc1d74da2e137fe44131d",
+            "path": "jsonargparse/_parameter_resolvers.py",
+            "start_line": 784
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 942,
+            "line_count": 941,
+            "path": "jsonargparse/_parameter_resolvers.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "jsonargparse/_parameter_resolvers.py",
+            "resolved_path": "jsonargparse/_parameter_resolvers.py",
+            "start_line": 905
+          }
+        ]
+      },
+      "question": "What is the inheritance hierarchy used by jsonargparse's parameter resolution system to handle different dataclass-like types (standard dataclasses, Pydantic models, and attrs classes)?",
+      "question_sha256": "8773975b2b15bb0aebd8f06a71796a81196e3632acee8448525b7f5188a8001e",
+      "reference_answer": "The parameter resolution system employs a four-tier inheritance hierarchy designed to handle different dataclass-like types systematically. At the top level, get_signature_parameters (jsonargparse/_parameter_resolvers.py: line 905-942) serves as the main entry point that orchestrates the resolution process through a cascade of increasingly general strategies. The first tier attempts specialized resolution via get_parameters_from_pydantic_or_attrs (jsonargparse/_parameter_resolvers.py: line 856-902), which acts as a dispatcher for dataclass-like types. This function uses is_dataclass_like (jsonargparse/_common.py: line 81-103) to classify types and delegates to specific field data extractors based on framework detection. The second tier contains framework-specific extractors: get_field_data_pydantic1_model (jsonargparse/_parameter_resolvers.py: line 804-815) for Pydantic v1 models, get_field_data_pydantic2_model (jsonargparse/_parameter_resolvers.py: line 826-837) for Pydantic v2 models, and get_field_data_attrs (jsonargparse/_parameter_resolvers.py: line 840-853) for attrs classes. Each extractor understands the specific field metadata and default value semantics of its respective framework. The third tier handles complex inheritance scenarios through get_mro_parameters (jsonargparse/_parameter_resolvers.py: line 431-439), which performs method resolution order traversal to ensure proper parameter inheritance from parent classes. When specialized resolution fails, the system falls back to the ParametersVisitor class (jsonargparse/_parameter_resolvers.py: line 479-782) for AST-based analysis, and finally to get_parameters_by_assumptions (jsonargparse/_parameter_resolvers.py: line 784-801) when source code is unavailable. This hierarchical approach ensures comprehensive support for standard dataclasses, both versions of Pydantic models, and attrs classes while maintaining compatibility with complex inheritance patterns",
+      "reference_sha256": "a6da1bcc6cd8c2b08aa742720953ee018bde45b38867eef2b89cafef65590dcd",
+      "repository": {
+        "commit": "dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+        "family_id": "omni-us/jsonargparse",
+        "url": "https://github.com/omni-us/jsonargparse"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/omni-us--jsonargparse-dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+      "task_id": "import-db89c718c8f990426951c536"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/omni-us--jsonargparse-dd0f9e3767fc",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 49,
+            "file_sha256": "1aaa7a7df460257916c52e9802b50a2230099d26f42a19c90199495952fae942",
+            "path": "jsonargparse/_loaders_dumpers.py",
+            "start_line": 36
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the float pattern regex defined that causes strings containing digits and 'e' characters to be incorrectly parsed as floats instead of strings?",
+      "question_sha256": "06bf0a633c9ad39082cca28ac5d993c2d3a71649dfeade023148cfeb921be1de",
+      "reference_answer": "The float pattern regex is defined in jsonargparse/_loaders_dumpers.py at lines 36-49, where DefaultLoader.add_implicit_resolver() registers a custom regex pattern for 'tag:yaml.org,2002:float'. The pattern includes the scientific notation component '(?:[eE][-+]?[0-9]+)' on line 41, which matches strings consisting of digits followed by 'e' and more digits (scientific notation). This definition causes strings that look like scientific notation (e.g., file hashes like 123e456) to be automatically parsed as floating-point numbers instead of strings.",
+      "reference_sha256": "62744d69189235697ea85c5b49fa945a7ed8a3d3e8b9347aa1982076a644a8ac",
+      "repository": {
+        "commit": "dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+        "family_id": "omni-us/jsonargparse",
+        "url": "https://github.com/omni-us/jsonargparse"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/omni-us--jsonargparse-dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+      "task_id": "import-dbc96c4659da71e65d10baa1"
+    }
+  ]
+}

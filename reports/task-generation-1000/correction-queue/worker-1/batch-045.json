@@ -1,0 +1,126 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 1,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-045.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "f08742eb3f90876e6bf982bcfaab2a15d049cff23119ac4eb88bb9514e6cb632",
+      "question": "Why does the assignment name processing method defer frame node visitation until the local variable type attribute is accessed rather than visiting frames upfront?",
+      "question_sha256": "b4b1e1f3d005542fa8e10172c2e02305d5f3cc1fe4a768063887d3adaf2968f6",
+      "reference_answer": "visit_assignname first uses _handled to prevent duplicate processing across Linkers. It selects the enclosing frame or module for a global name, initializes locals_type if that frame has not yet been visited, then merges inferred types. Frame visitors themselves guard against reinitialization (pylint/pyreverse/inspector.py:137-218). This accommodates visitation order and reuse; it does not establish that all frames are otherwise skipped or quantify a speedup.",
+      "reference_sha256": "9a311d257dfac5064036077300302e928b5fdbbb3d417d3afba1c6087c7f69b5",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-0bdb889ba31573bf3694ddf2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "5e9bb4a5a20f7fa4e4ce0b47537807676cbb83509a643d9acb4a891f5a62dc68",
+      "question": "Where does the descriptor protocol implementation that provides __get__ and __set__ methods interact with the slot assignment validation mechanisms across the inheritance hierarchy in the slot assignment test file?",
+      "question_sha256": "4e17a92f1f4440096d3aea9c8c6e4809168f1fadf3f2695f436989d5688c87c5",
+      "reference_answer": "The regression fixture assigns through Base.attr2, a MyDescriptor implementing __get__ and __set__, on a Repro instance (tests/functional/a/assigning/assigning_non_slot.py:219-241). _check_in_slots has several exemptions: properties, class attributes, annotation-only local attributes, and locally found data descriptors (pylint/checkers/classes/class_checker.py:1806-1828). _has_data_descriptor infers an attribute and looks for __get__ and __set__ (lines 396-412), but its invocation is inside the local-attribute branch; the inherited fixture must not be described as unconditionally taking that helper path.",
+      "reference_sha256": "317092f11e82c52a1a75ef03add5b0f3bae83417a11b3ad1fd622f91d7caeecd",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-1a0a848fe0d53a38b00368c7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "5364f5dc61ce95ce3b059296f0437594aa466d9928b5a06015079090fc5cd30e",
+      "question": "What is the exception handling pattern that catches an exception and raises a new one with 'from None' to decouple error detection from propagation?",
+      "question_sha256": "5726540805774a94f92a250796910ff1935cb398e68740013a8a5fec029e1ef7",
+      "reference_answer": "raise_catch_raise catches and prints the original exception, then raises a fresh Exception from None (tests/functional/b/broad_exception/broad_exception_raised.py:33-38). This explicitly suppresses display of implicit exception context; it does not delete the stored context. In the AST, explicit from None supplies a cause node, so visit_raise routes to _check_bad_exception_cause, which accepts a Const whose value is None (pylint/checkers/exceptions.py:319-373). The broad-exception-raised warning remains applicable to the newly raised generic Exception.",
+      "reference_sha256": "47ec99c36b8cb5ad74bff65782e4ed2244c325f57e3216ac6be8bcf1d1447ae5",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-1c5442786feebda389e3b4e5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "bb7e917bf467fffa819744f0717867c7551493b493c6a1268ac86090ef7e2bf7",
+      "question": "What is the semantic relationship between input arguments and return values when the functools cache decorator is applied?",
+      "question_sha256": "15daadd85504f0c0f695bc55e92e8f8c9428253165accfa3754a9ba372769948",
+      "reference_answer": "Caching associates a call key with a retained result, permitting repeated equivalent calls to reuse that result. On instance methods, the key includes the instance. Pylint identifies functools.cache and lru_cache(maxsize=None) and emits method-cache-max-size-none, with exemptions for enum ancestry and non-instance methods (pylint/checkers/stdlib.py:726-766). An unbounded cache can retain arguments and results while entries remain cached; clearing or discarding the cache can release those references. The source does not imply a reverse result-to-argument mapping.",
+      "reference_sha256": "92efcc1eeadd7563a2a6560abf0c6f9474965e3ecbebadbd6ffb99e8ad2b7321",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-2505179a3385b7e8b3b70c7e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "5fac7d5d9a825620383921b375b75d196ac9f615ed26dfa26bd002b042155b14",
+      "question": "Why does the current implementation of the method that checks class subscriptability for generic type annotations cause performance overhead when the same class is checked repeatedly during static analysis?",
+      "question_sha256": "e5f7ee551d1b3bbf4b12b5897f2fa891b08652aa207a624a98caddb2f768c4e1",
+      "reference_answer": "supports_getitem calls _supports_protocol_method for ClassDef.__class_getitem__ (pylint/checkers/utils.py:1316-1319). The helper calls value.getattr and examines the result without its own memoization (lines 1180-1201). Repeated calls therefore repeat this helper work, but these lines do not establish the underlying lookup cost, cache behavior elsewhere, or a significant bottleneck. Memoization is a possible experiment after profiling, with a lifecycle that avoids stale results and retaining ASTs unnecessarily.",
+      "reference_sha256": "a49e7575e20c15825900c0a0f6483e2432f1b5ffb08c67457b92f438e57c27fa",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-2cd6a2da9c1f440f1a4a0ae8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "faa163011533f10547bb3b339e4ea5eade3ad55df3f669cc8a3cc17d7f661811",
+      "question": "What is the architectural pattern that distinguishes type-annotated from non-annotated instance attribute initialization using AST node type separation?",
+      "question_sha256": "1aa04a329a1076648d7d51395128dc7b4e0fc9fd550f9c58d8ba0eaf8dda965f",
+      "reference_answer": "The code branches on AST node types rather than introducing a separate attribute-storage architecture. is_attribute_typed_annotation checks the first local attribute binding for AssignName with an AnnAssign parent, then recursively checks inferred bases (pylint/checkers/utils.py:1731-1752). Separately, _get_all_attribute_assignments traverses Assign and AnnAssign and normalizes their different target fields before collecting AssignAttr names (pylint/checkers/typecheck.py:525-545). These support annotation-aware checks but do not prove all instance attributes share the claimed storage or guarantee postponed-annotation handling.",
+      "reference_sha256": "d821912cf59560e880b5ff24f294dacd5b0e8c6446c5d78087ceb66fcaad0c59",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-533cf8ea035081a729f35f20"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "bda8f48ae3b0778572b8b5aa791ea9229d35787e6639c1ab856aa3532dd7fec1",
+      "question": "How should the custom string class architecture be redesigned to separate parameter validation from formatting operations while maintaining backward compatibility with the built-in str interface?",
+      "question_sha256": "43646c804318805dc669ea811a06e2f1f5fd5a6421d364b9e7ca96109172a996",
+      "reference_answer": "MyString is a minimal lint fixture: rjust only calls width.__index__ and returns no formatted string (tests/functional/u/unnecessary/unnecessary_dunder_call.py:127-131). A proposed production design should retain str inheritance and delegate formatting and built-in argument validation to super().rjust(width, fillchar), returning its result. If extra domain validation is required, put it in a helper before delegation and document any stricter behavior. No __init__ override or mutable validator instance is necessary. This proposal restores built-in formatting semantics; it is not behavior-preserving for the existing fixture.",
+      "reference_sha256": "aa679958d0d133f0d55c4e7899324fcd2a1f7260d5addd08be9cd94a64e61c07",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-616acfb0a51760eb40b98a01"
+    }
+  ]
+}

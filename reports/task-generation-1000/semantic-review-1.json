@@ -1,0 +1,632 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "purposive sample not all1000",
+  "tasks": [
+    {
+      "task_id": "import-044fbaedd790bfa9f36b0f7b",
+      "reference_sha256": "7d9fe0423b667591300f6144ab69b46234b3830f0a37a6823d08ea4433778e9f",
+      "question_sha256": "c8df26c2f688adc0882a3f816deca5b05e2a5e043c4b34c8d069843cf188e811",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Finer discretization increases grid size",
+          "verdict": "supported",
+          "evidence": {
+            "path": "astropy/modeling/bounding_box.py",
+            "start_line": 133,
+            "end_line": 134
+          },
+          "reason": "arange uses resolution as its step; larger steps instead reduce the grid in general."
+        },
+        {
+          "claim": "Changing resolution dynamically rebuilds the cached grid",
+          "verdict": "contradicted",
+          "evidence": {
+            "path": "astropy/modeling/convolution.py",
+            "start_line": 51,
+            "end_line": 85
+          },
+          "reason": "Cache invalidation checks only missing convolution or changed kwargs, not _resolution."
+        }
+      ],
+      "material_errors": [
+        "Answer reverses increased step size into decreased step size. Runtime mutation is not automatically reflected in an existing cache."
+      ],
+      "citation_corrections": [],
+      "notes": "Question assumes a runtime resolution mechanism not provided by a public setter. Static source review only; no repository code executed.",
+      "corrected_reference_answer": "The cache flag retains a RegularGridInterpolator for reuse; disabling it recomputes the domain, mesh and convolution on every call (astropy/modeling/convolution.py:68-85). Increasing the step size generally reduces the number of grid points, hence the grid storage and computation, because the domain uses np.arange(..., resolution) (astropy/modeling/bounding_box.py:133-134). Runtime changes to _resolution alone do not invalidate an existing cache: call clear_cache() or create a new model before evaluating the changed grid (astropy/modeling/convolution.py:61-80). Caching saves repeated convolution work at the cost of retaining grid data; disabling caching removes retained cache storage, but still needs temporary computation memory."
+    },
+    {
+      "task_id": "import-07783c19f1efdb9b1314b31f",
+      "reference_sha256": "25be1f59caa560d5a1c0f9d11f66f6f4653a9e895b91b7e03900b9e00908e3bf",
+      "question_sha256": "398215b212b50d4744d9bfeaa41a4bcf64d763ba47ead21a575bad12fa38deca",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "is_dirty filters parsed status paths with fnmatch",
+          "verdict": "supported",
+          "evidence": {
+            "path": "conan/tools/scm/git.py",
+            "start_line": 133,
+            "end_line": 155
+          },
+          "reason": "Explicit path extraction strips surrounding quotes and applies exclusion patterns."
+        },
+        {
+          "claim": "The implementation documents why git pathspec was rejected",
+          "verdict": "unsupported",
+          "evidence": {
+            "path": "conan/tools/scm/git.py",
+            "start_line": 143,
+            "end_line": 154
+          },
+          "reason": "Comments explain output parsing, not pathspec alternatives, historical intent, or comparative portability."
+        }
+      ],
+      "material_errors": [
+        "Claims of personally testing git and historical/design rationale lack source evidence; fnmatch is not universally platform-independent."
+      ],
+      "citation_corrections": [
+        "spaces.txt is example text, not a missing source citation."
+      ],
+      "notes": "Question asks undocumented intent; code answers how, not a proven reason for rejecting pathspec. No execution needed for mechanism; historical rationale requires additional evidence. Static source review only; no repository code executed.",
+      "corrected_reference_answer": "Git.is_dirty runs git status, extracts each reported path, strips surrounding quotes, then removes paths matching self._excluded using fnmatch.fnmatch (conan/tools/scm/git.py:143-155). The comments explicitly account for paths containing spaces (150-152). The pinned implementation does not explain why git pathspec exclusions were not chosen; simplicity or shell-quoting benefits would be plausible interpretations, not established design intent."
+    },
+    {
+      "task_id": "import-1bb79aa402423c16dff40dee",
+      "reference_sha256": "7bd8d6a36c4e679aaa1f4e0ae30920b6235156a052f908a7bf7366ab64140b18",
+      "question_sha256": "26800859eef7283b37cd2250c427c2147a3e65adf112cc6ea31e1435a9a81077",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "BaseUrlSession resolves request URLs and delegates session behavior",
+          "verdict": "supported",
+          "evidence": {
+            "path": "dwave/cloud/utils.py",
+            "start_line": 282,
+            "end_line": 301
+          },
+          "reason": "Subclass overrides request and applies urljoin before requests.Session.request."
+        },
+        {
+          "claim": "Client configures endpoint-based sessions",
+          "verdict": "supported",
+          "evidence": {
+            "path": "dwave/cloud/client.py",
+            "start_line": 513,
+            "end_line": 539
+          },
+          "reason": "Normalizes trailing slash, constructs BaseUrlSession and sets adapters, authentication headers and proxy options."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Answerable statically. URL routing means client-side URL resolution, not server routing. Relative solver and multipart call sites also located at client.py:632-635 and 1714. Static source review only; no repository code executed."
+    },
+    {
+      "task_id": "import-08933d31a87481f23a4dc833",
+      "reference_sha256": "246db94aa831c03fba864fc9af41bb49860a413f06e30967f31cb8a56fbcfa9a",
+      "question_sha256": "2cafd95f4701560eff0ae029e0b8dd7fe0de9001cef66cb859b57c597219ca78",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "GeoSeries itself owns lazy index cache",
+          "verdict": "contradicted",
+          "evidence": {
+            "path": "geopandas/base.py",
+            "start_line": 4888,
+            "end_line": 4938
+          },
+          "reason": "Property delegates to self.geometry.values.sindex."
+        },
+        {
+          "claim": "Lazy cache exists on underlying geometry array",
+          "verdict": "supported",
+          "evidence": {
+            "path": "geopandas/array.py",
+            "start_line": 335,
+            "end_line": 341
+          },
+          "reason": "Actual cache location and construction are here."
+        },
+        {
+          "claim": "SpatialIndex.query performs pandas alignment and GIL-bound postprocessing",
+          "verdict": "contradicted",
+          "evidence": {
+            "path": "geopandas/sindex.py",
+            "start_line": 210,
+            "end_line": 243
+          },
+          "reason": "Calls Shapely then NumPy sorting/array construction and returns indices; cited code contains no pandas alignment or serialization mechanism."
+        }
+      ],
+      "material_errors": [
+        "Central categorical concurrency/scaling failure is unsupported by static source and attributed to nonexistent pandas work in the cited query."
+      ],
+      "citation_corrections": [
+        "Cache construction citation should be geopandas/array.py:335-341; base.py:4938 only delegates."
+      ],
+      "notes": "Performance premise needs workload and measurements; native Shapely/GEOS execution cannot be characterized as serialized from these files. Static source review only; no repository code executed.",
+      "corrected_reference_answer": "The code alone does not establish a general concurrency scaling failure. GeoSeries/GeoDataFrame.sindex delegates to the geometry array (geopandas/base.py:4938), whose property lazily caches SpatialIndex (geopandas/array.py:335-341). Construction copies the geometry array and creates a Shapely STRtree (geopandas/sindex.py:25-35). Queries delegate to that tree and optionally sort or construct dense/sparse NumPy/SciPy outputs (geopandas/sindex.py:210-243). Index rebuilding and large outputs can add cost, but attributing a particular slowdown to serialization, GIL contention or pandas alignment requires the actual operation, data, object-reuse pattern and measurements."
+    },
+    {
+      "task_id": "import-032ed4ac089801d8763d60f5",
+      "reference_sha256": "41c6c3ef3b2e7c73852328e36e99b757f5ac5cd633cd4fb1a981b1730a45e279",
+      "question_sha256": "005e48e97a05be7227dc8cca4cc66e4698e8d59d15afd5937cffa19e709faf0c",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Decorator wraps parser validation and translates errors",
+          "verdict": "supported",
+          "evidence": {
+            "path": "hy/macros.py",
+            "start_line": 37,
+            "end_line": 80
+          },
+          "reason": "whole(pattern), wrapper_maker, parse, syntax error conversion and macro installation are explicit."
+        },
+        {
+          "claim": "Combinator requires whole argument sequence",
+          "verdict": "supported",
+          "evidence": {
+            "path": "hy/model_patterns.py",
+            "start_line": 58,
+            "end_line": 65
+          },
+          "reason": "finished enforces no remaining inputs."
+        },
+        {
+          "claim": "Compiler macro-expands before expression compilation",
+          "verdict": "supported",
+          "evidence": {
+            "path": "hy/compiler.py",
+            "start_line": 560,
+            "end_line": 569
+          },
+          "reason": "macroexpand runs at entry and returned AST/results are used."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Answerable statically; three-layer terminology is informal but mechanism accurate. Static source review only; no repository code executed."
+    },
+    {
+      "task_id": "import-0286db3e04e10bc0cb64bc59",
+      "reference_sha256": "53e1eeace2a7aef9d4682f093f2bd5b4aa4d1e1acb5fbaa08d83363c436b5979",
+      "question_sha256": "2043239fe443f940d760d875d1f6e00c8e615efbd7f56d3a85d38744c7323025",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Travis matrix and tox coordinate Python versions and test modes",
+          "verdict": "supported",
+          "evidence": {
+            "path": ".travis.yml",
+            "start_line": 1,
+            "end_line": 14
+          },
+          "reason": "Matrix matches listed versions and test types."
+        },
+        {
+          "claim": "Tox unittest jobs collect coverage and lint separately",
+          "verdict": "supported",
+          "evidence": {
+            "path": "tox.ini",
+            "start_line": 1,
+            "end_line": 17
+          },
+          "reason": "nose coverage flags and flake8 exclusions match."
+        },
+        {
+          "claim": "Coveralls is conditional",
+          "verdict": "supported",
+          "evidence": {
+            "path": ".travis.sh",
+            "start_line": 3,
+            "end_line": 10
+          },
+          "reason": "Coverage branch installs coveralls and runs py27-unittests."
+        },
+        {
+          "claim": "Integration loops through themes",
+          "verdict": "supported",
+          "evidence": {
+            "path": "mkdocs/tests/integration.py",
+            "start_line": 91,
+            "end_line": 108
+          },
+          "reason": "Click main builds each discovered theme; independently counted 15 theme directories."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Describes pinned historical CI, not current MkDocs. No execution required to explain configuration. Static source review only; no repository code executed."
+    },
+    {
+      "task_id": "import-034d845133236ae9b7f5a3f3",
+      "reference_sha256": "6ca6085492bbb0ab159282cbde366bc411b30203310ddbb54ec8da3d6b5e445f",
+      "question_sha256": "3d725edc1767c882c84a4818aac486e3054be193fb5a6940fa006e79e4c62c8e",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "ActionsContainer selects ActionTypeHint and delegates validation",
+          "verdict": "supported",
+          "evidence": {
+            "path": "jsonargparse/_core.py",
+            "start_line": 119,
+            "end_line": 132
+          },
+          "reason": "Supported type hints take prepare_add_argument path."
+        },
+        {
+          "claim": "Every Union component must be supported",
+          "verdict": "contradicted",
+          "evidence": {
+            "path": "jsonargparse/_typehints.py",
+            "start_line": 224,
+            "end_line": 254
+          },
+          "reason": "Union is accepted when at least one subtype is supported; initializer discards unsupported Union members at 169-178."
+        },
+        {
+          "claim": "Leaf conversion directly casts primitive strings",
+          "verdict": "contradicted",
+          "evidence": {
+            "path": "jsonargparse/_typehints.py",
+            "start_line": 618,
+            "end_line": 625
+          },
+          "reason": "Uses YAML parsing plus instance checks, with explicit int-to-float conversion."
+        },
+        {
+          "claim": "Union validation recursively takes first successful alternative",
+          "verdict": "supported",
+          "evidence": {
+            "path": "jsonargparse/_typehints.py",
+            "start_line": 670,
+            "end_line": 682
+          },
+          "reason": "Calls adapt_typehints for each until success."
+        }
+      ],
+      "material_errors": [
+        "Universal all-components-supported claim has a Union exception; entry point is __call__, not call."
+      ],
+      "citation_corrections": [
+        "is_supported_typehint is _typehints.py:224-254, not around 302; adapt_typehints starts at 577, not 748; SignatureArguments is _signatures.py:37."
+      ],
+      "notes": "Core delegation is correct; precision edits needed. Static source review only; no repository code executed.",
+      "corrected_reference_answer": "ActionsContainer.add_argument detects supported type hints and prepares ActionTypeHint (jsonargparse/_core.py:119-132). ActionTypeHint.__call__ delegates values to _check_type (jsonargparse/_typehints.py:412-433), which uses recursive adapt_typehints. Schema support is checked by is_supported_typehint; Union is special because unsupported alternatives can be discarded rather than requiring every alternative to work (jsonargparse/_typehints.py:165-178,224-254). Runtime primitive conversion uses YAML parsing and instance validation, and Union conversion tries alternatives until one succeeds (jsonargparse/_typehints.py:618-625,670-682). Class configurations support class_path/init_args, with instantiation requested separately through instantiate_classes (jsonargparse/_typehints.py:497-504,871-900). SignatureArguments uses get_signature_parameters to populate parser arguments (jsonargparse/_signatures.py:233)."
+    },
+    {
+      "task_id": "import-05472f493dc811e6307cc99a",
+      "reference_sha256": "9bc94fc63e1036d12bb09888aa144cd864286ac6c10ee37aa3f67af26c5cb927",
+      "question_sha256": "f75ae08677b44cab0450bfdf63f39a27050e47b896007612faa8281b7b5ff1e1",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Reverse subtraction translates overflow into ValueError",
+          "verdict": "supported",
+          "evidence": {
+            "path": "xarray/coding/cftimeindex.py",
+            "start_line": 542,
+            "end_line": 549
+          },
+          "reason": "TimedeltaIndex construction is inside try and catches defined bounds exceptions."
+        },
+        {
+          "claim": "Distant scalar case is covered by a test",
+          "verdict": "supported",
+          "evidence": {
+            "path": "xarray/tests/test_cftimeindex.py",
+            "start_line": 960,
+            "end_line": 965
+          },
+          "reason": "Year 1 minus year 2000 index asserts difference exceeds."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Reference appropriately corrects the question: limit is pandas nanosecond result representation, not cftime date representation. No execution needed to trace test and handler. Static source review only; no repository code executed."
+    },
+    {
+      "task_id": "import-05c4419df577dcd774daea5a",
+      "reference_sha256": "e2e2dad01955bb0c1df7ea3eef58c40f84b8c78d3e57bcbebe1387b357578b46",
+      "question_sha256": "f89ec53e9a1d4045f413b3a2faaf9a089dff8cc6deadb29881616d37fa47187b",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Repeated getitem can repeat collection",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/_pytest/pytester.py",
+            "start_line": 1254,
+            "end_line": 1283
+          },
+          "reason": "getitem calls getitems, which creates module collector and generates items."
+        },
+        {
+          "claim": "Direct evaluate_xfail_marks calls reuse per-item stash",
+          "verdict": "contradicted",
+          "evidence": {
+            "path": "src/_pytest/skipping.py",
+            "start_line": 213,
+            "end_line": 268
+          },
+          "reason": "Function never reads stash; runtest hooks separately maintain it."
+        },
+        {
+          "claim": "String conditions are compiled for each evaluation",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/_pytest/skipping.py",
+            "start_line": 97,
+            "end_line": 118
+          },
+          "reason": "compile and eval are unconditional on string path."
+        }
+      ],
+      "material_errors": [
+        "Central mitigation misleading: reusing an item does not memoize direct evaluate_xfail_marks calls. AST parsing on every import is not guaranteed because bytecode/assertion-rewrite caches also exist."
+      ],
+      "citation_corrections": [],
+      "notes": "Magnitude of performance effects needs profiling; source is enough to reject direct-call cache implication. Static source review only; no repository code executed.",
+      "corrected_reference_answer": "getitem obtains a new module collection and generates items, so repeated calls may repeat collection work (src/_pytest/pytester.py:1254-1283,1308-1317). String xfail conditions are compiled and evaluated each time evaluate_condition is reached (src/_pytest/skipping.py:97-118). evaluate_xfail_marks itself does not read or populate a cache, even on the same Item (src/_pytest/skipping.py:213-235). The runtest hooks store and reuse xfailed_key separately, and reevaluate when it is None (src/_pytest/skipping.py:238-268). _mod_collections caches collect_by_name results for an existing collector, not arbitrary getitem invocations (src/_pytest/pytester.py:1319-1332). Reusing collected items can avoid collection work, but caching condition results across evaluations requires preserving dynamic-condition semantics; measuring AST/import costs needs the actual invocation and cache behavior."
+    },
+    {
+      "task_id": "import-050b5693297db6d96c6cf5d6",
+      "reference_sha256": "308080afde0f96a33379f399293c61dc0efc39f3836f06baa0f250a1bbcc34c3",
+      "question_sha256": "d8ba1245cb8455204bbf833d0f4caadeb96bae0df13b19bc106fe7f22cbabf2f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Input events supply target.value",
+          "verdict": "supported",
+          "evidence": {
+            "path": "reflex/event.py",
+            "start_line": 593,
+            "end_line": 602
+          },
+          "reason": "Transformer returns e.target.value; text_field.py:79 binds on_change to it."
+        },
+        {
+          "claim": "EventSpec argument mappings compile to payload",
+          "verdict": "supported",
+          "evidence": {
+            "path": "reflex/utils/format.py",
+            "start_line": 487,
+            "end_line": 517
+          },
+          "reason": "Name/value pairs become an object argument to ReflexEvent."
+        },
+        {
+          "claim": "Backend coerces payload and calls handler with keywords",
+          "verdict": "supported",
+          "evidence": {
+            "path": "reflex/state.py",
+            "start_line": 1830,
+            "end_line": 1906
+          },
+          "reason": "Resolves hints, handles models/dataclasses/enums and invokes fn(**payload)."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Mechanism traced across component, event, compiler and state; frontend socket.emit event located at reflex/.templates/web/utils/state.js:400. Concrete text argument name is illustrative, not fixed by framework. Static source review only; no repository code executed."
+    },
+    {
+      "task_id": "import-02afcdc8ff44636a2507af03",
+      "reference_sha256": "e96f703faedec50f813fefe7995f18a8d79ab66f9ebb0fb01a26f565166c425f",
+      "question_sha256": "614cf9534e78a40955ffa217fc0ae68a58dc6c173ccff12f240f8eaa12cedb9c",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Environment cache missing/failure creates fresh environment",
+          "verdict": "supported",
+          "evidence": {
+            "path": "sphinx/application.py",
+            "start_line": 326,
+            "end_line": 348
+          },
+          "reason": "Explicit conditions and exception handling match."
+        },
+        {
+          "claim": "Incremental scan checks documents and dependencies",
+          "verdict": "supported",
+          "evidence": {
+            "path": "sphinx/environment/__init__.py",
+            "start_line": 477,
+            "end_line": 540
+          },
+          "reason": "Per-document and dependency existence/mtime operations are explicit."
+        },
+        {
+          "claim": "Pickling clears live caches and causes later same-run disk reads",
+          "verdict": "contradicted",
+          "evidence": {
+            "path": "sphinx/environment/__init__.py",
+            "start_line": 275,
+            "end_line": 284
+          },
+          "reason": "__getstate__ edits a copy of __dict__, not the live environment."
+        },
+        {
+          "claim": "Updated environment is pickled",
+          "verdict": "supported",
+          "evidence": {
+            "path": "sphinx/builders/__init__.py",
+            "start_line": 318,
+            "end_line": 334
+          },
+          "reason": "Dump occurs when updated_docnames is nonempty."
+        }
+      ],
+      "material_errors": [
+        "Container-specific poor scaling is assumed without workload/cache/filesystem evidence; cache clearing description blurs serialized state with live state."
+      ],
+      "citation_corrections": [],
+      "notes": "Implementation supports possible costs, not categorical diagnosis. Container cache persistence and timing measurements are missing. Static source review only; no repository code executed.",
+      "corrected_reference_answer": "Incremental builds still inspect discovered documents and dependencies for missing files or changed mtimes (sphinx/environment/__init__.py:477-540); HTML also checks output/source/template times (sphinx/builders/html/__init__.py:382-425). Missing, fresh or unreadable environment caches produce a new environment (sphinx/application.py:326-348), and updated environments are pickled (sphinx/builders/__init__.py:318-334). __getstate__ excludes doctree caches from the serialized copy, not the live object (sphinx/environment/__init__.py:275-284). These operations can matter for large projects, but the code does not establish that containerized CI necessarily scales poorly. That diagnosis requires cache persistence, filesystem and profiling information."
+    },
+    {
+      "task_id": "import-150e2ee523cd090d02e9b255",
+      "reference_sha256": "0c3f94e2365f0ce3d4211f84d423232536151ac22928f24796d90ab0f8281de0",
+      "question_sha256": "5e681b472c3f068e1204c92ad0719704b561cbb8b6554623a165017215be62a2",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Test simulates ImportError and checks empty match/load/logs",
+          "verdict": "supported",
+          "evidence": {
+            "path": "tests/session/test_plugins.py",
+            "start_line": 623,
+            "end_line": 633
+          },
+          "reason": "Mock, monkeypatch, assertions and exact log checks match answer."
+        },
+        {
+          "claim": "Loader handles ImportError by returning None",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/streamlink/session/plugins.py",
+            "start_line": 191,
+            "end_line": 203
+          },
+          "reason": "Exception logs failure and returns None."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Answerable from test and loader without executing either. Static source review only; no repository code executed."
+    },
+    {
+      "task_id": "import-092081db4ada9466237f5b14",
+      "reference_sha256": "bb78a3a803c64c67292d1e64beb007684d8a1fac4558f2b7a4377eeffbb30956",
+      "question_sha256": "c55120601619ab062a7c1d536a9334bceb6a9a532cc473d598c03879d09283ab",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Static fallback registry places GenericIE last",
+          "verdict": "supported",
+          "evidence": {
+            "path": "yt_dlp/extractor/extractors.py",
+            "start_line": 9,
+            "end_line": 26
+          },
+          "reason": "Optional lazy import, static fallback and GenericIE append are explicit; plugins are prepended."
+        },
+        {
+          "claim": "Lazy generator preserves matching metadata and module reference",
+          "verdict": "supported",
+          "evidence": {
+            "path": "devscripts/make_lazy_extractors.py",
+            "start_line": 15,
+            "end_line": 24
+          },
+          "reason": "Metadata includes _VALID_URL and IE_NAME; generator builds class module reference at 102-108."
+        },
+        {
+          "claim": "Generated registry places GenericIE last",
+          "verdict": "supported",
+          "evidence": {
+            "path": "devscripts/make_lazy_extractors.py",
+            "start_line": 69,
+            "end_line": 99
+          },
+          "reason": "Generator builds registry and requires final GenericIE."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [
+        "_extractors.py:4 only documents YouTube ordering for performance; use extractor/extractors.py:16-26 for registry/GenericIE ordering. Add make_lazy_extractors.py:102-108 for _module generation."
+      ],
+      "notes": "Broad design explanation is supported as architectural inference. Specialized-before-generic is correct; not every ordered pair is justified solely by specificity. Selection uses suitable(), which can have custom logic beyond _VALID_URL. Static source review only; no repository code executed."
+    },
+    {
+      "task_id": "import-0bc3cde110c8dd1cd64fd09b",
+      "reference_sha256": "ee5ed5e9d401c93bbcc00fda6b2f239bb606664d6ad2d34edcd0cb2b11b68658",
+      "question_sha256": "3cea3fd2333ae88fd7c864666901634f156333a8d51bb1e8a792aeb448dcbeec",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "LIKE grammar sequences table reference and optional column list",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/sqlfluff/dialects/dialect_exasol.py",
+            "start_line": 1155,
+            "end_line": 1174
+          },
+          "reason": "Delimited inner Sequence permits identifiers and optional aliases."
+        },
+        {
+          "claim": "Sequence advances by match stop and collects children",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/grammar/sequence.py",
+            "start_line": 315,
+            "end_line": 339
+          },
+          "reason": "Confirms positional parsing rather than passing table data to column parser."
+        },
+        {
+          "claim": "Bracketed delegates inner content to Sequence",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/grammar/sequence.py",
+            "start_line": 491,
+            "end_line": 513
+          },
+          "reason": "Opening bracket then super().match with closing terminator."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [
+        "Normalize /src/sqlfluff/core/parser/grammar/sequence.py to repository-relative src/sqlfluff/core/parser/grammar/sequence.py."
+      ],
+      "notes": "Reference correctly challenges data-flow premise. Grammar recognizes syntax; it does not resolve actual source-table columns or execute CREATE TABLE. Column identifiers may be descendants within a bracketed node, not necessarily direct siblings. Static source review only; no repository code executed."
+    },
+    {
+      "task_id": "import-1517a212c8df5b2477819c8e",
+      "reference_sha256": "8d53b6aa6e5756da9fa6cfd605f43e17fe2031fec74914716d808fb9efa27d2c",
+      "question_sha256": "87fb67b63098989f617976b19d61eaecd4dffc25211d24b432a5c7a8ad7db21d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Config registers custom extensions and import directory",
+          "verdict": "supported",
+          "evidence": {
+            "path": "doc/conf.py",
+            "start_line": 19,
+            "end_line": 44
+          },
+          "reason": "Path insertion and both extension names match."
+        },
+        {
+          "claim": "Gallery setup connects main to builder-inited",
+          "verdict": "supported",
+          "evidence": {
+            "path": "doc/sphinxext/gallery_generator.py",
+            "start_line": 392,
+            "end_line": 393
+          },
+          "reason": "Exact event hookup exists despite one-line citation overrun."
+        },
+        {
+          "claim": "Tutorial setup connects its own main",
+          "verdict": "supported",
+          "evidence": {
+            "path": "doc/sphinxext/tutorial_builder.py",
+            "start_line": 365,
+            "end_line": 366
+          },
+          "reason": "Handler at 49-77 reads YAML, writes tutorial and thumbnails."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [
+        "gallery_generator.py:392-394 should be 392-393; reference ends one line beyond EOF but semantic claim is correct."
+      ],
+      "notes": "No execution required; parser diagnostic is minor citation endpoint issue. Static source review only; no repository code executed."
+    }
+  ]
+}

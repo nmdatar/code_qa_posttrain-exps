@@ -1,0 +1,522 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/hgrecco--pint-5bdf0109576b",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2325,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 2295
+          },
+          {
+            "end_line": 602,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 556
+          },
+          {
+            "end_line": 158,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 147
+          },
+          {
+            "end_line": 667,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 631
+          },
+          {
+            "end_line": 272,
+            "file_sha256": "4b790a1d68f8b8a38142aebf84e41341b3a25e89a48fcb16600c94cafa7ded3d",
+            "path": "pint/util.py",
+            "start_line": 242
+          },
+          {
+            "end_line": 310,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 301
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "9884c81207c29f4712158c0a55a4f9225f9be6f013a67c3da431572a60008873",
+            "kind": "file_reference",
+            "line_count": 872,
+            "path": "pint/default_en.txt"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the UnitRegistry implement file-based definition loading with caching to support both resource files and external files across different environment contexts?",
+      "question_sha256": "7c59043a898ae086290e1479b581fd5a91f67ec7f135eedd597c0dd0a0c7099f",
+      "reference_answer": "The UnitRegistry implements file-based definition loading through a multi-layered architecture that handles both packaged resource files and external user files. The LazyRegistry class (pint/registry.py: line 2295-2325) provides delayed initialization by transforming itself into a UnitRegistry only when first accessed, ensuring efficient startup performance.\n\nThe core loading mechanism resides in BaseRegistry.load_definitions() (pint/registry.py: line 556-602), which branches its file handling strategy based on the is_resource parameter. Resource files are loaded using importlib.resources.read_binary() for reliable package access (line 575), while external files use standard file operations with open() (line 580). The method supports recursive @import directives with context-aware path resolution: resource imports keep the same is_resource flag, while external file imports resolve paths relative to the containing file's directory or the current working directory (lines 593-602).\n\nThe RegistryCache class (pint/registry.py: line 147-158) stores parsed dimensionality mappings, root unit relationships, and unit name lookups to eliminate redundant parsing. Cache construction occurs through _build_cache() (pint/registry.py: line 631-667), which uses the solve_dependencies function (pint/util.py: line 242-272) to build a topologically sorted dependency graph of unit definitions. This ensures units are processed in the correct order so that derived units can reference their base units.\n\nThe initialization process in _after_init() (pint/registry.py: line 301-310) demonstrates the dual-mode operation: an empty filename string triggers loading of the default resource file 'default_en.txt', while non-null filenames load external definition files. After loading definitions, the cache is built and the registry is marked as initialized. This design enables seamless switching between bundled definitions and user-provided files while maintaining consistent cache state.",
+      "reference_sha256": "0617e935d45589ce95f600e4f637d40471847eacb87954bd0301431f3bae96c4",
+      "repository": {
+        "commit": "5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+        "family_id": "hgrecco/pint",
+        "url": "https://github.com/hgrecco/pint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hgrecco--pint-5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+      "task_id": "import-3a5acbc8e87cf599d2b2c6ac"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hgrecco--pint-5bdf0109576b",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 3,
+            "file_sha256": "16edf0f34d2caf3245672d8081a2fdf59c072e8e6251091061673f6fc4c4a74e",
+            "path": ".github/workflows/lint.yml",
+            "start_line": 3
+          },
+          {
+            "end_line": 15,
+            "file_sha256": "16edf0f34d2caf3245672d8081a2fdf59c072e8e6251091061673f6fc4c4a74e",
+            "path": ".github/workflows/lint.yml",
+            "start_line": 15
+          },
+          {
+            "end_line": 17,
+            "file_sha256": "16edf0f34d2caf3245672d8081a2fdf59c072e8e6251091061673f6fc4c4a74e",
+            "path": ".github/workflows/lint.yml",
+            "start_line": 17
+          },
+          {
+            "end_line": 13,
+            "file_sha256": "6578bce4c2a38a7b1cb7c9dab6cec80815b7d4d0972ac8879e6ce476281de416",
+            "path": ".pre-commit-config.yaml",
+            "start_line": 2
+          },
+          {
+            "end_line": 63,
+            "file_sha256": "fbb863a28490c673111f58a7635f32c8edc2377f24fbcc3462369b03e4d9ca2c",
+            "path": "setup.cfg",
+            "start_line": 53
+          },
+          {
+            "end_line": 74,
+            "file_sha256": "fbb863a28490c673111f58a7635f32c8edc2377f24fbcc3462369b03e4d9ca2c",
+            "path": "setup.cfg",
+            "start_line": 67
+          },
+          {
+            "end_line": 6,
+            "file_sha256": "9f8090370e1f3d498810262e886d7625895f7969c3441ea18de936bdb64603c3",
+            "path": ".github/workflows/lint-autoupdate.yml",
+            "start_line": 4
+          },
+          {
+            "end_line": 46,
+            "file_sha256": "9f8090370e1f3d498810262e886d7625895f7969c3441ea18de936bdb64603c3",
+            "path": ".github/workflows/lint-autoupdate.yml",
+            "start_line": 35
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "fbb863a28490c673111f58a7635f32c8edc2377f24fbcc3462369b03e4d9ca2c",
+            "kind": "file_reference",
+            "line_count": 77,
+            "path": "setup.cfg"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What constitutes the automated code quality enforcement workflow pipeline in this project's CI system?",
+      "question_sha256": "3d8806d55246c1d817de92c8d968a3390510f6d65f685637bb02b8325fdce6de",
+      "reference_answer": "The automated code quality enforcement workflow comprises three interconnected components that work together to maintain consistent code standards. The primary enforcement mechanism is implemented through a GitHub Actions workflow (.github/workflows/lint.yml: line 3) that triggers on every push and pull request event, utilizing pre-commit/action@v2.0.0 (.github/workflows/lint.yml: line 15) with the --all-files and --show-diff-on-failure flags (.github/workflows/lint.yml: line 17) to ensure comprehensive checking and clear failure reporting. The code quality tools are orchestrated through a pre-commit configuration (.pre-commit-config.yaml: line 2-13) that integrates three essential tools: black for code formatting (pinned to revision 21.9b0), isort for import organization (pinned to revision 5.9.3), and flake8 for code linting (pinned to revision 3.9.2). These tools are configured with specific compatibility settings in setup.cfg, where flake8 ignores certain rules (E203, E402, E501, E731, W503) (setup.cfg: line 53-63) to maintain harmony with black's formatting decisions, and isort is configured with parameters like multi_line_output=3 and line_length=88 (setup.cfg: line 67-74) to align with the overall formatting strategy. The pipeline includes an automated maintenance component (.github/workflows/lint-autoupdate.yml: line 4-6) that runs weekly on Sundays using a cron schedule, automatically updating pre-commit hook versions through the pre_commit autoupdate command and creating pull requests (.github/workflows/lint-autoupdate.yml: line 35-46) to keep the tools current with minimal manual intervention.",
+      "reference_sha256": "0b45478410e6ea42080363e37755bddafda7cccfaf3a67791ea7d37902892539",
+      "repository": {
+        "commit": "5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+        "family_id": "hgrecco/pint",
+        "url": "https://github.com/hgrecco/pint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hgrecco--pint-5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+      "task_id": "import-608536679587551bab88f0fe"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hgrecco--pint-5bdf0109576b",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 82,
+            "file_sha256": "06cea8e0ac430432cf87ca59c38b6fc0ba84654e693379cc1d158342e1a37e54",
+            "path": "pint/__init__.py",
+            "start_line": 80
+          },
+          {
+            "end_line": 1162,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 1133
+          },
+          {
+            "end_line": 645,
+            "file_sha256": "4b790a1d68f8b8a38142aebf84e41341b3a25e89a48fcb16600c94cafa7ded3d",
+            "path": "pint/util.py",
+            "start_line": 596
+          },
+          {
+            "end_line": 706,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 668
+          },
+          {
+            "end_line": 849,
+            "file_sha256": "4b790a1d68f8b8a38142aebf84e41341b3a25e89a48fcb16600c94cafa7ded3d",
+            "path": "pint/util.py",
+            "start_line": 797
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does unit string parsing flow through the registry system when unpickling Quantity objects created from custom UnitRegistry instances?",
+      "question_sha256": "8426f1a97aee8b6137553645ec3f432b933c79423e79c05db563ab6b9674f071",
+      "reference_answer": "Pint is a Python library for handling physical units. A Quantity object contains a magnitude and units, while a UnitRegistry stores unit definitions. When pickling a Quantity, only the magnitude and unit name string are saved\u2014the unit definitions are not preserved. During unpickling, the system looks up definitions in the global application_registry, and raises an error if the unit is not found. \nUnpickling begins with the _unpickle_quantity function in pint/__init__.py: line 80-82, which receives the saved magnitude and unit string, then calls the _unpickle function at lines 53-75 in the same file. This function iterates through each unit name in the units container and calls application_registry.parse_units() for each name to ensure the units are properly registered. \nThe parsing process enters the parse_units method in pint/registry.py:1133-1162, which first applies preprocessors, then calls the _parse_units method at lines 1164-1204 in the same file. This method uses ParserHelper.from_string in pint/util.py:596-645 to tokenize and parse the unit string, then calls the get_name method in pint/registry.py:668-706 to look up the canonical unit name in the registry's internal dictionary. If the unit does not exist in the application_registry, an UndefinedUnitError is raised at this point. \nFinally, a new Quantity object is created through SharedRegistryObject.__new__ in pint/util.py:797-849, with its _REGISTRY attribute set to the current application_registry rather than the custom registry used when the original Quantity was created. \nIn summary, the core of this entire flow is that unit string parsing during unpickling relies entirely on the global application_registry and has no connection to the custom UnitRegistry that the original Quantity belonged to. If custom units were used, the correct registry must be set via set_application_registry before unpickling, otherwise the process will fail due to missing unit definitions.",
+      "reference_sha256": "75426535680c1e650911419a8036faa16827de4e8641c6bf8b351fa7580d5755",
+      "repository": {
+        "commit": "5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+        "family_id": "hgrecco/pint",
+        "url": "https://github.com/hgrecco/pint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hgrecco--pint-5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+      "task_id": "import-6359b8feb174527b953671e8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hgrecco--pint-5bdf0109576b",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2044,
+            "file_sha256": "f12fce32b82155e608a5b2b27cd06cce9e5b9027cee9a4df8ea6a7b1749999a4",
+            "path": "pint/quantity.py",
+            "start_line": 2040
+          },
+          {
+            "end_line": 2060,
+            "file_sha256": "f12fce32b82155e608a5b2b27cd06cce9e5b9027cee9a4df8ea6a7b1749999a4",
+            "path": "pint/quantity.py",
+            "start_line": 2055
+          },
+          {
+            "end_line": 2068,
+            "file_sha256": "f12fce32b82155e608a5b2b27cd06cce9e5b9027cee9a4df8ea6a7b1749999a4",
+            "path": "pint/quantity.py",
+            "start_line": 2062
+          },
+          {
+            "end_line": 2073,
+            "file_sha256": "f12fce32b82155e608a5b2b27cd06cce9e5b9027cee9a4df8ea6a7b1749999a4",
+            "path": "pint/quantity.py",
+            "start_line": 2070
+          },
+          {
+            "end_line": 168,
+            "file_sha256": "f12fce32b82155e608a5b2b27cd06cce9e5b9027cee9a4df8ea6a7b1749999a4",
+            "path": "pint/quantity.py",
+            "start_line": 157
+          },
+          {
+            "end_line": 175,
+            "file_sha256": "5950a40b255907a5183816de0facfed6bff2fc577a2b01ad3c6009fab82c3c8e",
+            "path": "pint/compat.py",
+            "start_line": 169
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "5950a40b255907a5183816de0facfed6bff2fc577a2b01ad3c6009fab82c3c8e",
+            "kind": "file_reference",
+            "line_count": 293,
+            "path": "pint/compat.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the Quantity class implement the Dask Array protocol to enable distributed computation while preserving physical units throughout the task graph execution?",
+      "question_sha256": "0dcf9d79d968774a61d3ed43b87fb02b9bd10989fdb067bcb23cf795560dfe7f",
+      "reference_answer": "Pint's Quantity class implements the Dask Array protocol through a multi-layered approach that ensures distributed computation capabilities while maintaining unit consistency. The core strategy involves delegating Dask's graph operations directly to the underlying magnitude array while intercepting finalization to re-attach physical units upon result materialization. \nThe implementation relies on three interconnected components working together: \nFirst, Graph Operation Delegation Mechanism. The implementation delegates instance-specific graph definitions (__dask_graph__ and __dask_keys__) directly to self._magnitude (pint/quantity.py, lines 2040-2044), while explicitly using the standard dask.array.Array class implementations for execution policies (__dask_optimize__ and __dask_scheduler__) (pint/quantity.py, lines 2055-2060). This design allows Dask to treat the Quantity almost exactly like the array it wraps, enabling full participation in Dask's task graph construction and optimization pipeline without requiring any special handling. \nSecond, Unit Preservation Hooks. Unit preservation during distributed computation is achieved through custom postcompute and postpersist hooks (__dask_postcompute__ and __dask_postpersist__) that return the static _dask_finalize method along with the original units (pint/quantity.py, lines 2062-2068). When Dask completes the computation and calls the finalization hook, _dask_finalize (pint/quantity.py, lines 2070-2073) acts as the bridge back to Pint. It receives the raw numeric results and the preserved units, then re-wraps everything into a new Quantity object with the correct physical dimensions intact. \nThird, Convenience Methods. The implementation provides three convenience methods: compute(), persist(), and visualize(). These methods are decorated with @check_dask_array to ensure they only operate on Dask arrays (pint/quantity.py, lines 157-168 and 2075-2124). This decorator validates that the magnitude is a dask.array.Array before proceeding, raising an AttributeError for non-Dask objects. \nAdditionally, the system uses conditional imports in compat.py (pint/compat.py, lines 169-175) to gracefully handle environments where Dask is not available. When Dask cannot be imported, the compute, persist, and visualize functions are set to None. \nIn summary, this design enables transparent distributed computation on physical quantities while maintaining complete unit consistency across all distributed operations. The elegance of the approach lies in its simplicity: by delegating graph operations to the underlying array and intercepting only the finalization step, Pint achieves seamless integration with Dask's distributed computing framework without disrupting the computational pipeline.",
+      "reference_sha256": "b5d1a878bf16a72977298d0347ccd9ade2c45c6e05ceb270f23659b370651f42",
+      "repository": {
+        "commit": "5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+        "family_id": "hgrecco/pint",
+        "url": "https://github.com/hgrecco/pint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hgrecco--pint-5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+      "task_id": "import-a76fd9f4eb74ea9d6f9d4eb2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hgrecco--pint-5bdf0109576b",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 196,
+            "file_sha256": "9ea4d624a0b007e89b73aec3d393cb296692e93be90d7e72b8d6e7239fd78947",
+            "path": "pint/numpy_func.py",
+            "start_line": 195
+          },
+          {
+            "end_line": 1018,
+            "file_sha256": "f12fce32b82155e608a5b2b27cd06cce9e5b9027cee9a4df8ea6a7b1749999a4",
+            "path": "pint/quantity.py",
+            "start_line": 1018
+          },
+          {
+            "end_line": 97,
+            "file_sha256": "5752e13bae8ae6b8f17e04ccc89d84244ec4abbff666460606c68e562d5af1ac",
+            "path": "docs/nonmult.rst",
+            "start_line": 94
+          },
+          {
+            "end_line": 173,
+            "file_sha256": "fcb8d8d23948b84cd3086176731e7b92c48d4542c081b38060f21f5727a705de",
+            "path": "pint/testsuite/test_numpy_func.py",
+            "start_line": 172
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "5752e13bae8ae6b8f17e04ccc89d84244ec4abbff666460606c68e562d5af1ac",
+            "kind": "file_reference",
+            "line_count": 198,
+            "path": "docs/nonmult.rst"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does Pint's statistical operation system specifically raise OffsetUnitCalculusError for variance operations on offset units like degC rather than auto-converting to delta units?",
+      "question_sha256": "b807d384dc312e1783df21cc48dcd11569a705ff50c114daa1b6f9e2dae0ac18",
+      "reference_answer": "Pint raises OffsetUnitCalculusError for variance operations on offset units because the underlying computation requires addition, and addition of offset units is mathematically ambiguous.\n\nThe variance operation in `get_op_output_unit` (pint/numpy_func.py: lines 195-196) computes the output unit using the expression `((1 * first_input_units + 1 * first_input_units) ** 2).units`. This triggers an addition of two quantities with offset units. When this addition reaches the `_add_sub` method (pint/quantity.py: line 1018), Pint detects that both operands have non-multiplicative (offset) units and raises OffsetUnitCalculusError (line 1126) because the operation has no unambiguous interpretation.\n\nThe fundamental issue is documented in the nonmult.rst documentation (docs/nonmult.rst: lines 94-97): adding two offset temperatures like 10 degC + 100 degC could reasonably yield either 110 degC (treating them as readings on the same scale) or 383.15 degC (summing their absolute values in Kelvin: 283.15 K + 373.15 K). Neither interpretation is universally correct, so Pint refuses to guess.\n\nFor variance specifically, auto-converting to delta units would be semantically incorrect. Variance measures the spread of absolute values around a mean, and the \"variance\" unit operation is defined to compute the square of the input units (as shown in the docstring at lines 145-146). If variance auto-converted degC to delta_degC, it would silently change the meaning of the computation in ways that could produce incorrect scientific results.\n\nThe design philosophy prioritizes explicit correctness over convenience. Users must convert offset units to either absolute units (kelvin) or delta units (delta_degC) before statistical operations, making their intent unambiguous. This behavior is verified by test cases in pint/testsuite/test_numpy_func.py (lines 172-173) that confirm OffsetUnitCalculusError is raised when calling `get_op_output_unit(\"variance\", ureg.degC)`.",
+      "reference_sha256": "e9ce7675eb1965a1de1ecb2f49311203091e8423eb2285dbbba7b262ead8b930",
+      "repository": {
+        "commit": "5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+        "family_id": "hgrecco/pint",
+        "url": "https://github.com/hgrecco/pint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hgrecco--pint-5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+      "task_id": "import-bc30185425e80f6b1d4cfda3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hgrecco--pint-5bdf0109576b",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 3,
+            "file_sha256": "16edf0f34d2caf3245672d8081a2fdf59c072e8e6251091061673f6fc4c4a74e",
+            "path": ".github/workflows/lint.yml",
+            "start_line": 3
+          },
+          {
+            "end_line": 3,
+            "file_sha256": "261a3707281cb9090d983f611ff38323a6014d4a23504d96f5d76c2f36ae7442",
+            "path": ".github/workflows/ci.yml",
+            "start_line": 3
+          },
+          {
+            "end_line": 17,
+            "file_sha256": "16edf0f34d2caf3245672d8081a2fdf59c072e8e6251091061673f6fc4c4a74e",
+            "path": ".github/workflows/lint.yml",
+            "start_line": 14
+          },
+          {
+            "end_line": 13,
+            "file_sha256": "6578bce4c2a38a7b1cb7c9dab6cec80815b7d4d0972ac8879e6ce476281de416",
+            "path": ".pre-commit-config.yaml",
+            "start_line": 2
+          },
+          {
+            "end_line": 24,
+            "file_sha256": "261a3707281cb9090d983f611ff38323a6014d4a23504d96f5d76c2f36ae7442",
+            "path": ".github/workflows/ci.yml",
+            "start_line": 10
+          },
+          {
+            "end_line": 82,
+            "file_sha256": "261a3707281cb9090d983f611ff38323a6014d4a23504d96f5d76c2f36ae7442",
+            "path": ".github/workflows/ci.yml",
+            "start_line": 77
+          },
+          {
+            "end_line": 118,
+            "file_sha256": "261a3707281cb9090d983f611ff38323a6014d4a23504d96f5d76c2f36ae7442",
+            "path": ".github/workflows/ci.yml",
+            "start_line": 111
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the GitHub Actions workflow coordinate between linting and testing phases to ensure code quality validation in pint's CI pipeline?",
+      "question_sha256": "be86f216a94a29467a0238e4b10a12dfafc1872446c1920e8dd9039e77220d8a",
+      "reference_answer": "The GitHub Actions workflow coordination in pint operates through a parallel execution model where two independent workflows run simultaneously on the same trigger events. Both the lint workflow (.github/workflows/lint.yml: line 3) and CI workflow (.github/workflows/ci.yml: line 3) are triggered on push and pull_request events, ensuring immediate validation on code changes. The lint workflow (.github/workflows/lint.yml: line 14-17) executes pre-commit hooks using the pre-commit/action@v2.0.0 with --all-files --show-diff-on-failure flags, running black for code formatting, isort for import sorting, and flake8 for style checking as configured in .pre-commit-config.yaml: line 2-13. The CI workflow implements a comprehensive test matrix (.github/workflows/ci.yml: line 10-24) across Python versions 3.7-3.10 with various combinations of numpy and uncertainties dependencies. Testing is performed using pytest with coverage reporting (.github/workflows/ci.yml: line 77-82), and results are aggregated through a ci-success summary job (.github/workflows/ci.yml: line 111-118) that depends on the completion of all test matrix jobs. The coordination mechanism relies on GitHub's implicit status check system where both workflows must complete successfully for the overall CI check to pass, rather than explicit workflow dependencies. This design ensures that code style validation and functional testing occur in parallel for efficiency, while both must pass before code can be considered ready for merge.",
+      "reference_sha256": "1568e06cb9b21d35af0f3f57ef01e51bfb9471550fb9c0b92a78b7f7e2570a94",
+      "repository": {
+        "commit": "5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+        "family_id": "hgrecco/pint",
+        "url": "https://github.com/hgrecco/pint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hgrecco--pint-5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+      "task_id": "import-ca732085b0b4ee98c1bcb284"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hgrecco--pint-5bdf0109576b",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1344,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 177
+          },
+          {
+            "end_line": 1550,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 1347
+          },
+          {
+            "end_line": 1931,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 1553
+          },
+          {
+            "end_line": 2192,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 1934
+          },
+          {
+            "end_line": 2227,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 2195
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why is Pint's unit registry implemented as a hierarchical architecture with five specialized registry classes instead of a single monolithic registry?",
+      "question_sha256": "998b83f62e88801df16044f622acf62917ca635d689291bc048516d70cf24351",
+      "reference_answer": "Pint uses a hierarchical unit registry architecture rather than a single monolithic registry because different kinds of unit conversions rely on fundamentally different mathematical models and validation rules. Merging all of this logic into one class would result in a very large, complex registry dominated by conditional branches to distinguish conversion types, making the code difficult to maintain, test, and extend. To address this, Pint decomposes unit conversion into several orthogonal functional dimensions, each implemented as a specialized registry. BaseRegistry (pint/registry.py: 177\u20131344) handles core functionality such as unit definition and querying, dimensional analysis, unit parsing, and purely multiplicative conversions using ScaleConverter. NonMultiplicativeRegistry (pint/registry.py: 1347\u20131550) extends this foundation to support offset units, such as temperature, which require affine transformations rather than simple scaling; it implements OffsetConverter and enforces validation rules to prevent incorrect use of offset units in multiplicative contexts. ContextRegistry (pint/registry.py: 1553\u20131931) enables cross-dimensional conversions, such as frequency to energy, by introducing context-defined transformation rules and graph-based path discovery for multi-step conversions across different dimensions. SystemRegistry (pint/registry.py: 1934\u20132192) manages unit systems and groups, such as SI or CGS, providing base unit selection and system-specific organization without interfering with the mathematical conversion logic. The final UnitRegistry (pint/registry.py: 2195\u20132227) combines these specialized registries through multiple inheritance, forming a unified public API. Coordination between layers is achieved via Python\u2019s method resolution order and consistent use of super(), allowing each registry to apply its specific logic and then delegate to the next layer. This design cleanly separates concerns, improves maintainability and testability, and makes the system extensible, since new conversion capabilities can be added as additional mixin-style registries without breaking existing code.",
+      "reference_sha256": "cb9b7cd45c4c6394977d072f714dcfba004c0886c21b82402edc65e86e42930a",
+      "repository": {
+        "commit": "5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+        "family_id": "hgrecco/pint",
+        "url": "https://github.com/hgrecco/pint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hgrecco--pint-5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+      "task_id": "import-e646d396b85d04eb0e74f247"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hgrecco--pint-5bdf0109576b",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 331,
+            "file_sha256": "4b790a1d68f8b8a38142aebf84e41341b3a25e89a48fcb16600c94cafa7ded3d",
+            "path": "pint/util.py",
+            "start_line": 331
+          },
+          {
+            "end_line": 231,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 231
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the `_non_int_type` attribute defined and initialized within Pint's UnitsContainer class hierarchy?",
+      "question_sha256": "8599af1ce07652230f5f71e0253e8f74531ec74bb562c5eefc1f93caf35da3f1",
+      "reference_answer": "The `_non_int_type` attribute is defined within the UnitsContainer class at pint/util.py line 331 as part of the __slots__ declaration alongside '_d', '_hash', and '_one'. The initialization occurs in the __init__ method (lines 333-355) with sophisticated inheritance logic: if the first argument is another UnitsContainer instance, it inherits that instance's _non_int_type; otherwise it defaults to float. The attribute is explicitly set via `self._non_int_type = kwargs.pop(\"non_int_type\", default_non_int_type)` and drives the creation of the `_one` attribute, which becomes either the integer 1 (for float) or a type-specific \"1\" constructed via `self._non_int_type(\"1\")` for other numerical types. This attribute is used throughout the UnitsContainer hierarchy for type validation and conversion (lines 353-354), serialization support (__getstate__/__setstate__ at lines 426, 429), and is preserved during copy operations (line 472). The ParserHelper subclass, which extends UnitsContainer, inherits this attribute and uses it in its mathematical operations (lines 689, 722). The broader Pint ecosystem integrates this through the UnitRegistry's non_int_type parameter (registry.py lines 231, 252, 379), enabling precision-sensitive unit calculations with types like Decimal and Fraction as demonstrated in the comprehensive test suite.",
+      "reference_sha256": "6e6d9162f7fb01512e5cd81f042e55788ba472f566f6f4abefc4464a25452464",
+      "repository": {
+        "commit": "5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+        "family_id": "hgrecco/pint",
+        "url": "https://github.com/hgrecco/pint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hgrecco--pint-5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+      "task_id": "import-e69d2540b26614b28ac5e1a0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hgrecco--pint-5bdf0109576b",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1342,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 1296
+          },
+          {
+            "end_line": 790,
+            "file_sha256": "4b790a1d68f8b8a38142aebf84e41341b3a25e89a48fcb16600c94cafa7ded3d",
+            "path": "pint/util.py",
+            "start_line": 777
+          },
+          {
+            "end_line": 212,
+            "file_sha256": "426e1de27a2344add885cd68968bf7b372216a9c9e0c462e77b9e3283b70bcda",
+            "path": "pint/pint_eval.py",
+            "start_line": 121
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "5950a40b255907a5183816de0facfed6bff2fc577a2b01ad3c6009fab82c3c8e",
+            "kind": "file_reference",
+            "line_count": 293,
+            "path": "pint/compat.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the main expression parsing logic implemented that handles special characters and operators in unit expressions?",
+      "question_sha256": "bdcdd732cdbf7d4c1aba3b5aedcd992af63be9793b866c11c53ed7f2d868d250",
+      "reference_answer": "The main expression parsing logic in Pint is implemented as a coordinated parsing pipeline spanning several core modules, with clearly separated responsibilities for handling special characters, tokenization, and operator semantics. The entry point is the parse_expression() function in pint/registry.py (lines 1296\u20131342), which acts as the central coordinator. It receives the user\u2019s unit expression string, applies any user-defined preprocessors, and then dispatches the string through the standard parsing stages. Special characters and natural-language constructs are normalized in the preprocessing stage, implemented by string_preprocessor() in pint/util.py (lines 777\u2013790). This function converts degree symbols and superscripts using the _pretty_table mapping, replaces natural-language operators such as \u201cper\u201d with \u201c/\u201d, translates keywords like \u201csquared\u201d into exponentiation (**2) via regex rules defined in _subs_re_list (lines 754\u2013767), converts caret-based exponents to double asterisks, and inserts explicit multiplication operators where whitespace implies multiplication. This stage ensures the expression is transformed into a standardized, purely mathematical form. The normalized string is then tokenized by the tokenizer() function in pint/compat.py, which leverages Python\u2019s standard tokenize module to produce a stream of numbers, names, and operators. The core parsing algorithm that handles operators and precedence is implemented in build_eval_tree() in pint/pint_eval.py (lines 121\u2013212). This function recursively constructs an evaluation tree from the token stream according to operator precedence rules defined in _OP_PRIORITY (lines 17\u201326), correctly handling exponentiation, multiplication, division, unary operators, and parenthetical grouping. The resulting evaluation tree is then evaluated to produce the final Quantity object. Together, this architecture cleanly separates special-character handling from operator parsing while ensuring correct mathematical semantics for complex unit expressions.",
+      "reference_sha256": "669251af4dc2918e208682485eb1ac23fe8b3322226d70da88dd3c9203b84a5f",
+      "repository": {
+        "commit": "5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+        "family_id": "hgrecco/pint",
+        "url": "https://github.com/hgrecco/pint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hgrecco--pint-5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+      "task_id": "import-f779fa060a438f4ed9833265"
+    }
+  ]
+}

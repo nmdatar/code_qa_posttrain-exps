@@ -1,0 +1,58 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-014.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "original_reference_sha256": "4c53b7a1ead27ae23506893924826ad782618e0b40fefa238857f3a165ad6c59",
+      "question": "How does Django's admin framework validation system determine whether a method decorated with @admin.display can be safely included in readonly_fields without triggering check errors, and what internal mechanisms prevent false positives when the decorated method signature matches the expected callable interface?",
+      "question_sha256": "b4280f9376ad61042f012bbbae96f24750694b28f7c82e32433cc0e8134186ad",
+      "reference_answer": "_check_readonly_fields_item accepts callable entries directly, or names present on ModelAdmin/model, or model metadata fields (django/contrib/admin/checks.py:792-818). admin.display adds metadata and returns the same function (django/contrib/admin/decorators.py:58-77). No signature validation occurs here; a named decorated method passes attribute lookup, while a directly supplied function passes callable(). At rendering, lookup_field invokes it, so incompatible signatures may still raise a runtime TypeError (django/contrib/admin/utils.py:296-305).",
+      "reference_sha256": "063ef22757ad19a451fa27b501a75dd22a8b4458f74f978d445b973916bd77f8",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-c26272d937aa5a311f14a871"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "original_reference_sha256": "5981899b396d1e0e64556c7fecb7e095ebb15888bcc22836ee86450c0a8eb128",
+      "question": "What are the tablespace configuration dependencies of the Article class that interact with Django's database routing and the underlying database system's tablespace management capabilities?",
+      "question_sha256": "3e173d7ecf4030a5e4fb4065e88b7b2f92879abb60a853cc5b685cfcdb86e062",
+      "reference_answer": "Article specifies model tablespace tbl_tbsp and idx_tbsp on code and reviewers, but is managed=False (tests/model_options/models/tablespaces.py:33-44), so normal migrations do not create its table. For migratable models, CreateModel checks allow_migrate_model before schema_editor.create_model (django/db/migrations/operations/models.py:97-100); unmanaged models are excluded by Options.can_migrate (django/db/models/options.py:387-400). Index tablespace resolution uses explicit/field settings, DEFAULT_INDEX_TABLESPACE, then model tablespace (django/db/backends/base/schema.py:1521-1531). Backend SQL support and pre-existing tablespaces remain separate database concerns.",
+      "reference_sha256": "c67e8a8ef551b395f80c1997eef784258a6c6bd59ed4a87108f560d0199f3682",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e365c91c4187b2b238f16eb7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "original_reference_sha256": "534c6ed89d714dd24f3ccfdc0ba64583a267cfc0a34c0ff3623e761ad8c9bd4a",
+      "question": "Where does the quoted primary key value flow through the reverse URL resolution and HTML escaping pipeline to ensure the history link in the response matches the expected escaped URL?",
+      "question_sha256": "a9058e134c4147329ce33efa522628ec3dda5eaaa142ff90224a3eb4476f477a",
+      "reference_answer": "The template quotes original.pk with admin_urlquote, reverses the history route into history_url, then renders add_preserved_filters directly inside href (django/contrib/admin/templates/admin/change_form_object_tools.html:4-5). Admin quoting translates problematic path characters (django/contrib/admin/utils.py:89-96). The url tag with as history_url stores the reversed URL without conditional_escape (django/template/defaulttags.py:489-495). add_preserved_filters adjusts the query string, and SimpleNode.render conditionally HTML-escapes its output once (django/template/library.py:319-327). There is no extra variable-render escaping stage for this tag output.",
+      "reference_sha256": "226a8dc66de92e431f23a548186f246d8ef29f845eccd5a9e8cd32c54f25af2b",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-f428a78e12d9f2a124055c61"
+    }
+  ]
+}

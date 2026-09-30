@@ -1,0 +1,109 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-061.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "191c7cb560a05da12c7d8051b8fe0a65ccd4b47650c039a68804d7d6e05c3fd3",
+      "question": "How does the `pos_label` parameter resolution process handle the case where a user provides an explicit `pos_label` value versus relying on the default `estimators.classes_[1]` assumption in multi-class classification scenarios?",
+      "question_sha256": "aad8170db20e025515034230cd1b19d170f91bee516862bec57d18774995bb4a",
+      "reference_answer": "In _get_response_values, an explicit pos_label is checked against estimator.classes_ for binary or multiclass classifiers. An invalid label raises ValueError; a missing label defaults to classes[-1] only for binary targets, while multiclass None remains unset (sklearn/utils/_response.py:200-228). Separately, average_precision_score requires pos_label=1 for multiclass y_true because it binarizes the labels (sklearn/metrics/_ranking.py:259-268). That metric-specific rule is not a universal multiclass response-resolution policy.",
+      "reference_sha256": "b238b4dc0e2d1a13e138e3e78c840e33d574618575fd102b6de536fe498166b8",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-4c8ebe954a3040bb5d4a29b5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "2e34b561a08b16aabd68d9658ab95199d861896168337a88cf0d4c21c7527901",
+      "question": "Why does the warm_start mechanism in _posterior_mode() reduce computational overhead during hyperparameter optimization, and what performance trade-offs occur when caching the latent function values across multiple log_marginal_likelihood evaluations?",
+      "question_sha256": "448e7a1df10fc6672a51da0a6b97587cf9cedc2d67fcaf529bf858076a17d0a7",
+      "reference_answer": "_posterior_mode uses f_cached only when warm_start is enabled, the cache exists and its shape matches y_train_; otherwise it starts from zeros. It caches the final vector after the Newton loop (sklearn/gaussian_process/_gpc.py:452-495). For nearby hyperparameters that vector may reduce iterations, but speedup is not guaranteed for dissimilar problems. The trade-off is retained O(n_samples) vector state and dependence of initialization on previous evaluations; each evaluation still performs its Newton updates and Cholesky work, rather than reusing a complete likelihood/factorization (lines463-493).",
+      "reference_sha256": "b7748f6765f3c297f9c7c472e7bddca9013d250a40bbc36c513efd070aff5cdf",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-667d41494071f29d516a169b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "0f8dd3db0ad59f4ce16ce963a8e8792541546c4be68ac2f5a5269b36fe6e5161",
+      "question": "Where does the `set_params` method in `_BaseHeterogeneousEnsemble` delegate parameter setting to its parent class, and what is the control flow path that determines whether individual estimators are modified, replaced, or dropped based on the 'drop' sentinel value?",
+      "question_sha256": "5aa98a28efe527a2dfa261d049e3573f0859b960a0d266fc372fd75d72fd8dd4",
+      "reference_answer": "_BaseHeterogeneousEnsemble.set_params calls super()._set_params(\"estimators\", **params) (sklearn/ensemble/_base.py:251-274). Composition first replaces the whole list if supplied, then replaces a named entry for a plain estimator name, and finally forwards remaining parameters to BaseEstimator (sklearn/utils/metaestimators.py:52-80). A name__parameter key invokes that estimator\u2019s set_params; a name=\"drop\" key simply replaces the tuple value with the sentinel (sklearn/base.py:340-359). There is no special drop branch in _set_params. Ensemble validation subsequently skips drop entries and rejects an all-dropped ensemble (sklearn/ensemble/_base.py:228-249).",
+      "reference_sha256": "e91bb4cfff7e61ee7fa244e9fde3dae0dc28a71a4d71a6dfd3f893cfa1dbe04f",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-7660d4151be40b9f8de022ac"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "0ec89f1cb4a8839523f49ca5da7cbdc79736919f3d7313e6cbbcd91d84ed72ca",
+      "question": "Why does the repeated instantiation of SelectKBest and GenericUnivariateSelect objects in test_mutual_info_regression impact memory allocation and computational overhead compared to reusing a single fitted estimator instance across multiple transform operations?",
+      "question_sha256": "c7456e045b548c1416d380ed2e32d9ee173421c95b4306d03bd67490c6f86242",
+      "reference_answer": "The test fits SelectKBest and GenericUnivariateSelect independently to compare their selected data (sklearn/feature_selection/tests/test_feature_select.py:926-935). Reusing a fitted selector for repeated transforms avoids refitting and recomputing its scores, but transform still requests a support mask (sklearn/feature_selection/_base.py:118-132), and SelectKBest sorts scores each time for ordinary k values (sklearn/feature_selection/_univariate_selection.py:787-801). The source does not establish a measured slowdown or the claimed simple linear complexity; replacing these independent test fits with one object would weaken comparison coverage.",
+      "reference_sha256": "e5e47b2aa3274fa0aa9e85fd1ffbb073e673be5433008bbedcd6808c34cc05be",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-774e6143baa89afd72d7ffdc"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "e6761e13ddd0664e1741d3507d3bcca8d2ec99b720f3fa79f1166c0eb51f7017",
+      "question": "Why does DummyTransformer's fit_counter mechanism enable detection of redundant fit invocations in scikit-learn's pipeline cloning and composition workflows?",
+      "question_sha256": "dc17fed69c6bf3ccdb763dd79074316fae343015f567cb93ee8ea7177799cfa4",
+      "reference_answer": "DummyTransformer increments fit_counter in fit and otherwise passes data through. The regression test fits TransformedTargetRegressor for both check_inverse values and asserts transformer_.fit_counter==1, detecting repeated fit calls on that fitted transformer (sklearn/compose/tests/test_target.py:318-344). It does not itself exercise a Pipeline or prove all composition workflows fit exactly once. Pipeline\u2019s own code explicitly avoids cloning when caching is disabled (sklearn/pipeline.py:573-578).",
+      "reference_sha256": "f8f5a6c447acc646e2aa230241511f22b3ea1ea6816fba05b72e4717081c60e4",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-8880fe60d348fb42ba9caf18"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "e5acede158a557f966d429e4b9ccac6bfaf48f9f1e16fea0648535daefd738d1",
+      "question": "Where does the InfinityType class control the flow of comparison operations to ensure that its ordering semantics are preserved across all comparison chains, and what data transformation occurs when the __neg__ method is invoked to produce a NegativeInfinityType instance?",
+      "question_sha256": "55c5d6a7d37632c03005b6ad4855db9a39dd673804b9a451d0f51ca226be0629",
+      "reference_answer": "InfinityType defines __lt__/__le__ as False and __gt__/__ge__ as True; equality tests isinstance(other,self.__class__) and inequality negates that test (sklearn/externals/_packaging/_structures.py:29-52). These are specialized ordering sentinels, not a fully conventional total-order guarantee for arbitrary comparison chains (even same-type <= is False). __neg__ performs no numerical transformation or fresh allocation: it returns the module\u2019s existing NegativeInfinity singleton (lines54-55).",
+      "reference_sha256": "1e3f3cb61b64c8f1579fbf7e05f0ec70c8bfcf8cb8cc107249ddc87e47710a74",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-a03334ace499931cc91cbe7b"
+    }
+  ]
+}

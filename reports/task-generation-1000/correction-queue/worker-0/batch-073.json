@@ -1,0 +1,109 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-073.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/streamlink--streamlink-ab1f36560005",
+      "original_reference_sha256": "c04a6a619bd20b07361fbde209e2353fbe64a571bf2948f5b8d25eb26fbdc0c6",
+      "question": "How does a streaming plugin that processes encrypted streaming data from embedded iframes ensure secure authentication through its token acquisition mechanism while maintaining stateless session management across multiple HTTP requests?",
+      "question_sha256": "390d537640d7b7ef2d33bd88638e45d7ad2b3bd6639eaf09a8a3fb8d12a9c299",
+      "reference_answer": "Streann extracts the iframe URL and domain, decrypts its configuration using a page-derived passphrase, then requests a token (src/streamlink/plugins/streann.py:137-176). get_token sends base64 domain and time with Referer/X-Requested-With headers, validates the response shape and extracts token (97-135). The device ID is cached on the instance (70-83), and session headers are mutated (160). This is stateful client behavior; the code alone does not establish replay prevention or server-side authentication guarantees.",
+      "reference_sha256": "08455f21303c03fd04222cf8fefe5aadd97c0a39fe84835f07bb82582d8d33be",
+      "repository": {
+        "commit": "ab1f36560005253ca6a290a614730bf18a29a7f9",
+        "family_id": "streamlink/streamlink",
+        "url": "https://github.com/streamlink/streamlink"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/streamlink--streamlink-ab1f36560005253ca6a290a614730bf18a29a7f9",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-2591ea49469a2939a6e3f5e0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/streamlink--streamlink-ab1f36560005",
+      "original_reference_sha256": "a1c8d0eea62cebae70e69a91dfa0c4b1a7f07288515ddcc9b9c07bacbf97065f",
+      "question": "What is the integration of the scheduled navigation event with the broader browser protocol event handling architecture for coordinating frame navigation lifecycle management?",
+      "question_sha256": "05f91fb2bc8ccabfbe1463e48ecd70f0254914f50192d0cd5d3f343466edadd7",
+      "reference_answer": "FrameScheduledNavigation is registered as Page.frameScheduledNavigation and deserializes frameId, delay, reason and URL into typed fields (src/streamlink/webbrowser/cdp/devtools/page.py:3583-3606). It reports a potential navigation, explicitly not guaranteed to start. This binding supplies event data to protocol consumers; it does not itself coordinate network/DOM/runtime state, prioritize navigation or prevent races.",
+      "reference_sha256": "516e09fcdcaf5d7bfbcfe8eaeb6185ae4f02a61d890153a822f47b94f0447ea4",
+      "repository": {
+        "commit": "ab1f36560005253ca6a290a614730bf18a29a7f9",
+        "family_id": "streamlink/streamlink",
+        "url": "https://github.com/streamlink/streamlink"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/streamlink--streamlink-ab1f36560005253ca6a290a614730bf18a29a7f9",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-2acb011b61bfe150d6119ec8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/streamlink--streamlink-ab1f36560005",
+      "original_reference_sha256": "6812aab083414eee0b759a186ab0d33d52e8172af40796e8c3dbcc729f5f7de8",
+      "question": "Why does the parameter that enables reduced-latency streaming mode in a platform-specific HLS stream implementation class's initialization affect HLS segment fetching performance and buffer management?",
+      "question_sha256": "ab701deb903219981fac6fa2c0d288d72c0fc57846e44dd3d4120d217c7a7060",
+      "reference_answer": "KickHLSStream stores low_latency (src/streamlink/plugins/kick.py:118-124). Its worker sets reload_time to segment and retains prefetch segments only in low-latency mode (77-92). Its reader clamps hls-live-edge between 1 and LOW_LATENCY_MAX_LIVE_EDGE and enables hls-segment-stream-data before parent initialization (100-115). Those concrete settings affect how close playback starts to the live edge and how segment data is delivered; this code does not specify a generic smaller byte-buffer or partial-segment protocol.",
+      "reference_sha256": "bbc59b6d92975e19c35e68406f6a06ae0a7538d2654ec8777127993316393300",
+      "repository": {
+        "commit": "ab1f36560005253ca6a290a614730bf18a29a7f9",
+        "family_id": "streamlink/streamlink",
+        "url": "https://github.com/streamlink/streamlink"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/streamlink--streamlink-ab1f36560005253ca6a290a614730bf18a29a7f9",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-2e33d82a865b9e8b22764c78"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/streamlink--streamlink-ab1f36560005",
+      "original_reference_sha256": "5034393a9c89ed9e816ecfcd056c7d3816c77310a095a158ff50e3b3a1f8ece8",
+      "question": "Where is the implementation that handles the inheritance and merging of initialization parameters between parent and child plugin classes located in the plugin architecture?",
+      "question_sha256": "f1cc408238d27d1d17977fc92a9dea8c74c7c161dc9eede2da88b774a8fadf41",
+      "reference_answer": "The class-level inheritance handling is PluginMeta.__init__ in src/streamlink/plugin/plugin.py:245-249: it creates new Matchers and Arguments collections from inherited values. Plugin.__init__ merely constructs Options(options) from supplied instance options (299-310); it does not implement the claimed parent/child/default constructor-option merge.",
+      "reference_sha256": "61967c84ddf64fd0236ba54a11567c65c8d32393c52d1768d0216980cf01f5e2",
+      "repository": {
+        "commit": "ab1f36560005253ca6a290a614730bf18a29a7f9",
+        "family_id": "streamlink/streamlink",
+        "url": "https://github.com/streamlink/streamlink"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/streamlink--streamlink-ab1f36560005253ca6a290a614730bf18a29a7f9",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-35a8723fccd9ec1b3bd9ca75"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/streamlink--streamlink-ab1f36560005",
+      "original_reference_sha256": "8c8d4ebda5b4495848cb5e7ee7b4b5fbbf480c660f07ca8718f69c5fd29f8aaf",
+      "question": "How does the browser automation control class's method that retrieves the WebSocket connection URL implement error handling mechanisms when establishing WebSocket connections to the browser debugging protocol?",
+      "question_sha256": "eff3cbe78b57a6e564bbc1e5a2678669d2b46b188495bcd90a3b75213df14687",
+      "reference_answer": "ChromiumWebbrowser.get_websocket_url delegates to session.http.get for /json/version with retries=10, backoff and max-backoff 0.25, timeout 0.1 and an empty HTTP proxy override (src/streamlink/webbrowser/chromium.py:194-209). It brackets IPv6 hosts and validates/extracts a ws URL from JSON. This method discovers the URL; it neither opens the WebSocket nor defines num/raises parameters or its own timeout-catching loop.",
+      "reference_sha256": "f7b62ac64c0f68482da4aa15fee6ef0986a8fb8b69840218dab399350c5a49ac",
+      "repository": {
+        "commit": "ab1f36560005253ca6a290a614730bf18a29a7f9",
+        "family_id": "streamlink/streamlink",
+        "url": "https://github.com/streamlink/streamlink"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/streamlink--streamlink-ab1f36560005253ca6a290a614730bf18a29a7f9",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-47efc403ac14234eca78d3f1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/streamlink--streamlink-ab1f36560005",
+      "original_reference_sha256": "f717434aa23d003c3d45d05a58eefc4bb0c220155d2509044d65d38928ce1371",
+      "question": "Why does the design rationale justify the specific enumeration of cookie exemption reason values in relation to third-party cookie blocking policies?",
+      "question_sha256": "b4b7e307575618c76de7815430fd6e0eb791b0a92a5bafab6284d26803cf075a",
+      "reference_answer": "CookieExemptionReason represents protocol reasons a cookie otherwise blocked by 3PCD is exempted (src/streamlink/webbrowser/cdp/devtools/network.py:1482-1503). It enumerates None, user settings, metadata, deprecation trials, heuristics, enterprise policy, storage access, scheme and sandbox reasons. to_json returns the protocol value and from_json constructs the enum. The source documents this representation purpose, not a proof of completeness, backward compatibility or the policy rationale for each exemption.",
+      "reference_sha256": "fffa20e81dfedcdf6ca9a54f9e051ac37c4573c85566df54dfbae3a77fbb494c",
+      "repository": {
+        "commit": "ab1f36560005253ca6a290a614730bf18a29a7f9",
+        "family_id": "streamlink/streamlink",
+        "url": "https://github.com/streamlink/streamlink"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/streamlink--streamlink-ab1f36560005253ca6a290a614730bf18a29a7f9",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-4f1831120b7ec90aba0a8822"
+    }
+  ]
+}

@@ -1,0 +1,408 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1088,
+            "file_sha256": "cd45f12e701d7787bd029daca88058326b9204fec3a1d1c46914768e640ffc6b",
+            "path": "sympy/functions/elementary/hyperbolic.py",
+            "start_line": 1088
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the dependency mechanism of the hyperbolic cosecant class on its reciprocal base class and the attribute that establishes dependencies with the hyperbolic sine class?",
+      "question_sha256": "7ec571f2931979eb145f2ef13437b42120ab7c2243251c1e4fe409037914baf4",
+      "reference_answer": "The dependency mechanism works through inheritance and delegation via a class attribute. The hyperbolic cosecant class (`csch`) inherits from `ReciprocalHyperbolicFunction`, which provides a framework for reciprocal hyperbolic functions. The dependency on the hyperbolic sine class (`sinh`) is established through the `_reciprocal_of` class attribute, which `csch` sets to `sinh` (line 1088 in `hyperbolic.py`).\n\nThe base class `ReciprocalHyperbolicFunction` uses `_reciprocal_of` extensively to delegate operations:\n\n1. **Evaluation** (`eval` method, lines 1002-1013): Calls `cls._reciprocal_of.eval(arg)` (which is `sinh.eval(arg)`) and returns `1/t` if the result is not None.\n\n2. **Method delegation** (`_call_reciprocal`, lines 1015-1018): Creates an instance of the reciprocal function and calls methods on it dynamically via `getattr(o, method_name)`.\n\n3. **Property access** (`_eval_is_extended_real`, line 1062): Accesses `self._reciprocal_of(self.args[0]).is_extended_real`, directly using properties of the `sinh` instance.\n\n4. **Complex number operations** (`as_real_imag`, line 1046): Computes `(1 / self._reciprocal_of(self.args[0])).as_real_imag()`, delegating to `sinh`'s implementation.\n\n5. **Series expansion** (`_eval_as_leading_term`, line 1059): Delegates to `(1/self._reciprocal_of(self.args[0]))._eval_as_leading_term()`.\n\n6. **Rewrite operations** (lines 1033-1043): Methods like `_eval_rewrite_as_exp` use `_rewrite_reciprocal`, which calls corresponding rewrite methods on `sinh` and returns the reciprocal.\n\nThis design means `csch` inherits behavior from `ReciprocalHyperbolicFunction` and delegates core operations to `sinh` via `_reciprocal_of`, creating a tight coupling where changes to `sinh`'s implementation (evaluation logic, property methods, rewrite methods, series expansion) directly affect `csch`'s behavior.",
+      "reference_sha256": "3f859add2b1a31adb8727d7637847b21808ea7c6c8f108964fcafcff4d9a9c41",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-063fafa90032addd3af0d0e5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 786,
+            "file_sha256": "5e4737314e5d14b6a33da8c84ad5bf955e2a8ae88783ceab068e39cd7fe818b9",
+            "path": "sympy/stats/frv_types.py",
+            "start_line": 781
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the mechanism in the normalization constant property that ensures the combined probability mass function integrates to unity given the partial sum of reciprocal integers and the natural logarithm ratio term?",
+      "question_sha256": "f83d13c427b511f7bbc9bacd350e9d3af31f393cdf6a9de2bb8458fa27c2d078",
+      "reference_answer": "The normalization constant property (`Z`) in the robust soliton distribution class ensures that the combined probability mass function integrates to unity through a specific computational mechanism that matches the structure of the probability mass components.\n\nThe mechanism works as follows:\n\n1. **Harmonic Series Component**: The normalization constant computes a partial sum of reciprocal integers: `z = sum(1/i)` for `i` from 1 to `round(k/R) - 1`, where `R = c * log(k/delta) * k^0.5`. This harmonic series sum directly corresponds to the structure of the robust component (`tau`) in the probability mass function, which has terms of the form `R/(k*x)` for values of `x` from 1 to `round(k/R) - 1`.\n\n2. **Logarithmic Correction**: The normalization constant adds a logarithmic correction term `log(R/delta)` to the harmonic series sum. This correction term matches the special case in the robust component (`tau`) at `x = round(k/R)`, which has the value `R * log(R/delta)/k`.\n\n3. **Scaling Factor**: The combined sum (harmonic series + logarithmic correction) is multiplied by `R/k` and then added to 1: `Z = 1 + z * R/k`. The factor `R/k` scales the sum to properly normalize the robust component, while the `+1` accounts for the ideal soliton component (`rho`).\n\n4. **Unification**: When the probability mass function `(rho + tau)/Z` is computed, the normalization constant `Z` ensures that:\n   - The harmonic series structure in `Z` cancels out the corresponding harmonic terms in `tau`\n   - The logarithmic correction in `Z` cancels out the logarithmic term in `tau` at the boundary point\n   - The scaling factor `R/k` ensures proper normalization across the entire support\n\nThis mechanism is implemented in the `Z` property (lines 781-786 of `sympy/stats/frv_types.py`), which computes the normalization constant by iterating through the harmonic series range and adding the logarithmic correction, then scaling appropriately. The `pmf` method (lines 804-818) divides the combined `(rho + tau)` by this `Z` value to ensure the probability mass function sums to unity over the entire support set `{1, 2, ..., k}`.",
+      "reference_sha256": "3a9a002eccfe03b9411830bf8b2ab3ca5e5235592d5a465146509b783206541d",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-0b52b26ca874d4d1c1cbcdf9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "42e0a768c71cd48116d77d42fd825620f23fa0fff6e5a4d1f27dd67b4dacc510",
+            "kind": "file_reference",
+            "line_count": 791,
+            "path": "sympy/polys/polyoptions.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the option class that handles algebraic field extensions coordinate between its normalization method and its domain creation method to transform extension arguments into an algebraic field domain while maintaining consistency with mutually exclusive options?",
+      "question_sha256": "5c08eff4ce6594175a5bc78b06acee4bc0dc8731f596b2c82250577832713422",
+      "reference_answer": "The option class that handles algebraic field extensions (the `Extension` class in `sympy/polys/polyoptions.py`) coordinates between its normalization method (`preprocess`) and its domain creation method (`postprocess`) to ensure proper transformation of user-provided extension arguments into an algebraic field domain while maintaining consistency with mutually exclusive options.\n\n**The Coordination Mechanism:**\n\n1. **Normalization Method (`preprocess`, lines 552-567)**: This method transforms various user input formats into a consistent normalized format:\n   - If the input is `1` or `True`, it returns `True` (indicating automatic extension detection)\n   - If the input is `0` or `False`, it raises an `OptionError` (invalid argument)\n   - If the input is a single algebraic element (e.g., `sqrt(2)`), it converts it to a set: `{sqrt(2)}`\n   - If the input is an iterable (e.g., `[sqrt(2), I]`), it converts it to a set: `{sqrt(2), I}`\n   - If the input is an empty iterable, it returns `None`\n\n2. **Domain Creation Method (`postprocess`, lines 569-573)**: This method uses the normalized extension format to create the actual algebraic field domain:\n   - It checks if 'extension' is in the options and is not `True`\n   - If so, it creates an algebraic field domain using `sympy.polys.domains.QQ.algebraic_field(*options['extension'])`\n   - It sets this domain in the options dictionary: `options['domain'] = QQ.algebraic_field(*options['extension'])`\n\n**Why Coordination is Necessary:**\n\nThe coordination is essential because:\n- The `preprocess` method must normalize the input first to handle various user input formats (single values, iterables, boolean flags)\n- The `postprocess` method depends on this normalized format (a set of algebraic elements) to properly unpack and pass to `QQ.algebraic_field()`\n- Without normalization, the domain creation would fail or produce incorrect results when users provide different input formats\n\n**Maintaining Consistency with Mutually Exclusive Options:**\n\nThe class maintains consistency through its `excludes` list (lines 549-550), which specifies options that cannot be used together with Extension:\n- `'greedy'`, `'domain'`, `'split'`, `'gaussian'`, `'modulus'`, `'symmetric'`\n\nThe `Options` class enforces this consistency in its `__init__` method (lines 180-182):\n```python\nfor exclude_option in cls.excludes:\n    if self.get(exclude_option) is not None:\n        raise OptionError(\"'%s' option is not allowed together with '%s'\" % (option, exclude_option))\n```\n\nThis ensures that Extension cannot be used simultaneously with other domain-defining options, preventing conflicts and maintaining the integrity of the domain specification. The coordination between `preprocess` and `postprocess` ensures that when Extension is used, it properly transforms user input into a valid algebraic field domain, while the exclusion mechanism prevents incompatible option combinations.",
+      "reference_sha256": "c3ee8eda3c783a882e7c002f3bf0e9c63cc72bc230d5009cbdbbbe67e9d1add1",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-1388db5ba5326ce135a43752"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 29,
+            "file_sha256": "2a893600c3b8604297dfc7e2d8baf12e6e73a5370d5f3dfdf1bece06fad47b35",
+            "path": "sympy/solvers/ode/systems.py",
+            "start_line": 28
+          },
+          {
+            "end_line": 131,
+            "file_sha256": "8ee92a0f0e891997e5dfa1d11636485ff034fe26ab9936b0234529ef3e6d4037",
+            "path": "sympy/solvers/deutils.py",
+            "start_line": 94
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does data flow through the helper that computes maximum derivative orders for each dependent variable when the recursive order-finding utility is called for each equation-function pair?",
+      "question_sha256": "c434992f432ede3f148088244b15d0fd61164a17e09d77b642fb122c9b00d773",
+      "reference_answer": "The data flow through `_get_func_order` when `ode_order` is called for each equation-function pair follows this path:\n\n**1. Entry Point (`_get_func_order` in `systems.py:28-29`):**\n```python\ndef _get_func_order(eqs, funcs):\n    return {func: max(ode_order(eq, func) for eq in eqs) for func in funcs}\n```\n\n**2. Data Flow Structure:**\n- **Input**: `_get_func_order` receives two parameters:\n  - `eqs`: a list of differential equations (expressions or Equality objects)\n  - `funcs`: a list of applied functions (dependent variables)\n\n- **Outer Loop**: For each function `func` in `funcs`:\n  - **Inner Loop**: For each equation `eq` in `eqs`:\n    - **Call to `ode_order`**: `ode_order(eq, func)` is invoked\n    - **Recursive Traversal**: `ode_order` (defined in `deutils.py:94-131`) recursively traverses the expression tree:\n      - If the expression matches a wildcard pattern (no function present), returns 0\n      - If it encounters a `Derivative` node:\n        - If the derivative is of the target function, returns the number of variables (order)\n        - Otherwise, recursively processes the derivative's arguments and adds the derivative's order\n      - For other expression types, recursively processes all arguments and returns the maximum order found\n    - **Result Collection**: Each `ode_order(eq, func)` call returns an integer (the order)\n  \n- **Aggregation**: For each function, `max()` computes the maximum order across all equations\n- **Output**: Returns a dictionary `{func: max_order}` mapping each function to its maximum derivative order\n\n**3. Usage Contexts:**\nThe results from `_get_func_order` flow to:\n- **`canonical_odes` (line 1069)**: Uses the order dictionary to extract highest-order derivatives when converting equations to canonical form\n- **`_classify_linear_system` (line 1413)**: Uses the order dictionary to determine system characteristics (first-order, second-order, higher-order) for classification\n\n**4. Recursive Execution Path in `ode_order`:**\nWhen `ode_order(expr, func)` is called:\n- Base case: If expression matches pattern without the function \u2192 return 0\n- Derivative case: If `Derivative` node found:\n  - Direct match: `expr.args[0] == func` \u2192 return `len(expr.variables)`\n  - Nested case: Recursively process arguments and add derivative order\n- General case: Recursively process all sub-expressions and return maximum order\n\nThe data flows from the top-level dictionary comprehension through nested generator expressions, into recursive function calls that traverse expression trees, and back up as integer order values that are aggregated into the final dictionary result.\n</start_of_answer>",
+      "reference_sha256": "6b6a53f1c51a37a0b8036bd417d85a3f2dd7abb0c77dc1c36328343b18a9a824",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-13c8e26cc46757c05abf5532"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 732,
+            "file_sha256": "5f2bc40cd174f62e439c77fe62509e7041c374a2bd8f8f3a3763f9603f3f5da3",
+            "path": "sympy/physics/mechanics/kane.py",
+            "start_line": 719
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the Kane's method class conditionally create a secondary instance when auxiliary speeds are present, transferring the coordinate-to-speed mapping from the original instance?",
+      "question_sha256": "a4124c5e31402b35d9da1627472e47719f76a5b8782af867fd8ac52745e479f2",
+      "reference_answer": "The Kane's method class conditionally creates a secondary instance in the `kanes_equations` method when auxiliary generalized speeds (`_uaux`) are present. This occurs at lines 719-732 in `./sympy/physics/mechanics/kane.py`.\n\nThe conditional creation happens after the primary instance computes `fr` (generalized active force) and `frstar` (generalized inertia force) at lines 717-718. When `self._uaux` is truthy (line 719), the code creates a secondary `KanesMethod` instance (`km`) with different parameters depending on whether dependent speeds exist:\n\n- If no dependent speeds (`not self._udep`): The secondary instance is created with the inertial frame, coordinates (`self.q`), auxiliary speeds as the independent speeds, and the same constraint solver (lines 721-722).\n\n- If dependent speeds exist: The secondary instance is additionally configured with dependent speeds, velocity constraints, and acceleration constraints derived from the primary instance's constraint matrices (lines 724-730).\n\nThe specific state that must be transferred is `_qdot_u_map` (line 732: `km._qdot_u_map = self._qdot_u_map`). This dictionary maps time derivatives of generalized coordinates (q') to generalized speeds (u). It is computed during `_initialize_kindiffeq_matrices` (line 393) by solving the kinematic differential equations to express q' in terms of u.\n\nThe transfer is necessary because, as documented in the comment at lines 295-299, when auxiliary speeds are present, the secondary instance is created without kinematic differential equations (`kdeqs`). Since `_qdot_u_map` is only computed when `kdeqs` are provided during initialization (see `_initialize_kindiffeq_matrices` at lines 333-403), the secondary instance would not have this mapping available. Without this transfer, the secondary instance's methods like `_form_fr` and `_form_frstar` (called at lines 734-735) would fail when they try to use `_qdot_u_map` for substitutions (see lines 414-415, 469, etc.), as the mapping is essential for converting expressions involving q' into expressions involving u.",
+      "reference_sha256": "8b116bfe8b9cbbf47c24034e0498c18839ea0851f8283ef317d1dde5105f2128",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-1eb027be8692915d88e257d6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "b5c5265d7146219ca85f83ef044999f98626f8204b5e803218b1ef7abc4fdb7a",
+            "kind": "file_reference",
+            "line_count": 945,
+            "path": "sympy/simplify/cse_main.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the CSE argument tracking class maintain consistency between its sequential value-number-to-value list mapping and sorted ordering semantics required by the value-ordered argument retrieval method?",
+      "question_sha256": "5aa393e7f8373459736141557bda7b6c01b67997d0551b5f240f522c776c8dbe",
+      "reference_answer": "The CSE argument tracking class (`FuncArgTracker` in `sympy/simplify/cse_main.py`) maintains consistency through sequential, append-only value number assignment and a list where indices equal value numbers.\n\n**Sequential Value Number Assignment:**\nIn `get_or_add_value_number` (lines 251-260), value numbers are assigned sequentially and never reused:\n```python\nnvalues = len(self.value_numbers)\nvalue_number = self.value_numbers.setdefault(value, nvalues)\nif value_number == nvalues:\n    self.value_number_to_value.append(value)\n    self.arg_to_funcset.append(OrderedSet())\n```\nNew values get the current length as their number, and the value is appended to `value_number_to_value` at that index, ensuring `value_number_to_value[value_number] == value`.\n\n**Sorted Ordering Semantics:**\nThe `get_args_in_value_order` method (lines 244-249) relies on this invariant:\n```python\nreturn [self.value_number_to_value[argn] for argn in sorted(argset)]\n```\nIt sorts value numbers and looks them up in the list. Since numbers are assigned sequentially (0, 1, 2, ...), sorting by value number gives insertion order, providing deterministic ordering.\n\n**Consistency Guarantees:**\n1. Append-only updates: `value_number_to_value` is only appended to, never modified in place, so existing mappings remain stable.\n2. Non-reused value numbers: Once assigned, a value number is never reassigned, preventing index conflicts.\n3. Index-value correspondence: The invariant `value_number_to_value[value_number] == value` is maintained because values are appended at indices equal to their assigned numbers.\n\n**During CSE Operations:**\nDuring `match_common_args` (lines 365-457), `update_func_argset` modifies argument sets but does not touch `value_number_to_value`. New values added via `get_or_add_value_number` (e.g., line 428 when creating `Unevaluated` common functions) are appended, preserving consistency. This append-only design allows concurrent modifications to argument sets while keeping the value-number-to-value mapping stable and the sorted retrieval deterministic.",
+      "reference_sha256": "c04c371392100ef2751cda0f3edfecdf9f1944cdabbe6ee9d6d017ab0748c9c3",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-244ef0a7321a3adb8ec9ee4d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "ad425e817add3b52cf1e7cc9a5544062703a0ecbc5e3a9dd72d901b752470f02",
+            "kind": "file_reference",
+            "line_count": 869,
+            "path": "sympy/physics/biomechanics/activation.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the abstract base class for muscle activation dynamics models decouple symbolic equation representation from numerical solver implementations using abstract property interfaces?",
+      "question_sha256": "936d4fc5c69f1fba692d69bdcc9d5282adccde05c619adcfe52ee268ddf2c3ba",
+      "reference_answer": "The abstract base class for muscle activation dynamics models (located in `sympy/physics/biomechanics/activation.py`) decouples symbolic representation from numerical solver implementations through a standardized abstract property interface that defines the structure of differential equations without specifying their concrete form.\n\n**The Abstract Property Interface:**\n\nThe base class defines multiple abstract properties that concrete subclasses must implement:\n\n1. **`M`** - An abstract property returning a square matrix representing the left-hand side coefficients of the linear ODE system `M(x, r, t, p) x' = F(x, r, t, p)`\n\n2. **`F`** - An abstract property returning a column matrix representing the right-hand side equations of the same system\n\n3. **`state_vars` (or `x`)** - An abstract property returning a column matrix of state variables (functions of time)\n\n4. **`input_vars` (or `r`)** - An abstract property returning a column matrix of input variables\n\n5. **`constants` (or `p`)** - An abstract property returning a column matrix of non-time-varying symbolic constants\n\n6. **`order`** - An abstract property returning the order of the differential equation\n\n7. **`rhs()`** - An abstract method returning the solution to the ODE system\n\n**How Decoupling Works:**\n\nThe decoupling mechanism operates at two levels:\n\n1. **Symbolic Representation Layer**: The abstract properties (`M`, `F`, `x`, `r`, `p`) provide a standardized interface for accessing the symbolic form of the differential equations. Concrete implementations like `ZerothOrderActivation` and `FirstOrderActivationDeGroote2016` provide different symbolic expressions, but they all conform to the same interface structure.\n\n2. **Solver Independence**: Numerical solvers can interact with any subclass of the base class by accessing these properties without needing to know:\n   - The specific mathematical form of the activation dynamics\n   - The order of the differential equation (accessed via `order`)\n   - How state variables are structured (accessed via `state_vars`)\n   - The concrete implementation details\n\n**Example from the Code:**\n\nFor `ZerothOrderActivation` (which has no differential equation), the `M` property returns an empty matrix `Matrix([])`, while `FirstOrderActivationDeGroote2016` returns `Matrix([Integer(1)])` for `M` and a complex symbolic expression for `F` involving hyperbolic tangent functions. Despite these differences, both can be used by the same solver code because they implement the same abstract property interface.\n\n**Benefits:**\n\n- **Extensibility**: New activation dynamics models can be added by subclassing and implementing the abstract properties\n- **Solver Agnostic**: Solvers work with the interface, not specific implementations\n- **Code Generation**: The standardized structure (especially the `constants` property) facilitates automatic code generation for numerical solvers, as mentioned in the docstrings\n- **Integration**: The interface allows seamless integration with other biomechanics components (like `MusculotendonBase`) that accept any `ActivationBase` subclass\n\nThis design pattern follows the Strategy pattern, where the abstract base class defines the strategy interface, and concrete classes provide different strategies (activation dynamics models) that can be used interchangeably by clients (solvers and other components).",
+      "reference_sha256": "b9eee9427b97491d82ed2659ed93ee9f83112c62343a35ef9d7e87d8cb382b65",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-2f228b75418088bf281e50c8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "a2a78084500b00dfc7e9e4b416cfdac5d7cbf6321843e6911461a0424cb61d89",
+            "kind": "file_reference",
+            "line_count": 1185,
+            "path": "sympy/functions/special/hyper.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What architectural separation does the base class for tuple-parameter special functions' derivative evaluation method maintain between tuple and scalar argument differentiation through derivative dispatch indexing?",
+      "question_sha256": "aee933fbd8b9267d721358c0e164879b6ea944e7bd9cbeece1d40bb994374113",
+      "reference_answer": "The base class for tuple-parameter special functions (`TupleParametersBase` in `sympy/functions/special/hyper.py`) maintains a clear architectural separation in its `_eval_derivative` method (lines 77-87) between tuple argument differentiation and scalar argument differentiation through a dual-path indexing mechanism.\n\n**Tuple Argument Differentiation Path (lines 80-84):**\nWhen the first two arguments (which are tuples) contain the differentiation symbol, the method iterates through `_diffargs` (the combined tuple parameters) and uses tuple indexing `(1, i)` to call `fdiff((1, i))`. This tuple index routes to parameter-specific differentiation logic. For example, in `meijerg.fdiff` (line 546-560), when `argindex != 3`, it extracts `argindex[1]` to identify which specific parameter in the tuple to differentiate.\n\n**Scalar Argument Differentiation Path (line 85):**\nThe scalar argument (the third argument, `self.args[2]`) is handled separately using scalar index `3` via `fdiff(3)`. This scalar index routes to argument-specific differentiation logic, which computes the derivative with respect to the function's main argument (e.g., `z` in hypergeometric functions).\n\n**Control Flow Through Indexing:**\nThe `fdiff` method acts as a dispatcher based on index type:\n- **Tuple indices** `(1, i)`: Route to `_diff_wrt_parameter(argindex[1])` for parameter differentiation\n- **Scalar index** `3`: Route to argument differentiation logic (e.g., `hyper.fdiff(3)` returns `fac*hyper(nap, nbq, self.argument)`)\n\nThis separation ensures that tuple parameters (which may contain multiple values) are differentiated element-wise through iteration, while the scalar argument is differentiated as a single entity, with the indexing mechanism cleanly routing control flow to the appropriate differentiation logic.",
+      "reference_sha256": "fc51a0d78ecd15e43bdb4bd51990057751c8823bad8cd0e5a5892a0ec9a87708",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-2f34a9da46c23b3eea4a30e8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2302,
+            "file_sha256": "a2ec118ac135327e9ec6fa84f7903ae6fc3c33e0ad5432e3a59128363bed4370",
+            "path": "sympy/stats/stochastic_process_types.py",
+            "start_line": 2298
+          },
+          {
+            "end_line": 660,
+            "file_sha256": "8be542399ae3a49b6fc93066f718278930a493f894608b859e48b2c73927e888",
+            "path": "sympy/stats/tests/test_stochastic_process.py",
+            "start_line": 660
+          },
+          {
+            "end_line": 3208,
+            "file_sha256": "a97631b6f24f838391248ec0c489118709c9ea5733dec54159fe2da10cbdbef0",
+            "path": "sympy/stats/crv_types.py",
+            "start_line": 3208
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does repeated instantiation of the continuous probability distribution class representing Gaussian distributions with mean and standard deviation parameters in the method that returns the probability distribution for a given time index in the continuous-time stochastic process class that models Brownian motion impact memory allocation patterns?",
+      "question_sha256": "a969e05873dd58e9bf79d5bb8a383f390f6ff15860cd9cd3be397e85c9282c5c",
+      "reference_answer": "The repeated instantiation of `NormalDistribution` objects in the `distribution()` method of `WienerProcess` impacts memory allocation patterns because:\n\n1. **No Caching Mechanism**: The `distribution()` method (located at lines 2298-2302 in `sympy/stats/stochastic_process_types.py`) creates a new `NormalDistribution(0, sqrt(key))` object on every call without any caching. Unlike other methods in the codebase that use the `@cacheit` decorator (e.g., `_preprocess` at line 492, `transition_probabilities` at line 1592), the `distribution()` method has no memoization.\n\n2. **Frequent Object Creation**: Every time `WienerProcess` is queried at a time point (via `__call__` at line 323), it calls `self.distribution(time)`, which instantiates a new `NormalDistribution` object. This occurs even when querying the same time point multiple times, as shown in test cases (e.g., `test_stochastic_process.py` lines 660, 667-670) where the process is queried at multiple time points like `X(2)`, `X(3)`, `X(4)`, `X(6)`.\n\n3. **Basic Object Allocation**: `NormalDistribution` inherits from `SingleContinuousDistribution` (line 3208 in `sympy/stats/crv_types.py`), which ultimately inherits from `Basic`. Each instantiation creates a new Python object with its own memory allocation, storing the mean and standard deviation parameters (`_argnames = ('mean', 'std')`).\n\n4. **StochasticPSpace Storage**: Each `NormalDistribution` object is stored within a `StochasticPSpace` object (created at line 323), which itself is stored in a `RandomIndexedSymbol`. When querying at multiple time points, this creates a chain of new objects: `NormalDistribution` \u2192 `StochasticPSpace` \u2192 `RandomIndexedSymbol` for each time point.\n\n5. **Memory Accumulation**: In scenarios where the process is queried at many time points (common in stochastic process analysis), this pattern leads to linear memory growth proportional to the number of unique time queries, as each query allocates new distribution objects even when the underlying mathematical distribution parameters (mean=0, std=sqrt(time)) could be reused or cached.\n\nThe impact is particularly noticeable when performing joint distribution calculations or probability queries across multiple time points, as each time point query triggers a new object allocation cycle.",
+      "reference_sha256": "ec09dd65d84d72294d1fc85311e675cb568a2833ed156ffb99b68c47478ffd29",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-3063534b24598db94cc883e4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 118,
+            "file_sha256": "ac3de29ed80a0ad000307decaa582a6c92f55d2abd4237de1bf318cf008e7a4d",
+            "path": "sympy/polys/heuristicgcd.py",
+            "start_line": 118
+          },
+          {
+            "end_line": 1273,
+            "file_sha256": "e2674792487b592adbfc43ef202a7b45ffc0dfaddf6207645d66db701661c409",
+            "path": "sympy/polys/euclidtools.py",
+            "start_line": 1273
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "c41c88f9fa881d562c6119badcd9875e5492442c1223dbd95283bed4c7f95a59",
+            "kind": "file_reference",
+            "line_count": 183,
+            "path": "sympy/polys/polyerrors.py"
+          },
+          {
+            "file_sha256": "e2674792487b592adbfc43ef202a7b45ffc0dfaddf6207645d66db701661c409",
+            "kind": "file_reference",
+            "line_count": 1968,
+            "path": "sympy/polys/euclidtools.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the exception that signals failures in heuristic-based greatest common divisor computation strategies integrate into the base exception class for polynomial-related errors?",
+      "question_sha256": "e72a0069a79669995de94ec8e648d6cb04731391c37b0e6f6f2571c455832412",
+      "reference_answer": "The exception that signals failures in heuristic-based greatest common divisor computation strategies integrates into the base exception class for polynomial-related errors (`BasePolynomialError`) to enable structured error handling and fallback mechanisms within the polynomial computation framework.\n\n**Integration Purpose:**\n\n1. **Structured Exception Hierarchy**: By inheriting from `BasePolynomialError` (defined in `sympy/polys/polyerrors.py`), the exception becomes part of a unified error handling system for all polynomial operations. This allows code to catch all polynomial-related errors at once if needed, or handle specific error types individually.\n\n2. **Fallback Mechanism**: The integration enables a critical fallback pattern used throughout the GCD computation code. In `sympy/polys/euclidtools.py`, when heuristic GCD methods are attempted (lines 1544-1548, 1552-1556, 1580-1584, 1588-1592), the code catches `HeuristicGCDFailed` exceptions and automatically falls back to alternative methods:\n   - For rational number fields (`QQ`), it falls back to `dup_ff_prs_gcd` (polynomial remainder sequence)\n   - For integer domains (`ZZ`), it falls back to `dup_rr_prs_gcd` (polynomial remainder sequence)\n\n3. **Consistent Error Handling**: The exception hierarchy ensures that all polynomial computation errors follow the same pattern, making error handling predictable and maintainable. Other polynomial exceptions like `ModularGCDFailed`, `PolynomialDivisionFailed`, `ExactQuotientFailed`, etc., all inherit from the same base class.\n\n4. **Domain-Specific Error Classification**: The base class (`BasePolynomialError`) serves as a marker that distinguishes polynomial computation errors from other types of exceptions in SymPy, allowing for domain-specific error handling strategies.\n\n**Implementation Details:**\n\nThe exception is raised in heuristic GCD implementations when the algorithm exhausts its attempts (e.g., after `HEU_GCD_MAX = 6` evaluation points in `heuristicgcd.py` line 118, or in `euclidtools.py` lines 1273 and 1397). The try-except blocks in the GCD computation functions (lines 1547, 1555, 1583, 1591 in `euclidtools.py`) catch this exception silently and proceed with fallback algorithms, demonstrating how the exception hierarchy enables graceful degradation of computation strategies.",
+      "reference_sha256": "23de5bde821422c34417d9a209c9416cecd597717a92c5859d47f9e4a65652ac",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-356b1c9e40a4a1753d801313"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "47722dbfc2cdeec4904bd75327a49fea6a954e8bef11046081178553b305daef",
+            "kind": "file_reference",
+            "line_count": 3625,
+            "path": "sympy/functions/elementary/trigonometric.py"
+          },
+          {
+            "file_sha256": "cd45f12e701d7787bd029daca88058326b9204fec3a1d1c46914768e640ffc6b",
+            "kind": "file_reference",
+            "line_count": 2275,
+            "path": "sympy/functions/elementary/hyperbolic.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What are the interdependencies between the expression transformation methods that convert between circular and hyperbolic function families in the elementary functions module?",
+      "question_sha256": "3b2da0e6dd5e4cf95553a83ebe368f68f3abadb145250c00ce104399edeadac4",
+      "reference_answer": "The interdependencies between the expression transformation methods that convert between circular and hyperbolic function families in the elementary functions module create a complex network of bidirectional rewrite relationships. These interdependencies are implemented through `_eval_rewrite_as_*` methods in both `trigonometric.py` and `hyperbolic.py`.\n\n**Primary Interdependencies:**\n\n1. **Hyperbolic-to-Trigonometric Cross-Family Conversions:**\n   - `sinh._eval_rewrite_as_sin()` (line 300) calls `sin(I * arg)` - converts hyperbolic sine to trigonometric sine via complex argument\n   - `cosh._eval_rewrite_as_cos()` (line 495) calls `cos(I * arg, evaluate=False)` - converts hyperbolic cosine to trigonometric cosine\n   - `tanh._eval_rewrite_as_tan()` (line 753) calls `tan(I * arg, evaluate=False)` - converts hyperbolic tangent to trigonometric tangent\n   - Similar patterns exist for reciprocal functions: `csch._eval_rewrite_as_sin()`, `csch._eval_rewrite_as_csc()`, `sech._eval_rewrite_as_cos()`, `sech._eval_rewrite_as_sec()`\n\n2. **Within-Hyperbolic-Family Conversions:**\n   - `sinh._eval_rewrite_as_cosh()` (line 306) calls `cosh(arg + pi*I/2)` - converts sinh to cosh with phase shift\n   - `cosh._eval_rewrite_as_sinh()` (line 501) calls `sinh(arg + pi*I/2, evaluate=False)` - converts cosh to sinh with phase shift\n   - `tanh._eval_rewrite_as_sinh()` (line 759) calls `sinh(arg)/sinh(pi*I/2 - arg, evaluate=False)` - converts tanh to sinh\n   - `tanh._eval_rewrite_as_cosh()` (line 762) calls `cosh(pi*I/2 - arg, evaluate=False)/cosh(arg)` - converts tanh to cosh\n   - `coth._eval_rewrite_as_sinh()` (line 948) calls `sinh(pi*I/2 - arg, evaluate=False)/sinh(arg)` - converts coth to sinh\n   - `coth._eval_rewrite_as_cosh()` (line 951) calls `cosh(arg)/cosh(pi*I/2 - arg, evaluate=False)` - converts coth to cosh\n\n3. **Self-Referential Conversions:**\n   - `sinh._eval_rewrite_as_tanh()` (line 309) calls `tanh(S.Half*arg)` recursively\n   - `sinh._eval_rewrite_as_coth()` (line 313) calls `coth(S.Half*arg)` recursively\n   - `cosh._eval_rewrite_as_tanh()` (line 504) calls `tanh(S.Half*arg)**2` recursively\n   - `cosh._eval_rewrite_as_coth()` (line 508) calls `coth(S.Half*arg)**2` recursively\n\n**Circular Evaluation Chain Prevention:**\n\nThe codebase prevents infinite recursion through the `evaluate=False` parameter, which is strategically placed in critical rewrite methods. When `evaluate=False` is passed to function constructors (like `cos(I * arg, evaluate=False)`), it prevents automatic evaluation and rewriting, breaking potential circular chains.\n\n**Circular Dependencies That Would Create Infinite Loops Without `evaluate=False`:**\n\n1. **sinh \u2194 cosh cycle**: `sinh._eval_rewrite_as_cosh()` \u2192 `cosh(arg + pi*I/2)` could trigger `cosh._eval_rewrite_as_sinh()` \u2192 `sinh(arg + pi*I/2)` \u2192 back to sinh\n2. **tanh \u2194 sinh/cosh cycles**: `tanh._eval_rewrite_as_sinh()` \u2192 `sinh(arg)/sinh(pi*I/2 - arg)` could trigger recursive rewriting of the denominator\n3. **coth \u2194 sinh/cosh cycles**: Similar to tanh, with reciprocal relationships\n4. **Cross-family cycles**: Hyperbolic functions rewriting to trigonometric functions could theoretically trigger reverse conversions through complex argument transformations\n\nThe `evaluate=False` parameter in methods like `cosh._eval_rewrite_as_sinh()` (line 502), `tanh._eval_rewrite_as_tan()` (line 754), and `coth._eval_rewrite_as_sinh()` (line 949) ensures that newly created function instances do not automatically trigger their own rewrite methods, thus preventing infinite recursion while maintaining the mathematical correctness of the transformations.",
+      "reference_sha256": "8929dcc332d224b1de83361b00d40d793b93fc48aed9a1f6f1a932dcf0463bf7",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-36d4f43b8fc8a4d753b3acb4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 105,
+            "file_sha256": "66ef082bdcadebd5c914ab7e4a1a097d96ef67e086330beb28d897be2eaafe7e",
+            "path": "sympy/stats/drv.py",
+            "start_line": 99
+          },
+          {
+            "end_line": 379,
+            "file_sha256": "da32fa4186bd94095bbd3c6fc7d05775fc14e8f46dd2ecd5dc2557448799e64d",
+            "path": "sympy/stats/drv_types.py",
+            "start_line": 377
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "da32fa4186bd94095bbd3c6fc7d05775fc14e8f46dd2ecd5dc2557448799e64d",
+            "kind": "file_reference",
+            "line_count": 849,
+            "path": "sympy/stats/drv_types.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the dependency mechanism of the characteristic function method in the logarithmic discrete distribution class on the base class framework that ensures consistency across discrete distribution classes?",
+      "question_sha256": "32fb329d93808e8324cf66c71b7c42b7340773b2b9647348019238fc53e623ca",
+      "reference_answer": "The dependency mechanism uses the Template Method pattern implemented in the base class for single-variable discrete distributions. Here's how it works:\n\n**Template Method Pattern in Base Class:**\n\nThe base class defines a public `characteristic_function` method (in `sympy/stats/drv.py`, lines 99-105) that implements the template:\n\n```python\ndef characteristic_function(self, t, **kwargs):\n    \"\"\" Characteristic function \"\"\"\n    if not kwargs:\n        cf = self._characteristic_function(t)\n        if cf is not None:\n            return cf\n    return self.compute_characteristic_function(**kwargs)(t)\n```\n\n**Hook Method for Subclasses:**\n\nThe base class provides a hook method `_characteristic_function` (line 96-97) that returns `None` by default. Subclasses like the logarithmic distribution class can override this method to provide optimized closed-form implementations. In the logarithmic distribution class (`sympy/stats/drv_types.py`, lines 377-379), this override provides:\n\n```python\ndef _characteristic_function(self, t):\n    p = self.p\n    return log(1 - p * exp(I*t)) / log(1 - p)\n```\n\n**Fallback to Default Computation:**\n\nIf a subclass doesn't override `_characteristic_function` or it returns `None`, the base class falls back to `compute_characteristic_function` (lines 86-94), which computes the characteristic function generically from the probability density function using summation:\n\n```python\ndef compute_characteristic_function(self, **kwargs):\n    \"\"\" Compute the characteristic function from the PDF.\n    Returns a Lambda.\n    \"\"\"\n    x, t = symbols('x, t', real=True, cls=Dummy)\n    pdf = self.pdf(x)\n    cf = summation(exp(I*t*x)*pdf, (x, self.set.inf, self.set.sup))\n    return Lambda(t, cf)\n```\n\n**Consistency Mechanism:**\n\nThis pattern ensures consistency across all discrete distribution classes because:\n\n1. **Unified Interface**: All subclasses inherit the same `characteristic_function` method signature and behavior\n2. **Optional Optimization**: Subclasses can provide efficient closed-form implementations via `_characteristic_function` without breaking the interface\n3. **Automatic Fallback**: Subclasses that don't provide optimized implementations automatically get correct behavior through PDF-based computation\n4. **Same Pattern for Other Methods**: The same template method pattern is used for other methods like `cdf` and `moment_generating_function`, ensuring consistent architecture\n\nAll discrete distribution classes in `drv_types.py` (FlorySchulzDistribution, GeometricDistribution, HermiteDistribution, LogarithmicDistribution, NegativeBinomialDistribution, PoissonDistribution, SkellamDistribution, YuleSimonDistribution, ZetaDistribution) inherit from the base class and follow this same dependency mechanism, ensuring consistent behavior across the entire discrete distribution framework.",
+      "reference_sha256": "b9d431a35f6e38e65b4bd215358b5094b90d0463c4feac37843df49fa2f8bfd8",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-438a21a2ae2cba97902cb31b"
+    }
+  ]
+}

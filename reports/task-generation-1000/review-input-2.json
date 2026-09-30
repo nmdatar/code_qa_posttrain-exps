@@ -1,0 +1,1029 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/bridgecrewio--checkov-c2091482f54d",
+      "category": "{'id': '4.2', 'name': 'documentation / MkDocs / user tutorials'}",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "e77754c7fbfd3811b0da848113d0a6d4aa6fb9755d8ac9aa78fc453fd11ad49c",
+            "kind": "file_reference",
+            "line_count": 292,
+            "path": "docs/3.Scans/resource-scans.md"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "checkov/docs_generator.py",
+            "reason": "not_tracked",
+            "reference": "checkov/docs_generator.py",
+            "start_line": null
+          },
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "Lunr.js",
+            "reason": "not_tracked",
+            "reference": "Lunr.js",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "What are the core components and structure of Checkov's documentation system architecture?",
+      "question_sha256": "15ee2c62f48a1905d2361f8508bc6f7cf633ba3ec0a003b3cacc581470841785",
+      "reference_answer": "Checkov's documentation system architecture consists of several integrated components built around Jekyll static site generation. The foundation is a Jekyll configuration using the custom remote theme 'bridgecrewio/checkov-theme' with search functionality explicitly disabled. The documentation content is organized hierarchically using numbered directories (1.Introduction/, 2.Concepts/, 3.Scans/, 4.Integrations/, 5.Contribution/) where each markdown file contains YAML front-matter metadata specifying layout, title, and order properties for proper navigation structure. The check definition system is built on the BaseCheck abstract class which defines core properties including id, name, categories, and supported_entities fields, but notably lacks integrated guideline URL fields for external documentation links. A critical component is the automated documentation generation system implemented through checkov/docs_generator.py, which traverses various check registries (resource, data, provider registries for Terraform, CloudFormation, and Kubernetes) to programmatically generate tabulated listings of all available checks with their metadata. This automation is integrated into the CI/CD pipeline through GitHub workflows, which automatically regenerates the resource-scans.md file during version releases, ensuring the documentation stays synchronized with code changes. The system also includes web assets (CSS, JavaScript, images) and a search infrastructure using Lunr.js, although search functionality is disabled in the current configuration. This architecture deliberately separates static documentation content from dynamic check metadata generation, requiring external mechanisms for mapping check IDs to guideline URLs in tool outputs.",
+      "reference_sha256": "199c09a602770ad1abe2102c5d44dea3f74773ed3056b9aab863bc0c23a1fc49",
+      "repository": {
+        "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+        "family_id": "bridgecrewio/checkov",
+        "url": "https://github.com/bridgecrewio/checkov"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/bridgecrewio--checkov-c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+      "task_id": "import-1bd73f2caf250c79536f4328"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 543,
+            "file_sha256": "bdc7caba107ab2e99445c613db5ee4d8365ffef7c99165e44782b9d087137a89",
+            "path": "django/db/models/lookups.py",
+            "start_line": 500
+          },
+          {
+            "end_line": 180,
+            "file_sha256": "407704557a53a1a40170dd40d605ab2a5f71b580402c85e17b2c5e2343b688b8",
+            "path": "django/db/models/sql/where.py",
+            "start_line": 116
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "00c146701fcfc6661ac01f4f0ed65adc928d28797193b5968904918fdfd67fdf",
+            "kind": "file_reference",
+            "line_count": 1639,
+            "path": "tests/lookup/tests.py"
+          },
+          {
+            "file_sha256": "9587706ddf22ccd48a7eaad3f53f68e4ae3b892573844875a371e401e015f470",
+            "kind": "file_reference",
+            "line_count": 4607,
+            "path": "tests/queries/tests.py"
+          },
+          {
+            "file_sha256": "bba9afafdfbdc8015aca2daf79681a215029cbbdc0ab6465d517265fe22b2649",
+            "kind": "file_reference",
+            "line_count": 222,
+            "path": "tests/or_lookups/tests.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the Django ORM's filter mechanism handle the interaction between the `__in` lookup operator and an empty iterator argument to ensure query correctness while avoiding potential edge cases in SQL generation?",
+      "question_sha256": "9b75a9d6b0845287b09dd1b37ddd369c8a5f595bc0cc5f9819b8acd97e585347",
+      "reference_answer": "The Django ORM's filter mechanism handles empty iterator arguments for the `__in` lookup operator through a multi-layered approach that prevents invalid SQL generation while maintaining query correctness.\n\n**Implementation in the Lookup Class:**\n\nThe `In` lookup class (located in `django/db/models/lookups.py`, lines 500-543) inherits from `FieldGetDbPrepValueIterableMixin` and `BuiltinLookup`. When processing the right-hand side argument in the `process_rhs()` method:\n\n1. **Direct Value Detection**: The method first checks if the right-hand side is a direct value (not a Query or Expression) using `rhs_is_direct_value()`.\n\n2. **None Removal**: If it's a direct value, the code attempts to convert the iterable to an `OrderedSet` to remove duplicates and discard `None` values (since NULL is never equal to anything in SQL). If the items are unhashable (raising `TypeError`), it falls back to a list comprehension that filters out `None` values.\n\n3. **Empty Iterator Handling**: After removing `None` values, if the resulting iterable is empty, the method raises `EmptyResultSet` (line 536). This exception indicates that the query predicate is impossible to satisfy.\n\n**SQL Generation Protection:**\n\nThe `EmptyResultSet` exception is caught during SQL compilation in the WHERE clause handling. The `WhereNode.as_sql()` method (in `django/db/models/sql/where.py`, lines 116-180) catches `EmptyResultSet` exceptions when compiling children of the WHERE clause (line 152). The WHERE clause logic then handles this appropriately based on the connector type (AND/OR/XOR) and negation:\n\n- For AND connectors: If any child raises `EmptyResultSet`, the entire clause becomes impossible (line 171).\n- For OR connectors: An `EmptyResultSet` from one child doesn't invalidate the entire clause if other children can still match.\n- The exception prevents generating syntactically invalid SQL like `WHERE field IN ()`, which would cause database errors.\n\n**Edge Case Prevention:**\n\nThis design ensures that:\n- Empty iterators (including generators that yield no values) are detected before SQL generation\n- Invalid SQL syntax is never produced\n- The query system correctly identifies impossible predicates early in the compilation process\n- The behavior is consistent whether the empty iterator is a list, tuple, generator, or any other iterable type\n\nThe implementation is tested in multiple test files, including `tests/lookup/tests.py` (test_in_empty_list), `tests/queries/tests.py` (test_ticket10432 for generators), and `tests/or_lookups/tests.py` (test_empty_in), confirming that empty iterators return empty querysets without generating invalid SQL.",
+      "reference_sha256": "46b61e8c906d77cbd843ab805b063bea083bc8324486a6bbc62c22ff93cf47ad",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-0e5fbd5e6c0ac53b965271f5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/fitbenchmarking--fitbenchmarking-df465dc1b60d",
+      "category": "{'id': '5.3', 'name': 'threading / execution limits / scheduling / memory / timeout'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 61,
+            "file_sha256": "6d795d95595323a4d0025d670050cbe1f8fcf7a9245182fdd1947c24ea3800d1",
+            "path": "fitbenchmarking/utils/timer.py",
+            "start_line": 9
+          },
+          {
+            "end_line": 145,
+            "file_sha256": "cac97e1d59bbb4d14739a384999276c01121238905ffd29600be608d9925e1b1",
+            "path": "fitbenchmarking/controllers/bumps_controller.py",
+            "start_line": 126
+          },
+          {
+            "end_line": 214,
+            "file_sha256": "651d97032fbf34e5643a8d76466f8a58dfe7130993eefb1ce83947fc3a457d95",
+            "path": "fitbenchmarking/controllers/base_controller.py",
+            "start_line": 207
+          },
+          {
+            "end_line": 140,
+            "file_sha256": "6bacfa2fdc8c15b35787f597a66f31d2af7fbdd1b9fd9df3a5787092d2226784",
+            "path": "fitbenchmarking/parsing/fitting_problem.py",
+            "start_line": 140
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "218ff906a044b528d9dc1db9e7ab20a6647c177d314693489de6ddc2fb2c5f14",
+            "kind": "file_reference",
+            "line_count": 629,
+            "path": "fitbenchmarking/core/fitting_benchmarking.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the runtime limit enforcement mechanism become inefficient when scaling to benchmarks with many fitting problems and minimizers?",
+      "question_sha256": "ee3aef720218ff542fa02e6a5aa74324c05d4131d4fa7416acb92460e06497d3",
+      "reference_answer": "The runtime limit enforcement mechanism becomes inefficient when scaling due to several architectural factors in the benchmarking system. The system employs a 6-level nested loop structure as documented in fitbenchmarking/core/fitting_benchmarking.py: benchmark problems, starting values, software, minimizers, jacobians, and hessians. Timer operations accumulate overhead at each iteration level within this structure. The TimerWithMaxTime class (fitbenchmarking/utils/timer.py: lines 9-61) tracks cumulative elapsed time by continuously adding intervals to total_elapsed_time in its stop() method (line 39), and each check_elapsed_time() call (lines 50-61) performs time calculations and comparisons. Timer reset operations occur redundantly at multiple abstraction levels, with controller.timer.reset() calls appearing at lines 578 and 611 of fitbenchmarking/core/fitting_benchmarking.py in the perform_fit function, creating repetitive state management overhead. The 18 different controller implementations exhibit inconsistent timer integration patterns: the BumpsController (fitbenchmarking/controllers/bumps_controller.py: lines 126-145) uses abort_test callbacks with the _check_timer_abort_test method for real-time checking during optimization iterations, while most other controllers rely on the base controller's timer start/stop mechanism in the execute method (fitbenchmarking/controllers/base_controller.py: lines 207-214). Additionally, check_elapsed_time() is invoked during model evaluation in the eval_model method (fitbenchmarking/parsing/fitting_problem.py: line 140), meaning every function evaluation during fitting triggers a timer check with its associated time() system call. This heterogeneous timer architecture, combined with the multiplicative effect of deeply nested loops across many problems and minimizers, results in timer overhead that scales poorly with benchmark size.",
+      "reference_sha256": "da0ba9e7f1c3f6c043632d054b6607984462c6b60d2569dd0b38697786576dd6",
+      "repository": {
+        "commit": "df465dc1b60d580dfb885ee9d03866c25988566f",
+        "family_id": "fitbenchmarking/fitbenchmarking",
+        "url": "https://github.com/fitbenchmarking/fitbenchmarking"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/fitbenchmarking--fitbenchmarking-df465dc1b60d580dfb885ee9d03866c25988566f",
+      "task_id": "import-241e31f0666e9c2890e9eb8f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/getsentry--responses-3e029949c8f3",
+      "category": "{'id': '3.2', 'name': 'artifacts / distribution format / repository management / post-install state'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 77,
+            "file_sha256": "2ceb347b139f4dfe0abce23491393758b1bf24baa3849b7613d01f3fe10c8eca",
+            "path": "setup.py",
+            "start_line": 77
+          },
+          {
+            "end_line": 78,
+            "file_sha256": "2ceb347b139f4dfe0abce23491393758b1bf24baa3849b7613d01f3fe10c8eca",
+            "path": "setup.py",
+            "start_line": 78
+          },
+          {
+            "end_line": 18,
+            "file_sha256": "486369c5cf332fef7170daa3409fdad27b05645a75101505a1a247d74d1c41cb",
+            "path": "responses/__init__.py",
+            "start_line": 17
+          },
+          {
+            "end_line": 24,
+            "file_sha256": "fd90bce64b77c54416f0d7134fa0d3d5113ad83526e85067c03bb9b65f2da53e",
+            "path": "responses/__init__.pyi",
+            "start_line": 24
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "2ceb347b139f4dfe0abce23491393758b1bf24baa3849b7613d01f3fe10c8eca",
+            "kind": "file_reference",
+            "line_count": 95,
+            "path": "setup.py"
+          },
+          {
+            "file_sha256": "fd90bce64b77c54416f0d7134fa0d3d5113ad83526e85067c03bb9b65f2da53e",
+            "kind": "file_reference",
+            "line_count": 322,
+            "path": "responses/__init__.pyi"
+          },
+          {
+            "file_sha256": "756ef871b13258483c1c03c063fb6deb51f5c0b1aae1edceba6662e526b05708",
+            "kind": "file_reference",
+            "line_count": 44,
+            "path": "responses/matchers.pyi"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the responses library handle type stub distribution in its package configuration to ensure mypy compatibility for matcher functions?",
+      "question_sha256": "ba4e0eb9ad718cc24806c1130c6ac22988068c2bdd842fd9e7a93d02e6b21335",
+      "reference_answer": "The responses library handles type stub distribution through a dual configuration approach that creates mypy compatibility issues. The setup.py file defines package_data at setup.py: line 77 as {'responses': ['py.typed', '__init__.pyi']}, which explicitly includes the PEP 561 marker file (py.typed) that signals to type checkers that the package provides type information, and the main module type stub but omits matchers.pyi. The setup.py also includes include_package_data=True at setup.py: line 78, which enables MANIFEST.in to take effect for source distributions. Meanwhile, MANIFEST.in at responses/responses/MANIFEST.in: line 3 includes all .pyi files using the pattern **/*.pyi, but this only affects source distributions because wheel distributions completely ignore MANIFEST.in and rely solely on the package_data configuration in setup.py. This configuration mismatch is problematic because the main responses module imports critical matcher functions (json_params_matcher and urlencoded_params_matcher) from the matchers module at responses/__init__.py: line 17-18, and the main type stub file references these imports at responses/__init__.pyi: line 24. The matchers.pyi file provides essential type information for matcher functions like json_params_matcher and urlencoded_params_matcher that return callable matcher objects used for request matching. When users install the library from wheels (the default pip installation method), the matchers.pyi type stub is missing due to the incomplete package_data configuration, causing mypy to fail type checking in strict mode when these matcher functions are used. This creates an inconsistency where source installs work correctly with mypy due to MANIFEST.in inclusion (enabled by include_package_data=True), but wheel installs fail type checking because wheels ignore MANIFEST.in entirely.",
+      "reference_sha256": "05474d2ccf97fbf8a25318237a374ac9788087ce6c7fc0527807030853fc370c",
+      "repository": {
+        "commit": "3e029949c8f3c1b3b2b48f9e437fedd7cf27746d",
+        "family_id": "getsentry/responses",
+        "url": "https://github.com/getsentry/responses"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/getsentry--responses-3e029949c8f3c1b3b2b48f9e437fedd7cf27746d",
+      "task_id": "import-1858f3ada8c0a29a6f8c0877"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "ccb9c9dcfb8a27f568afab81347b20b0e3332d91a474f34763e7e1bba491822e",
+            "kind": "file_reference",
+            "line_count": 4784,
+            "path": "lib/matplotlib/patches.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the _Style class leverage __new__ method interception combined with string parsing to implement a factory pattern that defers style instantiation until runtime, and what are the implications of this design choice on error handling for malformed style specifications?",
+      "question_sha256": "382f2348112ec45ed3c91c419d854c3f1da08800f6626949bc4133765f9a8aff",
+      "reference_answer": "The base container class for patch style classes (the `_Style` class in `lib/matplotlib/patches.py`) uses `__new__` to intercept instantiation and implement a factory mechanism that defers style subclass creation until runtime.\n\nImplementation details:\n\n1. **Instantiation interception via `__new__`**: The `__new__` method (lines 2336-2352) intercepts calls like `BoxStyle(\"Round, pad=0.2\")` before an instance is created.\n\n2. **Comma-separated string parsing**: The method parses the `stylename` string:\n   - Removes spaces and splits by commas: `stylename.replace(\" \", \"\").split(\",\")`\n   - Extracts the style name from the first element (lowercased): `_name = _list[0].lower()`\n   - Parses additional parameters from remaining elements as key=value pairs: `[cs.split(\"=\") for cs in _list[1:]]`\n   - Converts values to floats: `{k: float(v) for k, v in _args_pair}`\n\n3. **Runtime lookup and deferred instantiation**: \n   - Looks up the actual style class from the `_style_list` dictionary: `_cls = cls._style_list[_name]`\n   - Returns an instance of the found subclass: `return _cls(**{**_args, **kwargs})`\n   - This defers instantiation until runtime, allowing string-based style selection\n\n4. **Error handling for malformed specifications**:\n   - Unknown style names raise `ValueError` with message `\"Unknown style: {stylename!r}\"` (line 2345)\n   - Malformed arguments (e.g., invalid key=value pairs) raise `ValueError` with message `\"Incorrect style argument: {stylename!r}\"` (lines 2350-2351)\n   - Both errors preserve the original exception via `from err` for debugging\n\nThis design allows flexible style creation through string specifications (e.g., `BoxStyle(\"Round, pad=0.2\")`) while maintaining type safety through runtime validation and clear error messages for invalid inputs.",
+      "reference_sha256": "82c91342b2f79da81c17b7e3259baa570b3359b4561f8d45f413ba8863ff824b",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-06b49ee02708261c54545230"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/mwaskom--seaborn-3d3d715989d1",
+      "category": "{'id': '1.1', 'name': 'pandas / parquet / datetime / Dask / table schema'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 67,
+            "file_sha256": "c2deefdfc44ded15a824b75b2c8f22dcaf78af70f1871ebaef91d3f5c69f7994",
+            "path": "seaborn/_core/groupby.py",
+            "start_line": 67
+          },
+          {
+            "end_line": 98,
+            "file_sha256": "c2deefdfc44ded15a824b75b2c8f22dcaf78af70f1871ebaef91d3f5c69f7994",
+            "path": "seaborn/_core/groupby.py",
+            "start_line": 96
+          },
+          {
+            "end_line": 96,
+            "file_sha256": "c2deefdfc44ded15a824b75b2c8f22dcaf78af70f1871ebaef91d3f5c69f7994",
+            "path": "seaborn/_core/groupby.py",
+            "start_line": 96
+          },
+          {
+            "end_line": 1622,
+            "file_sha256": "7d5a9fc0303567c35ff8343ec9fbc573f086c716f46d8a35acceb34d69823c59",
+            "path": "seaborn/_core/plot.py",
+            "start_line": 1622
+          },
+          {
+            "end_line": 920,
+            "file_sha256": "4382717f35a721b2565ee582636aadd1f640dbb9f2f8c2820ed60545225ff976",
+            "path": "seaborn/_base.py",
+            "start_line": 920
+          },
+          {
+            "end_line": 69,
+            "file_sha256": "f170bc5b6d70c435a080bbc9612298b27df786a7a0bff9a3d7a099caa75990e3",
+            "path": "seaborn/_core/data.py",
+            "start_line": 45
+          },
+          {
+            "end_line": 1238,
+            "file_sha256": "7d5a9fc0303567c35ff8343ec9fbc573f086c716f46d8a35acceb34d69823c59",
+            "path": "seaborn/_core/plot.py",
+            "start_line": 1238
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does seaborn's GroupBy implementation create performance bottlenecks when processing large datasets with multiple categorical grouping variables?",
+      "question_sha256": "337786a7ca2a2ea43b22f8b6b657b2975c70b022e975a6748b381d4260b5c68f",
+      "reference_answer": "Seaborn\u2018s GroupBy implementation can become a performance bottleneck for large datasets with multiple categorical grouping variables because several interacting design choices cause computation and memory usage to scale with categorical cardinality rather than with the number of observed data points. The core of this behavior lies in the _get_groups method (seaborn/_core/groupby.py: line 67), which unconditionally constructs the full Cartesian product of all categorical grouping variable levels using pd.MultiIndex.from_product(levels.values(), names=grouper), regardless of whether those combinations actually appear in the data. This guarantees a stable and predictable output structure that simplifies downstream plotting and faceting logic, but it introduces exponential growth in the grouping index for sparse categorical combinations. The cost is further amplified by the subsequent reindexing step (seaborn/_core/groupby.py: line 96-98), where grouped results are reindexed against this complete product space via .reindex(groups), forcing the materialization of rows containing null values for non-existent category combinations. Although the GroupBy class itself passes observed=True when invoking pandas groupby to restrict aggregation to observed categorical combinations (seaborn/_core/groupby.py: line 96), other code paths in seaborn, such as those in (seaborn/_core/plot.py: line 1622) and (seaborn/_base.py: line 920), perform groupby operations with observed=False, which reintroduces unobserved categorical levels into the result index and significantly increases computational and memory overhead in sparse grouping scenarios. This effect is compounded in pair plot and similar multi-panel contexts by the PlotData.frames dictionary structure (seaborn/_core/data.py: line 45-69), which maintains separate DataFrame copies for each coordinate variable combination (seaborn/_core/plot.py: line 1238), leading to redundant data storage on top of the already expanded grouping structure.",
+      "reference_sha256": "9d1d7e8209541f48df6595ca3b5ffc6259e0e56562d31f727cdeefbe4e00c218",
+      "repository": {
+        "commit": "3d3d715989d1a9cecc2b08fb23c695b6bb686754",
+        "family_id": "mwaskom/seaborn",
+        "url": "https://github.com/mwaskom/seaborn"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/mwaskom--seaborn-3d3d715989d1a9cecc2b08fb23c695b6bb686754",
+      "task_id": "import-0d0fc175b21a3af99a3fa5ff"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 339,
+            "file_sha256": "0f77f7b0a22b7c92be25aa67b7aeecb73e6f7be9b6b710c46a6e6167ccf01b7d",
+            "path": "CHANGES.rst",
+            "start_line": 338
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+            "kind": "file_reference",
+            "line_count": 87,
+            "path": "src/flask/typing.py"
+          },
+          {
+            "file_sha256": "4554c7c77994fdd2ba2a8c50756c418aba619707f3e951551f26e8e9fd37c72a",
+            "kind": "file_reference",
+            "line_count": 112,
+            "path": "tests/type_check/typing_route.py"
+          },
+          {
+            "file_sha256": "5c6aa0151b0b8018732280761d27eda0c4c83378630e21faadd57b73783720a7",
+            "kind": "file_reference",
+            "line_count": 1536,
+            "path": "src/flask/app.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "src/flask/app.py",
+              "src/flask/sansio/app.py",
+              "tests/test_apps/cliapp/app.py"
+            ],
+            "end_line": 1162,
+            "path": "app.py",
+            "reason": "ambiguous_basename",
+            "reference": "app.py",
+            "start_line": 1155
+          }
+        ]
+      },
+      "question": "How does the type-safe dictionary structure used as a view function return type annotation decouple JSON response serialization from HTTP status representation to maintain type safety?",
+      "question_sha256": "11576063885655d9ecce2ae5dac8a30c30608b82b7df662469cff8b40e38fdba",
+      "reference_answer": "The type-safe dictionary structure (TypedDict) used as a view function return type annotation decouples JSON response serialization from HTTP status representation through Flask's type system and runtime handling.\n\n**Type System Design:**\nIn `src/flask/typing.py`, the `ResponseValue` type union includes `t.Mapping[str, t.Any]` with a comment noting \"Only dict is actually accepted, but Mapping allows for TypedDict\" (line 17-18). This allows type checkers to validate TypedDict structures while Flask's runtime accepts them as regular dictionaries.\n\n**Runtime Handling:**\nWhen a view function returns a TypedDict instance (like `StatusJSON` from `tests/type_check/typing_route.py`), Flask's `make_response` method in `src/flask/app.py` treats it as a regular dict at runtime. At line 1230, the code checks `isinstance(rv, (dict, list))` and converts it to JSON using `self.json.response(rv)` (line 1231), which serializes the dictionary structure to a JSON response.\n\n**Separation of Concerns:**\nHTTP status codes are handled separately from the JSON payload structure:\n- Status codes can be specified via tuple returns: `(dict, status_code)` or `(dict, status_code, headers)` (lines 1155-1162 in `app.py`)\n- The status code is set on the Response object separately after JSON serialization (lines 1259-1263)\n- The TypedDict defines only the JSON payload structure, not HTTP metadata\n\n**Type Safety Across Boundaries:**\nThis maintains type safety because:\n1. Type checkers validate the TypedDict structure at development time\n2. Flask's runtime doesn't need special TypedDict handling\u2014it processes them as dicts\n3. HTTP status representation (status codes, headers) is handled by Flask's framework separately from the JSON data structure\n4. The separation allows type checkers to validate JSON payload structure independently of HTTP concerns\n\nThis pattern was introduced in Flask 2.1.3 (as noted in `CHANGES.rst` line 338-339: \"When type checking, allow TypedDict to be returned from view functions\"), enabling type-safe JSON responses while maintaining framework flexibility for HTTP status handling.",
+      "reference_sha256": "d7a728edac48b9cec5cecdf2390904c6620a4619cfc3528bb4f80fe84b3c1e04",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-06919193f30b63440265fcad"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-82fd8320b1be",
+      "category": "{'id': '5.5', 'name': 'parallel execution / distributed frameworks / task graphs'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 97,
+            "file_sha256": "5929e49b8bd33b801b3af563c114450c285f0cfad5b14cb68aa32680022cfadb",
+            "path": "xarray/backends/locks.py",
+            "start_line": 65
+          },
+          {
+            "end_line": 47,
+            "file_sha256": "5929e49b8bd33b801b3af563c114450c285f0cfad5b14cb68aa32680022cfadb",
+            "path": "xarray/backends/locks.py",
+            "start_line": 42
+          },
+          {
+            "end_line": 21,
+            "file_sha256": "5929e49b8bd33b801b3af563c114450c285f0cfad5b14cb68aa32680022cfadb",
+            "path": "xarray/backends/locks.py",
+            "start_line": 18
+          },
+          {
+            "end_line": 29,
+            "file_sha256": "c552c23ebce1e85a0a4dd129ef92f44aa8abd1df59c156576892b228461c33fa",
+            "path": "xarray/backends/netCDF4_.py",
+            "start_line": 29
+          },
+          {
+            "end_line": 81,
+            "file_sha256": "c552c23ebce1e85a0a4dd129ef92f44aa8abd1df59c156576892b228461c33fa",
+            "path": "xarray/backends/netCDF4_.py",
+            "start_line": 48
+          },
+          {
+            "end_line": 35,
+            "file_sha256": "b87045cc2bb359e304ec5c337c8335b9508f709130b54ce558c709198100ed4a",
+            "path": "xarray/backends/h5netcdf_.py",
+            "start_line": 17
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "5929e49b8bd33b801b3af563c114450c285f0cfad5b14cb68aa32680022cfadb",
+            "kind": "file_reference",
+            "line_count": 211,
+            "path": "xarray/backends/locks.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does xarray implement distributed coordination for concurrent file access across multiple Dask workers?",
+      "question_sha256": "7ff4e164ee6c62801a0675c1d7b04c2a625d0a04ab9019a4f3b1a8539e0519de",
+      "reference_answer": "Xarray coordinates concurrent file access with scheduler-aware locks in xarray/backends/locks.py. The _get_scheduler() helper inspects the active Dask scheduler and returns threaded/multiprocessing/distributed (xarray/backends/locks.py: line 65-97). _LOCK_MAKERS maps those scheduler types to lock factories (threading.Lock, multiprocessing.Lock, or dask.distributed.Lock when available), and get_write_lock(key) uses that mapping to create a per-resource lock (xarray/backends/locks.py: line 42-47, line 100-114).\n\nTo protect thread-unsafe libraries and serialize writes, xarray combines global library locks (HDF5_LOCK, NETCDFC_LOCK) with file-specific locks using combine_locks and CombinedLock (xarray/backends/locks.py: line 18-21, line 138-168, line 189-204).\n\nBackends apply these locks around actual I/O. The netCDF4 backend defines NETCDF4_PYTHON_LOCK = combine_locks([NETCDFC_LOCK, HDF5_LOCK]) and, in write modes, NetCDF4DataStore.open merges that base lock with get_write_lock(filename) (xarray/backends/netCDF4_.py: line 29, line 299-328). The array wrapper uses self.datastore.lock around reads/writes (__setitem__ and _getitem) to serialize access (xarray/backends/netCDF4_.py: line 48-81). The h5netcdf backend does the same: for writes it uses combine_locks([HDF5_LOCK, get_write_lock(filename)]) and its array wrapper guards indexing with self.datastore.lock (xarray/backends/h5netcdf_.py: line 17-35, line 70-90). In a distributed Dask scheduler, the per-file lock is a dask.distributed.Lock, so writes to the same file are coordinated across workers while still honoring the global HDF5/NETCDF locks.",
+      "reference_sha256": "2a623094753e47cc4e1cb65ecf70a34078e272458847c6ae3bedd80cc60e84d8",
+      "repository": {
+        "commit": "82fd8320b1be7a434effd247baf07004b66b802f",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-82fd8320b1be7a434effd247baf07004b66b802f",
+      "task_id": "import-0a6671e6d87753ef56b24bb4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/python-pillow--Pillow-c4325c805e59",
+      "category": "{'id': '4.4', 'name': 'CI pipelines / coverage / lint / GitHub Actions / security checks'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 26,
+            "file_sha256": "4848a9e4d65bdbe0f9cf246cc16805718a8bb49649f64a2c8c83db02793d830c",
+            "path": ".github/workflows/tidelift.yml",
+            "start_line": 26
+          },
+          {
+            "end_line": 82,
+            "file_sha256": "36f0a00da623893f37dc77a835664b55356d7cd18f53ed22fa82c29243576fe9",
+            "path": ".github/workflows/test-docker.yml",
+            "start_line": 79
+          },
+          {
+            "end_line": 99,
+            "file_sha256": "53b9821ecbe2bf072bdc0eba012b6060e7f64658f8434ecaaac433c4d76fb43c",
+            "path": ".github/workflows/test-cygwin.yml",
+            "start_line": 95
+          },
+          {
+            "end_line": 175,
+            "file_sha256": "f931f2e1c3838f66b24c045922aa8ed1aa79a17597c8296a7ade7e7ef235bbbe",
+            "path": ".github/workflows/test-windows.yml",
+            "start_line": 171
+          },
+          {
+            "end_line": 109,
+            "file_sha256": "9d2020308a2ef33691969b18940bcad533d47b48176de2c44de4ff022057bd9c",
+            "path": ".github/workflows/test.yml",
+            "start_line": 107
+          },
+          {
+            "end_line": 77,
+            "file_sha256": "c1d121f1faa08991165caacff5339dbb41bfa69763d5ccd596bce35bd060e6c0",
+            "path": ".github/workflows/test-mingw.yml",
+            "start_line": 74
+          },
+          {
+            "end_line": 4,
+            "file_sha256": "2382e772284dbf266d903abce57a2ed143b6c75e493a9ac0ef32b417097ae294",
+            "path": ".ci/after_success.sh",
+            "start_line": 4
+          },
+          {
+            "end_line": 9,
+            "file_sha256": "b094a6f40d72fa6589f00bd174985e7ed350f4251dc0ae15a815c8283915c7b4",
+            "path": "codecov.yml",
+            "start_line": 9
+          },
+          {
+            "end_line": 18,
+            "file_sha256": "10a9b9c8a568dfc700db96ce54f8e0380cc0aabb8f594cc64345b3c17a7f6d79",
+            "path": ".github/workflows/release-drafter.yml",
+            "start_line": 18
+          },
+          {
+            "end_line": 21,
+            "file_sha256": "830874872bd0a968262acd101feac1b56164ecf32d9f0ca5c05ccb614a0b6649",
+            "path": ".github/workflows/stale.yml",
+            "start_line": 21
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where are the security tokens and API keys (TIDELIFT_API_KEY, CODECOV_ORG_TOKEN) defined and referenced across Pillow's multi-workflow GitHub Actions CI system?",
+      "question_sha256": "9112e7fbcce0e55191794a389707db20f23a47a1c79bcf76b8dfc66fab2a2e86",
+      "reference_answer": "Pillow's GitHub Actions CI system uses GitHub's encrypted secrets mechanism for security tokens. TIDELIFT_API_KEY is defined as a GitHub Actions secret and referenced in `.github/workflows/tidelift.yml: line 26` for dependency security scanning via the Tidelift alignment action. CODECOV_ORG_TOKEN does not exist in this repository's configuration. Codecov integration employs multiple strategies across different workflows: the codecov/codecov-action is used in `.github/workflows/test-docker.yml: line 79-82`, `.github/workflows/test-cygwin.yml: line 95-99`, and `.github/workflows/test-windows.yml: line 171-175` with flags configuration for different environments. The main `.github/workflows/test.yml: line 107-109` workflow uses a direct bash script approach to upload coverage via curl, and `.github/workflows/test-mingw.yml: line 74-77` also uses the curl approach. Coverage data preparation occurs in `.ci/after_success.sh: line 4` through codecov package installation. Codecov behavior is configured in `codecov.yml: line 9` with `comment: false` to disable PR comments. The system also uses standard GitHub tokens including `secrets.GITHUB_TOKEN` for `.github/workflows/release-drafter.yml: line 18` and `.github/workflows/stale.yml: line 21`. This multi-strategy approach allows codecov to function across diverse CI environments without requiring explicit token configuration in most cases, as codecov can use repository context for public repositories.",
+      "reference_sha256": "aaf69f96167a2c488b5bd16cf75757c1763e63c79fe6d7df54881f77e29c29fc",
+      "repository": {
+        "commit": "c4325c805e5909f0bf7201ce1f259bc34a1a49e0",
+        "family_id": "python-pillow/pillow",
+        "url": "https://github.com/python-pillow/Pillow"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/python-pillow--Pillow-c4325c805e5909f0bf7201ce1f259bc34a1a49e0",
+      "task_id": "import-15a6f06f0687b4b3272302c0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sanic-org--sanic-57d44f263fa8",
+      "category": "{'id': '5.4', 'name': 'connection lifecycle / protocol handling / low-level failures'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 134,
+            "file_sha256": "1dcffb1987fdaea471f59dfee058d71e2a3e6b782f2b48d403357aebc1ccb06d",
+            "path": "sanic/server/runners.py",
+            "start_line": 133
+          },
+          {
+            "end_line": 59,
+            "file_sha256": "1dcffb1987fdaea471f59dfee058d71e2a3e6b782f2b48d403357aebc1ccb06d",
+            "path": "sanic/server/runners.py",
+            "start_line": 59
+          },
+          {
+            "end_line": 347,
+            "file_sha256": "1dcffb1987fdaea471f59dfee058d71e2a3e6b782f2b48d403357aebc1ccb06d",
+            "path": "sanic/server/runners.py",
+            "start_line": 310
+          },
+          {
+            "end_line": 308,
+            "file_sha256": "1dcffb1987fdaea471f59dfee058d71e2a3e6b782f2b48d403357aebc1ccb06d",
+            "path": "sanic/server/runners.py",
+            "start_line": 195
+          },
+          {
+            "end_line": 26,
+            "file_sha256": "e339c5cd65f3044cb56dea842f225b6626a2a6836a567aa94d15945d201f6594",
+            "path": "sanic/http/constants.py",
+            "start_line": 22
+          },
+          {
+            "end_line": 91,
+            "file_sha256": "47130707d98669d066a0b1a7da9ec8e98898eb6bf0134b1fb573a2a2d4c6d20c",
+            "path": "sanic/server/protocols/http_protocol.py",
+            "start_line": 79
+          },
+          {
+            "end_line": 310,
+            "file_sha256": "47130707d98669d066a0b1a7da9ec8e98898eb6bf0134b1fb573a2a2d4c6d20c",
+            "path": "sanic/server/protocols/http_protocol.py",
+            "start_line": 308
+          },
+          {
+            "end_line": 32,
+            "file_sha256": "7120409f322e57b59a1d4de92737e22254c51257375803fe2a5ccd5601fdeddc",
+            "path": "sanic/http/http1.py",
+            "start_line": 32
+          },
+          {
+            "end_line": 289,
+            "file_sha256": "60294ecb4bceac654ff4b2378f5abfa6e3d776fc2eedb5cfd9fb0ac9682a2368",
+            "path": "sanic/http/http3.py",
+            "start_line": 289
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "1dcffb1987fdaea471f59dfee058d71e2a3e6b782f2b48d403357aebc1ccb06d",
+            "kind": "file_reference",
+            "line_count": 359,
+            "path": "sanic/server/runners.py"
+          },
+          {
+            "file_sha256": "e339c5cd65f3044cb56dea842f225b6626a2a6836a567aa94d15945d201f6594",
+            "kind": "file_reference",
+            "line_count": 30,
+            "path": "sanic/http/constants.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the HTTP protocol version selection and server configuration logic implemented in Sanic's deployment infrastructure?",
+      "question_sha256": "34c64d2b1772f1dad3508b7c926579ba7e2ed7966371197d02723998c246f487",
+      "reference_answer": "The HTTP protocol version selection and server configuration logic is implemented primarily in sanic/server/runners.py within the serve() function (sanic/server/runners.py: line 133-134). This function examines the version parameter, which defaults to HTTP.VERSION_1 (sanic/server/runners.py: line 59), and performs a simple conditional check to route between two distinct server implementations. When version equals HTTP.VERSION_3, the request is routed to _serve_http_3() (sanic/server/runners.py: line 310-347), otherwise it defaults to _serve_http_1() (sanic/server/runners.py: line 195-308). The HTTP version constants are defined as an IntEnum in sanic/http/constants.py (sanic/http/constants.py: line 22-26), where VERSION_1 equals 1 representing HTTP/1.1 and VERSION_3 equals 3 representing HTTP/3. Each HTTP version utilizes dedicated protocol classes: HttpProtocol for HTTP/1.1 (sanic/server/protocols/http_protocol.py: line 79-91) and Http3Protocol for HTTP/3 (sanic/server/protocols/http_protocol.py: line 308-310). These protocol classes in turn delegate to corresponding HTTP implementation classes - the Http class for HTTP/1.1 processing (sanic/http/http1.py: line 32) and the Http3 class for HTTP/3 processing (sanic/http/http3.py: line 289). This architecture provides clear separation of concerns between version selection, server configuration, protocol handling, and HTTP message processing, enabling Sanic to support both HTTP/1.1 and HTTP/3 through a unified interface while maintaining distinct implementation paths for each protocol version.",
+      "reference_sha256": "14529b6791875b7895be07a6fdade290cf6f924b43626c844033b0c126497963",
+      "repository": {
+        "commit": "57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+        "family_id": "sanic-org/sanic",
+        "url": "https://github.com/sanic-org/sanic"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sanic-org--sanic-57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+      "task_id": "import-6a26e8b8371b267e34d1cac2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 415,
+            "file_sha256": "1d7757ac6b3d58b6f48341f347b5720660fe0c2a4ff1a885cd4458c6ce70e2fa",
+            "path": "sphinx/ext/autosummary/generate.py",
+            "start_line": 396
+          },
+          {
+            "end_line": 866,
+            "file_sha256": "ca2134bdadff8c0c385eb1804b1eae0b63387f0c9c5e5f98a78f5b1e8d8c9913",
+            "path": "tests/test_extensions/test_ext_autosummary.py",
+            "start_line": 866
+          },
+          {
+            "end_line": 282,
+            "file_sha256": "1d7757ac6b3d58b6f48341f347b5720660fe0c2a4ff1a885cd4458c6ce70e2fa",
+            "path": "sphinx/ext/autosummary/generate.py",
+            "start_line": 271
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "templates/autosummary/class.rst",
+            "reason": "not_tracked",
+            "reference": "templates/autosummary/class.rst",
+            "start_line": null
+          },
+          {
+            "candidates": [
+              "sphinx/__init__.py",
+              "sphinx/_cli/__init__.py",
+              "sphinx/_cli/util/__init__.py",
+              "sphinx/builders/__init__.py",
+              "sphinx/builders/html/__init__.py",
+              "sphinx/builders/latex/__init__.py",
+              "sphinx/cmd/__init__.py",
+              "sphinx/directives/__init__.py",
+              "sphinx/domains/__init__.py",
+              "sphinx/domains/c/__init__.py",
+              "sphinx/domains/cpp/__init__.py",
+              "sphinx/domains/python/__init__.py",
+              "sphinx/domains/std/__init__.py",
+              "sphinx/environment/__init__.py",
+              "sphinx/environment/adapters/__init__.py",
+              "sphinx/environment/collectors/__init__.py",
+              "sphinx/ext/__init__.py",
+              "sphinx/ext/apidoc/__init__.py",
+              "sphinx/ext/autodoc/__init__.py",
+              "sphinx/ext/autosummary/__init__.py",
+              "sphinx/ext/intersphinx/__init__.py",
+              "sphinx/ext/napoleon/__init__.py",
+              "sphinx/locale/__init__.py",
+              "sphinx/pycode/__init__.py",
+              "sphinx/search/__init__.py",
+              "sphinx/search/_stopwords/__init__.py",
+              "sphinx/testing/__init__.py",
+              "sphinx/transforms/__init__.py",
+              "sphinx/transforms/post_transforms/__init__.py",
+              "sphinx/util/__init__.py",
+              "sphinx/writers/__init__.py",
+              "tests/__init__.py",
+              "tests/roots/test-ext-apidoc-custom-templates/mypackage/__init__.py",
+              "tests/roots/test-ext-apidoc-pep420/a/b/c/__init__.py",
+              "tests/roots/test-ext-apidoc-pep420/a/b/e/__init__.py",
+              "tests/roots/test-ext-apidoc-subpackage-in-toc/parent/__init__.py",
+              "tests/roots/test-ext-apidoc-subpackage-in-toc/parent/child/__init__.py",
+              "tests/roots/test-ext-apidoc-toc/mypackage/__init__.py",
+              "tests/roots/test-ext-apidoc-toc/mypackage/resource/__init__.py",
+              "tests/roots/test-ext-apidoc-toc/mypackage/something/__init__.py",
+              "tests/roots/test-ext-apidoc-trailing-underscore/package_/__init__.py",
+              "tests/roots/test-ext-autodoc/bug2437/__init__.py",
+              "tests/roots/test-ext-autodoc/circular_import/__init__.py",
+              "tests/roots/test-ext-autodoc/target/__init__.py",
+              "tests/roots/test-ext-autodoc/target/canonical/__init__.py",
+              "tests/roots/test-ext-autodoc/target/name_conflict/__init__.py",
+              "tests/roots/test-ext-autosummary-import_cycle/spam/__init__.py",
+              "tests/roots/test-ext-autosummary-imported_members/autosummary_dummy_package/__init__.py",
+              "tests/roots/test-ext-autosummary-module_all/autosummary_dummy_package_all/__init__.py",
+              "tests/roots/test-ext-autosummary-module_empty_all/autosummary_dummy_package_empty_all/__init__.py",
+              "tests/roots/test-ext-autosummary-module_prefix/pkg/__init__.py",
+              "tests/roots/test-ext-autosummary-module_prefix/pkg/mod0/__init__.py",
+              "tests/roots/test-ext-autosummary-module_prefix/pkg/mod1/__init__.py",
+              "tests/roots/test-ext-autosummary-recursive/package/__init__.py",
+              "tests/roots/test-ext-autosummary-recursive/package/package/__init__.py",
+              "tests/roots/test-ext-autosummary-recursive/package2/__init__.py",
+              "tests/roots/test-ext-coverage/grog/__init__.py",
+              "tests/roots/test-ext-doctest-with-autodoc/dir/__init__.py",
+              "tests/roots/test-ext-inheritance_diagram/example/__init__.py",
+              "tests/roots/test-ext-napoleon-paramtype/pkg/__init__.py",
+              "tests/roots/test-ext-napoleon/mypackage/__init__.py",
+              "tests/roots/test-ext-viewcode-find-package/main_package/__init__.py",
+              "tests/roots/test-ext-viewcode-find-package/main_package/subpackage/__init__.py",
+              "tests/roots/test-ext-viewcode-find-package/main_package/subpackage/_subpackage2/__init__.py",
+              "tests/roots/test-ext-viewcode-find/not_a_package/__init__.py",
+              "tests/roots/test-ext-viewcode/spam/__init__.py",
+              "tests/roots/test-inheritance/dummy/__init__.py",
+              "tests/roots/test-theming/test_theme/__init__.py",
+              "tests/test__cli/__init__.py",
+              "tests/test_builders/__init__.py",
+              "tests/test_config/__init__.py",
+              "tests/test_directives/__init__.py",
+              "tests/test_domains/__init__.py",
+              "tests/test_environment/__init__.py",
+              "tests/test_extensions/__init__.py",
+              "tests/test_intl/__init__.py",
+              "tests/test_markup/__init__.py",
+              "tests/test_pycode/__init__.py",
+              "tests/test_theming/__init__.py",
+              "tests/test_transforms/__init__.py",
+              "tests/test_util/__init__.py",
+              "tests/test_writers/__init__.py",
+              "utils/__init__.py"
+            ],
+            "end_line": 233,
+            "path": "__init__.py",
+            "reason": "ambiguous_basename",
+            "reference": "__init__.py",
+            "start_line": 196
+          }
+        ]
+      },
+      "question": "What implicit contract does the empty test class with no methods or attributes establish for the automatic documentation generation system that processes Python objects and creates summary tables?",
+      "question_sha256": "72ce2b8a067a5fc72af7451a15e37210658733b6a080f8544e176fa502b3b2b0",
+      "reference_answer": "The implicit contract established by an empty class (like PublicBar) in autosummary is that a class can be included in documentation even without explicit members.\n\nWhen autosummary processes a class (see `sphinx/ext/autosummary/generate.py`, lines 396-415), it:\n1. Collects all members via `dir(obj)` and separates inherited members\n2. Calls `_get_members()` to find methods and attributes\n3. For an empty class, these lists are empty\n\nThe contract means:\n- The class is a valid documentable entity based on its type (class), not its content\n- It can appear in autosummary summary tables (as seen in `test_ext_autosummary.py` line 866)\n- It can be included in `__all__` lists and will be documented when `autosummary_ignore_module_all=False` (see `generate.py` lines 271-282)\n- The generated stub file uses the class template (`templates/autosummary/class.rst`), which includes `.. autoclass::` even when methods/attributes blocks are empty\n\nThis allows classes to serve as type markers or placeholders in documentation, enabling them to be referenced and documented without requiring implementation details. The autosummary system treats the class as documentable based on introspection (`_get_documenter()` in `__init__.py` lines 196-233) determining it's a class type, regardless of whether it has members to document.",
+      "reference_sha256": "0727992d4bbed21cb9dda687f43d2dd768cb348fdef1b63efbe08ee5dde8c88f",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-08a3d3a9ac5c0d79f7e14bc2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1059,
+            "file_sha256": "dda15f87ce8b7c72053ec63b6b39031f26fb6ce53a4a4db1e9abea7a188a7520",
+            "path": "sympy/printing/tests/test_str.py",
+            "start_line": 1059
+          },
+          {
+            "end_line": 2536,
+            "file_sha256": "2ad4b0dc805888e601569a9151b5320151065b9b6d750252230bf3b8dec5fc9a",
+            "path": "sympy/printing/tests/test_latex.py",
+            "start_line": 2536
+          },
+          {
+            "end_line": 877,
+            "file_sha256": "7ad204809c25196c6d1fa551620dd9923cb0fe4b584588fffa6bc43107a19a32",
+            "path": "sympy/printing/tests/test_c.py",
+            "start_line": 871
+          },
+          {
+            "end_line": 37,
+            "file_sha256": "9e83754ba7dcefcd2b4c370d557622134120c53fb020f3125098e6746d2d65d3",
+            "path": "sympy/printing/tests/test_fortran.py",
+            "start_line": 37
+          },
+          {
+            "end_line": 7117,
+            "file_sha256": "2b65edfbea6d77158bb949ad6099eeca1f3566b1880d1a8d33f88e5000c07630",
+            "path": "sympy/printing/pretty/tests/test_pretty.py",
+            "start_line": 7117
+          },
+          {
+            "end_line": 144,
+            "file_sha256": "7a64d20f01dd1a9ac434edee80af3a9352fa9bc63721a98f8f5a1434829a62b4",
+            "path": "sympy/utilities/tests/test_lambdify.py",
+            "start_line": 144
+          },
+          {
+            "end_line": 549,
+            "file_sha256": "24e8c7e46e863df79a2a929d79e28bd6fbc781bb7c4c6c5392a987d9ed68bd8f",
+            "path": "sympy/simplify/tests/test_cse.py",
+            "start_line": 549
+          },
+          {
+            "end_line": 201,
+            "file_sha256": "dc1796e79890e2a5dd7c34c5aa9b44dae7c93c92013b375f218571f389ff1300",
+            "path": "sympy/vector/tests/test_printing.py",
+            "start_line": 201
+          },
+          {
+            "end_line": 124,
+            "file_sha256": "e92e5de42a9f60e25265c0d0baf8a97cb3867c3033bfe50ac4b94c7ed85f16c9",
+            "path": "sympy/printing/codeprinter.py",
+            "start_line": 124
+          },
+          {
+            "end_line": 4096,
+            "file_sha256": "bf76e0a02aee357246196e69164e872347572d426f8c09181aae97bac380bf0a",
+            "path": "sympy/core/expr.py",
+            "start_line": 4096
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "de36d6107afc89e65809f565c09d4a4c0d5627d75c4c2c90d69debf06da3a752",
+            "kind": "file_reference",
+            "line_count": 1695,
+            "path": "sympy/physics/biomechanics/tests/test_curve.py"
+          },
+          {
+            "file_sha256": "2ece7d9ad250f375b47dda4318518d79382dc4bf32019e8e0d6f7a37d9af16d3",
+            "kind": "file_reference",
+            "line_count": 837,
+            "path": "sympy/physics/biomechanics/tests/test_musculotendon.py"
+          },
+          {
+            "file_sha256": "3decca394cad882d79a0b575d460b833abbb9dd5c7a70b5b8a5a9d6c88aabe0c",
+            "kind": "file_reference",
+            "line_count": 1763,
+            "path": "sympy/physics/biomechanics/curve.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where do modules and classes directly instantiate the expression wrapper class that prevents automatic evaluation?",
+      "question_sha256": "4a565701cc50eca3067b28e92d835219b9c5ce3a4d50d43e4fd2c9ace5046aad",
+      "reference_answer": "Based on my exploration of the SymPy codebase, modules and classes directly instantiate `UnevaluatedExpr` in the following locations:\n\n1. **Test files** (multiple locations):\n   - `sympy/printing/tests/test_str.py` (line 1059): `2*UnevaluatedExpr(a+b)` in `test_UnevaluatedExpr()`\n   - `sympy/printing/tests/test_latex.py` (line 2536): `UnevaluatedExpr(1/x)` in `test_latex_UnevaluatedExpr()`\n   - `sympy/printing/tests/test_c.py` (lines 871-877): Multiple instantiations in `test_ccode_UnevaluatedExpr()`\n   - `sympy/printing/tests/test_fortran.py` (lines 37, 41): Instantiations in `test_UnevaluatedExpr()`\n   - `sympy/printing/pretty/tests/test_pretty.py` (line 7117): `UnevaluatedExpr(1/x)` in `test_pretty_UnevaluatedExpr()`\n   - `sympy/utilities/tests/test_lambdify.py` (line 144): `UnevaluatedExpr(q+r)` in a test\n   - `sympy/simplify/tests/test_cse.py` (line 549): `UnevaluatedExpr(x + 1)` in `test_cse_unevaluated()`\n   - `sympy/vector/tests/test_printing.py` (line 201): `UnevaluatedExpr(10)` in a test\n   - `sympy/physics/biomechanics/tests/test_curve.py` (multiple lines): Used in assertions for expected values\n   - `sympy/physics/biomechanics/tests/test_musculotendon.py`: Used in tests\n\n2. **Production code**:\n   - `sympy/physics/biomechanics/curve.py` (multiple locations, lines 250, 266, 268, 270, 274, 469, 493, 685, 701, 704, 705, 709, 899, 1189, 1190, 1191, 1465, 1481, 1485, 1488, 1490, 1689): Extensively used in biomechanical curve functions like `TendonForceLengthDeGroote2016`, `TendonForceLengthInverseDeGroote2016`, `FiberForceLengthPassiveDeGroote2016`, `FiberForceLengthActiveDeGroote2016`, `FiberForceVelocityDeGroote2016`, and `FiberForceVelocityInverseDeGroote2016` to prevent evaluation of subexpressions when `evaluate=False` is passed\n\n3. **Code generation/printing modules**:\n   - `sympy/printing/codeprinter.py` (line 124): The `_handle_UnevaluatedExpr` method processes `UnevaluatedExpr` instances, but doesn't instantiate them directly\n\nThe class is defined in `sympy/core/expr.py` (line 4096) and is imported in various modules via `from sympy.core.expr import UnevaluatedExpr` or `from sympy import UnevaluatedExpr`. The primary production use is in the biomechanics module, where it's used to preserve unevaluated expressions in mathematical formulas for biomechanical modeling.",
+      "reference_sha256": "b957b24675dac1612c32f20dd6ce7259d06c60558e3d5e07bd19ab6cc116635c",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-022bd5aaec20279be914e1ab"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 282,
+            "file_sha256": "8879c7714be9baa98b4fce5643116d3fa1bccfe47207a96dce514b92a3517bb2",
+            "path": "src/sqlfluff/core/parser/match_result.py",
+            "start_line": 193
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "src/sqlfluff/core/dialects/base.py",
+              "src/sqlfluff/core/parser/grammar/base.py",
+              "src/sqlfluff/core/parser/segments/base.py",
+              "src/sqlfluff/core/rules/base.py",
+              "src/sqlfluff/core/templaters/base.py"
+            ],
+            "end_line": 448,
+            "path": "base.py",
+            "reason": "ambiguous_basename",
+            "reference": "base.py",
+            "start_line": 322
+          },
+          {
+            "candidates": [
+              "src/sqlfluff/core/dialects/base.py",
+              "src/sqlfluff/core/parser/grammar/base.py",
+              "src/sqlfluff/core/parser/segments/base.py",
+              "src/sqlfluff/core/rules/base.py",
+              "src/sqlfluff/core/templaters/base.py"
+            ],
+            "end_line": 299,
+            "path": "base.py",
+            "reason": "ambiguous_basename",
+            "reference": "base.py",
+            "start_line": 285
+          },
+          {
+            "candidates": [
+              "src/sqlfluff/core/dialects/base.py",
+              "src/sqlfluff/core/parser/grammar/base.py",
+              "src/sqlfluff/core/parser/segments/base.py",
+              "src/sqlfluff/core/rules/base.py",
+              "src/sqlfluff/core/templaters/base.py"
+            ],
+            "end_line": 1239,
+            "path": "base.py",
+            "reason": "ambiguous_basename",
+            "reference": "base.py",
+            "start_line": 1233
+          },
+          {
+            "candidates": [
+              "src/sqlfluff/core/dialects/base.py",
+              "src/sqlfluff/core/parser/grammar/base.py",
+              "src/sqlfluff/core/parser/segments/base.py",
+              "src/sqlfluff/core/rules/base.py",
+              "src/sqlfluff/core/templaters/base.py"
+            ],
+            "end_line": 212,
+            "path": "base.py",
+            "reason": "ambiguous_basename",
+            "reference": "base.py",
+            "start_line": 182
+          }
+        ]
+      },
+      "question": "Why does repeatedly instantiating the segment class that parses structured data type definitions during parsing of deeply nested structured data type definitions impact memory allocation and garbage collection overhead compared to reusing the shared grammar definition object?",
+      "question_sha256": "322fff7184c45208abd7a4207f830b057e3b08b481b48a93165a2105cb4d5134",
+      "reference_answer": "During parsing of nested STRUCT types, each match of `Ref(\"StructTypeSegment\")` creates a new `StructTypeSegment` instance, which increases memory allocation and GC overhead compared to reusing the shared grammar definition.\n\n**How the grammar reference works:**\nThe `Ref(\"StructTypeSegment\")` grammar (defined in `base.py:322-448`) retrieves the same class from the dialect's `_library` via `dialect.ref()` (`base.py:285-299`). This class is stored once and reused as the grammar definition.\n\n**What happens during parsing:**\nWhen parsing nested STRUCT types (e.g., `STRUCT<STRUCT<x INT64>>`), each occurrence of `Ref(\"StructTypeSegment\")` that matches triggers:\n1. `MatchResult.apply()` (`match_result.py:193-282`) creates a new segment instance\n2. `from_result_segments()` (`base.py:1233-1239`) calls `cls(segments=result_segments, **segment_kwargs)`\n3. `BaseSegment.__init__()` (`base.py:182-212`) allocates:\n   - A new UUID (`uuid4().int` at line 208)\n   - A tuple of child segments (line 204)\n   - Position markers (lines 194-199)\n   - Parent references via `set_as_parent()` (line 210)\n   - Cache recalculation via `_recalculate_caches()` (line 212)\n\n**Memory and GC impact:**\n- Each instance allocates memory for its attributes, child segments tuple, position markers, and caches\n- Deeply nested structures create many instances, multiplying allocations\n- These instances become GC targets, increasing collection overhead\n- The grammar reference itself (the class) is reused, but instances are created per match\n\n**The contrast:**\nThe grammar reference (the class) is a singleton stored in the dialect library and reused. However, parsing creates multiple segment instances, each with its own memory footprint. For deeply nested STRUCT types, this leads to many allocations and more GC work compared to a design that could reuse instances or avoid creating them until necessary.",
+      "reference_sha256": "8d7cc1f3f44c22441e6f8b68f22bca6811f53328d8c2479f7e2f527fb1b3699a",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "selection": "additional diagnostic risk sample",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-054283390a7ca05883b3c10e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 792,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 792
+          },
+          {
+            "end_line": 35,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 35
+          },
+          {
+            "end_line": 39,
+            "file_sha256": "27bb088d1e97a031a9e494d5ccec642b97d2a145546bf3e373b8916610161a62",
+            "path": "src/requests/compat.py",
+            "start_line": 30
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "src/requests/compat.py",
+              "tests/compat.py"
+            ],
+            "end_line": 35,
+            "path": "compat.py",
+            "reason": "ambiguous_basename",
+            "reference": "compat.py",
+            "start_line": 35
+          }
+        ]
+      },
+      "question": "Where does the apparent_encoding method's control flow handle the absence of the chardet library, and what data path does self.content follow when chardet detection fails versus succeeds?",
+      "question_sha256": "bb8572ebeae9a247ad7a7cd34cecba68317ad941b8b3107ea7bc0bc6a6a3858e",
+      "reference_answer": "The Response class property that detects character encoding from response content handles the absence of the character detection library in its control flow at the conditional branch on line 792 of `src/requests/models.py`.\n\nThe implementation (lines 790-797) uses an `if chardet is not None:` check. If `chardet` is not None (either chardet or charset_normalizer was successfully imported), it calls `chardet.detect(self.content)[\"encoding\"]` on line 793. If `chardet` is None (neither library is available), the `else` branch on lines 794-797 returns the hardcoded string `\"utf-8\"` as a fallback.\n\nThe `chardet` variable is imported from `compat.py` (line 35 in models.py) and is set by `_resolve_char_detection()` (lines 30-39 in `src/requests/compat.py`). This function attempts to import \"chardet\" first, then \"charset_normalizer\" if chardet fails, returning the first successful import or None if both fail.\n\nWhen the property accesses `self.content` on line 793 (if chardet is available), it triggers the `content` property (lines 891-907), which reads the response data via `iter_content()` if not already consumed, joining chunks into bytes. The same data path applies whether chardet detection succeeds or fails; the difference is only in the return value (detected encoding vs. \"utf-8\" fallback).",
+      "reference_sha256": "7e78d3ee8994e6ab04848e1e47a82c7789d902efcaa969c124ad598297691ece",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "selection": "additional diagnostic risk sample",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-0d5da92978dc996d9ff1e090"
+    }
+  ]
+}

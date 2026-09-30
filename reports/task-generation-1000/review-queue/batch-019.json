@@ -1,0 +1,358 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/geopandas--geopandas-7d460d9efff5",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "8d8e9677599dfe2da83c1ba1164767ecdf08519a7fca0371d13729d69d41cf56",
+            "kind": "file_reference",
+            "line_count": 977,
+            "path": "geopandas/plotting.py"
+          },
+          {
+            "file_sha256": "5527de431d770a6d8fa3cdfce9b4ae4386a83ba5e4c93ffb7254ce5098244afe",
+            "kind": "file_reference",
+            "line_count": 1036,
+            "path": "geopandas/explore.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does geopandas legend rendering fail to scale efficiently when plotting categorical data with large numbers of unique categories in both static and interactive visualization modes?",
+      "question_sha256": "b8af82352ba95017e7aedb23188b892511c089bc8bbc7ff9b27f4abf53a7e3a5",
+      "reference_answer": "GeoPandas legend rendering scales poorly for high cardinality categorical columns because both its Matplotlib and Folium based code paths implement categorical legends by explicitly generating one legend entry per category, which makes the computational cost, memory usage, and rendering overhead grow linearly with the number of unique values rather than with the visual complexity of the geometries themselves; in the static plotting path, once a column is detected as categorical, GeoPandas converts it to a pandas Categorical, extracts all category labels, and defines the color index span to cover the full category range, for example `categories = list(cat.categories)` followed by `vmax = len(categories) - 1` (geopandas/plotting.py L795\u2013L807), and when `legend=True` it constructs the legend by iterating over the entire category list, creating a separate Matplotlib artist for each category via logic equivalent to `for i in range(len(categories)):` with one handle per label, before passing the full handle and label lists into `ax.legend` and triggering a redraw with `ax.figure.canvas.draw_idle()` (geopandas/plotting.py L910\u2013L946, L956), so thousands of categories directly translate into thousands of Python objects and an expensive layout computation inside Matplotlib; in the interactive `explore` path, the same fundamental design choice appears, where the data are coerced to a Categorical and the number of legend entries is fixed as `N = len(cat.categories)` (geopandas/explore.py L442\u2013L445), colors are computed for every category index using the colormap, and the categorical legend HTML is built by concatenating one HTML fragment per category in a loop equivalent to `for label, color in zip(categories, colors): body += ...`, which is then injected into the Leaflet map (geopandas/explore.py L446\u2013L460, L890\u2013L902); because neither implementation introduces any aggregation, truncation, or deferred rendering of legend entries, legend construction becomes O(n) in both Python level work and rendering complexity, and with large numbers of categories the legend itself dominates performance and display cost even though the underlying spatial plotting logic remains unchanged.",
+      "reference_sha256": "c7e6d0b1afd40296139bc759fe8b10e3d1160f8bc8f778da65bcf92e3e152eed",
+      "repository": {
+        "commit": "7d460d9efff57720c970fd6a040914286846c589",
+        "family_id": "geopandas/geopandas",
+        "url": "https://github.com/geopandas/geopandas"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/geopandas--geopandas-7d460d9efff57720c970fd6a040914286846c589",
+      "task_id": "import-1966c4ed643617951d3f3400"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/geopandas--geopandas-7d460d9efff5",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 118,
+            "file_sha256": "eb66ac1fe77ec66ccc436d2bb0bd6bee5bb8ff536b448728b2edb0fcaa30e0b3",
+            "path": "geopandas/tools/geocoding.py",
+            "start_line": 70
+          },
+          {
+            "end_line": 149,
+            "file_sha256": "eb66ac1fe77ec66ccc436d2bb0bd6bee5bb8ff536b448728b2edb0fcaa30e0b3",
+            "path": "geopandas/tools/geocoding.py",
+            "start_line": 121
+          },
+          {
+            "end_line": 143,
+            "file_sha256": "eb66ac1fe77ec66ccc436d2bb0bd6bee5bb8ff536b448728b2edb0fcaa30e0b3",
+            "path": "geopandas/tools/geocoding.py",
+            "start_line": 140
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "eb66ac1fe77ec66ccc436d2bb0bd6bee5bb8ff536b448728b2edb0fcaa30e0b3",
+            "kind": "file_reference",
+            "line_count": 184,
+            "path": "geopandas/tools/geocoding.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the geocoding provider resolution and instantiation logic implemented in the geopandas geocoding system?",
+      "question_sha256": "ce4f7ff724a06a6f501efbfd22f55a152d05f4e98a333add7adbb6b3b597d20b",
+      "reference_answer": "In the GeoPandas geocoding system, the provider resolution and instantiation logic is implemented in the repository file geopandas/tools/geocoding.py inside the internal _query helper, and this is directly verifiable from the code that both geocode and reverse_geocode delegate into _query after selecting a default provider when provider is None (the defaulting to 'photon' and the call return _query(..., provider, ...) occur in geocode and reverse_geocode in geopandas/tools/geocoding.py lines 70 to 118), establishing the complete call path that funnels all provider handling through one place for correctness and completeness (the shared wrapper _query is defined and used in geopandas/tools/geocoding.py lines 121 to 149). Within _query, GeoPandas first imports get_geocoder_for_service from geopy.geocoders and then normalizes the incoming provider argument: if provider is a string, it resolves that name to a concrete geopy geocoder class via provider = get_geocoder_for_service(provider), and it then instantiates the resolved class with the caller supplied keyword arguments using coder = provider(**kwargs) before performing the actual coder.geocode(...) or coder.reverse(...) calls depending on the forward flag (this string to geocoder resolution, class instantiation, and subsequent use of coder are all in geopandas/tools/geocoding.py line 140 to 143). This precisely answers where resolution and instantiation occur (relevance), explains why this location is authoritative (both public entry points route through _query, so any provider selection flows through the same mechanism), and ties the causal chain from user input (provider as None, str, or a geopy geocoder class) to execution behavior (either defaulting, resolving, instantiating, then invoking), while keeping the reasoning self consistent and checkable against the quoted control flow and code elements for high reasoning quality and clarity.",
+      "reference_sha256": "48b5d6aafa6e71af6f0275523a3ffed8ee7be3f2efd8fb675cbb47c6f0620b25",
+      "repository": {
+        "commit": "7d460d9efff57720c970fd6a040914286846c589",
+        "family_id": "geopandas/geopandas",
+        "url": "https://github.com/geopandas/geopandas"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/geopandas--geopandas-7d460d9efff57720c970fd6a040914286846c589",
+      "task_id": "import-2e972d2e3cde7129e37212b6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/geopandas--geopandas-7d460d9efff5",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "5527de431d770a6d8fa3cdfce9b4ae4386a83ba5e4c93ffb7254ce5098244afe",
+            "kind": "file_reference",
+            "line_count": 1036,
+            "path": "geopandas/explore.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where is the color assignment logic for categorical legends implemented in the interactive explore() functionality?",
+      "question_sha256": "2b47e2254d5cb3f18fc776c196528d890538d5280be2e275eb26491a7ca00c53",
+      "reference_answer": "The categorical legend color assignment for interactive explore() is implemented entirely in geopandas/explore.py, where GeoPandas both decides that a column is categorical and constructs the mapping from category values to colors before rendering the legend. In the categorical branch, the code creates a pandas.Categorical object from the selected column and derives integer category codes, for example cat = pd.Categorical(gdf[column][~nan_idx], categories=categories) and N = len(cat.categories) at lines 442\u2013443. Those codes are then mapped to colors depending on the cmap argument: when a Matplotlib colormap name is used, colors are generated via cm.get_cmap(cmap, N)(cat.codes) for features and cm.get_cmap(cmap, N)(range(N)) for legend entries at lines 447\u2013473, while list based colormaps use np.take(cmap, cat.codes) and np.take(cmap, range(N)) at lines 463\u2013467. The resulting legend_colors and category labels are passed unchanged to _categorical_legend(m, caption, categories, legend_colors) at lines 675\u2013683, and _categorical_legend simply pairs each label with its precomputed color when building the HTML, as shown by the for label, color in zip(categories, colors) loop at lines 889\u2013892. This establishes that the authoritative logic for assigning categorical legend colors resides in geopandas/explore.py, with the legend function only consuming those assignments rather than generating colors itself.",
+      "reference_sha256": "a3e8dae5a4f0e0b048e9a7165415c386d057b80a907899cec940d3d46de12cd9",
+      "repository": {
+        "commit": "7d460d9efff57720c970fd6a040914286846c589",
+        "family_id": "geopandas/geopandas",
+        "url": "https://github.com/geopandas/geopandas"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/geopandas--geopandas-7d460d9efff57720c970fd6a040914286846c589",
+      "task_id": "import-3309f037e45dac0838651c29"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/geopandas--geopandas-7d460d9efff5",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "064cc32f92d2f568b0ed088c6b577b00c8488c31ed80c191a08e09be2b7f2b00",
+            "kind": "file_reference",
+            "line_count": 1760,
+            "path": "geopandas/array.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why do equality and inequality operations in GeometryArray use Python loops while other binary predicates like intersects and within use vectorized shapely functions?",
+      "question_sha256": "6d80d61b66ee5dd0d4454c55c35a48e10dc07705aa8b37c17768e17836c174e2",
+      "reference_answer": "Equality and inequality on GeometryArray use Python level loops because they are implemented through the pandas ExtensionArray comparison protocol, which enforces scalar, elementwise semantics for == and != so that results integrate correctly with pandas alignment, masking, and boolean indexing, and this design directly constrains GeoPandas to apply comparisons pair by pair rather than as bulk geometry operations. Concretely, in geopandas/array.py the comparison operators are funneled through the internal _binop method lines 1662\u20131687, where the left and right geometry arrays are first converted to object arrays and the requested operator is then applied in a Python list comprehension over zip(lvalues, rvalues) lines 1682\u20131684, which necessarily executes one scalar geometry comparison per element and therefore cannot benefit from vectorization. By contrast, spatial predicates such as intersects, within, and similar methods are not part of pandas\u2019 generic comparison semantics and are instead implemented using GeoPandas\u2019 own binary operation dispatch; these methods route through _binary_method in the same file lines 688\u2013699, which directly calls the corresponding vectorized Shapely functions, for example getattr(shapely, op)(left._data, right, **kwargs) lines 699, passing entire geometry arrays to Shapely\u2019s GEOS backed implementations in one call. The performance difference follows causally from this split in responsibility: equality and inequality must respect pandas\u2019 scalar oriented ExtensionArray API and therefore iterate in Python, while spatial predicates bypass pandas comparison hooks entirely and delegate to Shapely\u2019s array aware functions, allowing computation to occur in compiled code without per element Python overhead.",
+      "reference_sha256": "495bfbd64259a601b26b1670de568d41e8b61f7a778d548427a72804fee41fca",
+      "repository": {
+        "commit": "7d460d9efff57720c970fd6a040914286846c589",
+        "family_id": "geopandas/geopandas",
+        "url": "https://github.com/geopandas/geopandas"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/geopandas--geopandas-7d460d9efff57720c970fd6a040914286846c589",
+      "task_id": "import-685a6003896e8843746f4ae6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/geopandas--geopandas-7d460d9efff5",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 29,
+            "file_sha256": "9aed0df34ffa63eef0c35a37e4ddce975fa9015c8886cfa33625d2deab4c94db",
+            "path": "geopandas/io/file.py",
+            "start_line": 26
+          },
+          {
+            "end_line": 291,
+            "file_sha256": "9aed0df34ffa63eef0c35a37e4ddce975fa9015c8886cfa33625d2deab4c94db",
+            "path": "geopandas/io/file.py",
+            "start_line": 288
+          },
+          {
+            "end_line": 355,
+            "file_sha256": "9aed0df34ffa63eef0c35a37e4ddce975fa9015c8886cfa33625d2deab4c94db",
+            "path": "geopandas/io/file.py",
+            "start_line": 352
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does geopandas implement HTTP range request detection and fallback logic for remote geospatial data sources in its file I/O system?",
+      "question_sha256": "7e22321956954e5611df4a3af58cafa12abe8feed2b4afdac3f2537c209b3c21",
+      "reference_answer": "In the current GeoPandas, HTTP Range request handling for remote vector data is implemented as an explicit detection and fallback mechanism inside the file I O pathway rather than being delegated implicitly, and the control flow starts when `_read_file` determines that the input is a URL using `_is_url`, which parses the scheme and checks it against `_VALID_URLS` while excluding empty and `file` schemes so that local paths are not treated as remote (`_is_url` and `_VALID_URLS` definitions in `geopandas/io/file.py` lines 26 to 29 and the conditional usage in lines 182 to 189). When a URL is detected, GeoPandas proactively probes server capabilities by issuing a minimal HTTP request with a `Range` header using `Request(filename, headers={'Range': 'bytes=0-1'})`, and it interprets support for random access strictly: if the response status is not `206`, or if the `Accept-Ranges` header is present and equal to `'none'`, or if any connection level exception is raised during this probe, the code sets `from_bytes = True`, which is the internal signal that partial reads are unsafe and a full download is required. This decision directly determines the downstream behavior, because when `from_bytes` remains false the original URL is preserved and later passed through `vsi_path(str(path_or_bytes))` before being opened with Fiona, enabling GDAL to perform on demand byte range reads, whereas when `from_bytes` is true GeoPandas reads the entire response into memory with `response.read()` and switches to an in memory container (`geopandas/io/file.py` lines 288 to 291). The Fiona specific branch makes this distinction concrete by choosing `fiona.open` when operating on a path and `fiona.BytesCollection` when operating on downloaded bytes (`geopandas/io/file.py` lines 352 to 355), which is the exact point where the earlier HTTP Range probe translates into either streaming access or full materialization. The effectiveness of the non fallback path relies on `vsi_path`, which converts supported remote schemes such as `http` and `https` into GDAL virtual file system prefixes like `/vsicurl/` while leaving any existing `/vsi...` paths untouched, ensuring that when the probe succeeds the URL is handed to GDAL in a form that preserves random access semantics instead of forcing a download.",
+      "reference_sha256": "91e30f19afe382bc44b1fc36a762e17ab04fc4bc17d994ff6cd8e0a48529b485",
+      "repository": {
+        "commit": "7d460d9efff57720c970fd6a040914286846c589",
+        "family_id": "geopandas/geopandas",
+        "url": "https://github.com/geopandas/geopandas"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/geopandas--geopandas-7d460d9efff57720c970fd6a040914286846c589",
+      "task_id": "import-83c7982eff348d996687a28c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/geopandas--geopandas-7d460d9efff5",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 527,
+            "file_sha256": "b50fba2f51a0ec5237f57dd30ad7cd290ad1d80b082af28ea1aaf17e5ae15584",
+            "path": "geopandas/io/arrow.py",
+            "start_line": 527
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "b50fba2f51a0ec5237f57dd30ad7cd290ad1d80b082af28ea1aaf17e5ae15584",
+            "kind": "file_reference",
+            "line_count": 913,
+            "path": "geopandas/io/arrow.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does geopandas handle pandas data type conversion parameters when reading parquet files with complex data types?",
+      "question_sha256": "b190dc632e5e60573af2c63461153275e52161a32988fba1d7f14fcc1f10a58f",
+      "reference_answer": "GeoPandas does not interpret pandas specific Parquet dtype conversion parameters during Parquet reads because its implementation routes Parquet I O through PyArrow and only materializes pandas dtypes at the Arrow to pandas conversion boundary, so parameters such as pandas.read_parquet dtype_backend are irrelevant unless they can be expressed as pyarrow.Table.to_pandas options; this is visible in the code path identified in geopandas/io/arrow.py where the Arrow table is converted with df = table.to_pandas() (geopandas/io/arrow.py line 527), meaning dtype decisions for non geometry columns are delegated to PyArrow\u2019s pandas conversion rules rather than pandas\u2019 Parquet reader knobs. Consequently, when reading Parquet files that contain complex or nullable data, the effective control surface is the set of keyword arguments that GeoPandas forwards into Table.to_pandas, because that call is where Arrow extension types, nested types, and null handling are mapped into concrete pandas dtypes; for example, PyArrow exposes integer_object_nulls to prevent object columns containing integers and nulls from being coerced into floating point, and it also supports types_mapper for steering Arrow backed or extension dtype selection during conversion, so providing the corresponding to_pandas arguments is the mechanism GeoPandas users must use to preserve precision and avoid lossy coercions when complex types and missing values are present. Framed against the five quality requirements, the correctness claim is verifiable because it ties the behavioral conclusion directly to the concrete conversion statement in geopandas/io/arrow.py line 527 and to the upstream PyArrow API contract for Table.to_pandas parameters, the completeness requirement is met because it covers both what GeoPandas does not do (it does not apply pandas Parquet dtype parameters) and what it does do (it converts via Arrow then calls Table.to_pandas which determines pandas dtypes), the relevance requirement is met by focusing strictly on dtype conversion parameter handling in Parquet reads under complex data types, the clarity requirement is met by making the causal chain explicit from Parquet read to Arrow table to pandas conversion, and the reasoning quality requirement is met by explaining why control shifts from pandas to PyArrow and how specific PyArrow conversion options map to the observed outcomes such as nullable integer to float coercion and potential precision loss.",
+      "reference_sha256": "2385c5bea89365bdedbc0a9886330fd5a73f3c7a64b514955f96d13763270eb3",
+      "repository": {
+        "commit": "7d460d9efff57720c970fd6a040914286846c589",
+        "family_id": "geopandas/geopandas",
+        "url": "https://github.com/geopandas/geopandas"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/geopandas--geopandas-7d460d9efff57720c970fd6a040914286846c589",
+      "task_id": "import-89ee261aef574400411cc2b6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/geopandas--geopandas-7d460d9efff5",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 32,
+            "file_sha256": "5527de431d770a6d8fa3cdfce9b4ae4386a83ba5e4c93ffb7254ce5098244afe",
+            "path": "geopandas/explore.py",
+            "start_line": 13
+          },
+          {
+            "end_line": 369,
+            "file_sha256": "5527de431d770a6d8fa3cdfce9b4ae4386a83ba5e4c93ffb7254ce5098244afe",
+            "path": "geopandas/explore.py",
+            "start_line": 366
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where are the folium map initialization parameter constants defined that control the interactive plotting behavior in geopandas' explore functionality?",
+      "question_sha256": "3ed8566d6b0545f191fc07c14ae4d01ea94993b477c8bc8d8996504a9b0f6049",
+      "reference_answer": "In geopandas, the constants that define which Folium folium.Map initialization keyword arguments are accepted through the explore workflow are defined as the module level list named _MAP_KWARGS in geopandas/explore.py on lines 13 to 32, where the code explicitly enumerates the allowed keys (for example 'location', 'zoom_start', 'crs', 'prefer_canvas', 'zoom_control', 'min_zoom', and 'max_zoom' are all present in that literal list). This location is the technically correct answer because _MAP_KWARGS is not just documentation but is enforced by the implementation: when m is None and a new Folium map is created, GeoPandas constructs map_kwds by selecting only those entries from kwargs whose names appear in _MAP_KWARGS using map_kwds = {i: kwargs[i] for i in kwargs.keys() if i in _MAP_KWARGS} in geopandas/explore.py lines 366 to 369, and then passes them into the Folium constructor via m = folium.Map(..., **map_kwds) in lines 387 to 395, which is the causal mechanism by which this list controls interactive map initialization behavior (only keys in _MAP_KWARGS can influence the created folium.Map). Completeness is ensured because the same list also governs cleanup of residual initialization keys: immediately after the map is created, GeoPandas iterates for map_kwd in _MAP_KWARGS: kwargs.pop(map_kwd, None) in lines 410 to 411, which guarantees that those initialization related parameters are consumed and do not leak into later styling and layer construction logic, reinforcing that _MAP_KWARGS is the single authoritative gate for map init kwargs in explore. Relevance and clarity follow from focusing on the exact identifiers, file path, and the two code sites that apply the list (filtering into map_kwds and then popping from kwargs), and the reasoning quality is anchored in direct, verifiable code evidence that ties definition to effect, showing that _MAP_KWARGS both specifies and constrains the Folium map initialization parameters that shape the interactive plotting behavior exposed by GeoPandas explore.",
+      "reference_sha256": "cf3fdc226371a18f7e4555ccbf774decb14723fbd652b8b28f5a573a68b15388",
+      "repository": {
+        "commit": "7d460d9efff57720c970fd6a040914286846c589",
+        "family_id": "geopandas/geopandas",
+        "url": "https://github.com/geopandas/geopandas"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/geopandas--geopandas-7d460d9efff57720c970fd6a040914286846c589",
+      "task_id": "import-8bd8d955ab21428398dda7c2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/geopandas--geopandas-7d460d9efff5",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "8154490eb66da597affb40375f6f053edf5851fc0f33cf9677f95491f5580a95",
+            "kind": "file_reference",
+            "line_count": 2690,
+            "path": "geopandas/geodataframe.py"
+          },
+          {
+            "file_sha256": "5527de431d770a6d8fa3cdfce9b4ae4386a83ba5e4c93ffb7254ce5098244afe",
+            "kind": "file_reference",
+            "line_count": 1036,
+            "path": "geopandas/explore.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the interactive explore() method experience performance degradation and high CPU consumption when rendering large GeoDataFrames with complex styling and multiple layers?",
+      "question_sha256": "1e5757d30016e35520e0f53fb3f04774ff478aa59f1a8f0a42ccb2a55ce0946d",
+      "reference_answer": "The slowdown and high CPU usage seen with GeoDataFrame.explore() on large or complex datasets comes from how GeoPandas prepares data for interactive web maps and how that data is rendered in the browser. On the Python side, explore() must eagerly serialize the entire GeoDataFrame to GeoJSON because folium and Leaflet only consume GeoJSON, and this is done by GeoDataFrame.to_json() in geopandas/geodataframe.py, where a full FeatureCollection is built by iterating over all geometries and properties before dumping to JSON, as shown in lines 867 to 962; as a result, CPU time and memory usage scale with total vertex count and attribute size, not merely row count. After serialization, explore() sets up styling and interactivity by constructing style functions, tooltips, popups, and highlight logic that are evaluated per feature, which is implemented in geopandas/explore.py around lines 511 to 669, so choropleths and complex styling multiply computation by the number of geometries. When multiple layers are added, this same serialization and styling pipeline runs independently for each layer, further compounding the cost. Finally, on the client side, Leaflet must parse the full GeoJSON, create and draw a vector object for each feature, and attach interaction handlers, so large numbers of features or highly detailed geometries significantly increase browser side CPU load. Together, the eager GeoJSON serialization, per feature styling logic, repeated layer processing, and Leaflet\u2019s vector rendering model explain why explore() degrades in performance and becomes CPU intensive for large, richly styled GeoDataFrames.",
+      "reference_sha256": "f93981136ed2e96f450b772cb6c91b8151e39002627abae3eb41dd147c64619a",
+      "repository": {
+        "commit": "7d460d9efff57720c970fd6a040914286846c589",
+        "family_id": "geopandas/geopandas",
+        "url": "https://github.com/geopandas/geopandas"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/geopandas--geopandas-7d460d9efff57720c970fd6a040914286846c589",
+      "task_id": "import-da439129d2082bbaebc50bc2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/geopandas--geopandas-7d460d9efff5",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 793,
+            "file_sha256": "8d8e9677599dfe2da83c1ba1164767ecdf08519a7fca0371d13729d69d41cf56",
+            "path": "geopandas/plotting.py",
+            "start_line": 790
+          },
+          {
+            "end_line": 444,
+            "file_sha256": "5527de431d770a6d8fa3cdfce9b4ae4386a83ba5e4c93ffb7254ce5098244afe",
+            "path": "geopandas/explore.py",
+            "start_line": 441
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "8d8e9677599dfe2da83c1ba1164767ecdf08519a7fca0371d13729d69d41cf56",
+            "kind": "file_reference",
+            "line_count": 977,
+            "path": "geopandas/plotting.py"
+          },
+          {
+            "file_sha256": "5527de431d770a6d8fa3cdfce9b4ae4386a83ba5e4c93ffb7254ce5098244afe",
+            "kind": "file_reference",
+            "line_count": 1036,
+            "path": "geopandas/explore.py"
+          },
+          {
+            "file_sha256": "8154490eb66da597affb40375f6f053edf5851fc0f33cf9677f95491f5580a95",
+            "kind": "file_reference",
+            "line_count": 2690,
+            "path": "geopandas/geodataframe.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "benchmarks/plotting.py",
+              "geopandas/plotting.py"
+            ],
+            "end_line": null,
+            "path": "plotting.py",
+            "reason": "ambiguous_basename",
+            "reference": "plotting.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "Where are the default colormap selection rules implemented for categorical data visualization in GeoPandas' dual plotting systems?",
+      "question_sha256": "bd23e21d6c36b9628c450c1f0742c4ce943105dceeea4890d090c0855827cda3",
+      "reference_answer": "In GeoPandas there is no shared, central \u2018default categorical colormap\u2019 policy that both plotting systems consult, so the default colormap selection rules are implemented inside each backend\u2019s own entry point: for the static Matplotlib based path, GeoDataFrame.plot ultimately delegates into plot_dataframe in geopandas/plotting.py, and the categorical default is chosen there by explicitly setting cmap when categorical=True and no colormap was provided, i.e. the code branch that checks for a missing colormap and then assigns cmap = 'tab10' lives in geopandas/plotting.py at lines 790\u2013793, which is why categorical plots with cmap=None end up using \u2018tab10\u2019 in the Matplotlib backend; for the interactive Folium based path, the equivalent decision is not reused from plotting.py but is made inside the interactive implementation itself, where _explore in geopandas/explore.py applies a fallback when no colormap is passed by using cmap = cmap if cmap else 'tab20' in geopandas/explore.py at lines 441\u2013444, which is why the interactive categorical behavior defaults to \u2018tab20\u2019 rather than \u2018tab10\u2019; the reason these rules appear in different places is that the public APIs (GeoDataFrame.plot and GeoDataFrame.explore) are thin dispatch layers that route into different backend specific implementations rather than a unified visualization core, so the only enforceable point for a backend specific default is inside the backend function that actually prepares colors for that rendering stack, namely plot_dataframe for Matplotlib and _explore for Folium, with the interactive entry being exposed through GeoDataFrame.explore defined in geopandas/geodataframe.py.",
+      "reference_sha256": "1de0979f1b3ee43799ae3c0d57fc0ddb2b793fbc88b17d51e079570b5c7c0dca",
+      "repository": {
+        "commit": "7d460d9efff57720c970fd6a040914286846c589",
+        "family_id": "geopandas/geopandas",
+        "url": "https://github.com/geopandas/geopandas"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/geopandas--geopandas-7d460d9efff57720c970fd6a040914286846c589",
+      "task_id": "import-ef28faecac5ec2a021a296dd"
+    }
+  ]
+}

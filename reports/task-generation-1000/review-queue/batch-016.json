@@ -1,0 +1,371 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/dwavesystems--dwave-cloud-client-88e14e9b7459",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 482,
+            "file_sha256": "b4aa22bdf16a7fb0fefc191d409599d009f77133e78fc809752b8f9300f092f4",
+            "path": "dwave/cloud/solver.py",
+            "start_line": 474
+          },
+          {
+            "end_line": 83,
+            "file_sha256": "31f820e220db621c3a66564a461c0df13a81364e4ca8261a016c0ce12d37e9ae",
+            "path": "dwave/cloud/coders.py",
+            "start_line": 27
+          },
+          {
+            "end_line": 258,
+            "file_sha256": "32022775d3f9e722171ce6d1e2cc0169046c067f681010756599ace8256bfaf1",
+            "path": "dwave/cloud/utils.py",
+            "start_line": 244
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 403,
+            "line_count": 402,
+            "path": "dwave/cloud/upload.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "dwave/cloud/upload.py",
+            "resolved_path": "dwave/cloud/upload.py",
+            "start_line": 326
+          }
+        ]
+      },
+      "question": "Where does binary quadratic model data flow through the encoding, compression, and upload pipeline during problem submission to D-Wave cloud solvers?",
+      "question_sha256": "d18e9b8719c3fe793e8d8c784d016bcb41fa3881d816bb674dcfa3a60bbd4605",
+      "reference_answer": "The process begins with StructuredSolver (dwave/cloud/solver.py: line 474-482) extracting linear and quadratic terms using ordered _encoding_qubits and _encoding_couplers mappings from solver properties, which determine the exact sequence for encoding. The actual encoding occurs in encode_problem_as_qp (dwave/cloud/coders.py: line 27-83), which converts coefficients to doubles using struct.pack, then base64-encodes them into 'qp' format strings suitable for JSON transmission. For large data, the encoded content flows through ChunkedData (dwave/cloud/upload.py: line 326-403), which provides a unified streaming interface supporting both in-memory (GettableMemory) and file-based (GettableFile) data with efficient getinto methods for memory-efficient transfer. The submission pipeline uses _upload_part_executor to manage concurrent uploads with priority-based task scheduling. Finally, the encoded data flows through BaseUrlSession HTTP adapters (dwave/cloud/utils.py: line 244-258) with TimeoutingHTTPAdapter instances mounted for both HTTP and HTTPS protocols, submitting to D-Wave API endpoints via POST requests to the 'problems/' endpoint.",
+      "reference_sha256": "6f46d2c2e3407f3b26aa4e8dec2aa7a7e3ddb3508ebdf2fe288f71ce474baa8b",
+      "repository": {
+        "commit": "88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+        "family_id": "dwavesystems/dwave-cloud-client",
+        "url": "https://github.com/dwavesystems/dwave-cloud-client"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/dwavesystems--dwave-cloud-client-88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+      "task_id": "import-2bbb422f934a8f7f9d482013"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/dwavesystems--dwave-cloud-client-88e14e9b7459",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 539,
+            "file_sha256": "8483f5d76fda4cab03df7b41288813c8c26afd29debbe6edc10773506a411d09",
+            "path": "dwave/cloud/client.py",
+            "start_line": 506
+          },
+          {
+            "end_line": 455,
+            "file_sha256": "8483f5d76fda4cab03df7b41288813c8c26afd29debbe6edc10773506a411d09",
+            "path": "dwave/cloud/client.py",
+            "start_line": 455
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the Client class manage HTTP session creation and configuration to ensure thread-safe API communications with D-Wave's quantum computing endpoints?",
+      "question_sha256": "1bd5a40e99aff87df1ca0ebc0cc3dbf980add0f765edf782dc6fa174c3efcf68",
+      "reference_answer": "The Client class manages HTTP session creation through a centralized create_session() factory method (dwave/cloud/client.py: lines 506-539) that instantiates BaseUrlSession objects with endpoint-specific configuration. The architecture ensures thread safety by having each worker thread create its own isolated session instance rather than sharing sessions across threads. The main thread creates one session during Client initialization (dwave/cloud/client.py: line 455), while multiple worker threads each create separate sessions in their respective worker methods: _do_submit_problems (line 1149), _do_cancel_problems (line 1325), _do_poll_problems (line 1414), and _do_load_results (line 1549). This architecture supports robust communication with D-Wave's API endpoints while properly managing connection pooling, retries, and avoiding the thread-safety issues inherent in the requests.Session class.",
+      "reference_sha256": "e121d7abdee1e4003a02ed3827038f2709f98883b909598aae5a60f4339674fd",
+      "repository": {
+        "commit": "88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+        "family_id": "dwavesystems/dwave-cloud-client",
+        "url": "https://github.com/dwavesystems/dwave-cloud-client"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/dwavesystems--dwave-cloud-client-88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+      "task_id": "import-4ac69db60f10c68bfb203dce"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/dwavesystems--dwave-cloud-client-88e14e9b7459",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1868,
+            "file_sha256": "8483f5d76fda4cab03df7b41288813c8c26afd29debbe6edc10773506a411d09",
+            "path": "dwave/cloud/client.py",
+            "start_line": 1865
+          },
+          {
+            "end_line": 161,
+            "file_sha256": "8483f5d76fda4cab03df7b41288813c8c26afd29debbe6edc10773506a411d09",
+            "path": "dwave/cloud/client.py",
+            "start_line": 161
+          },
+          {
+            "end_line": 162,
+            "file_sha256": "8483f5d76fda4cab03df7b41288813c8c26afd29debbe6edc10773506a411d09",
+            "path": "dwave/cloud/client.py",
+            "start_line": 160
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the dwave-cloud-client specifically use PriorityThreadPoolExecutor for upload_part operations while using standard ThreadPoolExecutor for upload_problem and encode_problem tasks?",
+      "question_sha256": "9d7db673c825ce8ddbc006fc2515cae417ba1a0a98d241a1b7796d122d5239f6",
+      "reference_answer": "The upload_part operations are submitted to the PriorityThreadPoolExecutor without any priority parameter (dwave/cloud/client.py: line 1865-1868), meaning they execute with default priority behavior identical to a standard ThreadPoolExecutor. The key architectural difference lies in concurrency levels: upload_part operations use a pool of 10 worker threads to handle chunked data uploads in parallel (dwave/cloud/client.py: line 161), while upload_problem and encode_problem operations use single-threaded executors with only 1 worker thread each (dwave/cloud/client.py: lines 160-162). The design may have been implemented with future extensibility in mind, possibly anticipating scenarios where certain upload chunks might need prioritization based on factors like dependency order or criticality, but such functionality is not currently implemented.",
+      "reference_sha256": "f8c0e77a798ad93c35413a4b3dcfdb4ebda6d356d46672da7049356d16c9d3dc",
+      "repository": {
+        "commit": "88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+        "family_id": "dwavesystems/dwave-cloud-client",
+        "url": "https://github.com/dwavesystems/dwave-cloud-client"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/dwavesystems--dwave-cloud-client-88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+      "task_id": "import-6d87cb2e6c40fcbacb1155f7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/dwavesystems--dwave-cloud-client-88e14e9b7459",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 46,
+            "file_sha256": "2fe5e54037a9095ccd8dd3235d1d105e654ca87adf6a63e12c8b876bf6d05f92",
+            "path": ".travis.yml",
+            "start_line": 46
+          },
+          {
+            "end_line": 49,
+            "file_sha256": "2fe5e54037a9095ccd8dd3235d1d105e654ca87adf6a63e12c8b876bf6d05f92",
+            "path": ".travis.yml",
+            "start_line": 49
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "67d18ffd65f56890cc7b8996528d4073820b6723639c6c9388ca881472198f58",
+            "kind": "file_reference",
+            "line_count": 22,
+            "path": "dwave/cloud/package_info.py"
+          },
+          {
+            "file_sha256": "d31baf761e413b62a2f53425ec8e60c9fd19f4ba1031f8c4c72d6c186e341d75",
+            "kind": "file_reference",
+            "line_count": 6,
+            "path": "tests/requirements.txt"
+          },
+          {
+            "file_sha256": "2fe5e54037a9095ccd8dd3235d1d105e654ca87adf6a63e12c8b876bf6d05f92",
+            "kind": "file_reference",
+            "line_count": 59,
+            "path": ".travis.yml"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does coverage data flow from test execution to the external reporting service in the current CI pipeline?",
+      "question_sha256": "84d72819a3f0f9a933489ad7f7091d688771a659a0bfbcdde1cffc7645282100",
+      "reference_answer": "During test execution, coverage data is generated via the 'coverage run -m unittest discover' command (.travis.yml: line 46), which instruments the test runs to collect code coverage metrics. The coverage collection is configured by .coveragerc, which specifies that coverage should track the 'dwave.cloud' source package (line 2) while omitting virtual environments, test files, performance tests, and the package_info.py file (lines 3-6). The necessary dependencies for this process, including both 'coverage' and 'coveralls' packages, are installed during the CI setup phase as specified in tests/requirements.txt and installed via .travis.yml. After successful test completion, the collected coverage data is transmitted to the external Coveralls reporting service through the 'coveralls' command executed in the after_success phase (.travis.yml: line 49).",
+      "reference_sha256": "cf2a41dc1087d72faa4a4f788d678af62ed7de817fce30ae2cee8fb49be488e4",
+      "repository": {
+        "commit": "88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+        "family_id": "dwavesystems/dwave-cloud-client",
+        "url": "https://github.com/dwavesystems/dwave-cloud-client"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/dwavesystems--dwave-cloud-client-88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+      "task_id": "import-868376bc591f2713af89da07"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/dwavesystems--dwave-cloud-client-88e14e9b7459",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "8483f5d76fda4cab03df7b41288813c8c26afd29debbe6edc10773506a411d09",
+            "kind": "file_reference",
+            "line_count": 1920,
+            "path": "dwave/cloud/client.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the Client class coordinate multiple API endpoints (SAPI, Leap API, metadata API) through its configuration and session management system?",
+      "question_sha256": "9b8e01b4e612b419e3504e186af471f10121fe36ffe9c9c264552031e7836ed4",
+      "reference_answer": "The Client class coordinates API endpoints through a two-layer architecture rather than the three-layer system mentioned in the reference. The first layer is configuration resolution implemented in dwave/cloud/client.py, which loads endpoint URLs with a clear precedence hierarchy: keyword arguments override environment variables (specifically DWAVE_API_ENDPOINT), which override configuration file values. The second layer is session management, where the Client creates BaseUrlSession objects that extend requests.Session to maintain persistent connections with authentication headers, timeouts, and proxy settings. API routing occurs within a single configured endpoint, where different request types are dispatched to specific paths: solver metadata queries use 'solvers/remote/' endpoints, problem submission and status polling use 'problems/' endpoints, and multipart uploads use 'bqm/multipart' endpoints. All operations are routed through the single configured SAPI endpoint URL with different path suffixes.",
+      "reference_sha256": "7323995138516d9747ef8ab8cf046798df49f3fe90ceb622881bf4125dadec43",
+      "repository": {
+        "commit": "88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+        "family_id": "dwavesystems/dwave-cloud-client",
+        "url": "https://github.com/dwavesystems/dwave-cloud-client"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/dwavesystems--dwave-cloud-client-88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+      "task_id": "import-9cb0681e71852f70241c9c8e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/dwavesystems--dwave-cloud-client-88e14e9b7459",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 498,
+            "file_sha256": "8483f5d76fda4cab03df7b41288813c8c26afd29debbe6edc10773506a411d09",
+            "path": "dwave/cloud/client.py",
+            "start_line": 497
+          },
+          {
+            "end_line": 464,
+            "file_sha256": "8483f5d76fda4cab03df7b41288813c8c26afd29debbe6edc10773506a411d09",
+            "path": "dwave/cloud/client.py",
+            "start_line": 458
+          },
+          {
+            "end_line": 1870,
+            "file_sha256": "8483f5d76fda4cab03df7b41288813c8c26afd29debbe6edc10773506a411d09",
+            "path": "dwave/cloud/client.py",
+            "start_line": 1865
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the Client's concurrent task submission pipeline use PriorityThreadPoolExecutor instead of standard ThreadPoolExecutor for handling quantum problem submissions to multiple solvers?",
+      "question_sha256": "9bc3866b25a8c1547ae2d9405c516536e0b98e11cd1f6b88507cec75cf72758a",
+      "reference_answer": "The Client does not use PriorityThreadPoolExecutor for quantum problem submissions to multiple solvers. Instead, PriorityThreadPoolExecutor is used exclusively for multipart file upload operations in the upload part executor (dwave/cloud/client.py: line 497-498). Quantum problem submissions use a standard queue-based worker system with regular Python Queue objects for the submission pipeline (dwave/cloud/client.py: line 458-464). The PriorityThreadPoolExecutor was implemented as part of rewriting the upload architecture to handle concurrent multipart uploads of problem data to the D-Wave API. The priority system allows for potential prioritization of different upload parts based on size, urgency, or retry requirements, though the current implementation does not explicitly pass priority values when submitting upload tasks (dwave/cloud/client.py: line 1865-1870). The multipart upload system chunks large problem files into smaller parts and uploads them concurrently, where the PriorityThreadPoolExecutor could theoretically prioritize smaller parts or retries over larger initial uploads to optimize overall upload throughput and reduce latency for time-sensitive operations.",
+      "reference_sha256": "d78ade0e22e2165fa7a893e9e16251a899d4d3d0b775455077258b10df78ba8b",
+      "repository": {
+        "commit": "88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+        "family_id": "dwavesystems/dwave-cloud-client",
+        "url": "https://github.com/dwavesystems/dwave-cloud-client"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/dwavesystems--dwave-cloud-client-88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+      "task_id": "import-a1eed3ff9ae87b27f4714f00"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/dwavesystems--dwave-cloud-client-88e14e9b7459",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 321,
+            "file_sha256": "8483f5d76fda4cab03df7b41288813c8c26afd29debbe6edc10773506a411d09",
+            "path": "dwave/cloud/client.py",
+            "start_line": 318
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the configuration system in dwave-cloud-client serve as the primary authentication credential provider for the Client class?",
+      "question_sha256": "2378aed0d9df1e0c837559e4e8a6049eb003e38468586e95925e44385058a126",
+      "reference_answer": "The configuration system serves as the primary authentication credential provider because it is a convenient centralized strategy that unifies authentication credentials from multiple sources with a clear precedence order. This allows the system to support three sources ranked by priority: direct keyword arguments (highest), environment variables such as DWAVE_API_TOKEN (middle), and configuration file values (lowest). The Client.from_config factory method (dwave/cloud/client.py lines 318-321) leverages this consolidated configuration to instantiate client objects with the resolved token stored in the Client.token field. This token is then automatically added as the X-Auth-Token header to all HTTP requests via the create_session method, ensuring consistent authentication across all communications with the D-Wave API. This design choice provides developers with flexible configuration options while maintaining a single source of truth for authentication credentials and eliminating the need for manual token management in application code.",
+      "reference_sha256": "c481b2ac40e25f1dd531f30f4570d3f73d0010f9e5abc90be40f34b982071118",
+      "repository": {
+        "commit": "88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+        "family_id": "dwavesystems/dwave-cloud-client",
+        "url": "https://github.com/dwavesystems/dwave-cloud-client"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/dwavesystems--dwave-cloud-client-88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+      "task_id": "import-c6fc3d320b32817af4deef74"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/dwavesystems--dwave-cloud-client-88e14e9b7459",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the current simple token-based authentication architecture in dwave-cloud-client create scalability bottlenecks when handling concurrent API requests across multiple thread pools?",
+      "question_sha256": "4527ccdf5f990eb430baab93e47e3ed41832deda46555f1afccb5a5eed640f66",
+      "reference_answer": "The current token-based authentication architecture creates scalability bottlenecks primarily due to its static, non-refreshable token design combined with high concurrency. The client spawns concurrent threads across multiple thread pools. Each thread creates its own session via the create_session method, but all sessions use the same static token stored in self.token and applied via session.headers.update({'X-Auth-Token': self.token}). The architecture lacks token refresh mechanisms, so when tokens expire during long-running concurrent workloads, all 401 authentication failures across all threads immediately trigger SolverAuthenticationError exceptions with no retry or refresh logic. Additionally, the simple header-based approach provides no per-request authentication context, preventing fine-grained rate limiting or user session management that could help distribute load. While the reference answer incorrectly suggests threads share session objects (they don't), the core scalability issues are valid: static tokens without refresh capability become a single point of failure under concurrent load, and the absence of modern OAuth flows limits the system's ability to handle token lifecycle management.",
+      "reference_sha256": "f97ba6fdeb62e8193336dc204a308b084cadc0662c931b458fdf4eb43790b489",
+      "repository": {
+        "commit": "88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+        "family_id": "dwavesystems/dwave-cloud-client",
+        "url": "https://github.com/dwavesystems/dwave-cloud-client"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/dwavesystems--dwave-cloud-client-88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+      "task_id": "import-ce28a9cd8598c38c913483a8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/dwavesystems--dwave-cloud-client-88e14e9b7459",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 138,
+            "file_sha256": "8483f5d76fda4cab03df7b41288813c8c26afd29debbe6edc10773506a411d09",
+            "path": "dwave/cloud/client.py",
+            "start_line": 83
+          },
+          {
+            "end_line": 39,
+            "file_sha256": "7687b0dba74b3bb29a9031ccf994a85c7fb8326b3c0aebb581089fc8c9cff231",
+            "path": "dwave/cloud/qpu.py",
+            "start_line": 39
+          },
+          {
+            "end_line": 27,
+            "file_sha256": "4d6a444354c88395e7b412fe5baf8bd32821c52d84b353fcc4c67ef6c8057639",
+            "path": "dwave/cloud/hybrid.py",
+            "start_line": 27
+          },
+          {
+            "end_line": 30,
+            "file_sha256": "ad37bb69bd093c039555db1b53c5391fac758f00c498ce3d69d37c1c3b842265",
+            "path": "dwave/cloud/sw.py",
+            "start_line": 30
+          },
+          {
+            "end_line": 84,
+            "file_sha256": "b4aa22bdf16a7fb0fefc191d409599d009f77133e78fc809752b8f9300f092f4",
+            "path": "dwave/cloud/solver.py",
+            "start_line": 57
+          },
+          {
+            "end_line": 468,
+            "file_sha256": "b4aa22bdf16a7fb0fefc191d409599d009f77133e78fc809752b8f9300f092f4",
+            "path": "dwave/cloud/solver.py",
+            "start_line": 451
+          },
+          {
+            "end_line": 275,
+            "file_sha256": "b4aa22bdf16a7fb0fefc191d409599d009f77133e78fc809752b8f9300f092f4",
+            "path": "dwave/cloud/solver.py",
+            "start_line": 256
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the architectural structure of the client specialization hierarchy in the D-Wave cloud client system?",
+      "question_sha256": "b1231524474d4178473248949e340d13fb811a6cdd7d231fab40cdc9441338d5",
+      "reference_answer": "The D-Wave cloud client system implements an architectural design that abstracts client specialization from solver abstraction. At the foundation is the base Client class (dwave/cloud/client.py: lines 83-138) which provides core functionality including authentication, threading, API management, and problem lifecycle operations. Three specialized client classes inherit from this base as BaseClient: QPU Client (dwave/cloud/qpu.py: line 39), Hybrid Client (dwave/cloud/hybrid.py: line 27), and Software Client (dwave/cloud/sw.py: line 30), each optimized for specific computational backends. The solver abstraction layer operates independently with BaseSolver (dwave/cloud/solver.py: line 57-84) as the foundation, extended by two concrete implementations: StructuredSolver (dwave/cloud/solver.py: line 451-468) handles 'ising' and 'qubo' problem types using 'qp' encoding format, while UnstructuredSolver (dwave/cloud/solver.py: line 256-275) handles 'bqm' problems using 'bq' encoding format.",
+      "reference_sha256": "fa150fa02843ed1e164f260171dd6b7a4a08111d016032ffb792cbf55009e353",
+      "repository": {
+        "commit": "88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+        "family_id": "dwavesystems/dwave-cloud-client",
+        "url": "https://github.com/dwavesystems/dwave-cloud-client"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/dwavesystems--dwave-cloud-client-88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+      "task_id": "import-e674f5f0973ad2a1fb4bafd1"
+    }
+  ]
+}

@@ -1,0 +1,411 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 78,
+            "file_sha256": "3d4a37fac0f489d56a52d8d7b17ad4d7a8edbd75c5a7b892274aa54a31c4ded6",
+            "path": "src/psyclone/psyir/tools/dependency_tools.py",
+            "start_line": 56
+          },
+          {
+            "end_line": 273,
+            "file_sha256": "f933a09d3fc1f376b4a97a7f6338180b4c10e49517ee8ad19c5e0684c6c1e885",
+            "path": "src/psyclone/psyir/transformations/parallel_loop_trans.py",
+            "start_line": 121
+          },
+          {
+            "end_line": 659,
+            "file_sha256": "3d4a37fac0f489d56a52d8d7b17ad4d7a8edbd75c5a7b892274aa54a31c4ded6",
+            "path": "src/psyclone/psyir/tools/dependency_tools.py",
+            "start_line": 655
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 1068,
+            "line_count": 1067,
+            "path": "src/psyclone/psyir/tools/dependency_tools.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "src/psyclone/psyir/tools/dependency_tools.py",
+            "resolved_path": "src/psyclone/psyir/tools/dependency_tools.py",
+            "start_line": 133
+          }
+        ]
+      },
+      "question": "Why does PSyclone's transformation engine separate dependency analysis validation from transformation application, considering the scalability impacts on large HPC codebases with complex loop nests?",
+      "question_sha256": "a49146c88878af69744eff7a13857726e9f82fdc4039829ac8c4dcf9841e25e5",
+      "reference_answer": "PSyclone's transformation engine separates dependency analysis validation from transformation application through a rigorous two-phase architecture designed for correctness and safety in HPC environments. The DependencyTools class (src/psyclone/psyir/tools/dependency_tools.py: line 133-1068) serves as the central dependency analysis engine, employing a comprehensive categorized error system through the DTCode enumeration (src/psyclone/psyir/tools/dependency_tools.py: line 56-78) that distinguishes between informational messages, warnings, and blocking errors. All transformation classes, including ParallelLoopTrans and LoopFuseTrans, implement this separation through distinct validate() and apply() methods (src/psyclone/psyir/transformations/parallel_loop_trans.py: line 121-273 and line 275-409), where validation must complete successfully before any code transformation proceeds. The dependency analysis employs sophisticated algorithms that detect write-write race conditions, loop-carried dependencies, and variable access patterns, but this thoroughness comes at a computational cost. The core scalability bottleneck emerges from the nested loop structure in the dependency analysis (src/psyclone/psyir/tools/dependency_tools.py: line 655-659), where each write access is compared against all other variable accesses, creating O(n\u00b2) algorithmic complexity for loop interactions. This architecture prioritizes transformation safety and provides detailed diagnostic messages for complex HPC codes, enabling selective transformation application when some loops can be optimized while others cannot. ",
+      "reference_sha256": "93d7d1a171d0610ea3c3899ebb74c17549f439e81510755bd26e2b76cc3697d8",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "task_id": "import-8cf10c0c4a274c5334fe19a0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "f6296630e724020eb9ac3d53592ec1504b3a5345f03d3ad967bbe7e017c693c9",
+            "kind": "file_reference",
+            "line_count": 399,
+            "path": "src/psyclone/psyir/transformations/intrinsics/array_reduction_base_trans.py"
+          },
+          {
+            "file_sha256": "384c49a32c8eca6fa4f2ff8fe0cf613ab7b45ad9cc2b78117a12d7c2e52433bc",
+            "kind": "file_reference",
+            "line_count": 172,
+            "path": "src/psyclone/psyir/transformations/intrinsics/minormax2code_trans.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does PSyclone's intrinsic transformation system implement the Template Method design pattern to provide extensible optimization strategies for Fortran intrinsic functions?",
+      "question_sha256": "e46e743ecedddeda94bb1f9f38127b1826bac89b9dd8d1c32dc3b6135accdf9a",
+      "reference_answer": "PSyclone implements the Template Method design pattern through a sophisticated three-layer inheritance hierarchy for its intrinsic transformation system. At the foundation, abstract base classes like ArrayReductionBaseTrans and Intrinsic2CodeTrans define the template methods that outline the general algorithmic structure. ArrayReductionBaseTrans (in src/psyclone/psyir/transformations/intrinsics/array_reduction_base_trans.py) provides concrete implementations of validate and apply methods that handle the common steps of array reduction transformations, while defining abstract hook methods _loop_body and _init_var that subclasses must implement. The class also establishes abstract attributes _INTRINSIC_NAME and _INTRINSIC_TYPE that concrete implementations must specify. At the intermediate layer, classes like MinOrMax2CodeTrans (in src/psyclone/psyir/transformations/intrinsics/minormax2code_trans.py) extend Intrinsic2CodeTrans to implement shared algorithmic patterns for related intrinsics, providing common functionality for MIN and MAX operations while leaving specific comparison operators to be defined by subclasses. At the concrete layer, specific transformation classes like Max2CodeTrans, Min2CodeTrans, Maxval2LoopTrans, Minval2LoopTrans, and Sum2LoopTrans provide the implementation-specific details. For example, Max2CodeTrans sets self._intrinsic to IntrinsicCall.Intrinsic.MAX and self._compare_operator to BinaryOperation.Operator.GT, while Maxval2LoopTrans implements _loop_body to return a MAX intrinsic call and _init_var to return -HUGE() for initialization. This design enables systematic extension of optimization strategies while maintaining consistent validation and application patterns across all transformations, allowing new intrinsic transformations to be easily added by inheriting from appropriate base classes and implementing only the intrinsic-specific logic.",
+      "reference_sha256": "6fd22b786a4ecc6bff7854f9d8754b7ffa15b6c2a59b89fbb3cfd9297dcbafce",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "task_id": "import-7453d326f08b9fc6b3c6253b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "19694388375141f62eebd32b23ac0e21dba1eafca7155aea544dbf5536db899d",
+            "kind": "file_reference",
+            "line_count": 171,
+            "path": ".github/workflows/python-package.yml"
+          },
+          {
+            "file_sha256": "7e012282b949ff0d7e52739eec678fe3cc3b1c91e7ee4a51fa1eed4c99005969",
+            "kind": "file_reference",
+            "line_count": 134,
+            "path": ".github/workflows/compilation.yml"
+          },
+          {
+            "file_sha256": "151e2aa2ff73fe04cf0f72e2e61dbbf8ade2e12bb3853bbc888ee6e3dcd64a1e",
+            "kind": "file_reference",
+            "line_count": 239,
+            "path": ".github/workflows/lfric_test.yml"
+          },
+          {
+            "file_sha256": "9818dbef8d13acd83e5453a4b63f15317377879c05dc2ca0bd917e6fae733d1b",
+            "kind": "file_reference",
+            "line_count": 231,
+            "path": ".github/workflows/nemo_tests.yml"
+          },
+          {
+            "file_sha256": "f58feba74701a862db75b7583a0389822ba076c32e3895ceb9961312b76a6be7",
+            "kind": "file_reference",
+            "line_count": 320,
+            "path": ".github/workflows/nemo_v5_tests.yml"
+          },
+          {
+            "file_sha256": "458c52a18c8aa6fa376aa762dc3bbe893b963e9e68797cf2b1124dfb824767c8",
+            "kind": "file_reference",
+            "line_count": 17,
+            "path": ".github/workflows/linkcheck.yml"
+          },
+          {
+            "file_sha256": "fbacf254342d6616f06ca8913e3092f2e7f199ec486382f304eac954b290a2e1",
+            "kind": "file_reference",
+            "line_count": 87,
+            "path": ".github/workflows/repo-sync.yml"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What are the core components and their responsibilities in PSyclone's GitHub Actions CI/CD workflow architecture?",
+      "question_sha256": "e64501b0fb548e32c07168b666df1dcbab3bee6141dad84d0529a5af277e0f14",
+      "reference_answer": "PSyclone's CI/CD architecture consists of seven core workflow components (.github/workflows/python-package.yml, .github/workflows/compilation.yml, .github/workflows/lfric_test.yml, .github/workflows/nemo_tests.yml, .github/workflows/nemo_v5_tests.yml, .github/workflows/linkcheck.yml, .github/workflows/repo-sync.yml) with distinct responsibilities. The main testing workflow (.github/workflows/python-package.yml) serves as the primary validation pipeline, running unit tests with pytest, flake8 linting, examples execution, tutorials validation, and coverage reporting across Python versions 3.7, 3.8, and 3.13 on GitHub-hosted runners. This workflow also handles Sphinx documentation building and link checking for all documentation guides. The compilation workflow (.github/workflows/compilation.yml) operates exclusively on self-hosted runners within the PSyclone-mirror repository, performing expensive compilation tests using both gfortran and nvfortran compilers, including OpenACC support for GPU computing. Three domain-specific integration workflows (.github/workflows/lfric_test.yml, .github/workflows/nemo_tests.yml, .github/workflows/nemo_v5_tests.yml) conduct API-specific integration testing, running full application builds and validations against known good outputs for the LFRic and NEMO computational frameworks. A dedicated link checking workflow (.github/workflows/linkcheck.yml) uses linkspector to validate external links in pull requests. The repository synchronization workflow (.github/workflows/repo-sync.yml) pushes changes from the public repository to a private mirror that provides access to self-hosted computational resources. Underpinning this architecture is a hierarchical Makefile system that coordinates build targets across API domains including gocean, lfric, nemo, psyir, psyad, xdsl, line_length, and stub_generation. All workflows integrate with CodeCov for coverage reporting and support selective execution through [skip ci] directives in commit messages.",
+      "reference_sha256": "e5b55d4dffe8f9b92ef78a423e520b69859da5fd1a0d1ded18803e03754957d8",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "task_id": "import-584a3d79de6cd1988916e143"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 863,
+            "file_sha256": "3d4a37fac0f489d56a52d8d7b17ad4d7a8edbd75c5a7b892274aa54a31c4ded6",
+            "path": "src/psyclone/psyir/tools/dependency_tools.py",
+            "start_line": 785
+          },
+          {
+            "end_line": 734,
+            "file_sha256": "3d4a37fac0f489d56a52d8d7b17ad4d7a8edbd75c5a7b892274aa54a31c4ded6",
+            "path": "src/psyclone/psyir/tools/dependency_tools.py",
+            "start_line": 647
+          },
+          {
+            "end_line": 282,
+            "file_sha256": "3d4a37fac0f489d56a52d8d7b17ad4d7a8edbd75c5a7b892274aa54a31c4ded6",
+            "path": "src/psyclone/psyir/tools/dependency_tools.py",
+            "start_line": 206
+          },
+          {
+            "end_line": 119,
+            "file_sha256": "f933a09d3fc1f376b4a97a7f6338180b4c10e49517ee8ad19c5e0684c6c1e885",
+            "path": "src/psyclone/psyir/transformations/parallel_loop_trans.py",
+            "start_line": 84
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does PSyclone's dependency analysis system create performance bottlenecks when analyzing deeply nested loop structures for parallelization transformations in large scientific kernels?",
+      "question_sha256": "f879c67ea55d899008604c07212e1fb819c704a9f44753cf719982305a612a74",
+      "reference_answer": "PSyclone's dependency analysis system creates performance bottlenecks in deeply nested loop structures due to several algorithmic complexity issues. The primary bottleneck occurs in the can_loop_be_parallelised method (src/psyclone/psyir/tools/dependency_tools.py: line 785-863), which iterates through all variables in a loop and performs detailed dependency analysis for each one. For deeply nested structures, this becomes quadratic in complexity as the number of variables and their interdependencies grow exponentially with nesting depth. The _array_access_parallelisable method (src/psyclone/psyir/tools/dependency_tools.py: line 647-734) exacerbates this by comparing each write access against every other access, creating O(w \u00d7 a) complexity where w is write accesses and a is all accesses. The partitioning algorithm (_partition method, src/psyclone/psyir/tools/dependency_tools.py: line 206-282) compounds the problem by performing complex set operations to group coupled subscripts, with complexity growing significantly as loop variables become interdependent across multiple nesting levels. Additionally, the privatisation analysis (_attempt_privatisation, src/psyclone/psyir/transformations/parallel_loop_trans.py: line 84-119) must traverse entire symbol tables and node trees for each problematic variable, performing expensive symbol lookups that scale poorly with kernel size. The system lacks caching mechanisms for intermediate dependency analysis results, forcing each transformation pass (ParallelLoopTrans, LoopFuseTrans) to repeat these expensive computations. Finally, the symbolic mathematics operations used for dependency distance calculation can become exponentially complex for nested loop expressions, particularly when involving complex array index expressions common in scientific kernels.",
+      "reference_sha256": "676d77e655fd175a53582376a42fbcb80e382a2ca8b069e31ffcdfe643ef98a0",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "task_id": "import-8c644074cd4e2351d243b4a1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "e91075651ed636ee116b29ed56a09c7c22b753fa5899436a127933a4fe91e869",
+            "kind": "file_reference",
+            "line_count": 243,
+            "path": "src/psyclone/psyad/domain/common/adjoint_utils.py"
+          },
+          {
+            "file_sha256": "ba0683fd47d617d21400dd943c4675f8738cc3c5645ed4fe20350174cfc88b0b",
+            "kind": "file_reference",
+            "line_count": 821,
+            "path": "src/psyclone/psyad/domain/lfric/lfric_adjoint_harness.py"
+          },
+          {
+            "file_sha256": "5d490f4c69c79e0fad071b2671378ca98a18a07db06f0ef0441a5a6831eaa5f4",
+            "kind": "file_reference",
+            "line_count": 724,
+            "path": "src/psyclone/psyad/tl2ad.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where are the precision verification mechanisms implemented in PSyclone's adjoint test harness generation system?",
+      "question_sha256": "6c5201f2018ac7e192e4b92b2966d92f94afacef2c390eb87f82a625d02b106a",
+      "reference_answer": "The precision verification mechanisms in PSyclone's adjoint test harness generation system are implemented across three main components. The core functionality resides in src/psyclone/psyad/domain/common/adjoint_utils.py, which defines the INNER_PRODUCT_TOLERANCE constant (1500.0) and implements the common_real_comparison function that calculates machine tolerance using the SPACING intrinsic function to determine relative differences between inner product values. This function creates tagged symbols for tracking relative_diff and overall_tolerance values. The LFRic-specific implementation in lfric_adjoint_harness.py extends this base functionality through _lfric_create_real_comparison, which calls the common verification logic and then uses _lfric_log_write to output results to the LFRic logging API rather than standard output. The test harness generation orchestration occurs in tl2ad.py, which imports create_real_comparison from src/psyclone/psyad/domain/common/adjoint_utils.py and integrates it into the adjoint test generation workflow to compare inner product values computed from the tangent-linear and adjoint kernel executions. The precision verification ensures mathematical correctness of adjoint implementations by checking that the inner products satisfy the adjoint test relationship within machine precision tolerances.",
+      "reference_sha256": "9898010de1adf88f6bb051fe498410079ea094dda21124e1478018b9cc2efdc0",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "task_id": "import-06d894f19682e481afe2f89d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does PSyclone's build system fail to scale efficiently under parallel compilation conditions when using the -j flag with make?",
+      "question_sha256": "2034656d84d9933190af05976b026b8fe12cee241fa28b67820b7b82dc51edea",
+      "reference_answer": "PSyclone's build system fails to scale under parallel compilation due to four primary architectural deficiencies. First, library dependencies are built sequentially using recursive make calls with the pattern `${MAKE} -C subdirectory` without proper parallel-safe dependency declarations, as seen throughout the top-level build infrastructure (examples/top_level.mk: line 59-75, examples/Makefile: line 41-47). This forces subdirectories to build one at a time regardless of the -j flag. Second, inconsistent F90FLAGS definitions across makefiles create compilation environment conflicts - common.mk defines basic flags (-g -O0) while infrastructure makefiles redefine them with different options (-Wall -g -fcheck=bound), leading to build failures when parallel processes use different flag sets (examples/common.mk: line 71, src/psyclone/tests/test_files/dynamo0p3/infrastructure/Makefile: line 39). Third, the transformation pipeline generates multiple output files from single source files with implicit ordering requirements that aren't captured in makefile dependencies, causing race conditions when parallel processes attempt simultaneous file generation (examples/nemo/eg1/Makefile: line 41-44, examples/lfric/eg17/full_example/Makefile: line 90). Fourth, cross-directory dependencies are not explicitly declared at the top level, so make cannot determine safe parallelization boundaries and defaults to sequential execution. These issues compound to create a build system that effectively serializes compilation despite parallel make invocation.",
+      "reference_sha256": "8748759ab10d97da6848ba403dd580e8ce5c480c513de44afcee61a772f44bc4",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "task_id": "import-e90581de25fdc24433dd62f2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1493,
+            "file_sha256": "f115e3fee1e3f79e5a91b1c37c0329f99103c66b9afe2ecd13e0f9f78015e89f",
+            "path": "src/psyclone/psyir/nodes/node.py",
+            "start_line": 1484
+          },
+          {
+            "end_line": 332,
+            "file_sha256": "2becb6efd073147d5b1f8fef0418c31b0a1c4a989244e22cef52940d3d8a7314",
+            "path": "src/psyclone/psyir/symbols/symbol_table.py",
+            "start_line": 312
+          },
+          {
+            "end_line": 51,
+            "file_sha256": "94ee80a34c136a75565c3d1f81a41cc7de41707e2db0a822badb85f007067ba0",
+            "path": "src/psyclone/core/variables_access_info.py",
+            "start_line": 51
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does PSyclone's dependency analysis system fail to scale efficiently when analyzing variable references across deeply nested scoping regions in large PSyIR trees?",
+      "question_sha256": "8a952db90d9edd9898b495589b84419715893d833bf7f71bdf9f38d22abad222",
+      "reference_answer": "PSyclone's dependency analysis system fails to scale efficiently in large PSyIR trees with deeply nested scoping regions due to three fundamental architectural limitations. First, the reference_accesses method (src/psyclone/psyir/nodes/node.py: line 1484-1493) performs naive recursive tree traversal that visits every child node without any scope-aware caching or pruning mechanisms, resulting in unnecessary traversal of subtrees that may not contain relevant variable references. Second, the symbol lookup system uses string-based name comparison through the _normalize method (src/psyclone/psyir/symbols/symbol_table.py: line 312-332, line 964-965) rather than symbol identity comparison, which causes false positive matches when symbols with identical names exist in different nested scopes, leading to incorrect dependency relationships and requiring additional validation overhead. Third, the VariablesAccessInfo class (src/psyclone/core/variables_access_info.py: line 51) inherits from a standard Python dictionary, creating a flat storage structure that doesn't preserve or leverage the hierarchical scoping relationships present in the PSyIR tree. This flat organization forces the system to perform linear searches through all stored access patterns when analyzing dependencies, resulting in O(n*m) complexity where n represents tree depth and m represents average symbol table size per scope. These design choices compound in deeply nested structures where the same variable names may appear across multiple scopes, requiring extensive disambiguation and repeated traversal of large portions of the tree for each dependency analysis operation.",
+      "reference_sha256": "5fc0dd25c88287d29e0e4ea9d6008a905b6658997cc8a8ba50ae48f7466dc083",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "task_id": "import-7a27d85aae27e3df1afac2c6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "913938367c9ba0319a94719a72eaade592b0905670156205ffa67430828f8494",
+            "kind": "file_reference",
+            "line_count": 467,
+            "path": "src/psyclone/psyir/transformations/acc_update_trans.py"
+          },
+          {
+            "file_sha256": "94ee80a34c136a75565c3d1f81a41cc7de41707e2db0a822badb85f007067ba0",
+            "kind": "file_reference",
+            "line_count": 390,
+            "path": "src/psyclone/core/variables_access_info.py"
+          },
+          {
+            "file_sha256": "2f8b630d02a46204b0627c2f663bae6f3817c2231eb39b9a4b69d84b5eda4a2e",
+            "kind": "file_reference",
+            "line_count": 328,
+            "path": "src/psyclone/psyir/nodes/directive.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does PSyclone's data movement analysis algorithm determine which variables require host-device synchronization in OpenACC directive transformations?",
+      "question_sha256": "c26fd2f15ae600c5bf589de1d765c2b8fb11b13a29e6cc286775d4f7cf1c9912",
+      "reference_answer": "The determination of variables requiring host-device synchronization is primarily driven by the `ACCUpdateTrans` transformation class, typically found in `src/psyclone/psyir/transformations/acc_update_trans.py`. This transformation operates by first identifying distinct OpenACC regions (such as `ACCParallelDirective` or `ACCKernelsDirective`) and the blocks of host code execution that lie between them. To ensure data consistency, the algorithm performs a dependency analysis on these intervening host code sections using the `DependencyTools` and `VariablesAccessInfo` classes, the latter of which is centrally located in `src/psyclone/core/variables_access_info.py`. This analysis allows the system to build a comprehensive picture of variable usage, categorizing accesses into specific signatures such as `is_read`, `is_written`, or `has_read_write`.\n\nOnce the access patterns are established, the algorithm applies synchronization logic to determine the necessary direction of data movement. If a variable is identified as being written by the host code and subsequently read by the device in a following region, the transformation inserts an `!$acc update device(...)` directive immediately before the device region. Conversely, if a variable is modified on the device and then read by the host, the system generates an `!$acc update host(...)` directive after the device region. While the `ACCUpdateTrans` class handles these dynamic synchronization points, the static generation of data clauses (like `copy`, `copyin`, `copyout`) for the directives themselves is handled by methods such as `create_data_movement_deep_copy_refs`, found in `src/psyclone/psyir/nodes/directive.py` (around lines 79-178). This method complements the synchronization logic by ensuring that variables\u2014including complex structures requiring deep copies\u2014are correctly categorized and declared on the device when the region begins.",
+      "reference_sha256": "96156de10a2a4c682c651211623e2de3115ffc1e035bad4479a8f3eff89cfd6f",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "task_id": "import-123ecdad968e7ea36e4a5f6a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "f933a09d3fc1f376b4a97a7f6338180b4c10e49517ee8ad19c5e0684c6c1e885",
+            "kind": "file_reference",
+            "line_count": 408,
+            "path": "src/psyclone/psyir/transformations/parallel_loop_trans.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What are the concrete transformation classes that inherit from the abstract ParallelLoopTrans base class in PSyclone's transformation hierarchy?",
+      "question_sha256": "6b35af731863ac7d274f8c51647a0aec8f288f1c48fec1ebcbe30d943aaca4a1",
+      "reference_answer": "PSyclone's ParallelLoopTrans abstract base class (in src/psyclone/psyir/transformations/parallel_loop_trans.py) has nine concrete transformation subclasses organized in a multi-level inheritance hierarchy. The four direct concrete subclasses are: OMPLoopTrans for basic OpenMP loop directives, OMPTaskTrans for OpenMP task-based loop parallelization, OMPTaskloopTrans for OpenMP taskloop constructs, and ACCLoopTrans for OpenACC loop acceleration directives. The OMPLoopTrans class further serves as a base for domain-specific implementations: OMPParallelLoopTrans provides OpenMP parallel do functionality, which extends to DynamoOMPParallelLoopTrans for the LFRic domain and GOceanOMPParallelLoopTrans for the GOcean domain. Additionally, OMPLoopTrans has two other direct subclasses: Dynamo0p3OMPLoopTrans for LFRic-specific orphan loop transformations and GOceanOMPLoopTrans for GOcean-specific orphan loop transformations. This hierarchy allows PSyclone to provide both general-purpose parallel loop transformations and domain-specific optimizations tailored to the requirements of different computational science APIs.",
+      "reference_sha256": "4c8d15a89ec033363fd5d7e75cae1ee60a91f66e797d5b2414cd84f37d25c3ac",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "task_id": "import-37e12ac8abaadb8d3c8400ef"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1766,
+            "file_sha256": "2becb6efd073147d5b1f8fef0418c31b0a1c4a989244e22cef52940d3d8a7314",
+            "path": "src/psyclone/psyir/symbols/symbol_table.py",
+            "start_line": 1569
+          },
+          {
+            "end_line": 73,
+            "file_sha256": "bca31138cfb5106670c247176f483e89888c12f8a7e3f1b4f0413ed98fc6b4d6",
+            "path": "src/psyclone/core/signature.py",
+            "start_line": 72
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the symbol table import resolution mechanism in PSyclone exhibit poor scalability when processing large codebases with multiple nested modules and wildcard imports?",
+      "question_sha256": "598145427b519a34a3fc217f033d52d57e657f344fff76d96189c3246347549f",
+      "reference_answer": "The symbol table import resolution mechanism in PSyclone exhibits poor scalability due to fundamental architectural inefficiencies in the resolve_imports() method (src/psyclone/psyir/symbols/symbol_table.py: line 1569-1766). The primary bottleneck stems from a triple-nested loop structure that creates O(C\u00d7S\u00d7N) computational complexity. The outer loop iterates over container symbols (line 1616), the middle loop processes all symbols within each external container (line 1634), and the inner loop walks through every ScopingNode in the PSyIR tree (line 1664). This design becomes prohibitively expensive for large codebases with multiple nested modules. The scalability problem is exacerbated by wildcard import handling (line 1750-1756), which processes every public symbol in wildcard-imported containers and adds them to symbol tables, effectively expanding the symbol search space. Additional performance degradation occurs through nested reference walking (line 1688-1689) and repeated container symbol checks (line 1672-1674) within the core resolution loops. While the reference answer mentions VariablesAccessInfo string-based tracking, the primary scalability issue lies in the resolve_imports() method's algorithmic complexity rather than the variable access tracking system, though the string-based Signature system (src/psyclone/core/signature.py: line 72-73) does contribute to lookup overhead through string parsing and dictionary key comparisons.",
+      "reference_sha256": "a4d0310c9aa5fef3554babb69cf742b67c3ddf52b5f3b3a291d18916218d0966",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "task_id": "import-a38d8c6a4c053daff0d79957"
+    }
+  ]
+}

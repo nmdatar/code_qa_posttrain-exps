@@ -1,0 +1,485 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "229ff19104bb4f251e0f2b72d6fdf6050496e176c437b03abc39ecbed7e90c0d",
+            "kind": "file_reference",
+            "line_count": 404,
+            "path": "pylint/pyreverse/inspector.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the assignment name processing method defer frame node visitation until the local variable type attribute is accessed rather than visiting frames upfront?",
+      "question_sha256": "b4b1e1f3d005542fa8e10172c2e02305d5f3cc1fe4a768063887d3adaf2968f6",
+      "reference_answer": "The assignment name processing method defers frame node visitation until the local variable type attribute is accessed to avoid double parsing when multiple `Linker` instances visit the same project and to only visit frames that are actually needed.\n\nIn `pylint/pyreverse/inspector.py`, the `visit_assignname` method (lines 190-218) implements lazy evaluation. When it needs to access `frame.locals_type` (line 206), it checks if the frame has been visited using `hasattr(frame, \"locals_type\")`. If not, it visits the frame lazily by calling the appropriate visit method (`visit_classdef`, `visit_functiondef`, or `visit_module`) at that point (lines 210-215).\n\nThe comment on lines 195-196 explains: \"avoid double parsing done by different Linkers.visit running over the same project\". This means:\n\n1. **Preventing duplicate work**: Multiple `Linker` instances may visit the same project. The visit methods (`visit_module`, `visit_classdef`, `visit_functiondef`) all check `if hasattr(node, \"locals_type\"): return` (lines 144, 158, 184) to skip already-visited frames. By deferring visitation until `locals_type` is accessed, frames are only visited once, even across multiple linker instances.\n\n2. **On-demand processing**: Not all frames may need their `locals_type` populated. By deferring until access, only frames that are actually referenced through assignment names are visited, avoiding unnecessary work.\n\n3. **Efficiency**: Eagerly visiting all frames during initial traversal would process every module, class, and function upfront, even if their type information is never needed. The deferred approach processes frames only when their type mapping is actually required.\n\nThe alternative (eager visiting) would visit all frames during the initial traversal in `visit_project` or `LocalsVisitor.visit`, but this would be less efficient and could cause duplicate processing when multiple linkers operate on the same project.",
+      "reference_sha256": "f08742eb3f90876e6bf982bcfaab2a15d049cff23119ac4eb88bb9514e6cb632",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-0bdb889ba31573bf3694ddf2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 43,
+            "file_sha256": "a8b4fcaabe57ec598264e20a56663c552078af4d7c93a6960f3821e5eb09e16f",
+            "path": "pylint/pyreverse/printer.py",
+            "start_line": 38
+          },
+          {
+            "end_line": 82,
+            "file_sha256": "0ddcb7ad63736901de620f6426064b974e9b76b80b75773a6d62d8d0d72133e1",
+            "path": "pylint/pyreverse/plantuml_printer.py",
+            "start_line": 46
+          },
+          {
+            "end_line": 172,
+            "file_sha256": "be3280188da6b508d418c7d85d844b6d53e273d2b2d510e32aee79f24dfa8508",
+            "path": "pylint/pyreverse/utils.py",
+            "start_line": 167
+          },
+          {
+            "end_line": 181,
+            "file_sha256": "a9776bb1b9e1cdb034302d9b6d5cd92212288bffd8c660b7db07e4c4c5543546",
+            "path": "pylint/pyreverse/writer.py",
+            "start_line": 172
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What dependencies exist between the named tuple storing class node metadata with method definitions and the node rendering function's formatting of method signatures with return type annotations in PlantUML output?",
+      "question_sha256": "9b01bdf8276325a2f2f59d9e2219333e26eb8a5147d11ba2c1efec26812e72ac",
+      "reference_answer": "The dependencies between the named tuple structure and the node rendering function's formatting capability are:\n\n**1. Structural dependency on the `methods` field:**\nThe named tuple (`NodeProperties` in `pylint/pyreverse/printer.py:38-43`) includes a `methods` field of type `list[nodes.FunctionDef] | None`. The rendering function (`emit_node` in `pylint/pyreverse/plantuml_printer.py:46-82`) depends on this field to iterate through methods (line 66-67: `if properties.methods: for func in properties.methods:`). If `methods` is `None` or empty, no method signatures are rendered.\n\n**2. Type dependency on FunctionDef objects:**\nThe rendering function assumes each element in `properties.methods` is a `nodes.FunctionDef` object with specific attributes:\n- `func.name` (line 70) - used for the method name\n- `func.returns` (line 71) - used to check for return type annotations\n- `func.is_abstract()` (line 69) - used to mark abstract methods\n- `func.args` (accessed via `_get_method_arguments(func)` on line 68) - used for parameter formatting\n\n**3. Return type annotation dependency:**\nThe formatting of return type annotations (lines 71-72) depends on:\n- `func.returns` being a valid AST node (can be `None` if no annotation exists)\n- The `get_annotation_label()` utility function (`pylint/pyreverse/utils.py:167-172`) to convert the AST node to a string representation\n- The format: `method_name(args) -> return_type` (line 70-72)\n\n**4. Data flow dependency:**\nThe named tuple is populated in `pylint/pyreverse/writer.py:172-181` via `get_class_properties()`, which sets `methods=obj.methods` where `obj.methods` is a list of `nodes.FunctionDef` objects extracted from class definitions. The rendering function receives this structure and formats it without modification, creating a one-way data dependency.\n\n**5. Formatting logic dependency:**\nThe rendering function's ability to correctly format method signatures depends on the named tuple's structure remaining compatible. Specifically:\n- The `methods` field must remain a list of `nodes.FunctionDef` objects (not strings or other types)\n- The structure must allow iteration and attribute access on each function definition\n- Changes to the named tuple's field names or types would break the rendering function's attribute access patterns\n\nIf the named tuple structure changed (e.g., `methods` renamed, type changed, or structure altered), the rendering function would fail when accessing `properties.methods` or when calling methods like `func.returns` on the contained objects.\n</start_of_answer>",
+      "reference_sha256": "6ffe409796a7492dca3730964ec4b3b2fc6f20d5c38909dba72dc2799d0caa97",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-117f0638beb4f96968645770"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "233b4d19610a473837b4306fd937d3e618c3dfda5be2fb964559024b6e3a0a73",
+            "kind": "file_reference",
+            "line_count": 2445,
+            "path": "pylint/checkers/classes/class_checker.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where does the descriptor protocol implementation that provides __get__ and __set__ methods interact with the slot assignment validation mechanisms across the inheritance hierarchy in the slot assignment test file?",
+      "question_sha256": "4e17a92f1f4440096d3aea9c8c6e4809168f1fadf3f2695f436989d5688c87c5",
+      "reference_answer": "The descriptor protocol implementation interacts with slot assignment validation in the `_has_data_descriptor` function call within `_check_in_slots` in `pylint/checkers/classes/class_checker.py`.\n\nWhen an attribute assignment occurs (e.g., `repro.attr2 = \"anything\"` in the test file), the checker's `visit_assignattr` method (line 1729) calls `_check_in_slots` (line 1734). In `_check_in_slots` (starting at line 1765), after confirming the attribute is not in slots (line 1806) and other checks, it calls `_has_data_descriptor(klass, node.attrname)` at line 1826 to determine if the attribute is a data descriptor.\n\nThe `_has_data_descriptor` function (lines 396-412) uses `cls.getattr(attr)` at line 397, which traverses the inheritance hierarchy via the MRO to locate the attribute. This allows it to find descriptors defined in parent classes (e.g., `Base` with `attr2 = MyDescriptor()`) when checking child classes (e.g., `Repro`). It then infers the attribute and checks for both `__get__` and `__set__` methods (lines 403-404). If found, it returns `True`, causing `_check_in_slots` to return early at line 1828 without emitting an \"assigning-non-slot\" warning, since descriptors bypass the slots mechanism.\n\nIn the test file's hierarchy (`Base` \u2192 `Repro`), when validating `repro.attr2 = \"anything\"`, the checker traverses from `Repro` to `Base` via `getattr`, finds `MyDescriptor` as a class attribute, verifies it implements the descriptor protocol, and exempts the assignment from slot validation.",
+      "reference_sha256": "5e9bb4a5a20f7fa4e4ce0b47537807676cbb83509a643d9acb4a891f5a62dc68",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-1a0a848fe0d53a38b00368c7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 38,
+            "file_sha256": "34cafc1d1d977f1dc4d1ed68829355896e85b03ad44cceea03faf28081febc2b",
+            "path": "tests/functional/b/broad_exception/broad_exception_raised.py",
+            "start_line": 33
+          },
+          {
+            "end_line": 373,
+            "file_sha256": "3ab806ee0dc051aafc7250bfd972c13fe2aeeed6da194369556a13ca2313c8bd",
+            "path": "pylint/checkers/exceptions.py",
+            "start_line": 358
+          },
+          {
+            "end_line": 102,
+            "file_sha256": "0355469a301e81825853f64ad0a1c840b97b86748266da40a96051aaa4ec6376",
+            "path": "pylint/config/argument.py",
+            "start_line": 102
+          },
+          {
+            "end_line": 4,
+            "file_sha256": "c196db58a80d1eeeb06dc2671590015f50deb60b266c6e008007b2dbeaef6bb3",
+            "path": "tests/functional/b/broad_exception/broad_exception_raised.txt",
+            "start_line": 4
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "3ab806ee0dc051aafc7250bfd972c13fe2aeeed6da194369556a13ca2313c8bd",
+            "kind": "file_reference",
+            "line_count": 660,
+            "path": "pylint/checkers/exceptions.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the exception handling pattern that catches an exception and raises a new one with 'from None' to decouple error detection from propagation?",
+      "question_sha256": "5726540805774a94f92a250796910ff1935cb398e68740013a8a5fec029e1ef7",
+      "reference_answer": "The exception handling pattern that catches an exception and raises a new one with `'from None'` to decouple error detection from propagation is implemented in the test function `raise_catch_raise` located in `tests/functional/b/broad_exception/broad_exception_raised.py` (lines 33-38).\n\n**Architecture Overview:**\n\nThe pattern decouples error detection from error propagation through a two-phase approach:\n\n1. **Error Detection Phase** (lines 34-36): The `try` block calls `exploding_apple(\"apple\")`, which raises an `Exception`. The `except Exception as ex:` clause detects and catches this exception.\n\n2. **Error Propagation Phase** (line 38): After handling the caught exception (printing it on line 37), a new `Exception()` is raised with `raise Exception() from None`. The `from None` syntax suppresses the exception chain, preventing the original exception from appearing in the traceback.\n\n**Key Architectural Characteristics:**\n\n- **Decoupling Mechanism**: Detection (catching) and propagation (raising) are separated. The caught exception is handled locally (printed), then a fresh exception is raised without chaining to the original.\n\n- **Exception Chain Suppression**: The `from None` syntax sets the exception's `__cause__` to `None`, breaking the chain. This is validated by the `ExceptionsChecker._check_bad_exception_cause()` method (lines 358-373 in `pylint/checkers/exceptions.py`), which confirms that `None` is a valid exception cause.\n\n- **Contrast with Similar Patterns**: This differs from `raise_catch_reraise()` (lines 25-30 in the same file), which re-raises the same exception object (`raise ex`), preserving the original exception and its traceback.\n\n**Usage in Pylint Codebase:**\n\nThis pattern is also used in pylint's own code. For example, in `pylint/config/argument.py` (line 102), `_py_version_transformer()` uses `raise argparse.ArgumentTypeError(...) from None` to prevent `ValueError` from propagating and to present a cleaner error message to users.\n\n**Checker Analysis:**\n\nThe `ExceptionsChecker` in `pylint/checkers/exceptions.py` analyzes this pattern:\n- The `visit_raise()` method (lines 319-335) processes raise statements\n- When `node.cause is None` (line 324), it calls `_check_raise_missing_from()` (lines 375-419), which would normally warn about missing exception chaining, but `from None` explicitly suppresses the chain, which is intentional\n- The `broad-exception-raised` message (W0719) is emitted for raising generic exceptions like `Exception`, as seen in the test output (`broad_exception_raised.txt` line 4)\n\nThis architecture allows error detection logic to remain separate from error propagation, enabling localized error handling while controlling what information propagates to callers.",
+      "reference_sha256": "5364f5dc61ce95ce3b059296f0437594aa466d9928b5a06015079090fc5cd30e",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-1c5442786feebda389e3b4e5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 766,
+            "file_sha256": "9c5f341effa509c3ce73a72ebf13e1a9afa76cf13644fdea26c580fc59ec2c3c",
+            "path": "pylint/checkers/stdlib.py",
+            "start_line": 726
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "336f4598297d2b56d3aee450a08aedcf7e7dacf54879a43c9b34835a46bf0efa",
+            "kind": "file_reference",
+            "line_count": 94,
+            "path": "tests/functional/m/method_cache_max_size_none.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the semantic relationship between input arguments and return values when the functools cache decorator is applied?",
+      "question_sha256": "15daadd85504f0c0f695bc55e92e8f8c9428253165accfa3754a9ba372769948",
+      "reference_answer": "When the functools cache decorator (lru_cache) is applied to a function, it creates a persistent mapping between function arguments and their computed return values. This mapping is stored in an internal cache dictionary that persists across function calls.\n\nThe semantic relationship is:\n1. Argument-to-result mapping: The decorator creates a dictionary-like structure where function arguments (as a tuple, serving as the cache key) map to their corresponding return values (as the cache value).\n2. Persistent storage: Unlike normal function calls where arguments and return values are ephemeral, the cache decorator maintains this mapping in memory, allowing subsequent calls with the same arguments to retrieve the cached result without recomputation.\n3. Bidirectional reference: The cache holds references to both the arguments (as keys) and the return values (as values), creating a persistent link between them that survives beyond the function call's execution.\n\nIn the specific case from the test file (`method_cache_max_size_none.py`), where a function takes a parameter and returns its incremented value, the cache decorator creates a mapping like: `(param_value,) \u2192 param_value + 1`. This means:\n- Each unique input argument value maps to its corresponding incremented result\n- The mapping persists in memory across multiple function calls\n- When the same argument is passed again, the cached result is returned immediately\n\nThe implementation in pylint's stdlib checker (`pylint/checkers/stdlib.py`, lines 726-766) specifically checks for this pattern, particularly when `maxsize=None`, because it creates an unbounded cache that keeps all argument values (and for instance methods, the `self` reference) alive indefinitely, preventing garbage collection.\n\nThis semantic relationship is fundamentally different from normal function execution, where the relationship between arguments and return values exists only during the function call's execution. With the cache decorator, this relationship becomes a persistent, stateful mapping that can grow unbounded when `maxsize=None`.",
+      "reference_sha256": "bb7e917bf467fffa819744f0717867c7551493b493c6a1268ac86090ef7e2bf7",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-2505179a3385b7e8b3b70c7e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1613,
+            "file_sha256": "b1d5dd6400d18daa9b3166ebe480b4eabf06aaafdf95335b175a1ad5b3ccba8c",
+            "path": "pylint/checkers/utils.py",
+            "start_line": 1613
+          },
+          {
+            "end_line": 1971,
+            "file_sha256": "b1d5dd6400d18daa9b3166ebe480b4eabf06aaafdf95335b175a1ad5b3ccba8c",
+            "path": "pylint/checkers/utils.py",
+            "start_line": 1971
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "3bdf852a07dc41b721568c4cfcd7e139c6250697f09633d37242a6b18ed1fa93",
+            "kind": "file_reference",
+            "line_count": 3493,
+            "path": "pylint/checkers/variables.py"
+          },
+          {
+            "file_sha256": "b1d5dd6400d18daa9b3166ebe480b4eabf06aaafdf95335b175a1ad5b3ccba8c",
+            "kind": "file_reference",
+            "line_count": 2345,
+            "path": "pylint/checkers/utils.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the undefined-variable error triggered for the type annotation parameter in the first-level method that incorrectly references its own class, through the chain of module imports and type-checking guards?",
+      "question_sha256": "91ce20f2e2cb4831b8e99aa52d8423109c1f35dce02c9cfdea6cd00e4b4e08df",
+      "reference_answer": "The undefined-variable error is triggered at **line 1744** in the `_undefined_and_used_before_checker` method within the `VariablesChecker` class in `pylint/checkers/variables.py`.\n\n**Execution flow:**\n1. Entry point: When pylint processes a `Name` node (e.g., `MyClass` in the type annotation), the `visit_name` method (line 1659) calls `_undefined_and_used_before_checker` (line 1671).\n\n2. Main checker loop: `_undefined_and_used_before_checker` (line 1696) iterates through parent scopes from inner to outer, calling `_check_consumer` for each scope (line 1714).\n\n3. Self-reference detection: For class definitions, `_check_consumer` (line 1797) calls `_is_first_level_self_reference` (line 1983, defined at line 2510). This method checks if:\n   - The node's frame parent is the class definition (`node.frame().parent == defstmt`)\n   - The node's statement is the frame itself (`node.statement() == node.frame()`)\n   - The node is in a type annotation context (checked via `utils.is_node_in_type_annotation_context` at line 2522)\n\n4. Type annotation context check: `is_node_in_type_annotation_context` (defined in `pylint/checkers/utils.py` at line 1613) traverses the AST upward, checking if the node is:\n   - Part of an `AnnAssign` annotation\n   - In a function's `Arguments` annotations (including `annotations`, `posonlyargs_annotations`, `kwonlyargs_annotations`, `varargannotation`, or `kwargannotation`)\n   - Part of a function's return type annotation\n\n5. Postponed evaluation check: If the node is in a type annotation context and postponed evaluation is NOT enabled (Python < 3.14), `_is_first_level_self_reference` returns `CONTINUE` (line 2524), allowing the loop to continue checking other scopes.\n\n6. Final error trigger: If no definition is found after checking all scopes, and the name is not a builtin, module scope attribute, or special case (like `__class__`), the error is triggered at line 1744:\n   ```python\n   self.add_message(\"undefined-variable\", args=node.name, node=node)\n   ```\n\n**Module import chain:**\n- `pylint/checkers/variables.py` imports from `pylint.checkers.utils` (lines 23-30), specifically:\n  - `in_type_checking_block` (used for TYPE_CHECKING guard detection)\n  - `is_postponed_evaluation_enabled` (checks if `from __future__ import annotations` is enabled)\n  - `is_node_in_type_annotation_context` (determines if a node is in a type annotation)\n- `pylint/checkers/utils.py` imports `TYPE_CHECKING` from `typing` (line 19) for conditional imports\n- The `is_node_in_type_annotation_context` function uses `nodes.Arguments` from `astroid.nodes` to check function argument annotations\n\n**Type-checking guards:**\nThe code checks for TYPE_CHECKING guards via `in_type_checking_block` (defined in `pylint/checkers/utils.py` at line 1971), which:\n- Traverses ancestor nodes looking for `If` statements\n- Checks if the condition is `TYPE_CHECKING` imported from the `typing` module\n- Returns `True` if the node is guarded by such a block\n\nIn the specific test case, the `MyClass` reference in the type annotation is not guarded by TYPE_CHECKING, and postponed evaluation is disabled (Python < 3.14), so the undefined-variable error is correctly triggered at line 1744.",
+      "reference_sha256": "264500c9f728a963a60694d6989f6c44c5edcc8e432de97b916299412b357288",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-2a77af89399925f31f9548ad"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "b1d5dd6400d18daa9b3166ebe480b4eabf06aaafdf95335b175a1ad5b3ccba8c",
+            "kind": "file_reference",
+            "line_count": 2345,
+            "path": "pylint/checkers/utils.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the current implementation of the method that checks class subscriptability for generic type annotations cause performance overhead when the same class is checked repeatedly during static analysis?",
+      "question_sha256": "e5f7ee551d1b3bbf4b12b5897f2fa891b08652aa207a624a98caddb2f768c4e1",
+      "reference_answer": "The performance overhead arises because the current implementation in `pylint/checkers/utils.py` does not cache the results of checking whether a class supports subscript operations via `__class_getitem__`.\n\nWhen `supports_getitem()` is called for a `ClassDef` node (line 1317-1318), it calls `_supports_protocol_method(value, CLASS_GETITEM_METHOD)`. This function (lines 1180-1201) performs an expensive attribute lookup by calling `value.getattr(attr)` every time, without any memoization.\n\nDuring static analysis, the same class may be checked multiple times across different subscript nodes in the codebase. Each check triggers a full attribute lookup through the class hierarchy via `getattr()`, which can traverse MRO (Method Resolution Order), check metaclasses, and inspect the class's attribute dictionary. This is particularly costly for classes with deep inheritance hierarchies or complex metaclasses.\n\nThe function `_supports_protocol_method` is not decorated with `@lru_cache` (unlike other utility functions in the same file such as `unimplemented_abstract_methods`, `class_is_abstract`, and `safe_infer` which are cached). Similarly, `supports_getitem` itself is not cached, so repeated calls with the same class node will repeatedly perform the same expensive `getattr()` operation.\n\nAdding caching (e.g., `@lru_cache` decorator) to `_supports_protocol_method` or memoizing the results of `supports_getitem` for ClassDef nodes would eliminate redundant attribute lookups and significantly reduce overhead when the same classes are checked multiple times during linting, which is common when analyzing codebases with extensive use of generic type annotations like `List[int]`, `Dict[str, int]`, etc.",
+      "reference_sha256": "5fac7d5d9a825620383921b375b75d196ac9f615ed26dfa26bd002b042155b14",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-2cd6a2da9c1f440f1a4a0ae8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "3f186aa53840acd0fea31537e1b8e0763109fc9f8e13461d356ff6f6ca493842",
+            "kind": "file_reference",
+            "line_count": 2338,
+            "path": "pylint/checkers/typecheck.py"
+          },
+          {
+            "file_sha256": "47d1b50f338e779cdc8ecc01db65c8faed71d0499daff6acb5b9ac965637117a",
+            "kind": "file_reference",
+            "line_count": 66,
+            "path": "tests/functional/a/assignment/assignment_from_no_return_2.py"
+          },
+          {
+            "file_sha256": "7da587414bc8e2b952638486503cd92d3156a026b475d10cf1313b81dfbe8c92",
+            "kind": "file_reference",
+            "line_count": 6,
+            "path": "tests/functional/a/assignment/assignment_from_no_return_2.txt"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the function that yields values in the assignment-from-no-return test use yield instead of return to validate exclusion from the no-return checker?",
+      "question_sha256": "c9f43a7ca26f1e00d2aa03af7eaa7c16b18cf589765d6345a643fc1be5e40888",
+      "reference_answer": "The function uses `yield` instead of `return` to ensure generator functions are excluded from the assignment-from-no-return check.\n\nIn `pylint/checkers/typecheck.py`, the `_check_assignment_from_function_call` method (lines 1226-1279) checks assignments to function calls. It skips checking if `_is_ignored_function` returns `True` (line 1249). `_is_ignored_function` (lines 1282-1290) returns `True` for generator functions via `function_node.is_generator()` (line 1288).\n\nWhen a function contains `yield`, it becomes a generator and returns a generator object, not `None`. Assigning the result of a generator call is valid, so the checker should not emit assignment-from-no-return.\n\nThe test file `tests/functional/a/assignment/assignment_from_no_return_2.py` includes this generator (lines 50-54):\n```python\ndef generator():\n    \"\"\"no problemo\"\"\"\n    yield 2\n\nA = generator()\n```\n\nThe expected output file (`assignment_from_no_return_2.txt`) shows no error for line 54, confirming that generator functions are correctly excluded from this check. Using `yield` makes the function a generator, which triggers the exclusion logic in the checker.",
+      "reference_sha256": "bfb942c09ca471cec78905ebfcca237f4bd297b6b7bf3fc88371c80867c9e9af",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-3b032834d5e1807693aafcb4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 986,
+            "file_sha256": "b1d5dd6400d18daa9b3166ebe480b4eabf06aaafdf95335b175a1ad5b3ccba8c",
+            "path": "pylint/checkers/utils.py",
+            "start_line": 936
+          },
+          {
+            "end_line": 2235,
+            "file_sha256": "233b4d19610a473837b4306fd937d3e618c3dfda5be2fb964559024b6e3a0a73",
+            "path": "pylint/checkers/classes/class_checker.py",
+            "start_line": 2204
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "5093278799eb4fa7aa0eefdc58db23c1c682d2507661a11eaffbd127af8a1127",
+            "kind": "file_reference",
+            "line_count": 54,
+            "path": "tests/functional/g/generic_alias/generic_alias_related.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the contract enforcement mechanism for the method decorated with the abstract method decorator in the abstract base class that uses the ABCMeta metaclass in the generic alias test file when inherited by concrete subclasses?",
+      "question_sha256": "15e863ed9e83fa27d265655840e909f8e5c1b5ee9e77b135ca0056c5e8736059",
+      "reference_answer": "The contract enforcement mechanism for abstract methods in classes using ABCMeta is implemented through both static analysis (pylint) and runtime enforcement (Python's ABCMeta).\n\n**Static Analysis (Pylint):**\n\n1. **Abstract Method Detection**: The `unimplemented_abstract_methods()` function in `pylint/checkers/utils.py` (lines 936-986) traverses the Method Resolution Order (MRO) of a class to identify abstract methods. It checks if methods are decorated with `abc.abstractmethod` by using the `decorated_with()` function with `ABC_METHODS` (which includes `\"abc.abstractmethod\"`).\n\n2. **Abstract Class Identification**: The `class_is_abstract()` function (lines 1154-1177) determines if a class is abstract by checking:\n   - If it uses `metaclass=ABCMeta` (checking if the metaclass name is \"ABCMeta\" and from `abc` or `_py_abc` modules)\n   - If it inherits from `abc.ABC`\n   - If it defines methods decorated with `@abstractmethod`\n\n3. **Concrete Class Validation**: The `_check_bases_classes()` method in `pylint/checkers/classes/class_checker.py` (lines 2204-2235) checks concrete classes (non-abstract classes) to ensure they implement all abstract methods from their base classes. If an abstract method is not overridden, it emits the \"abstract-method\" warning (W0223).\n\n**Runtime Enforcement (Python):**\n\nAt runtime, Python's `ABCMeta` metaclass prevents instantiation of classes that have unimplemented abstract methods. When you attempt to instantiate a class that inherits from an ABC but doesn't implement all abstract methods, Python raises a `TypeError`.\n\n**Example from the repository:**\n\nIn `tests/functional/g/generic_alias/generic_alias_related.py`:\n- `ClsAbstract` (line 48) uses `metaclass=ABCMeta` and defines `abstract_method` decorated with `@abstractmethod`\n- `Derived` (line 53) inherits from `ClsAbstract` but doesn't override `abstract_method`\n- Pylint detects this and emits: `abstract-method:53:0:53:13:Derived:Method 'abstract_method' is abstract in class 'ClsAbstract' but is not overridden in child class 'Derived'`\n\nThe mechanism ensures that concrete subclasses must implement all abstract methods defined in their abstract base classes, enforced both statically by pylint and at runtime by Python's ABCMeta.",
+      "reference_sha256": "9db5bf8921d3dc5053213e90de3497ce1bae89c96334c16f1e8b0a531caa7fc4",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-52f6741f1734f4c347800dbc"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 472,
+            "file_sha256": "3f186aa53840acd0fea31537e1b8e0763109fc9f8e13461d356ff6f6ca493842",
+            "path": "pylint/checkers/typecheck.py",
+            "start_line": 469
+          },
+          {
+            "end_line": 545,
+            "file_sha256": "3f186aa53840acd0fea31537e1b8e0763109fc9f8e13461d356ff6f6ca493842",
+            "path": "pylint/checkers/typecheck.py",
+            "start_line": 525
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "b1d5dd6400d18daa9b3166ebe480b4eabf06aaafdf95335b175a1ad5b3ccba8c",
+            "kind": "file_reference",
+            "line_count": 2345,
+            "path": "pylint/checkers/utils.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the architectural pattern that distinguishes type-annotated from non-annotated instance attribute initialization using AST node type separation?",
+      "question_sha256": "1aa04a329a1076648d7d51395128dc7b4e0fc9fd550f9c58d8ba0eaf8dda965f",
+      "reference_answer": "The architectural pattern is node-type-based conditional processing that separates handling logic based on whether instance attributes originate from `AnnAssign` (type-annotated) or `Assign` (non-annotated) AST nodes.\n\nImplementation details:\n1. Separation mechanism: The codebase uses AST node type checking to distinguish attributes. In `pylint/checkers/utils.py`, the `is_attribute_typed_annotation()` function checks if an attribute's parent node is an `AnnAssign` node (lines 1731-1752). This function recursively traverses class hierarchies to determine annotation status.\n\n2. Different processing paths: Type-annotated and non-annotated attributes receive different treatment. For example, in `pylint/checkers/typecheck.py` (lines 469-472), type-annotated attributes are excluded from `no-member` checks because they \"might actually exist at some point during the runtime of the program,\" while non-annotated attributes are subject to stricter validation.\n\n3. Unified storage with conditional logic: All instance attributes are stored in astroid's `instance_attrs` dictionary, but processing branches based on node type. The `_get_all_attribute_assignments()` function in `typecheck.py` (lines 525-545) explicitly handles both `Assign` and `AnnAssign` nodes differently when extracting attribute assignments.\n\n4. Hierarchical traversal: The pattern involves recursive traversal of class hierarchies. The `is_attribute_typed_annotation()` function checks base classes recursively (lines 1744-1751), enabling categorization across heterogeneous class hierarchies.\n\n5. Static analysis implications: This separation allows static analysis tools to:\n   - Categorize attributes by annotation status during traversal\n   - Apply different validation rules (e.g., type-annotated attributes may be excluded from certain checks)\n   - Handle postponed evaluation of annotations (PEP 563) correctly\n   - Distinguish between attributes that exist at runtime vs. those that might exist\n\nThe pattern exemplifies a dual-path processing architecture where a single data structure (`instance_attrs`) is processed through conditional logic that branches on AST node types, enabling differentiated handling while maintaining a unified representation.",
+      "reference_sha256": "faa163011533f10547bb3b339e4ea5eade3ad55df3f669cc8a3cc17d7f661811",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-533cf8ea035081a729f35f20"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 131,
+            "file_sha256": "c6fad0313a6e9514ee5e04ad2f2e742b0aeb2921dd7a71b62effbc1f79d33f7d",
+            "path": "tests/functional/u/unnecessary/unnecessary_dunder_call.py",
+            "start_line": 127
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "72154281acdd012352479610d6af6f9dfe4d4dab7f11e0b31abd39403aed45a8",
+            "kind": "file_reference",
+            "line_count": 1099,
+            "path": "pylint/checkers/strings.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How should the custom string class architecture be redesigned to separate parameter validation from formatting operations while maintaining backward compatibility with the built-in str interface?",
+      "question_sha256": "43646c804318805dc669ea811a06e2f1f5fd5a6421d364b9e7ca96109172a996",
+      "reference_answer": "Based on my exploration of the pylint repository, the custom string class (MyString) that inherits from `str` and implements formatting methods can be redesigned using a composition or delegation pattern to separate parameter validation from formatting operations while maintaining backward compatibility.\n\n**Current Architecture**:\nThe MyString class in `tests/functional/u/unnecessary/unnecessary_dunder_call.py` (lines 127-131) currently inherits directly from `str` and mixes validation with formatting:\n\n```python\nclass MyString(str):\n    \"\"\"Custom str implementation\"\"\"\n    def rjust(self, width, fillchar= ' '):\n        \"\"\"Acceptable call to __index__\"\"\"\n        width = width.__index__()\n```\n\n**Recommended Redesign Approach**:\n\n1. **Separate Validation Layer**: Create a dedicated validator class or module that handles all parameter validation logic (e.g., checking that `width` implements `__index__()`, validating `fillchar` is a single character). This validation logic would be extracted from the formatting methods.\n\n2. **Composition Pattern**: Instead of mixing validation in each formatting method, the MyString class could:\n   - Delegate validation to a separate `ParameterValidator` component\n   - Keep formatting methods focused solely on string manipulation\n   - Maintain the same public interface (same method signatures) to preserve backward compatibility\n\n3. **Maintain str Interface Compatibility**: To maintain backward compatibility with the built-in `str` interface:\n   - Keep all method signatures identical to the parent `str` class\n   - Use `super()` calls to delegate to the parent class for actual formatting operations\n   - Ensure the class can be used anywhere a `str` is expected (Liskov Substitution Principle)\n\n4. **Implementation Pattern**:\n   ```python\n   class MyString(str):\n       def __init__(self, value):\n           self._validator = ParameterValidator()\n           super().__init__(value)\n       \n       def rjust(self, width, fillchar=' '):\n           self._validator.validate_rjust_params(width, fillchar)\n           return super().rjust(width, fillchar)\n   ```\n\nThis separation allows:\n- **Testability**: Validation logic can be tested independently\n- **Maintainability**: Changes to validation rules don't affect formatting logic\n- **Extensibility**: New validation rules can be added without modifying formatting methods\n- **Backward Compatibility**: The public interface remains unchanged, so existing code using MyString continues to work\n\nThe repository's string checker (`pylint/checkers/strings.py`) demonstrates similar separation of concerns, where validation logic (checking format strings, argument counts) is separated from the actual string formatting operations, providing a reference pattern for this architectural approach.",
+      "reference_sha256": "bda8f48ae3b0778572b8b5aa791ea9229d35787e6639c1ab856aa3532dd7fec1",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-616acfb0a51760eb40b98a01"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 23,
+            "file_sha256": "f3110f57bee72d709a733d2c0401a33e02b4a0c81b23f23d39ec058c3a31e05b",
+            "path": "tests/functional/u/unexpected_special_method_signature.py",
+            "start_line": 23
+          },
+          {
+            "end_line": 6,
+            "file_sha256": "db2a46a1028b8ac2734cd50bd8814ec765f6907caa1e4910f2c0ab5777e922bf",
+            "path": "tests/functional/u/unexpected_special_method_signature.txt",
+            "start_line": 6
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "f1c95c78a1a73360dbd1275a9e333eb47f318c7e18ace8b77e1c5c588595becf",
+            "kind": "file_reference",
+            "line_count": 403,
+            "path": "pylint/checkers/classes/special_methods_checker.py"
+          },
+          {
+            "file_sha256": "b1d5dd6400d18daa9b3166ebe480b4eabf06aaafdf95335b175a1ad5b3ccba8c",
+            "kind": "file_reference",
+            "line_count": 2345,
+            "path": "pylint/checkers/utils.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does a deep copying hook method with an extra parameter violate the protocol that Python's copy module expects?",
+      "question_sha256": "d07b205c931badc31b462ed9bd265fc3a8db413a0210faf41e4f28e8ac3b43cf",
+      "reference_answer": "A deep copying hook method with an extra parameter violates the protocol because Python's `copy.deepcopy()` calls the hook with only one argument (the memo dictionary) after `self`. The correct signature is `__deepcopy__(self, memo)`.\n\nIn the repository, this is enforced by `SpecialMethodsChecker` in `pylint/checkers/classes/special_methods_checker.py`. The checker uses `SPECIAL_METHODS_PARAMS` from `pylint/checkers/utils.py`, which maps `__deepcopy__` to exactly 1 parameter (besides `self`).\n\nThe test case in `tests/functional/u/unexpected_special_method_signature.py` (line 23) shows the violation:\n```python\ndef __deepcopy__(self, memo, other): # [unexpected-special-method-signature]\n```\n\nThe checker's `_check_unexpected_method_signature` method (lines 197-245) validates parameter counts. For `__deepcopy__`, it expects 1 parameter (besides `self`), so a signature with 2 parameters (like `memo, other`) triggers the \"unexpected-special-method-signature\" error.\n\nThe error message states: \"The special method '__deepcopy__' expects 1 param(s), 2 were given\" (see `tests/functional/u/unexpected_special_method_signature.txt`, line 6).\n\nThe correct implementation is shown in the same test file (line 90):\n```python\ndef __deepcopy__(self, memo):\n    pass\n```\n\nThis matches Python's protocol: `copy.deepcopy()` calls `obj.__deepcopy__(memo)`, passing only the memo dictionary. Adding an extra parameter breaks compatibility because the copy module won't pass it, and the method won't be called correctly.",
+      "reference_sha256": "382d2687b4f3c44d2a885ddc03c0d99dd3b9a09c04a79ceb6a6011b4228d2dea",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-623fc72e3d6724470c7b4956"
+    }
+  ]
+}

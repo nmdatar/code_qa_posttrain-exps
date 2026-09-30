@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PublicDatasetTask",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "1.0"
+      ]
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "system_prompt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "user_prompt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repository": {
+      "type": "object",
+      "properties": {
+        "family_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$"
+        },
+        "url": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "family_id",
+        "commit",
+        "url"
+      ],
+      "additionalProperties": false
+    },
+    "environment_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "split": {
+      "enum": [
+        "train",
+        "development",
+        "final_test"
+      ]
+    },
+    "permitted_tools": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    },
+    "budgets": {
+      "type": "object",
+      "properties": {
+        "latency_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "compute_units": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "max_tool_calls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_output_tokens": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_submission_bytes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "latency_seconds",
+        "compute_units",
+        "max_tool_calls",
+        "max_output_tokens",
+        "max_submission_bytes"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "system_prompt",
+    "user_prompt",
+    "repository",
+    "environment_id",
+    "split",
+    "permitted_tools",
+    "budgets"
+  ],
+  "additionalProperties": false
+}

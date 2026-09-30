@@ -1,0 +1,92 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-050.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "cb4138457048673e5c2b6b37f2dcd199582f76d6bcc12bb16900875f5acf9e2b",
+      "question": "How does the import_path API framework resolve module identity and ensure module caching consistency when the same file path is imported multiple times through different sys.path configurations?",
+      "question_sha256": "759f33092110c8b43093ffb3a77d863f1ab545f87f4631b3de25086f4373d82b",
+      "reference_answer": "importlib mode first resolves a package name and checks sys.modules, attempts a spec import, then falls back to a path-derived name with another cache check (src/_pytest/pathlib.py:535-566). It does not scan cached modules by physical path, so changed name resolution can produce separate module objects. prepend/append modes adjust sys.path, import by name, and generally compare __file__ to the requested path; __init__.py returns early and PY_IGNORE_IMPORTMISMATCH=1 disables the check (src/_pytest/pathlib.py:568-612). Repeated identical names reuse the cache; arbitrary sys.path changes do not guarantee physical-file identity.",
+      "reference_sha256": "148b51de7d70567866e3dafb85bd32f9009c345c53cdf0e3ca4e8edb2c2230e1",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-6feca8b1665f61ec6f045bdd"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "91429dd6b59a34593b805c2582495e3cd38f3883d6616ed913741823381a206a",
+      "question": "How does the pytest_internalerror method iterate through split lines instead of directly passing the exception representation to write_line, and what control flow optimization could be applied if the exception representation format were guaranteed to be single-line?",
+      "question_sha256": "ce8c77f03f3cc031921b191e07d7de7703569c389f0c50873fdba38d85a16c56",
+      "reference_answer": "pytest_internalerror converts excrepr to text, splits on newline, and prefixes every resulting line with INTERNALERROR> before write_line (src/_pytest/terminal.py:560-563). If the representation were guaranteed to contain no newline, it could instead call self.write_line('INTERNALERROR> ' + str(excrepr)) once and return True, eliminating split and iteration. Keep the loop for the actual potentially multiline representation; no meaningful performance gain is established.",
+      "reference_sha256": "dc765269dbd1c6adb42378561d4ba7abf60c7428b50093abfe82af1f7e7891c7",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-7284ea763c016c3c59a0002e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "3623e6c8777ec048ea34e089369dd7246623056543e8bdebecca8f20bf7a4380",
+      "question": "Why does the ensure_deletable function's resilience mechanism prevent cascading failures when both lock file removal and file status checks fail simultaneously in a concurrent directory cleanup scenario?",
+      "question_sha256": "4f8e0197c39f152deae533b8aa2f7883b135135a29deade61a01b02fd87266ff",
+      "reference_answer": "ensure_deletable returns False for a symlink, catches OSError from lock.is_file and Exception from lock.stat, and otherwise checks expiration (src/_pytest/pathlib.py:310-327). For an expired lock, unlink and return True are both inside suppress(OSError); if unlink raises, execution skips that return and reaches False (src/_pytest/pathlib.py:328-335). A status-check failure returns early before unlink. This contains expected cleanup races conservatively; it is not an absolute promise that every possible exception is caught.",
+      "reference_sha256": "35061e7418fadc12927e0bd816a8f9dc6ae1b14f2e6f87397beb83eb6aa637a3",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-744fe693da73e6ef247fa831"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "880e270e3f212e5c6dc5bf8623eadd1afac924973e3020088cfce9c6da1a53cc",
+      "question": "What is the impact of the tmpdir fixture's conversion from Path to LEGACY_PATH through legacy_path() on the fixture's dependency chain, and what would be the cascading impact on test isolation if the conversion were to fail silently?",
+      "question_sha256": "9b898db05fcd5fefc8fc41b0d8feb6da42caa164018e97e8c0261dfe570bbf95",
+      "reference_answer": "tmpdir converts the already supplied tmp_path with legacy_path and returns it (src/_pytest/legacypath.py:318-320). This occurs during tmpdir fixture setup after its dependency is resolved. It changes the path API, not the directory allocated upstream. The code has no silent-failure handler: a conversion exception propagates as setup failure. If a hypothetical converter instead returned an invalid value, consumers could fail, but directory reuse or cross-test interference does not follow automatically; that would depend on additional consumer fallback behavior.",
+      "reference_sha256": "4b3bf3c9dd842e5018319b48b5dc47d2c43eba1c26121201aedb12fa8e346aea",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-86e86ea76209f61f907f1726"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "dd42d0152498242b54286e65f12b466a4b42752887d3b3941c7d8d384037f7d7",
+      "question": "What is the defensive layering pattern established by the exception handling architecture in _format_repr_exception to prevent cascading failures when repr() operations fail during error reporting?",
+      "question_sha256": "787f149c428b9cfad93ac3d71106b0fc022cda52dac9317bd959a77dcfa3283a",
+      "reference_answer": "_try_repr_or_str tries repr and, for ordinary failures, formats a type-named string using the object; control exceptions are reraised (src/_pytest/_io/saferepr.py:7-13). _format_repr_exception catches failure to render the original exception and tries the inner exception under an 'unpresentable exception' label before assembling the placeholder (src/_pytest/_io/saferepr.py:16-25). These layers handle common broken repr/str cases, but do not guarantee success: formatting the inner exception can also fail and is not wrapped in another fallback here.",
+      "reference_sha256": "8c6e50a13611f4941ba3e23026473318b5c87c7c3b9e53386810f7d7fb0a0d54",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-8924de6cee1bd80f03e07152"
+    }
+  ]
+}

@@ -41,6 +41,8 @@ def parser():
     run.add_argument('--output-price-per-million', type=float)
     run.add_argument('--max-steps', type=int, default=30)
     run.add_argument('--max-tool-calls', type=int, default=25)
+    run.add_argument('--max-parallel-tool-calls', type=int, choices=range(1, 9), default=1,
+                     help='Opt in to up to 8 independent read-only tools per turn (POSIX only)')
     run.add_argument('--max-output-tokens', type=int, default=16000, help='Total generated-token budget per episode')
     run.add_argument('--wall-time-seconds', type=float, default=300)
     run.add_argument('--model-timeout-seconds', type=float, default=120)
@@ -110,11 +112,12 @@ def main(argv=None):
         else:
             limits = RunLimits(max_steps=args.max_steps, max_tool_calls=args.max_tool_calls,
                 max_output_tokens=args.max_output_tokens, wall_time_seconds=args.wall_time_seconds,
-                max_context_chars=args.max_context_chars)
+                max_context_chars=args.max_context_chars, max_parallel_tool_calls=args.max_parallel_tool_calls)
             model = ChatCompletionsModel(model=args.model, base_url=args.base_url,
                 api_key=os.environ.get(args.api_key_env), timeout_seconds=args.model_timeout_seconds,
                 input_price_per_million=args.input_price_per_million,
-                output_price_per_million=args.output_price_per_million)
+                output_price_per_million=args.output_price_per_million,
+                max_parallel_tool_calls=args.max_parallel_tool_calls)
             if args.task:
                 task = json.loads(args.task.read_text())
                 if task.get('repository', {}).get('commit') != commit:

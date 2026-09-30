@@ -1,0 +1,487 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "6cd8be8aa123e0d3d9d34fa86feac7bf392f39bccdde5129830de0ea9692dd7c",
+            "kind": "file_reference",
+            "line_count": 561,
+            "path": "src/requests/cookies.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why would the repeated urlparse calls in MockRequest's __init__, get_host, and get_full_url methods impact performance when processing high-volume cookie jar operations, and what optimization strategy would minimize redundant URL parsing while preserving the read-only semantics of the wrapped request?",
+      "question_sha256": "0184fadb582dd1b9b3506334533f06c56e593031a39af4822b13e783b889765f",
+      "reference_answer": "The repeated URL parsing function calls impact performance during high-volume cookie operations because the same URL string is parsed multiple times unnecessarily, creating computational overhead that scales linearly with request volume.\n\nIn the wrapper class (`MockRequest` in `src/requests/cookies.py`), three methods each call `urlparse()` on the same URL (`self._r.url`):\n\n1. **Initialization method** (line 38): `self.type = urlparse(self._r.url).scheme` - parses the URL to extract only the scheme\n2. **Network location retrieval method** (line 44): `return urlparse(self._r.url).netloc` - parses the URL again to extract only the netloc\n3. **Complete URL retrieval method** (line 56): `parsed = urlparse(self._r.url)` - parses the URL a third time to access all components\n\nDuring cookie extraction and header generation operations, Python's `http.cookiejar.CookieJar` internally calls these methods multiple times per request. For example:\n- `extract_cookies_to_jar()` (line 124) creates a MockRequest and calls `jar.extract_cookies(res, req)`\n- `get_cookie_header()` (line 140) creates a MockRequest and calls `jar.add_cookie_header(r)`\n\nThe cookiejar's policy evaluation logic calls `get_host()`, `get_full_url()`, and other methods repeatedly during cookie matching and domain validation. Each call triggers a full URL parse, even though the URL hasn't changed.\n\nThe performance impact compounds because:\n- `urlparse()` performs string parsing, regex matching, and creates a `ParseResult` named tuple each time\n- In high-volume scenarios (many requests with many cookies), these redundant parses accumulate\n- The same URL may be parsed 3-5+ times per request during cookie processing\n- The overhead is O(n) where n is the number of requests \u00d7 number of method calls per request\n\nThe wrapper class maintains read-only semantics (as documented on line 30: \"The original request object is read-only\"), so the URL cannot be modified. However, the parsed result could be cached in the `__init__` method and reused by the other methods, eliminating redundant parsing while preserving the read-only contract.",
+      "reference_sha256": "948934905d56ba4cbc8f6741577bede1961f3f4d6e9b0c3e13eef97080a72af7",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-0fce241788d5057d546c7640"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 280,
+            "file_sha256": "0a5d5da449ce7f0af3ccf6e4bbe7a67a935e37846dff4ff9f08cb6c7e2464e6f",
+            "path": "src/requests/sessions.py",
+            "start_line": 159
+          },
+          {
+            "end_line": 137,
+            "file_sha256": "6cd8be8aa123e0d3d9d34fa86feac7bf392f39bccdde5129830de0ea9692dd7c",
+            "path": "src/requests/cookies.py",
+            "start_line": 124
+          },
+          {
+            "end_line": 628,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 610
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the SessionRedirectMixin handle the interplay between cookie extraction, cookie merging, and cookie preparation across multiple redirect hops while maintaining cookie jar consistency?",
+      "question_sha256": "eeee60bf279b1d5ae11273834e74baebe72ab368bf4f8c7f5d03c9c797d0807f",
+      "reference_answer": "The session redirect handling mixin (SessionRedirectMixin) coordinates cookie extraction, merging, and preparation across redirect hops in the `resolve_redirects` method in `sessions.py` (lines 159-280).\n\n**Cookie extraction:**\n- Line 240: `extract_cookies_to_jar(prepared_request._cookies, req, resp.raw)` extracts cookies from the redirect response into the prepared request's cookie jar.\n- Line 276: `extract_cookies_to_jar(self.cookies, prepared_request, resp.raw)` extracts cookies from each redirect response into the session's persistent cookie jar (`self.cookies`).\n\n**Cookie merging:**\n- Line 241: `merge_cookies(prepared_request._cookies, self.cookies)` merges the session's persistent cookie jar into the prepared request's cookie jar before each redirect request. This ensures cookies from previous requests and redirects are available for the next hop.\n\n**Cookie preparation:**\n- Line 235: The existing Cookie header is removed from the prepared request.\n- Line 242: `prepared_request.prepare_cookies(prepared_request._cookies)` generates the Cookie header from the merged cookie jar for the next request.\n\n**Consistency mechanism:**\n1. The session's cookie jar (`self.cookies`) serves as the persistent store across all redirect hops.\n2. Before each redirect request: cookies are extracted from the previous response, merged with the session jar, and prepared for the next request.\n3. After each redirect response: cookies are extracted into the session jar, updating it for subsequent hops.\n4. This ensures cookies accumulate across the redirect chain and are available for each subsequent request.\n\nThe `extract_cookies_to_jar` function (in `cookies.py`, lines 124-137) uses `MockRequest` and `MockResponse` to interface with Python's `cookielib` for cookie extraction. The `merge_cookies` function (lines 542-561) adds cookies from dictionaries or CookieJars into the target jar. The `prepare_cookies` method (in `models.py`, lines 610-628) generates the Cookie header string from the CookieJar using `get_cookie_header`.",
+      "reference_sha256": "c95f4b1dc83f8b5c550b7e7a88183745f25f353dd43e3e1f084ebf3c35ebdb62",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-1b384ce28a37f75922bf0423"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 349,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 349
+          },
+          {
+            "end_line": 537,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 537
+          },
+          {
+            "end_line": 541,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 541
+          },
+          {
+            "end_line": 257,
+            "file_sha256": "0a5d5da449ce7f0af3ccf6e4bbe7a67a935e37846dff4ff9f08cb6c7e2464e6f",
+            "path": "src/requests/sessions.py",
+            "start_line": 248
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "src/requests/utils.py",
+              "tests/utils.py"
+            ],
+            "end_line": 1080,
+            "path": "utils.py",
+            "reason": "ambiguous_basename",
+            "reference": "utils.py",
+            "start_line": 1077
+          }
+        ]
+      },
+      "question": "What is the design rationale for storing `_body_position` as either `None`, an integer, or a sentinel `object()` instance rather than using a simple boolean flag to track whether body rewinding is possible?",
+      "question_sha256": "569c22149bdfc88028637975584948c94eb3c36542c84400a57e5462421ef92d",
+      "reference_answer": "The design rationale for using a three-state system (None, integer, or sentinel `object()`) instead of a boolean flag is to distinguish three distinct scenarios when handling file-like request bodies during redirects:\n\n1. **`None`**: Indicates that the body is not a file-like object with a `tell()` method, or no position tracking is needed. This is the initial state set in `PreparedRequest.__init__()` (line 349 in `models.py`).\n\n2. **Integer**: Represents a successfully captured position from `body.tell()`, which can be used to rewind the body to its starting position when a redirect occurs. This is set in `prepare_body()` when `body.tell()` succeeds (line 537 in `models.py`).\n\n3. **Sentinel `object()`**: Indicates that `body.tell()` was attempted but raised an `OSError`, meaning position tracking failed. This is set in the exception handler (line 541 in `models.py`) with a comment explaining: \"This differentiates from None, allowing us to catch a failed `tell()` later when trying to rewind the body.\"\n\nThe key advantage of this design is in the redirect handling logic in `sessions.py` (lines 248-257). The code checks `prepared_request._body_position is not None` to determine if rewinding should be attempted. This check catches both the integer case (can rewind) and the sentinel case (tracking failed). As the comment explains: \"A failed tell() sets `_body_position` to `object()`. This non-None value ensures `rewindable` will be True, allowing us to raise an UnrewindableBodyError, instead of hanging the connection.\"\n\nThen, in `rewind_body()` (`utils.py`, lines 1077-1080), the code checks if `_body_position` is an integer type before attempting to seek. If it's the sentinel `object()`, it's not an integer, so the function raises `UnrewindableBodyError` with the message \"Unable to rewind request body for redirect.\"\n\nA simple boolean flag would only distinguish \"can rewind\" from \"cannot rewind,\" but would lose the critical distinction between:\n- Bodies that don't need position tracking (None)\n- Bodies where position tracking succeeded (integer - can actually rewind)\n- Bodies where position tracking failed (sentinel - need to raise an error immediately)\n\nThis three-state design ensures that when `tell()` fails, the code can detect this condition during redirect handling and raise an appropriate error rather than attempting to rewind and potentially hanging the connection.",
+      "reference_sha256": "169f06ef4205f9cec65c6b6a0ac27710ba1be484f84c99c1264eb9fc4ef35f8c",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-28c3e8a144476fa768b63f94"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 492,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 483
+          },
+          {
+            "end_line": 1032,
+            "file_sha256": "5aa53ceab677c2f842fad42359c8ed1ff1c4299c1607789609957a496e4311d4",
+            "path": "src/requests/utils.py",
+            "start_line": 1024
+          },
+          {
+            "end_line": 35,
+            "file_sha256": "9cc4329abe21b37d93a95a3901b0ab99c24486f3d487bc57965bb2ab0b252e24",
+            "path": "src/requests/_internal_utils.py",
+            "start_line": 25
+          },
+          {
+            "end_line": 80,
+            "file_sha256": "f886e6855cf4e92fb968f499b94b6167afba0fd5ce8d1b935c739a6d8d38d573",
+            "path": "src/requests/structures.py",
+            "start_line": 13
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the data integrity mechanism in the PreparedRequest class that maintains header normalization when CaseInsensitiveDict and to_native_string transformations are applied to heterogeneous input headers?",
+      "question_sha256": "9e7a1f2f1b0417186a5669f6a9749e8d3b40b5dac4dc9902d7a3b7ced6682f9a",
+      "reference_answer": "The data integrity mechanism in request preparation that maintains header normalization when case-insensitive dictionary and string normalization are applied to heterogeneous input headers is implemented in the `prepare_headers` method of the PreparedRequest class (located in `src/requests/models.py`, lines 483-492).\n\nThe mechanism works through a coordinated three-step process:\n\n1. **Header Validation**: Each header from the heterogeneous input (which may contain headers with different cases, string types, or byte types) is first validated using `check_header_validity()` (defined in `src/requests/utils.py`, lines 1024-1032). This function validates that header names and values conform to HTTP specifications by checking for invalid characters, leading whitespace, or return characters using regex validators.\n\n2. **String Normalization**: The header name is then normalized using `to_native_string()` (defined in `src/requests/_internal_utils.py`, lines 25-35), which converts the header name to the native string type (ensuring consistent encoding, defaulting to ASCII). This handles heterogeneous input types (str, bytes) by converting them to a uniform native string representation.\n\n3. **Case-Insensitive Storage**: The normalized header name is stored in a `CaseInsensitiveDict` instance (defined in `src/requests/structures.py`, lines 13-80). This dictionary maintains data integrity through its internal `_store` OrderedDict that maps lowercase keys to tuples of `(original_key, value)`. When a header is set using `self.headers[to_native_string(name)] = value`, the CaseInsensitiveDict:\n   - Uses the lowercase version of the key for lookups (`key.lower()`)\n   - Stores the original case of the last key set alongside the value\n   - Preserves the case of the most recently set key while allowing case-insensitive retrieval\n\nThe data integrity is maintained because:\n- All header names are normalized to native strings before storage, ensuring type consistency\n- Case-insensitive lookup works correctly regardless of input case variations\n- The original case of headers is preserved (the last case used) for proper HTTP header formatting\n- Invalid headers are rejected before normalization, preventing corrupted data from entering the system\n- The mechanism handles heterogeneous inputs (mixed str/bytes, different cases) uniformly while maintaining referential integrity\n\nThis ensures that headers like `{\"Content-Type\": \"application/json\"}`, `{\"content-type\": \"application/json\"}`, or `{b\"Content-Type\": b\"application/json\"}` are all normalized and stored consistently, while maintaining the ability to retrieve them case-insensitively and preserve the original case for transmission.",
+      "reference_sha256": "988c19150f6b715602fdd350d9db3dd5bd4f8ab12cdac7419544d5c2eac5a808",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-2b51ade18300f08f75f60aea"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "0a5d5da449ce7f0af3ccf6e4bbe7a67a935e37846dff4ff9f08cb6c7e2464e6f",
+            "kind": "file_reference",
+            "line_count": 831,
+            "path": "src/requests/sessions.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the SessionRedirectMixin coordinate the interaction between get_redirect_target, resolve_redirects, and rebuild_auth to maintain security boundaries while following HTTP redirects across different hosts?",
+      "question_sha256": "98095a2135ac2becd45f7a81c3b0b5499ff5e5c1c515a35ff3810b74a094c940",
+      "reference_answer": "The redirect handling mixin (SessionRedirectMixin in `src/requests/sessions.py`) coordinates redirect URL extraction, redirect chain processing, and authentication header management through a generator-based redirect loop in `resolve_redirects` (lines 159-280).\n\nCoordination flow:\n1. Redirect URL extraction: `resolve_redirects` calls `get_redirect_target` (line 175) to get the redirect URL from the Location header. It calls it again in the loop (line 279) after each redirect response.\n2. Redirect chain processing: `resolve_redirects` runs a while loop that:\n   - Extracts the redirect URL using `get_redirect_target`\n   - Prepares a new request with the redirect URL\n   - Updates cookies, headers, and method\n   - Sends the request with `allow_redirects=False` to prevent nested redirects\n   - Yields each response in the chain\n3. Authentication header management: During each iteration, `resolve_redirects` calls `rebuild_auth` (line 246) before sending the redirected request.\n\nSecurity boundary maintenance:\n- `rebuild_auth` (lines 282-300) uses `should_strip_auth` (line 290) to decide whether to strip the Authorization header.\n- `should_strip_auth` (lines 127-157) compares the old and new URLs:\n  - Strips auth if hostnames differ (line 131)\n  - Allows http\u2192https on standard ports (lines 137-143) for backward compatibility\n  - Strips auth if the scheme or port changes (line 157)\n- This prevents leaking credentials to different hosts while allowing same-host redirects.\n\nThe coordination ensures that:\n- Each redirect URL is extracted before processing\n- Authentication is evaluated and stripped when crossing host boundaries\n- The redirect chain is processed sequentially with security checks at each step\n- Credentials are preserved for same-host redirects but removed when redirecting to different hosts\n\nThis design maintains security by preventing credential leakage across hosts while following redirects correctly.",
+      "reference_sha256": "9217ca62823831ca07e772cf773f6ed34a8a3777090b192d0392b75de4984732",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-2f3c8028c5a3f4f11f316e5c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2459,
+            "file_sha256": "4508b22c1aa65417427fe7e51ea1f4e3a3d43d3021acdeb5a5260720a1b367a1",
+            "path": "tests/test_requests.py",
+            "start_line": 2439
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "6cd8be8aa123e0d3d9d34fa86feac7bf392f39bccdde5129830de0ea9692dd7c",
+            "kind": "file_reference",
+            "line_count": 561,
+            "path": "src/requests/cookies.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where in the morsel_to_cookie function implementation are the conditional branches that determine whether to parse the expires field as a timestamp string versus handling it as None or raising a TypeError?",
+      "question_sha256": "f47b46780e61ef8ddbda3115415cbe4c2004d21ad61e014188784bd00d1f0555",
+      "reference_answer": "The conditional branches that determine whether to parse the expiration time field as a timestamp string versus handling it as None or raising a type error exception are located in the function that converts a Morsel object to a Cookie object in the cookies module, specifically at lines 496 and 501 in `src/requests/cookies.py`.\n\nThe implementation structure is as follows:\n\n1. **Line 495**: The expiration time field is initialized to `None`.\n\n2. **Line 496**: First conditional branch - `if morsel[\"max-age\"]:`\n   - This branch handles the `max-age` attribute (not the `expires` field directly), but affects the expiration time calculation.\n\n3. **Line 501**: Second conditional branch - `elif morsel[\"expires\"]:`\n   - This is the primary branch that determines whether to parse the expiration time field as a timestamp string.\n   - When this condition is true (the `expires` field is truthy), the code at line 503 attempts to parse it as a timestamp string using `time.strptime(morsel[\"expires\"], time_template)` with the template `\"%a, %d-%b-%Y %H:%M:%S GMT\"`.\n   - If `morsel[\"expires\"]` is not a string (e.g., an integer like 100), `time.strptime()` raises `TypeError` at line 503.\n   - If `morsel[\"expires\"]` is a string but in an invalid format (e.g., \"woops\"), `time.strptime()` raises `ValueError` at line 503.\n\n4. **Implicit else case**: If neither `morsel[\"max-age\"]` nor `morsel[\"expires\"]` is truthy, the expiration time field remains `None` (as initialized at line 495).\n\nThe conditional logic uses an `if-elif` structure where:\n- The `elif` branch at line 501 specifically handles parsing the expiration time field as a timestamp string.\n- The implicit else (when both conditions are false) results in the expiration time field being handled as `None`.\n- The `TypeError` can be raised at line 503 when `time.strptime()` receives a non-string value for the expiration time field.\n\nThis behavior is validated by the test cases in `tests/test_requests.py` (lines 2439-2459), which test valid string parsing, `None` handling, `TypeError` for non-string values, and `ValueError` for invalid string formats.\n</start_of_answer>",
+      "reference_sha256": "60bb91b7d95c2d5f99ae457582eeb7d6f5e62078a896f890331c5b2e89d49865",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-32b13dca143dd8ff9e079b9f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 792,
+            "file_sha256": "0a5d5da449ce7f0af3ccf6e4bbe7a67a935e37846dff4ff9f08cb6c7e2464e6f",
+            "path": "src/requests/sessions.py",
+            "start_line": 792
+          },
+          {
+            "end_line": 63,
+            "file_sha256": "f275f5d7781b6f5db7694b71d844e400dffa22c617f8cd9f4682c696e4c47119",
+            "path": "src/requests/adapters.py",
+            "start_line": 63
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the semantic distinction between InvalidSchema's dual inheritance from RequestException and ValueError in handling URL scheme validation failures, and how do these two parent exception types differ in the context of schema validation?",
+      "question_sha256": "18ee7019bf6375b634569fdc71994021cf5c9d16134c3f5fc9828aaddbccbbce",
+      "reference_answer": "The exception class for invalid URL schemes (`InvalidSchema`) uses dual inheritance from both the base request exception class (`RequestException`) and the built-in value error exception class (`ValueError`) to provide two semantic perspectives on the same error condition.\n\n**Semantic distinction:**\n\n1. **RequestException perspective (IOError category):**\n   - `RequestException` inherits from `IOError` (as of Requests 2.0, changed from `RuntimeError`), categorizing the error as a request/network I/O operation failure.\n   - This allows the exception to be caught as part of the Requests exception hierarchy, enabling generic handling of all request-related errors.\n   - It provides access to request and response objects through the `RequestException.__init__()` method, which stores `request` and `response` attributes for debugging.\n\n2. **ValueError perspective:**\n   - `ValueError` is Python's built-in exception for invalid argument values.\n   - This categorizes the error as a value validation failure, indicating that the URL scheme value itself is invalid or unsupported.\n   - This allows the exception to be caught by code that handles general value validation errors, not just Requests-specific errors.\n\n**Context in schema validation:**\n\nThe exception is raised in two scenarios:\n1. When no connection adapter is found for a URL scheme (in `sessions.py:792`): `raise InvalidSchema(f\"No connection adapters were found for {url!r}\")`\n2. When SOCKS proxy dependencies are missing (in `adapters.py:63`): `raise InvalidSchema(\"Missing dependencies for SOCKS support.\")`\n\nThe dual inheritance pattern is also used by other validation-related exceptions in the same module:\n- `MissingSchema(RequestException, ValueError)` - for missing URL schemes\n- `InvalidURL(RequestException, ValueError)` - for invalid URLs\n- `InvalidHeader(RequestException, ValueError)` - for invalid header values\n\nThis design allows flexible error handling: code can catch it either as a Requests-specific error (`RequestException`) or as a general Python value validation error (`ValueError`), depending on the error handling strategy.\n</start_of_answer>",
+      "reference_sha256": "3d8179812e9fb0367b9298362e263542769d192e75a5e84032611f33bb2fe34b",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-36475bcb5e2621f2e7608d02"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 826,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 826
+          },
+          {
+            "end_line": 59,
+            "file_sha256": "8c93d2d545804ecf3a4a155468ba2b4e225bd52686ba83445a020225ea7e5646",
+            "path": "src/requests/exceptions.py",
+            "start_line": 59
+          },
+          {
+            "end_line": 554,
+            "file_sha256": "89406fd034b6a7d354ca367489fa9f1b8c65e68af05d7f119f06aaed12868c57",
+            "path": "docs/user/quickstart.rst",
+            "start_line": 553
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "f275f5d7781b6f5db7694b71d844e400dffa22c617f8cd9f4682c696e4c47119",
+            "kind": "file_reference",
+            "line_count": 696,
+            "path": "src/requests/adapters.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the ConnectionError exception class serve as a specialized error handler within the requests library's exception hierarchy to distinguish network-level connection failures from other RequestException subclasses during HTTP request processing?",
+      "question_sha256": "9ff681851ef501433e5879d9a49c136badb3306d3f3a6a7e7231cc25f4ab6f74",
+      "reference_answer": "The exception class that handles network connection failures (ConnectionError) serves as a specialized handler within the base exception hierarchy (RequestException) to distinguish network-level connection failures from other exception subclasses for the following reasons:\n\n1. **Separation of concerns in error handling**: The requests library uses a hierarchical exception system where different exception types represent different failure categories. ConnectionError specifically handles failures at the network/transport layer, while other RequestException subclasses handle different issues:\n   - **HTTPError**: Handles HTTP status code errors (4xx, 5xx responses) - these occur after a successful connection\n   - **Timeout**: Handles timeout scenarios (though ConnectTimeout inherits from both ConnectionError and Timeout)\n   - **InvalidURL, URLRequired**: Handle URL validation and formatting issues\n   - **TooManyRedirects**: Handles redirect loop issues\n   - **ConnectionError**: Handles network-level failures that occur before or during connection establishment\n\n2. **Specific network failure scenarios**: ConnectionError is raised in `adapters.py` for specific network-level failures:\n   - **ProtocolError and OSError** (line 658-659): Socket-level errors that occur during connection attempts\n   - **MaxRetryError** (line 661-677): Connection retry failures that aren't more specific (not ConnectTimeout, ProxyError, SSLError, or ResponseError)\n   - **ClosedPoolError** (line 679-680): Connection pool closure issues\n   - **ReadTimeoutError** in some contexts (models.py line 826): When reading response data times out\n\n3. **Inheritance structure**: ConnectionError inherits from RequestException (exceptions.py line 59), making it part of the base exception hierarchy. More specialized connection errors inherit from ConnectionError:\n   - **ProxyError** inherits from ConnectionError (line 63)\n   - **SSLError** inherits from ConnectionError (line 67)\n   - **ConnectTimeout** inherits from both ConnectionError and Timeout (line 80)\n\n4. **User-facing error distinction**: This separation allows users to handle different error types appropriately. For example, network connection failures (ConnectionError) might be retried with exponential backoff, while HTTP status errors (HTTPError) might require different handling based on the status code. The documentation (docs/user/quickstart.rst lines 553-554) explicitly states that ConnectionError is raised for network problems like DNS failure or refused connections, distinguishing it from HTTP-level errors.\n\n5. **Technical implementation**: By catching low-level network errors (ProtocolError, OSError) and converting them to ConnectionError, the library provides a consistent interface for network failures while maintaining the ability to catch more specific subclasses (ProxyError, SSLError) when needed. This design allows for both broad error handling (catching ConnectionError) and specific error handling (catching ProxyError, SSLError) depending on the use case.\n\nThe specialized role of ConnectionError ensures that network-level connection failures are clearly distinguished from application-level HTTP errors, validation errors, and other request processing issues, enabling more precise error handling and debugging.",
+      "reference_sha256": "7e5c59c229ff1cad39918866a761983c1dbdb9bbbfe4385fcee24f5e827fb2aa",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-381108a98da087f9eab5eb8c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 116,
+            "file_sha256": "0a5d5da449ce7f0af3ccf6e4bbe7a67a935e37846dff4ff9f08cb6c7e2464e6f",
+            "path": "src/requests/sessions.py",
+            "start_line": 116
+          },
+          {
+            "end_line": 55,
+            "file_sha256": "6cd8be8aa123e0d3d9d34fa86feac7bf392f39bccdde5129830de0ea9692dd7c",
+            "path": "src/requests/cookies.py",
+            "start_line": 55
+          },
+          {
+            "end_line": 582,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 582
+          },
+          {
+            "end_line": 95,
+            "file_sha256": "905ef9b6a9cb72d67d31ffe19bd4d9223e1c4169cde6ec51cfca16b31e70991d",
+            "path": "src/requests/auth.py",
+            "start_line": 95
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "f886e6855cf4e92fb968f499b94b6167afba0fd5ce8d1b935c739a6d8d38d573",
+            "kind": "file_reference",
+            "line_count": 99,
+            "path": "src/requests/structures.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the repeated key-lookup pattern in CaseInsensitiveDict impact performance when scaling to thousands of case-insensitive dictionary operations in a high-throughput HTTP request processing pipeline?",
+      "question_sha256": "df88005deea9311051a87eef2b20b399de60699a660f60d31edbb55d9214e578",
+      "reference_answer": "The performance impact occurs because every key access in the case-insensitive dictionary class (implemented in `src/requests/structures.py`) requires calling `key.lower()` to normalize the key before performing the lookup in the internal `_store` OrderedDict.\n\nLooking at the `__getitem__` method implementation (lines 51-52):\n\n```python\ndef __getitem__(self, key):\n    return self._store[key.lower()][1]\n```\n\nEach time a key is accessed, the method calls `key.lower()`, which:\n1. **Creates a new string object** - String operations in Python allocate new memory for the lowercased result\n2. **Performs character-by-character conversion** - The lowercasing operation must iterate through each character in the key string\n3. **Happens on every access** - Even if the same header key (like \"Content-Type\" or \"Location\") is accessed multiple times, the lowercasing operation is repeated each time\n\nIn a high-throughput HTTP request processing pipeline, headers are accessed frequently throughout request/response processing:\n- Redirect handling: `resp.headers[\"location\"]` (sessions.py:116)\n- Cookie processing: `self._r.headers[\"Host\"]` (cookies.py:55)\n- Content type checks: `self.headers.get(\"Content-Length\")` (models.py:582)\n- Authentication: `r.headers[\"Authorization\"]` (auth.py:95)\n\nWhen scaling to thousands of operations, the cumulative overhead of these repeated string lowercasing operations becomes significant. Each header access triggers a string allocation and character conversion, and with thousands of requests processing multiple header lookups each, this creates a performance bottleneck. The same header keys may be accessed multiple times during a single request's lifecycle (e.g., checking redirect location, processing cookies, validating content types), and each access repeats the expensive lowercasing operation rather than caching the normalized key.\n\nThe implementation does not cache the lowercased keys - it recalculates `key.lower()` on every single access, which is the root cause of the performance impact when scaling to high-throughput scenarios.",
+      "reference_sha256": "b701d0d52dbbafd5a71c433e915f589be5f6498c4b4428f0129c56293c64137c",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-3c9a62a4f97b39abf81119fc"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 82,
+            "file_sha256": "4508b22c1aa65417427fe7e51ea1f4e3a3d43d3021acdeb5a5260720a1b367a1",
+            "path": "tests/test_requests.py",
+            "start_line": 82
+          },
+          {
+            "end_line": 176,
+            "file_sha256": "e3168011198f0c804fb1ad8fb23a54f6bd3aca8a0afb69992874d90215915adb",
+            "path": "src/requests/__init__.py",
+            "start_line": 165
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "8c93d2d545804ecf3a4a155468ba2b4e225bd52686ba83445a020225ea7e5646",
+            "kind": "file_reference",
+            "line_count": 151,
+            "path": "src/requests/exceptions.py"
+          },
+          {
+            "file_sha256": "0a5d5da449ce7f0af3ccf6e4bbe7a67a935e37846dff4ff9f08cb6c7e2464e6f",
+            "kind": "file_reference",
+            "line_count": 831,
+            "path": "src/requests/sessions.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the dependency chain between the TestRequests class and the requests library's exception hierarchy, and how do these exception types interact with the error-handling mechanisms in redirect and authentication scenarios?",
+      "question_sha256": "96010e2f5ca9405cebf4048d65c8cf63da9fd7e92360cf6f7f1999a65320b627",
+      "reference_answer": "The dependency relationship is:\n\n1. **Import dependency**: The test class (`TestRequests` in `tests/test_requests.py`, line 82) imports exception classes from `requests.exceptions` (lines 33-49), including `TooManyRedirects`, `RequestException`, `ConnectionError`, `HTTPError`, `InvalidURL`, and others.\n\n2. **Exception hierarchy structure**: Exceptions are defined in `src/requests/exceptions.py`:\n   - Base: `RequestException` (inherits from `IOError`, line 12)\n   - Redirect-related: `TooManyRedirects(RequestException)` (line 95)\n   - Other subclasses: `HTTPError`, `ConnectionError`, `Timeout`, etc.\n\n3. **Usage in redirect error handling**: In `src/requests/sessions.py`, `resolve_redirects` (line 159) raises `TooManyRedirects` when the redirect limit is exceeded (lines 191-193). The test class verifies this in methods like `test_HTTP_302_TOO_MANY_REDIRECTS` (line 241), which catches and asserts `TooManyRedirects` attributes.\n\n4. **Usage in authentication error handling**: During redirects, `rebuild_auth` (line 282) manages authentication headers. The test class includes tests like `test_auth_is_stripped_on_http_downgrade` (line 1882) and `test_auth_is_retained_for_redirect_on_host` (line 1894) that verify authentication behavior, though these don't directly raise exceptions; they test the authentication logic that runs during redirect processing.\n\n5. **Export chain**: Exceptions are exported from `src/requests/__init__.py` (lines 165-176), making them available to both the library code and the test suite.\n\nThe dependency flows: Test class \u2192 imports from `requests.exceptions` \u2192 uses exceptions to verify behavior \u2192 library code (`sessions.py`) raises these exceptions \u2192 test class catches and validates them.",
+      "reference_sha256": "1eb784bd29e2a796c735ca5c046b8feca0266e0160d4633e23e8157d3968632d",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-42094ef70792940aeb437a5e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 384,
+            "file_sha256": "5ef1d612edb55d4629fa8c3c6867bae0bf69050b951da9954927e42e48b88ff1",
+            "path": "tests/test_utils.py",
+            "start_line": 381
+          },
+          {
+            "end_line": 501,
+            "file_sha256": "5aa53ceab677c2f842fad42359c8ed1ff1c4299c1607789609957a496e4311d4",
+            "path": "src/requests/utils.py",
+            "start_line": 479
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What assumptions about encoding representation does the test_pragmas method enforce when validating that get_encodings_from_content correctly extracts and normalizes character encoding declarations from HTTP content headers?",
+      "question_sha256": "bf2ec236e7f01f6fb527c336a1faaea35369cb7715642e15157cbb903216d1c3",
+      "reference_answer": "The test enforces that encoding names preserve their original case representation and are not normalized to lowercase.\n\nThe test (in `tests/test_utils.py`, lines 381-384) uses parametrized content with \"UTF-8\" in uppercase across HTML5 meta charset attributes, HTML4 pragma directives, XHTML declarations, and XML encoding declarations. It asserts that the extracted encoding is exactly `\"UTF-8\"` (uppercase), not `\"utf-8\"` or any other case variant.\n\nThe underlying function (`get_encodings_from_content` in `src/requests/utils.py`, lines 479-501) uses case-insensitive regex patterns (`re.I` flag) to find encoding declarations, but extracts the encoding value as it appears in the content without case normalization. The test enforces that this case-preserving behavior is maintained, ensuring that encoding names retain their original representation from the source content rather than being normalized to a standard case format.",
+      "reference_sha256": "f5509e9c2bed37382e9bd5a7b0f9bf325af36283ca20ad5857f70df3ca7a7a3b",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-42cec52322387ba7c0875586"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the Response class coordinate the lifecycle management of the underlying urllib3 raw connection through its context manager protocol and close() method to ensure resource cleanup while preventing double-close scenarios?",
+      "question_sha256": "5b80ae5f74bad28e96cf9e42d3837db6626966a72992266ee68e1dac466ad454",
+      "reference_answer": "The response wrapper coordinates lifecycle management of the underlying transport connection through its context management interface and cleanup method as follows:\n\n**Context Management Interface:**\nThe response wrapper implements the context manager protocol with `__enter__` (line 705) returning `self` and `__exit__` (line 708) calling `close()` to ensure cleanup on exit.\n\n**Cleanup Method Implementation:**\nThe `close()` method (lines 1028-1039) manages resource cleanup in two steps:\n1. If `_content_consumed` is `False` (line 1034), it calls `self.raw.close()` to close the underlying urllib3 raw connection.\n2. It then calls `release_conn()` if available (lines 1037-1039) to release the connection back to the urllib3 connection pool.\n\n**Preventing Redundant Cleanup:**\nThe `_content_consumed` flag prevents redundant cleanup. When response content is consumed (via the `content` property at line 904 or `iter_content` at line 837), urllib3 already handles connection release. The comment at lines 905-906 notes: \"don't need to release the connection; that's been handled by urllib3 since we exhausted the data.\" Therefore, when `close()` is called after content consumption, it skips `raw.close()` (since `_content_consumed` is `True`) and only calls `release_conn()` if available, avoiding double-close of the raw connection.\n\nThis design ensures that:\n- The connection is always released back to the pool via `release_conn()`\n- The raw connection is only explicitly closed when content hasn't been consumed\n- Multiple calls to `close()` (e.g., via context manager exit and manual close) don't attempt to close an already-closed raw connection\n</start_of_answer>",
+      "reference_sha256": "0fcc69dab5e2a85dc82da01f9e33c0a947c1bc37510ab34aa28e182737247169",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-43544c025fdaa9cc2029afcd"
+    }
+  ]
+}

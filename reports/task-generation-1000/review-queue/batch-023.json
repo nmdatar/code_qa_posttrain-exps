@@ -1,0 +1,441 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 77,
+            "file_sha256": "572d5ecfbf43b149eca2774380e32caa77afc0be018772af8d659611e5d9bfac",
+            "path": "lib/matplotlib/legend_handler.py",
+            "start_line": 77
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the _update_prop method that is called by update_prop in HandlerRegularPolyCollection defined, and what is its inheritance chain?",
+      "question_sha256": "0c38cc08cf0b90195d6f9bda91cb4fdd8549e0e8f47a6476390ae773bdd7abc9",
+      "reference_answer": "The method that updates legend handle properties from original handles, invoked by the property update method in the regular polygon collection handler, is defined in the `HandlerBase` class in `./lib/matplotlib/legend_handler.py` at line 77.\n\nInheritance chain:\n1. `HandlerRegularPolyCollection` (line 430) inherits from\n2. `HandlerNpointsYoffsets` (line 208) inherits from\n3. `HandlerNpoints` (line 166) inherits from\n4. `HandlerBase` (line 46) \u2014 where `_update_prop` is defined\n\nImplementation details:\n- In `HandlerBase` (lines 77-81), `_update_prop` checks if `_update_prop_func` is set. If None, it calls `_default_update_prop` (which calls `legend_handle.update_from(orig_handle)`); otherwise it calls the custom function.\n- `HandlerRegularPolyCollection.update_prop` (line 465) calls `self._update_prop(legend_handle, orig_handle)` at line 467, then sets additional properties like the figure reference and clip settings.\n\nThe method is inherited through the chain, so `HandlerRegularPolyCollection` uses the implementation from `HandlerBase`.",
+      "reference_sha256": "393d3bb120a79d9df32bb16f713e59ab76ed3bd318dfa88d1176799899f0abde",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-0c4ab7cb422a1759ab019409"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 271,
+            "file_sha256": "b09723c8b59e3bac11490a36870536ba2f744d9063c6d3577327f53f7c39fcc8",
+            "path": "lib/matplotlib/offsetbox.py",
+            "start_line": 241
+          },
+          {
+            "end_line": 491,
+            "file_sha256": "79280d6b2df4e465fa4d5a2bb9860bded559ca1fc7409be0ef59f953f0a92ab3",
+            "path": "lib/matplotlib/artist.py",
+            "start_line": 475
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How should the `contains` method in `OffsetBox` be refactored to decouple the canvas validation logic from the child delegation logic while maintaining testability of each responsibility?",
+      "question_sha256": "2cf123f4a15c584823dc3b907d38c2f07d706f94a36c6ce3131f76543d204cad",
+      "reference_answer": "Based on my exploration of the matplotlib repository, the `contains` method in the `OffsetBox` class (located at `lib/matplotlib/offsetbox.py`, lines 241-271) currently combines two responsibilities:\n\n1. **Canvas validation**: The method checks if the mouse event occurred on a different canvas than the artist's canvas using `self._different_canvas(mouseevent)` (line 265). This validation is inherited from the `Artist` base class (defined in `lib/matplotlib/artist.py`, lines 475-491) and returns `False, {}` if the canvases don't match.\n\n2. **Child delegation**: The method iterates through child artists via `self.get_children()` and delegates the containment check to each child by calling `c.contains(mouseevent)` (lines 267-270), returning the first positive match.\n\n**Current implementation:**\n```python\ndef contains(self, mouseevent):\n    if self._different_canvas(mouseevent):\n        return False, {}\n    for c in self.get_children():\n        a, b = c.contains(mouseevent)\n        if a:\n            return a, b\n    return False, {}\n```\n\n**Refactoring approach:**\nTo decouple these responsibilities while maintaining testability, the method should be refactored to:\n\n1. **Extract canvas validation into a separate method** (e.g., `_validate_canvas` or `_check_canvas_match`) that can be tested independently. This method would encapsulate the `_different_canvas` check and return early if validation fails.\n\n2. **Extract child delegation into a separate method** (e.g., `_delegate_to_children` or `_check_children_containment`) that handles the iteration and delegation logic. This method would take the validated mouse event and return the containment result.\n\n3. **The main `contains` method** would then orchestrate these two responsibilities: first validate the canvas, then delegate to children if validation passes.\n\n**Benefits for testability:**\n- Canvas validation can be tested independently with mock mouse events on different canvases.\n- Child delegation can be tested independently with mock child artists and mouse events.\n- The main `contains` method can be tested for the orchestration logic.\n- Each responsibility can be mocked/stubbed when testing the other.\n\n**Implementation pattern:**\nThis refactoring follows the Single Responsibility Principle, allowing each extracted method to have a single, testable responsibility. The pattern is consistent with other artist classes in matplotlib (like `AnnotationBbox.contains` at line 1368, which also uses `_different_canvas` validation before delegating to `offsetbox.contains`).\n</start_of_answer>",
+      "reference_sha256": "f9c1e3d4cfadd0d314cb628f05eb0e0c5e291d653cb49ac30472d8da158d019f",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-12be21213c5b31a2eb1ef45d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 709,
+            "file_sha256": "b09723c8b59e3bac11490a36870536ba2f744d9063c6d3577327f53f7c39fcc8",
+            "path": "lib/matplotlib/offsetbox.py",
+            "start_line": 709
+          },
+          {
+            "end_line": 933,
+            "file_sha256": "b18a9752c160b21d99ff7d085ec7566cba4ce8d53eac552dc9a36bba46c0da4e",
+            "path": "lib/matplotlib/text.py",
+            "start_line": 931
+          },
+          {
+            "end_line": 411,
+            "file_sha256": "7866342a71caceb585f136f59729859cef9c704ef528f26160721990b0a523fa",
+            "path": "lib/matplotlib/tests/test_offsetbox.py",
+            "start_line": 405
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the TextArea.get_text() method's delegation pattern to self._text.get_text() enable framework-agnostic text retrieval while maintaining compatibility with matplotlib's text rendering API?",
+      "question_sha256": "744918da446b6e1735480e8ec07ff0e28a1330024d6e82933187dcda06a6fea0",
+      "reference_answer": "The delegation pattern in the offsetbox text container's text retrieval method enables framework-agnostic access while maintaining matplotlib API compatibility through a clear separation of concerns.\n\n**Implementation Details:**\n\nThe text container class (`TextArea`) is defined in `lib/matplotlib/offsetbox.py` at line 709. It inherits from `OffsetBox`, which is a container artist class (line 202) that provides a framework for positioning child artists.\n\nIn the `__init__` method (lines 718-744), the container creates an internal text rendering instance (`self._text`) as a `mtext.Text` object at line 737:\n```python\nself._text = mtext.Text(0, 0, s, **textprops)\n```\n\nThe `get_text()` method (lines 751-753) implements the delegation pattern:\n```python\ndef get_text(self):\n    \"\"\"Return the string representation of this area's text.\"\"\"\n    return self._text.get_text()\n```\n\n**How This Enables Framework-Agnostic Access:**\n\n1. **Container Abstraction**: `TextArea` provides a container interface that abstracts away the specific implementation details of matplotlib's `Text` class. Users interact with the container's API (`TextArea.get_text()`) rather than directly accessing the internal `Text` instance.\n\n2. **Separation of Concerns**: The container handles layout, positioning, and transformation (via `offset_transform` and `_baseline_transform` at lines 740-743), while the internal `Text` instance handles the actual text rendering and storage. This separation allows the container to be framework-agnostic in its interface while delegating rendering-specific operations to matplotlib's `Text` class.\n\n3. **Consistent API**: By delegating to `self._text.get_text()`, the container exposes the same method signature and return type as matplotlib's `Text.get_text()` method (defined in `lib/matplotlib/text.py` at line 931-933), which simply returns the stored text string (`self._text`).\n\n**Maintaining matplotlib API Compatibility:**\n\nThe delegation pattern maintains compatibility because:\n- The container's `get_text()` method returns the same type (string) as `Text.get_text()`\n- The method signature matches matplotlib's text API\n- The internal `Text` instance is a standard matplotlib `Text` object, ensuring all matplotlib text rendering features (font properties, alignment, etc.) work correctly\n- The container can be used anywhere a text retrieval API is expected, as demonstrated in tests (`lib/matplotlib/tests/test_offsetbox.py` lines 405-411)\n\nThis pattern allows `TextArea` to function as a framework-agnostic container (part of the offsetbox layout system) while seamlessly integrating with matplotlib's text rendering infrastructure through delegation to the internal `Text` instance.",
+      "reference_sha256": "9ebc00a153d882bef1a78b1c54fb7fbd6a6133b740a9e8414c1dfa04991ef826",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-14bd09e3c8e5c73cc8594bf7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1078,
+            "file_sha256": "b09723c8b59e3bac11490a36870536ba2f744d9063c6d3577327f53f7c39fcc8",
+            "path": "lib/matplotlib/offsetbox.py",
+            "start_line": 1060
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the get_offset method compute the final pixel offset by integrating borderpad unpacking, fontsize conversion, and the _get_anchored_bbox algorithm to position the child box relative to its anchor point?",
+      "question_sha256": "d46be761a22a37bc9c590f5b503d8b5cb2ccbd3d77e7eca186d4733cacaf3f3c",
+      "reference_answer": "The offset method in the `AnchoredOffsetbox` class (lines 1060-1078 in `lib/matplotlib/offsetbox.py`) computes the final pixel offset through these steps:\n\n1. **Font size conversion**: Converts the font size from points to pixels using `renderer.points_to_pixels(self.prop.get_size_in_points())` (line 1062). This provides the scaling factor for padding values.\n\n2. **Border padding unpacking and conversion**: The `borderpad` parameter can be either a float or a tuple of (x, y) values (lines 1064-1067). If it's a tuple, it's unpacked into `borderpad_x` and `borderpad_y`; otherwise, the same value is used for both axes. These values are then converted to pixels by multiplying with the font size in pixels: `pad_x_pixels = borderpad_x * fontsize_in_pixels` and `pad_y_pixels = borderpad_y * fontsize_in_pixels` (lines 1068-1069).\n\n3. **Anchored positioning algorithm**: The method calls `_get_anchored_bbox` (lines 1071-1077), which:\n   - Takes the location code (`self.loc`), the child bbox (normalized to start at (0,0)), the parent bbox (`bbox_to_anchor`), and the pixel paddings\n   - Converts the location code to an anchor string (NE, NW, SW, SE, E, W, S, N, C) using a lookup table (line 1109 in `_get_anchored_bbox`)\n   - Shrinks the parent bbox by the padding values using `parentbbox.padded(-pad_x, -pad_y)` (line 1110)\n   - Uses the `bbox.anchored()` method (line 1111) to position the child bbox within the padded parent container according to the anchor code, returning the position point `p0`\n\n4. **Final offset calculation**: The method returns `(x0 - bbox.x0, y0 - bbox.y0)` (line 1078), which adjusts the anchored position to account for the child bbox's origin, producing the final pixel offset that positions the contained box relative to its anchor point on the parent.\n\nThis integration ensures that padding is properly scaled by font size (maintaining visual consistency across different font sizes) and that the child box is correctly positioned at the specified anchor location with the appropriate border spacing.",
+      "reference_sha256": "d461412edf7cbfcc84e369f49d0ed79abf5a8ef350aba315225437ae633fb807",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-178cde6b170d9c97c8630c30"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 6821,
+            "file_sha256": "0075ff6bf69bd50f84320eb8e1a37ba4927091cb513481e22210e43f8eb8cc7f",
+            "path": "lib/matplotlib/axes/_axes.py",
+            "start_line": 6820
+          },
+          {
+            "end_line": 553,
+            "file_sha256": "c01ea6c0d6bdda5b732014b6d19ac85d772fab1a1ad288c3a25b0f57cfe6df7e",
+            "path": "lib/matplotlib/axes/_base.py",
+            "start_line": 553
+          },
+          {
+            "end_line": 874,
+            "file_sha256": "7da046d27bf43468d7ba487b1097f72498ecca25374d5fd297f50248e0297051",
+            "path": "lib/matplotlib/cbook.py",
+            "start_line": 871
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the shared axes mechanism in matplotlib that ensures sticky edge settings propagate correctly between leader and follower axes when pcolormesh is called on different axes in the sharing relationship?",
+      "question_sha256": "7c6b58f881332c331f7986e4ef79270cc91bfe2d2cabd17cd706950e460799c6",
+      "reference_answer": "The mechanism that ensures boundary constraints (sticky edges) preventing margin expansion are correctly collected when pseudocolor mesh plotting (`pcolormesh`) is called on different axes in a sharing relationship is implemented in the `autoscale_view()` method of the `Axes` class.\n\nWhen `pcolormesh` is called, it creates a `QuadMesh` collection and sets sticky edges on that collection based on the minimum and maximum coordinates of the mesh data (see `lib/matplotlib/axes/_axes.py` lines 6820-6821). These sticky edges are stored in the `sticky_edges` attribute of the artist.\n\nThe propagation mechanism works as follows:\n\n1. **Shared axes tracking**: Axes that share an axis (via `sharex` or `sharey`) are grouped together using a `Grouper` data structure stored in `_shared_axes[\"x\"]` or `_shared_axes[\"y\"]` (see `lib/matplotlib/axes/_base.py` line 553). The `Grouper` is a disjoint-set data structure that tracks which axes are connected.\n\n2. **Sticky edge collection**: During autoscaling in `autoscale_view()` (lines 3010-3021), when `use_sticky_edges` is enabled, the code collects sticky edges from ALL sibling axes in the shared group:\n   ```python\n   x_stickies = np.sort(np.concatenate([\n       artist.sticky_edges.x\n       for ax in self._shared_axes[\"x\"].get_siblings(self)\n       for artist in ax.get_children()]))\n   ```\n\n3. **Sibling retrieval**: The `get_siblings()` method (from the `Grouper` class in `lib/matplotlib/cbook.py` lines 871-874) returns all axes that are joined in the same group, including the current axis itself. This ensures that sticky edges from any axis in the sharing relationship are collected, regardless of which axis is the \"leader\" (the one passed to `sharex`/`sharey`) or \"follower\" (the one created with the `sharex`/`sharey` parameter).\n\n4. **Application during autoscaling**: The collected sticky edges are then used in the `handle_single_axis()` function (lines 3027-3086) to constrain margin expansion. The code prevents margins from crossing sticky edge values by checking if computed limits would exceed sticky bounds and clamping them accordingly (lines 3078-3082).\n\nThis mechanism ensures that when `pcolormesh` is called on any axis in a sharing relationship, the sticky edges it sets are available to all sibling axes during autoscaling, maintaining consistent view limits across the shared axes. This was fixed in PR #16450 to address issue #16448, which documented the bad interaction between shared axes and pcolormesh sticky edges.",
+      "reference_sha256": "2aa0491527fc560da4385eb4dc403dc0bdfeb171adadd6a9a8a4d8e0c99772f0",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-1961cd519d406ffccb4892ef"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the RendererSVG class employ a deferred rendering strategy where clip paths and hatches are written only during finalization rather than immediately when encountered?",
+      "question_sha256": "eed7233358cb4df5b8682aebb46ace92fc04eb7908c3731212890c7616c226b5",
+      "reference_answer": "The SVG rendering class defers writing clipping region definitions and fill pattern definitions until document completion to enable deduplication and proper SVG structure.\n\nImplementation details:\n1. Deduplication: During rendering, clip paths and hatches are stored in dictionaries (`_clipd` and `_hatchd`) keyed by their properties. If the same clip path or hatch pattern is encountered multiple times, the same ID is reused instead of creating duplicate definitions. This is verified by test `test_clip_path_ids_reuse()` which shows that the same clip path used across multiple axes results in only one `<clipPath>` definition in the SVG output.\n\n2. Dictionary-based collection: When a clip path is encountered (in `_get_clip_attrs()` at line 605-626), it's stored in `_clipd` with a unique key based on the clip path object and transformation. Similarly, hatches are stored in `_hatchd` (in `_get_hatch()` at line 494-511) keyed by hatch pattern, face color, edge color, and line width. The actual SVG definitions are not written at this point.\n\n3. Batch writing at completion: The `finalize()` method (line 344-348) is called after all drawing operations complete (as seen in `print_svg()` at line 1354, where it's called after `self.figure.draw(renderer)`). This method writes all collected clip paths and hatches in a single `<defs>` section via `_write_clips()` (line 628-649) and `_write_hatches()` (line 513-555).\n\n4. SVG structure: SVG requires that definitions appear in a `<defs>` section, and it's more efficient to group all definitions together rather than scattering them throughout the document. By deferring until completion, the renderer ensures all unique definitions are written once in a single location, reducing file size and improving organization.\n\nThis strategy optimizes SVG output by eliminating duplicate definitions and maintaining proper document structure.",
+      "reference_sha256": "09bed52c7467af2b3e8717bf1c4bb68ad2f32ddedb4d570aef90fd6e57b0c94b",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-27c88e9800690e60af874728"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 402,
+            "file_sha256": "1dc1b0fdd2cb6b803bdac1d033133c26a76a1db5fdcc01a505d9e306c5398d18",
+            "path": "lib/matplotlib/_mathtext.py",
+            "start_line": 373
+          },
+          {
+            "end_line": 296,
+            "file_sha256": "1dc1b0fdd2cb6b803bdac1d033133c26a76a1db5fdcc01a505d9e306c5398d18",
+            "path": "lib/matplotlib/_mathtext.py",
+            "start_line": 296
+          },
+          {
+            "end_line": 1700,
+            "file_sha256": "1dc1b0fdd2cb6b803bdac1d033133c26a76a1db5fdcc01a505d9e306c5398d18",
+            "path": "lib/matplotlib/_mathtext.py",
+            "start_line": 1585
+          },
+          {
+            "end_line": 176,
+            "file_sha256": "1dc1b0fdd2cb6b803bdac1d033133c26a76a1db5fdcc01a505d9e306c5398d18",
+            "path": "lib/matplotlib/_mathtext.py",
+            "start_line": 131
+          },
+          {
+            "end_line": 105,
+            "file_sha256": "c9396951f9cac73ac597b5cd8f2b82fb1301067c54b9f53a195c10ca1400236a",
+            "path": "lib/matplotlib/mathtext.py",
+            "start_line": 100
+          },
+          {
+            "end_line": 831,
+            "file_sha256": "5a436d1ed793ca19006807d5390e9739e111b0b44cf46d7b3a585776a72cadfc",
+            "path": "lib/matplotlib/backends/backend_ps.py",
+            "start_line": 831
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the FontInfo NamedTuple propagate font metrics and glyph data through the mathematical text rendering pipeline, and what control flow determines whether the postscript_name or the FT2Font object is used at different stages of character rendering?",
+      "question_sha256": "97feca511d28845f5d32adda672a5f4b448a8f7ad81ad8bbec6035b97dabadab",
+      "reference_answer": "The named tuple containing font metrics and glyph data (FontInfo) propagates through the mathematical text rendering pipeline in the following stages:\n\n1. **Creation in `TruetypeFonts._get_info()`** (`lib/matplotlib/_mathtext.py`, lines 373-402): FontInfo is created by the `_get_info()` method, which:\n   - Retrieves the FreeType font object (FT2Font) via `_get_glyph()`\n   - Loads the glyph using `font.load_char()`\n   - Computes FontMetrics from the glyph's bounding box and advance values\n   - Constructs FontInfo containing: the FT2Font object, fontsize, postscript_name (extracted from the font), metrics, glyph number, glyph object, and offset\n\n2. **Storage in Output.glyphs** (`lib/matplotlib/_mathtext.py`, line 296): When `render_glyph()` is called, FontInfo is appended to `output.glyphs` as tuples of `(ox, oy, info)`, where `ox` and `oy` are positioning coordinates and `info` is the FontInfo instance.\n\n3. **Conversion via `ship()` function** (`lib/matplotlib/_mathtext.py`, lines 1585-1700): The `ship()` function creates an Output object and populates its `glyphs` list by traversing the box structure (Hlist/Vlist nodes) and calling `Char.render()`, which in turn calls `Fonts.render_glyph()` to add FontInfo instances to the output.\n\n4. **Transformation to VectorParse or RasterParse** (`lib/matplotlib/_mathtext.py`, lines 131-176):\n   - **For vector output** (`to_vector()`, line 134): Extracts `info.font` (the FT2Font object) from each FontInfo and creates VectorParse with tuples `(FT2Font, fontsize, num, ox, oy)`\n   - **For raster output** (`to_raster()`, line 163): Uses `info.font.draw_glyph_to_bitmap()` directly from the FontInfo's font object to render glyphs to a bitmap image\n\n5. **Backend consumption** (`lib/matplotlib/mathtext.py`, lines 100-105): The MathTextParser calls `ship()` to create Output, then converts it via `to_vector()` or `to_raster()` depending on the output type. Backends like `backend_ps.py` (line 831) receive VectorParse glyphs containing FT2Font objects, then access `font.postscript_name` to write PostScript font selection commands.\n\nThroughout this pipeline, FontInfo serves as the carrier of both the font object reference and computed metrics, allowing the rendering system to access either the FT2Font object for direct rendering operations or the postscript_name string for font identification in output formats.",
+      "reference_sha256": "0e7452dca5d3c1cf040c113ab70f867ccf6219c3e8e657464cf5d17101a25eca",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-2a6944901f3f3f5146528ccb"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 997,
+            "file_sha256": "5a436d1ed793ca19006807d5390e9739e111b0b44cf46d7b3a585776a72cadfc",
+            "path": "lib/matplotlib/backends/backend_ps.py",
+            "start_line": 995
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the FigureCanvasPS class reconcile the dual rendering pathways between _print_figure and _print_figure_tex to maintain consistent PostScript output quality while accommodating both standard and TeX-based text rendering modes?",
+      "question_sha256": "ee71fde6eff3b21ded60690942d9885966385c61b0f04871613ab711dfb0c8a6",
+      "reference_answer": "The PostScript canvas class reconciles dual rendering pathways to ensure consistent PostScript output quality while supporting both standard and TeX-based text rendering, which have different requirements.\n\nThe reconciliation occurs in the `_print_ps` method (lines 995-997 in `backend_ps.py`), which selects the appropriate rendering method based on the `text.usetex` configuration parameter:\n\n```python\nprinter = (self._print_figure_tex\n           if mpl.rcParams['text.usetex'] else\n           self._print_figure)\n```\n\nThe two pathways differ in how they handle text:\n\n1. **Standard pathway (`_print_figure`)**: Directly embeds fonts (Type 3 or Type 42) into the PostScript file. Text is rendered using matplotlib's font system, with glyphs converted to PostScript commands. This method handles paper centering, rotation, and bounding box calculations before writing the final PostScript output.\n\n2. **TeX-based pathway (`_print_figure_tex`)**: Uses PSFrag tags to mark text positions in a temporary PostScript file. The text is then processed by LaTeX (via the `psfrag` package) and dvips to generate the final PostScript with LaTeX-rendered text. This method handles landscape orientation and bounding box adjustments after LaTeX processing, as LaTeX/dvips can affect the output geometry.\n\nBoth pathways:\n- Use the same `RendererPS` and `MixedModeRenderer` for drawing primitives (lines 1044-1047 and 1157-1160)\n- Accept the same parameters (dpi, dsc_comments, orientation, papertype, bbox_inches_restore)\n- Support the same distiller options (ghostscript or xpdf)\n- Produce PostScript files with consistent structure and quality\n\nThe reconciliation ensures that:\n- Users can switch between rendering modes transparently via the `text.usetex` setting\n- Both modes produce output with equivalent visual quality and proper bounding boxes\n- The implementation maintains a unified interface while accommodating the different processing requirements of standard font embedding versus LaTeX text processing\n- The selection logic is centralized in one place, making the codebase easier to maintain\n\nThis design allows matplotlib to support users who need LaTeX-quality typography (via TeX rendering) while also providing a faster, simpler path for standard text rendering, with both paths producing consistent, high-quality PostScript output.",
+      "reference_sha256": "566a891d655519384451a73c40dd8afeffc9e22440ec542ce23c026b30586d2e",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-2b97bc542993df90e0c5135b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1932,
+            "file_sha256": "02274218c2fd141abbaa245842d2ded21018dddb17c7d96841c195bfe573730f",
+            "path": "lib/matplotlib/ticker.py",
+            "start_line": 1932
+          },
+          {
+            "end_line": 2221,
+            "file_sha256": "02274218c2fd141abbaa245842d2ded21018dddb17c7d96841c195bfe573730f",
+            "path": "lib/matplotlib/ticker.py",
+            "start_line": 2221
+          },
+          {
+            "end_line": 1476,
+            "file_sha256": "c5f70563783702c5bd8ac9c420a1468f8817ab45dea31a31ff77f13420d0d357",
+            "path": "lib/matplotlib/dates.py",
+            "start_line": 1476
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What dependencies does the _Edge_integer class's __init__ method establish with the Locator hierarchy to ensure tick calculation consistency across different axis scaling scenarios?",
+      "question_sha256": "65bf714cba6d2ea704b732a435c621c0b30b6d962d5c5c1b7b2ba13a1f4c6a47",
+      "reference_answer": "The initialization method of the floating-point precision helper class establishes dependencies with the tick location determination hierarchy by storing step and offset parameters that enable consistent tick boundary calculations across different axis scaling scenarios.\n\nSpecifically, the initialization method (`__init__`) accepts two parameters:\n1. `step`: A positive float representing the interval between ticks\n2. `offset`: A float representing the offset subtracted from data limits prior to calculating tick locations\n\nThese parameters are stored as instance attributes (`self.step` and `self._offset`) and are used by the helper class's methods (`le()` and `ge()`) to calculate tick boundaries while accounting for floating-point precision limitations.\n\nThe dependency is established through instantiation in multiple Locator subclasses:\n\n1. **MultipleLocator** (line 1932 in `ticker.py`): Creates an instance with `_Edge_integer(base, 0)` during initialization, storing it as `self._edge`. This instance is used in `tick_values()` and `view_limits()` methods to calculate tick locations and view boundaries.\n\n2. **MaxNLocator** (line 2221 in `ticker.py`): Creates an instance with `_Edge_integer(step, offset)` in the `_raw_ticks()` method. The comment at line 2218 explicitly notes this handles \"degradation of precision when there is a large offset.\" The instance's `le()` and `ge()` methods are called to find tick boundaries that account for precision issues.\n\n3. **YearLocator** (line 1476 in `dates.py`): Creates an instance with `_Edge_integer(base, 0)` during initialization, storing it as `self.base`. This is used in `_create_rrule()` to ensure ticks are placed on interval multiples.\n\nThe consistency across different axis scaling scenarios is ensured by:\n- The `closeto()` method (lines 2020-2028), which dynamically adjusts tolerance based on the ratio of offset to step, allowing more slop when the offset is large compared to the step\n- The `le()` and `ge()` methods (lines 2030-2042), which use `closeto()` to handle floating-point rounding errors when determining the largest/smallest integer multiples of step that are less than or equal to/greater than or equal to a given value\n\nThis design ensures that tick calculations remain consistent whether dealing with small-scale data (where precision issues are minimal) or large-scale data with significant offsets (where floating-point precision degradation could cause incorrect tick placement).",
+      "reference_sha256": "59bbebb55c94aa4b8a8b132bcd04e3595671ad3e97a6fac6bbe58be9bfb90af0",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-2f291e6a29b8293818b6f1d6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2981,
+            "file_sha256": "02274218c2fd141abbaa245842d2ded21018dddb17c7d96841c195bfe573730f",
+            "path": "lib/matplotlib/ticker.py",
+            "start_line": 2970
+          },
+          {
+            "end_line": 2229,
+            "file_sha256": "02274218c2fd141abbaa245842d2ded21018dddb17c7d96841c195bfe573730f",
+            "path": "lib/matplotlib/ticker.py",
+            "start_line": 2207
+          },
+          {
+            "end_line": 1394,
+            "file_sha256": "35ae336447aa181e5243cca95a2cab2b394f4ed50cd11c30dbafd790580fd382",
+            "path": "lib/matplotlib/rcsetup.py",
+            "start_line": 1394
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the effect of the conditional branching in AutoLocator's __init__ method based on the '_internal.classic_mode' rcParam on the tick placement algorithm's behavior when transitioning between classic and modern matplotlib rendering modes, and what are the implications for backward compatibility when the steps parameter changes from [1, 2, 5, 10] to [1, 2, 2.5, 5, 10]?",
+      "question_sha256": "ce9811d9d1cbf2ab96f3a16b55369d15c3bfe6766672874a410c592005ac3640",
+      "reference_answer": "The conditional branching in AutoLocator's `__init__` method (located in `lib/matplotlib/ticker.py` at lines 2970-2981) selects different parameters based on the `_internal.classic_mode` rcParam:\n\n**Classic mode (when `_internal.classic_mode` is True):**\n- Sets `nbins=9` (fixed maximum number of intervals)\n- Sets `steps=[1, 2, 5, 10]` (classic sequence of acceptable tick multiples)\n\n**Modern mode (when `_internal.classic_mode` is False, the default):**\n- Sets `nbins='auto'` (automatically determined based on axis length)\n- Sets `steps=[1, 2, 2.5, 5, 10]` (includes 2.5 for more flexible tick spacing)\n\n**Effect on tick placement behavior:**\n\nThe `steps` parameter in MaxNLocator (the parent class) determines which multiples can be used for tick spacing. The algorithm iterates through the steps array to find the largest step size that provides enough ticks within the view limits (see `lib/matplotlib/ticker.py` lines 2207-2229).\n\nWhen transitioning from classic to modern mode:\n1. **More flexible spacing**: The addition of 2.5 to the steps array allows the algorithm to choose tick intervals like 2.5, 25, 250, etc., providing more options for optimal tick placement\n2. **Dynamic bin count**: The change from fixed `nbins=9` to `nbins='auto'` allows the algorithm to adapt the number of ticks based on the axis length, potentially producing different numbers of ticks for different plot sizes\n3. **Different tick locations**: These parameter changes can result in different tick positions being selected, as the algorithm may choose different step sizes that better fit the data range\n\nThe `_internal.classic_mode` rcParam (defined in `lib/matplotlib/rcsetup.py` line 1394, defaulting to False at line 1399) serves as a backward compatibility mechanism, allowing code to maintain pre-2.0 matplotlib tick placement behavior when needed, while modern code benefits from the improved algorithm with more flexible spacing options.",
+      "reference_sha256": "a7461b2dd42d48e41ece69fa60df3c75ac0f1908c75821ede50a7d35518df1d1",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-3383a928d26a4be88d792b6c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 395,
+            "file_sha256": "3d3b9328a70429464e48b4401efec8802513f3b254947cef5eb02145bb36669c",
+            "path": "lib/matplotlib/backends/backend_agg.py",
+            "start_line": 388
+          },
+          {
+            "end_line": 1054,
+            "file_sha256": "06d4dd6cf3f3e498b88c5c6d3f608238083582056b12000959f1b66dc7e67c39",
+            "path": "lib/matplotlib/legend.py",
+            "start_line": 1054
+          },
+          {
+            "end_line": 1618,
+            "file_sha256": "ae456ebf9c4a4ec1ded6d88029c1ab834c87db91369b3982ee2c027c5b053b68",
+            "path": "lib/matplotlib/backend_bases.py",
+            "start_line": 1589
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the repeated instantiation of figure and axes objects with different DPI values in test_legend_proper_window_extent impact renderer caching and what performance degradation occurs when get_window_extent is called sequentially on legends without renderer state reuse?",
+      "question_sha256": "e7b08c2b0ab639e442f3354baf17c6381f488680e96941ec2b35171a3f784c11",
+      "reference_answer": "Creating multiple figure instances with different DPI values prevents renderer state reuse because each figure has its own canvas object, and the renderer cache is scoped per canvas, not globally.\n\nThe renderer caching mechanism is implemented in `FigureCanvasAgg.get_renderer()` (lib/matplotlib/backends/backend_agg.py:388-395). It caches renderers based on a key tuple of `(width, height, dpi)`. When a new figure is created with a different DPI value, it's a completely separate canvas instance, so the cached renderer from previous figures cannot be reused.\n\nWhen `get_window_extent()` is called on a legend (or any artist) without explicitly passing a renderer parameter, it calls `self.get_figure(root=True)._get_renderer()` (lib/matplotlib/legend.py:1054). This eventually calls `_get_renderer()` from `backend_bases.py` (lines 1589-1618), which is an expensive operation that triggers a draw by temporarily patching the figure's draw method and raising an exception to capture the renderer.\n\nThe performance degradation occurs because:\n1. Each new figure with a different DPI creates a new canvas object\n2. The renderer cache (`_lastKey`) is per-canvas instance, not shared across figures\n3. When `get_window_extent()` is called without a renderer, it must call `_get_renderer()`, which triggers a full draw cycle\n4. This expensive operation happens for each sequential call when renderer state cannot be reused\n\nIn contrast, when `fig.canvas.draw()` is called first (as shown in `test_window_extent_cached_renderer` at line 729), it caches the renderer via `canvas.get_renderer()`, and subsequent calls to `get_window_extent()` without a renderer parameter can reuse this cached renderer, avoiding the expensive `_get_renderer()` path.\n</start_of_answer>",
+      "reference_sha256": "6602c42dd4b8960456c90b5eed3694fb37aa2a30773a4ccc0f832abb213d01af",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-33cd52ca6417c1dcc7cacd7c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1778,
+            "file_sha256": "5f955d78e654652a436f9d63873cd81386826dc05abefc2e83d1641f17c61155",
+            "path": "lib/matplotlib/transforms.py",
+            "start_line": 1743
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does TransformWrapper's set() method maintain invalidation state consistency when replacing a child transform, and what is the significance of the double invalidation pattern with _invalid flag reset?",
+      "question_sha256": "b548d58d92e0c44d11323b2b4df09d088f39464697e803c72f99d66e4413d0e9",
+      "reference_answer": "The child replacement method (`set()`) in `TransformWrapper` (located at `lib/matplotlib/transforms.py:1743-1778`) maintains invalidation state consistency during child replacement using a double invalidation pattern with flag resets.\n\nThe method performs the following sequence:\n\n1. **First invalidation** (line 1751): If a child already exists (not during initialization), it calls `self.invalidate()` before removing the old child. This propagates the old child's invalidation state to all parent transforms in the transform tree.\n\n2. **Child replacement** (lines 1758-1761): It removes the wrapper from the old child's parent registry (`self._child._parents.pop(id(self), None)`), assigns the new child (`self._child = child`), and establishes the parent-child relationship with the new child (`self.set_children(child)`).\n\n3. **Method delegation setup** (lines 1763-1771): It delegates all transform methods to the new child by directly assigning the child's methods to the wrapper's attributes.\n\n4. **Double invalidation pattern** (lines 1776-1778):\n   - **First flag reset** (line 1776): `self._invalid = 0` marks the wrapper as valid after setting up the new child.\n   - **Second invalidation** (line 1777): `self.invalidate()` propagates the new child's invalidation state to all parent transforms.\n   - **Second flag reset** (line 1778): `self._invalid = 0` marks the wrapper as valid again.\n\n**Significance of the double invalidation pattern:**\n\nThe double invalidation pattern is necessary because `TransformWrapper` has `pass_through = True` (line 1723). According to the invalidation logic in `_invalidate_internal()` (lines 163-176), when `pass_through` is `True`, the wrapper always propagates invalidation to its parents, even if the wrapper itself is already invalid (line 170: `if level <= self._invalid and not self.pass_through`).\n\nThe pattern ensures:\n- **Old child cleanup**: The first invalidation (line 1751) ensures the old child's invalidation state is properly communicated to parent transforms before the child is removed from the transform tree.\n- **New child integration**: The second invalidation (line 1777) ensures the new child's invalidation state is properly propagated to parent transforms after the new child is set up.\n- **State consistency**: The flag resets (`self._invalid = 0`) ensure the wrapper's own invalidation state is correctly synchronized with the child's state at each step, preventing stale invalidation states from persisting.\n\nThis pattern maintains consistency across the transform tree when a child transform is replaced at runtime, which is the primary use case for `TransformWrapper` as described in its docstring (lines 1714-1716): \"This is useful if a node of the transform tree must be replaced at run time with a transform of a different type.\"",
+      "reference_sha256": "3b9c80125330bd3f724a175ddf95807980450646bfeba8c56b368f42c3706cc0",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-35e0cd7ab847a000532888e8"
+    }
+  ]
+}

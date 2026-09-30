@@ -1,0 +1,280 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-8ef0e1b957a22b443baf00d3",
+      "reference_sha256": "9eafeb919104ef3ea6363ab4293cd8fe6245d96820bee9d36ac52bdb9a9d40bb",
+      "question_sha256": "ecfc5ef9faab0622abafa41bf5b89cda2ddcdb724c3ccd992f4fd518f9575fb8",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Dynamic marker test shares class node markers",
+          "verdict": "contradicted",
+          "reason": "Actual generated tests are module functions; class scope falls back to function item.",
+          "evidence": {
+            "path": "src/_pytest/fixtures.py",
+            "start_line": 763,
+            "end_line": 778
+          }
+        }
+      ],
+      "material_errors": [
+        "Actual generated tests are module functions; class scope falls back to function item."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "applymarker calls request.node.add_marker (src/_pytest/fixtures.py:508-517). In test_accessmarker_dynamic, the autouse fixture has class scope but generated tests are module-level functions (testing/python/fixtures.py:1193-1218). SubRequest.node falls back to the function item when no class node exists (src/_pytest/fixtures.py:763-778), so this example marks the relevant function item rather than sharing a class marker. In a real test class, the class node is used and NodeKeywords parent lookup exposes the marker to child functions (src/_pytest/mark/structures.py:610-635)."
+    },
+    {
+      "task_id": "import-9465cff51c9989ebc615a4cd",
+      "reference_sha256": "4ffcbb246e58918a1ec890efcd27fbe6f22cf831c4eb725b8dc38bbdc26c1f6c",
+      "question_sha256": "11971196abc30003181dd422d50315ac79c902672872c3d8ad43a496084d29c4",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Temporary directory construction is the validation point",
+          "verdict": "partially_supported",
+          "reason": "Core fallback facts correct; assertion pipeline omits test outcome and pytest.main lives in config rather than main.py.",
+          "evidence": {
+            "path": "testing/test_tmpdir.py",
+            "start_line": 325,
+            "end_line": 346
+          }
+        }
+      ],
+      "material_errors": [
+        "Core fallback facts correct; assertion pipeline omits test outcome and pytest.main lives in config rather than main.py."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "break_getuser replaces os.getuid with -1 and clears username environment variables; the generated test requests tmp_path and asserts is_dir(), then inline_run records a passing outcome (testing/test_tmpdir.py:325-346). TempPathFactory uses get_user() or unknown, creates a private root directory, and skips ownership comparison when get_user_id returns None (src/_pytest/tmpdir.py:155-192; src/_pytest/compat.py:260-278). These distinct username and UID fallbacks allow this simulated case to succeed; the test assertion and passed outcome provide the validation."
+    },
+    {
+      "task_id": "import-97b3c55fbe0d770d9d0d6e34",
+      "reference_sha256": "6d2d5844c7d390aa8ec4f650604836425c811a006d84b2593c53ecf8f0d5850c",
+      "question_sha256": "6372a0198e002860f7180b7ba1350e12e58962bdc935230ef045a53c3537f642",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Parametrization preserves all compatibility",
+          "verdict": "partially_supported",
+          "reason": "Discovery retained but node IDs/function signature/test counts change; original scenario must remain in data.",
+          "evidence": {
+            "path": "src/_pytest/python.py",
+            "start_line": 112,
+            "end_line": 114
+          }
+        }
+      ],
+      "material_errors": [
+        "Discovery retained but node IDs/function signature/test counts change; original scenario must remain in data."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Refactor test_1 to accept input_value and expected, add @pytest.mark.parametrize(\"input_value, expected\", cases), and keep the old scenario as one case with a stable explicit id. The hook processes markers through Metafunc.parametrize (src/_pytest/python.py:112-114). Keeping the test name preserves broad name selection such as -k test_1, while each case gets its own result. This changes the callable signature, collected node IDs and test count, so direct callers and exact-node-ID consumers may need updates; backward compatibility is not automatic."
+    },
+    {
+      "task_id": "import-9b15cd0e2e062e402dd64314",
+      "reference_sha256": "cef14e0fa4d9408ce6558cc5ecabfc86aff38a4dfe5c4c4971a5c02aef3a4d99",
+      "question_sha256": "29003487fe6b30048917fc074a48b4cb5bb9c973d40ec36f8ddc2b09fac51be0",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Lookup errors distinguish missing fixtures from arbitrary internal failures",
+          "verdict": "contradicted",
+          "reason": "msg None also handles recursive dependencies; custom msg not every runtime exception.",
+          "evidence": {
+            "path": "src/_pytest/fixtures.py",
+            "start_line": 830,
+            "end_line": 879
+          }
+        }
+      ],
+      "material_errors": [
+        "msg None also handles recursive dependencies; custom msg not every runtime exception."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "getfixturedefs separates name lookup from applicability filtering: absent names return None, while known but inapplicable names return an empty tuple (src/_pytest/fixtures.py:1853-1879). FixtureLookupError.formatrepr with no custom message distinguishes recursive dependency from fixture-not-found and lists available fixtures; a supplied message is displayed at the requesting side (lines 830-879). request.raiseerror explicitly creates such a custom lookup error (lines 519-525). This is not a universal classifier for internal fixture execution exceptions."
+    },
+    {
+      "task_id": "import-9ce914df6059b4a8894dc349",
+      "reference_sha256": "ce1ee507d80651485a7aa73b6e36e23219402e91e02f02494b0c2023d7b77301",
+      "question_sha256": "da8a80dd80a752b20f466da8c1ce49d86a14ff4ad55d2c34ff69af65ee20eea3",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Relative path cache computes on dict miss",
+          "verdict": "supported",
+          "reason": "__missing__ computes stores returns; repeated indexing reuses entry.",
+          "evidence": {
+            "path": "src/_pytest/main.py",
+            "start_line": 483,
+            "end_line": 492
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-9ef6839209e177ee0b789c96",
+      "reference_sha256": "4085ac4dae34c4d9feb7b77bd0c8313f73614d16125adf6d332d1a9bb9e86919",
+      "question_sha256": "4cadb0c3adc70c4e6106a38f5d1e07d420ad43c99dab501d6e48d027fb50b628",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "All mode aggregates logs plus stdout separately from stderr",
+          "verdict": "supported",
+          "reason": "Branches and reset match reference.",
+          "evidence": {
+            "path": "src/_pytest/junitxml.py",
+            "start_line": 159,
+            "end_line": 180
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-a666fd6c53a422b90e1b55ea",
+      "reference_sha256": "771e1197758aa7b64b313d8890236ba9b2565f2cbfbebb0596533b091d2346f8",
+      "question_sha256": "5886dfdb8c232cd3396cb7ea289e025a0b178f158bad42344d8bd0614831c7ff",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Enum sentinel distinguishes omission from None",
+          "verdict": "supported",
+          "reason": "parsefactories uses identity test and explicit None has visibility meaning.",
+          "evidence": {
+            "path": "src/_pytest/fixtures.py",
+            "start_line": 1787,
+            "end_line": 1812
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-a8f747280d42026c88700cfb",
+      "reference_sha256": "b7cab20c44cbbd806dc5ccc1fcc80a79f9a1e16045f30a4ee7dd9a282704791b",
+      "question_sha256": "3aa9337ca0848f0cc04f83a8d6955b1d8538734dbc945354f7a4076914a7211f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Fixture retrieves registered TerminalReporter instance",
+          "verdict": "supported",
+          "reason": "Configuration creates and registers reporter used by lookup.",
+          "evidence": {
+            "path": "src/_pytest/terminal.py",
+            "start_line": 287,
+            "end_line": 289
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-aef32c6831d57567c69c3f1c",
+      "reference_sha256": "43d1e3eed2aebaf3b1402c7db21633958bfeeaa11f0580838f72fe78bfd70b1a",
+      "question_sha256": "8fc32ed9aa5d626ff2d96a147b5aa83707955a6bf3bb13f4e5054d53be50319f",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Rewrite verification requires fresh interpreter with no imports",
+          "verdict": "partially_supported",
+          "reason": "Fresh process isolates state but imports already occur during startup; new uncached modules can be tested inline.",
+          "evidence": {
+            "path": "src/_pytest/assertion/__init__.py",
+            "start_line": 116,
+            "end_line": 126
+          }
+        }
+      ],
+      "material_errors": [
+        "Fresh process isolates state but imports already occur during startup; new uncached modules can be tested inline."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The tests use subprocess runs to isolate import state and pytest startup configuration. For example, conftest rewrite tests start pytest with plain/rewrite modes and compare failure rendering (testing/test_assertion.py:79-108). install_importhook puts the rewriting hook at the front of sys.meta_path and arranges removal (src/_pytest/assertion/__init__.py:116-126). Cached modules generally bypass a new import hook, so tests must arrange imports after installation. A subprocess is a convenient isolation boundary, not a logical requirement for every hook test; assertions across it are checked through subprocess output/outcomes rather than shared Python objects."
+    },
+    {
+      "task_id": "import-b4bd4d91f4d0e12cd83fdee1",
+      "reference_sha256": "e5a41c0c735fea2ec0c11fea651afb88b1efc37f7089d691c05fb21b42c5535c",
+      "question_sha256": "8c0b0944fe334976cb0b1c194681a649360e07026e98106e642905edddf2019e",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Separate doc tests demonstrably more maintainable than parametrization",
+          "verdict": "partially_supported",
+          "reason": "Source shows distinct cases but no author rationale or impossibility of clear parameter IDs.",
+          "evidence": {
+            "path": "testing/python/fixtures.py",
+            "start_line": 3689,
+            "end_line": 3742
+          }
+        }
+      ],
+      "material_errors": [
+        "Source shows distinct cases but no author rationale or impossibility of clear parameter IDs."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The tests separately generate fixture sources and assert the exact --fixtures output for indentation and first-line placement (testing/python/fixtures.py:3689-3742); another case uses a class fixture (lines 3744-3770). Separate methods keep each setup beside its expected output. That is a plausible readability benefit, not documented proof of the authors\u2019 reasoning or evidence that parameterization would be inferior. A table of source/expected-output cases with descriptive IDs could preserve the same coverage."
+    },
+    {
+      "task_id": "import-b981f9bac23687dd32ae162a",
+      "reference_sha256": "2fb6070f3cb34d6134d21643ddaee81c11782664ab27c0a012a5bb9e149d5611",
+      "question_sha256": "026e3a11c0cf17831906516b0ad7ac9be4874a22195396cc7d267cfea7e5caca",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Diff callers explicitly select diff lexer",
+          "verdict": "supported",
+          "reason": "ndiff output passes diff; representations default python; terminal lexer selection explicit.",
+          "evidence": {
+            "path": "src/_pytest/assertion/util.py",
+            "start_line": 325,
+            "end_line": 366
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-be34a26cecb95595b7a51d1f",
+      "reference_sha256": "0c376cade8c77039aa2e410089aabe3f8eb38d79a1f4684d88b76f20025a92c5",
+      "question_sha256": "8dfd796150ef07aad165cabb694f1ed96dfd4e6bb62e338c7cfaf4b866f271cb",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "All code importing timing functions sees replacements",
+          "verdict": "partially_supported",
+          "reason": "Previously bound from-import references remain old; sequential module attribute updates are not atomic.",
+          "evidence": {
+            "path": "src/_pytest/timing.py",
+            "start_line": 78,
+            "end_line": 91
+          }
+        }
+      ],
+      "material_errors": [
+        "Previously bound from-import references remain old; sequential module attribute updates are not atomic."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "MockTiming.patch sequentially replaces timing.sleep, timing.time and timing.perf_counter, using self.time for both clocks (src/_pytest/timing.py:86-91). Its sleep advances _current_time and time reads it (lines 78-84). Each monkeypatch update changes a separate module attribute and records restoration state; later lookups through the timing module see the replacements. Existing references imported before patching are not rebound, and the three updates are sequential rather than atomic."
+    }
+  ]
+}

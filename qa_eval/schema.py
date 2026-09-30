@@ -66,7 +66,7 @@ SUBMISSION = obj({"schema_version": VERSION, "task_id": NONEMPTY,
 METRICS = obj({
     "schema_version": VERSION, "task_hash": HASH, "submission_hash": HASH,
     "experiment_id": NONEMPTY, "episode_id": NONEMPTY, "trajectory_ref": NONEMPTY,
-    "latency_seconds": NUMBER, "time_to_first_token_seconds": NUMBER,
+    "latency_seconds": NUMBER, "time_to_first_token_seconds": {"oneOf": [NUMBER, {"type": "null"}]},
     "input_tokens": INT, "output_tokens": INT, "tool_seconds": NUMBER,
     "tool_calls": arr(NONEMPTY), "retries": INT, "cost": {"oneOf": [NUMBER, {"type": "null"}]},
     "termination_reason": enum("completed", "budget_exhausted", "agent_error", "infrastructure_error"),
@@ -90,7 +90,7 @@ CLAIM_FINDING = obj({"id": NONEMPTY, "coverage": enum("absent", "partial", "comp
 SEMANTIC = obj({
     "schema_version": VERSION, "task_hash": HASH, "submission_hash": HASH,
     "experiment_hash": HASH, "judge_family": NONEMPTY, "judge_version": NONEMPTY,
-    "prompt_version": VERSION, "snapshot_fingerprint": HASH,
+    "prompt_version": {"enum": ["1.0", "1.1", "1.2"]}, "snapshot_fingerprint": HASH,
     "required_claims": arr(CLAIM_FINDING), "additional_claims": arr(CLAIM_FINDING),
     "extracted_claims": arr(obj({"id": NONEMPTY, "text": NONEMPTY, "source": enum("text", "diagram")})),
     "citation_links": arr(obj({"claim_id": NONEMPTY, "citation_id": NONEMPTY,

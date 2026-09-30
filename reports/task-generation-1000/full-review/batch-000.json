@@ -1,0 +1,284 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-69e26ba46fe0b199109594b7",
+      "reference_sha256": "8a0d9831b12b98cc50aec78b047f23df01f61a51033561082258cee3a4f579c7",
+      "question_sha256": "f1a51abcff497b1befd9cf91afdac266cdf413fe5b8591f020177e61c41e8033",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "TensorLike metaclass delegates instance/subclass checks to built-in and optional framework predicates",
+          "verdict": "supported",
+          "reason": "Both dunders perform the stated disjunction; predicates inspect loaded modules and suppress ImportError.",
+          "evidence": {
+            "path": "pennylane/typing.py",
+            "start_line": 27,
+            "end_line": 118
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-73f308b613654741593e4884",
+      "reference_sha256": "40aacdd622806afd12794b79f52d3824cad07c675c564a5ed0e65c04c5d8c729",
+      "question_sha256": "2e015bb714e0deb8b74af09b2806f134914bff24063fb35a289d65051dbc4d23",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Missing QASM gate lookup raises the cited ValueError",
+          "verdict": "supported",
+          "reason": "The exception handler matches; it follows depth-two expansion.",
+          "evidence": {
+            "path": "pennylane/tape/qscript.py",
+            "start_line": 1106,
+            "end_line": 1118
+          }
+        }
+      ],
+      "material_errors": [
+        "Reference omits decomposition before lookup and overstates incompatibility of mid-circuit measurement with OpenQASM 2.0."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "QuantumScript.to_openqasm raises ValueError(\"Operation {op.name} not supported by the QASM serializer\") in pennylane/tape/qscript.py:1113-1118 when OPENQASM_GATES[op.name] fails. This lookup occurs after depth-two expansion with a stop predicate for supported gate names (1106-1111), so an initially unlisted operation can succeed if decomposed into supported gates."
+    },
+    {
+      "task_id": "import-871c8cadb652aef41ef2c0c8",
+      "reference_sha256": "c8b61ee54a408421370e5112930dc645b60459f49b8964ad9354a5b277dabea8",
+      "question_sha256": "11e038df5f977cdb202b6b948216954e0687976b58912a38d16e7f246eeb693a",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Mixed analytic/numeric dispatch occurs in param_shift",
+          "verdict": "supported",
+          "reason": "F parameters go to fallback_fn and A parameters to shift transforms.",
+          "evidence": {
+            "path": "pennylane/gradients/parameter_shift.py",
+            "start_line": 1015,
+            "end_line": 1047
+          }
+        },
+        {
+          "claim": "choose_grad_methods validates backend keywords and dispatches pulse gradients",
+          "verdict": "contradicted",
+          "reason": "It only maps selected indices to methods; param_shift has no pulse dispatch here.",
+          "evidence": {
+            "path": "pennylane/gradients/gradient_transform.py",
+            "start_line": 218,
+            "end_line": 251
+          }
+        }
+      ],
+      "material_errors": [
+        "Invented keyword-validation and pulse dispatch responsibilities; non-differentiable parameters raise rather than always falling back."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "For mixed analytic and finite-difference parameters, param_shift in pennylane/gradients/parameter_shift.py:1015-1047 calls gradient_analysis_and_validation, builds a map with choose_grad_methods, sends F parameters to fallback_fn and A parameters to variance or expectation parameter-shift routines, then combines their results at 1079-1101. Non-differentiable parameters raise in gradient_transform.py:158-168; they do not automatically use numerical fallback. QNode._validate_parameter_shift selects qubit/qutrit versus CV transforms (qnode.py:811-825)."
+    },
+    {
+      "task_id": "import-a339824c4064e23a7485f942",
+      "reference_sha256": "afaadba6a8a0dfc25c1ceaccfcc26dbf32660cd90d0abf56905ce415b465b0f1",
+      "question_sha256": "41419341dd152f9d79a4c46f7cd4f446ec20fb7122c941d6889142fd58acb7b9",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Unused BitGenerator imports expose optional generators while PCG64 is the default",
+          "verdict": "supported",
+          "reason": "Imports, capsule passthrough, and PCG64 construction match; test explicitly describes namespace exposure.",
+          "evidence": {
+            "path": "pennylane/numpy/random.py",
+            "start_line": 22,
+            "end_line": 55
+          }
+        },
+        {
+          "claim": "Tests exercise imported BitGenerator types",
+          "verdict": "supported",
+          "reason": "Parameterized test verifies wrapped bit generator identity and tensor output.",
+          "evidence": {
+            "path": "tests/numpy/test_numpy_random.py",
+            "start_line": 75,
+            "end_line": 88
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-b2d83fd2d402f086620f371d",
+      "reference_sha256": "27350d961fd14dbb1d8b17b5dfb6c53e6a7d6f41744d6d7ac3314d302ae465b5",
+      "question_sha256": "87538a9ce3eb8294e592e308490a769ea256f053fdbadc2adeeb30501c6f1a12",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Plot validation checks coefficient shapes",
+          "verdict": "supported",
+          "reason": "It checks list/array type, dimensions and odd shape sizes.",
+          "evidence": {
+            "path": "pennylane/fourier/visualize.py",
+            "start_line": 33,
+            "end_line": 80
+          }
+        },
+        {
+          "claim": "Plotting axes are optional and default to plt.gca",
+          "verdict": "contradicted",
+          "reason": "Example supplies axes; implementation immediately accesses ax.size, with no default axes creation.",
+          "evidence": {
+            "path": "pennylane/fourier/visualize.py",
+            "start_line": 173,
+            "end_line": 188
+          }
+        }
+      ],
+      "material_errors": [
+        "Reference invents optional Matplotlib axes/default gca behavior and numeric element validation."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Coordination is explicit at the caller: compute coefficients using pennylane.fourier.coefficients, then pass them and Matplotlib axes to a visualization function. The example in pennylane/fourier/visualize.py:168-178 demonstrates this. _validate_coefficients (33-80) normalizes lists and checks dimensions and odd coefficient-axis lengths; it does not verify numerical stability or element finiteness. The Fourier package exports computation functions at __init__.py:17-21."
+    },
+    {
+      "task_id": "import-c4a7b40d8b998551d9bdd79b",
+      "reference_sha256": "d0c78ec886a45f07c6e070dd227a1b02eb377fd341d00c57b0e808e4d552cc54",
+      "question_sha256": "4a6c560f2f20a7a0ac637130d87f53aeda757d1a462227b97e5e1d5b03448696",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "MidMeasureMP inherits directly from MeasurementProcess",
+          "verdict": "supported",
+          "reason": "Class and public measure construction are present; direct construction is also possible.",
+          "evidence": {
+            "path": "pennylane/measurements/mid_measure.py",
+            "start_line": 104,
+            "end_line": 131
+          }
+        },
+        {
+          "claim": "All devices choose native execution solely by supports_mid_measure",
+          "verdict": "contradicted",
+          "reason": "Experimental Device instances unconditionally enter the expansion condition.",
+          "evidence": {
+            "path": "pennylane/qnode.py",
+            "start_line": 899,
+            "end_line": 905
+          }
+        }
+      ],
+      "material_errors": [
+        "Exclusivity of construction through measure is false; experimental-device branch omitted; _device.py citation path is wrong."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "MidMeasureMP directly inherits MeasurementProcess (pennylane/measurements/mid_measure.py:113-131). measure constructs one and returns a MeasurementValue (104-107); these are not separate execution-strategy subclasses. In qnode.py:899-905, a tape containing MidMeasureMP is selected for deferred measurement when the device is experimental or a legacy device lacks supports_mid_measure. Thus the legacy capability flag does not alone describe all devices in this revision."
+    },
+    {
+      "task_id": "import-c586977613eb773cac977b32",
+      "reference_sha256": "a09b6c6fd23b16699e28afb18cbc858b49fceb4806fe75bbddbe23194c90be2f",
+      "question_sha256": "df92c32f403c2b8ce44413e538eeda41dcbb6b1a4f6bf0fe4a15044a9a5ac80c",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Class and wire metadata are stored and resolved on load",
+          "verdict": "supported",
+          "reason": "Parallel datasets and class registry lookup are present.",
+          "evidence": {
+            "path": "pennylane/data/attributes/operator/operator.py",
+            "start_line": 199,
+            "end_line": 268
+          }
+        },
+        {
+          "claim": "All operators and wire identities round-trip completely",
+          "verdict": "contradicted",
+          "reason": "Unsupported types are rejected; composites use recursive records, and wire serializer restricts labels.",
+          "evidence": {
+            "path": "pennylane/data/attributes/operator/_wires.py",
+            "start_line": 35,
+            "end_line": 57
+          }
+        }
+      ],
+      "material_errors": [
+        "Unqualified complete reconstruction claim ignores supported-type and wire-label restrictions and special composite handling."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "DatasetOperator._ops_to_hdf5 stores class names in op_class_names and ordinary-operator wire JSON in op_wire_labels alongside op.data (pennylane/data/attributes/operator/operator.py:199-225). Tensor and Hamiltonian components recurse into subgroups; Hamiltonians also store coefficients. _hdf5_to_ops resolves names through _supported_ops_dict, recursively rebuilds composites, and passes loaded parameters and decoded wires to ordinary constructors (229-268). Only supported operator types and serializable wire labels are accepted (_wires.py:35-57)."
+    },
+    {
+      "task_id": "import-f6b923d6e7a50d02acb851e6",
+      "reference_sha256": "1c560231e5fefa853e5e97f2f42f6f795b55cc915944760b14e9d2cb37a20886",
+      "question_sha256": "88c49b25c9c434b57e4beab69fb73e9183dc99da2fc0e2367242d43ba7ae7d15",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Device postprocessing precedes transform-program postprocessing",
+          "verdict": "supported",
+          "reason": "Both early and ML-boundary return paths apply batch_fn then program_post_processing.",
+          "evidence": {
+            "path": "pennylane/interfaces/execution.py",
+            "start_line": 607,
+            "end_line": 616
+          }
+        },
+        {
+          "claim": "Transform processing stacks individual batch functions",
+          "verdict": "supported",
+          "reason": "Per-tape transform functions and result slices form batch postprocessing functions appended to a stack.",
+          "evidence": {
+            "path": "pennylane/transforms/core/transform_program.py",
+            "start_line": 288,
+            "end_line": 310
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-f83191bb378dbedf06e68027",
+      "reference_sha256": "1fb0a49d607861e21afcb33c11c525aaf6e59bda478b10652c8a950a93674287",
+      "question_sha256": "d3da7f3b5c1ca6af48a2487251f811af003f134109f1e14272fd764a265cbc3d",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "General reconstruction warns above condition number 1e8",
+          "verdict": "supported",
+          "reason": "Warning is followed by solve rather than rejection or stabilization.",
+          "evidence": {
+            "path": "pennylane/fourier/reconstruct.py",
+            "start_line": 155,
+            "end_line": 169
+          }
+        },
+        {
+          "claim": "Visualization guarantees only stable reconstructions are rendered",
+          "verdict": "contradicted",
+          "reason": "Validation checks array type and shape only, not conditioning or numerical values.",
+          "evidence": {
+            "path": "pennylane/fourier/visualize.py",
+            "start_line": 47,
+            "end_line": 80
+          }
+        }
+      ],
+      "material_errors": [
+        "No coupled visualization stability guarantee; symmetric-shift error cancellation and enforced stability are unsupported."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "There is no guarantee that visualization renders only numerically stable reconstructions. _reconstruct_equ uses a ratio of sinc functions in a Dirichlet-kernel reconstruction (pennylane/fourier/reconstruct.py:59-84). _reconstruct_gen warns if the coefficient matrix condition number exceeds 1e8, then still solves it (155-169). Visualization validation checks list/array type, dimensionality, and odd coefficient-axis sizes (pennylane/fourier/visualize.py:33-80); those structural checks do not establish numerical stability."
+    }
+  ]
+}

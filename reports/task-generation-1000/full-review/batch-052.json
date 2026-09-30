@@ -1,0 +1,302 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-c4177c340bb4233a26ddafd9",
+      "reference_sha256": "7379827a843e1eaa7b355e0f8f40cdc4f64b473938ab0e6f5ec493467c3e06e2",
+      "question_sha256": "f245fc309c5b2b6dce285a813755b36467f7644838db086b96a751d11e4123ad",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Eligibility cache returns early, memoizes misses and clears on new marks",
+          "verdict": "supported",
+          "reason": "Name or dotted-prefix match cached true, absent match cached false; mark update invalidates.",
+          "evidence": {
+            "path": "src/_pytest/assertion/rewrite.py",
+            "start_line": 248,
+            "end_line": 277
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-ca382d379125c18ac1a07a83",
+      "reference_sha256": "8b49a283f084419550314a10b234d892d51723fc0e1c4a72b07d64a44d6a02d7",
+      "question_sha256": "92e5d45a82976059f447a4807123e4ff7440a815c9c380dd9a2404db2b295263",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Missing used argument validated against fixture names and defaults",
+          "verdict": "supported",
+          "reason": "Fail message distinguishes default argument, indirect fixture and direct argument; fixture closure includes dependencies so signature is not sole criterion.",
+          "evidence": {
+            "path": "src/_pytest/python.py",
+            "start_line": 1467,
+            "end_line": 1484
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-e00e627ca510b66a673a2f40",
+      "reference_sha256": "0ec096d9c6216f9fc8ee0dd3e8ad4183a21b6df6e214b84ce6a154cc471e65dd",
+      "question_sha256": "825f4146cef0e8992ce1827dbf03535d04ef55c716e7e148e1cdb17b4a4c11ab",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Parameter flows from callspec to SubRequest unchanged",
+          "verdict": "supported",
+          "reason": "No hash conversion in extraction.",
+          "evidence": {
+            "path": "src/_pytest/fixtures.py",
+            "start_line": 614,
+            "end_line": 637
+          }
+        },
+        {
+          "claim": "Cache compares equality before identity fallback",
+          "verdict": "supported",
+          "reason": "Different equal dictionaries can produce cache hits.",
+          "evidence": {
+            "path": "src/_pytest/fixtures.py",
+            "start_line": 1093,
+            "end_line": 1113
+          }
+        }
+      ],
+      "material_errors": [
+        "False claim different dictionary instances cannot cache correctly because comparisons use identity."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "Indirect parameters are retrieved directly from callspec.params and passed into SubRequest (src/_pytest/fixtures.py:614-637). FixtureDef.cache_key returns request.param (lines1136-1137), but this value is compared rather than hashed: execute first tries bool(request_cache_key == cache_key), falling back to identity only when equality raises ValueError or RuntimeError (lines1093-1113). Consequently non-hashable dictionaries need no transformation, and distinct equal dictionaries can hit the cache. Mutating shared parameters can change comparison behavior; no immutable copy is promised."
+    },
+    {
+      "task_id": "import-e0cdc230a5c178a07822d762",
+      "reference_sha256": "65523d248118e434a5b468a926054682b7e980642d446fae294ca3980b2640ba",
+      "question_sha256": "99d10d4eb3a2495a7944a413f5f99ec3a617f77be8e696de9cf3eed720b3a227",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Completer sorts combined glob results then slices output paths",
+          "verdict": "supported",
+          "reason": "No deduplication operation; wildcard input bypasses automatic appending and hidden expansion.",
+          "evidence": {
+            "path": "src/_pytest/_argcomplete.py",
+            "start_line": 80,
+            "end_line": 99
+          }
+        }
+      ],
+      "material_errors": [
+        "Claims deduplicated result and omits precise post-sort prefix-strip consequence."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "FastFilesCompleter computes a prefix_dir length, then for prefixes without * or ? adds hidden matches only for an empty prefix or trailing separator and appends * for ordinary matches. Existing wildcard prefixes are globbed directly (src/_pytest/_argcomplete.py:80-93). It sorts full matches, adds / to directories, and strips prefix_dir characters from each emitted completion (lines94-99). Output order therefore follows pre-stripping full paths, rather than a fresh sort of displayed names. There is no explicit deduplication."
+    },
+    {
+      "task_id": "import-e8d09990db3c6eb42ddf9dd6",
+      "reference_sha256": "fc8c5919548fe715673c48dff9eac98844cca61df5471571e4b819c8b4b24758",
+      "question_sha256": "460951877f8de6788969f65212545c3f92fd198402020f753a24fa0266d2c095",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Capture snapshot and original writes target separate streams",
+          "verdict": "supported",
+          "reason": "Snapshot reads/seeks/truncates in separate operations; no locks or transaction.",
+          "evidence": {
+            "path": "src/_pytest/capture.py",
+            "start_line": 450,
+            "end_line": 461
+          }
+        },
+        {
+          "claim": "State methods switch sys stream bindings",
+          "verdict": "supported",
+          "reason": "Sequential valid-state enforcement, no concurrent safety guarantee.",
+          "evidence": {
+            "path": "src/_pytest/capture.py",
+            "start_line": 402,
+            "end_line": 426
+          }
+        }
+      ],
+      "material_errors": [
+        "Unsupported atomicity/race-free/no-data-loss claims."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "SysCapture.snap reads tmpfile then seeks and truncates it; writeorg writes and flushes the saved original stream. Both require started or suspended state (src/_pytest/capture.py:450-461). start/resume bind the system stream to tmpfile while suspend restores the original (lines402-426). This separates sequential snapshotting from bypass output, but the operations are not an atomic transaction and these methods provide no locking guarantee for concurrent writes."
+    },
+    {
+      "task_id": "import-eb9ff6ab28569c0f26164f0c",
+      "reference_sha256": "de7593c044857c7fd10f6e7d27824ae772e1c4a1a8d6ca59d027fb6304bd0928",
+      "question_sha256": "6ad22db4188c0e4855c125f122765a92b1f80482dd67ca26e60af1e673c715f8",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Phase capture reads and labels output at phase end",
+          "verdict": "supported",
+          "reason": "finally deactivates fixture capture, suspends global capture, snapshots and adds stdout/stderr sections.",
+          "evidence": {
+            "path": "src/_pytest/capture.py",
+            "start_line": 857,
+            "end_line": 869
+          }
+        },
+        {
+          "claim": "Snapshot clears captured buffer",
+          "verdict": "supported",
+          "reason": "Subsequent phase captures begin after read/truncate.",
+          "evidence": {
+            "path": "src/_pytest/capture.py",
+            "start_line": 450,
+            "end_line": 456
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-f35a25d4323f7fb29e68ae3d",
+      "reference_sha256": "bd65adef4685dc4ed6b40a1b76f21a9dbc2496a7a71276299b5a714990570ff3",
+      "question_sha256": "d3fa05dc475de2754812da885c8870f75b74945674cc8b87f84fd609c0b84ab3",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Comparison helper accepts two callables and compares sets",
+          "verdict": "supported",
+          "reason": "Shared prefix and optional diagnostics; ignores ordering/duplicates rather than proving full behavior equivalence.",
+          "evidence": {
+            "path": "testing/test_argcomplete.py",
+            "start_line": 15,
+            "end_line": 24
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-f4bb470a3c29d36e29b968d4",
+      "reference_sha256": "74b2a90eec1897261329cd296e579c4f6f04228c533e487a5d4c674cbac52d20",
+      "question_sha256": "7f947d9b19fc7e820c670506a931a868c4690d88251facd05e1d56bf70c6763f",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Report branches on exception and phase",
+          "verdict": "supported",
+          "reason": "Passed, raw failure, skip location, call-specific failure repr and setup/teardown repr supported.",
+          "evidence": {
+            "path": "src/_pytest/reports.py",
+            "start_line": 349,
+            "end_line": 381
+          }
+        },
+        {
+          "claim": "Python item call failure does respect traceback style",
+          "verdict": "supported",
+          "reason": "repr_failure reads tbstyle, contradicting final claim.",
+          "evidence": {
+            "path": "src/_pytest/python.py",
+            "start_line": 1706,
+            "end_line": 1713
+          }
+        }
+      ],
+      "material_errors": [
+        "Incorrect claim traceback style is not respected for call-phase failures."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "TestReport.from_item_and_call marks no-exception calls passed, non-ExceptionInfo failures failed with their raw representation, skips skipped with item/crash location, and other exceptions failed (src/_pytest/reports.py:349-375). For call-phase failures it delegates to item.repr_failure; setup/teardown use item._repr_failure_py with configured tbstyle (lines376-381). Delegation permits item-specific formatting; it does not mean call failures ignore tbstyle\u2014Python Function.repr_failure explicitly reads that option (src/_pytest/python.py:1706-1713)."
+    },
+    {
+      "task_id": "import-f54befe4bf7353628615620b",
+      "reference_sha256": "e4ae83b1e8ce89078c0bf7b206a3c910c9314843487ccdab74302882f24f7d21",
+      "question_sha256": "c49d26824d41f6fee38f53465349f7d2d5e7cad7193b611016bd280380ee6afb",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Parametrized request scope tests inspect properties in generated fixtures",
+          "verdict": "supported",
+          "reason": "Class parameter matrix drives pytester makepyfile and inline_run.",
+          "evidence": {
+            "path": "testing/python/fixtures.py",
+            "start_line": 3430,
+            "end_line": 3479
+          }
+        },
+        {
+          "claim": "Request property guards enforce attribute availability",
+          "verdict": "supported",
+          "reason": "function/cls/module/path each check scopes.",
+          "evidence": {
+            "path": "src/_pytest/fixtures.py",
+            "start_line": 451,
+            "end_line": 489
+          }
+        },
+        {
+          "claim": "SubRequest scope check concerns fixture dependency scope",
+          "verdict": "supported",
+          "reason": "Does not resolve request attributes.",
+          "evidence": {
+            "path": "src/_pytest/fixtures.py",
+            "start_line": 780,
+            "end_line": 801
+          }
+        }
+      ],
+      "material_errors": [
+        "Conflates fixture dependency ScopeMismatch validation with request attribute availability."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "TestRequestScopeAccess parametrizes scope/allowed/error attributes, uses the pytester fixture to write generated tests with autouse or explicit fixtures, and runs them via inline_run (testing/python/fixtures.py:3430-3479). The generated fixtures inspect request properties. FixtureRequest\u2019s property guards provide the actual attribute restriction: function only at function scope, cls at class/function, module at module/class/function, and path additionally at package scope (src/_pytest/fixtures.py:451-489). SubRequest._check_scope instead rejects invalid fixture dependency scopes; it is a separate check (lines780-801)."
+    },
+    {
+      "task_id": "import-f5d5b8a1f728b442e7da9e96",
+      "reference_sha256": "61872a0b8ede4e161d0f94dc1c24792726f0145ec29b8ed1307508f64dc6401a",
+      "question_sha256": "d24d65a6b809b4263a88407d41c3b2c5f75459976d41fade2255d2d02b7f37ef",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Pytester receives process exit status and captured output",
+          "verdict": "supported",
+          "reason": "No Python exception transfer from subprocess.",
+          "evidence": {
+            "path": "src/_pytest/pytester.py",
+            "start_line": 1439,
+            "end_line": 1456
+          }
+        },
+        {
+          "claim": "Session wrapper converts interrupt and unexpected base exceptions",
+          "verdict": "supported",
+          "reason": "Interrupt/custom exit versus internal error; source supports general parent/child exception boundary.",
+          "evidence": {
+            "path": "src/_pytest/main.py",
+            "start_line": 290,
+            "end_line": 316
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

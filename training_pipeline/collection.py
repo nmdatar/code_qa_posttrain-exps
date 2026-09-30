@@ -14,7 +14,7 @@ from qa_eval.harness import EpisodeRecorder
 from qa_eval.schema import validate, SUBMISSION
 from .admission import verified_source, index, blob, sha
 from .config import verified_file
-from .contracts import ConfigurationError, VerificationResult, InfrastructureError
+from .contracts import ConfigurationError, VerificationResult, InfrastructureError, PolicyFormatError
 from .storage import digest, atomic_json
 from .claim_grading import VERSION as CLAIM_VERSION, PROMPT as JUDGE_PROMPT, reference_rubric, request_payload, aggregate
 
@@ -327,6 +327,8 @@ class CollectionEpisode:
         import copy
         from .harness_variants import tools, instructions, ObservationHistory
         spec = factory.config.get('harness', {})
+        self.source_tools = tuple(row['public']['permitted_tools'])
+        self.shell_only = spec.get('interface') == 'source-shell-v1'
         bash_only = factory.config['environment'].get('solver_tools') == 'bash-only-v1'
         self.bash_only = bash_only
         self.correctness_only = correctness_only(factory.config)
@@ -337,7 +339,7 @@ class CollectionEpisode:
             if bash_only:
                 raise ConfigurationError('Bash-only cannot expose additional harness tools')
             row = copy.deepcopy(row)
-            row['public']['permitted_tools'] = sorted(set(row['public']['permitted_tools']) | set(tools(spec)))
+            row['public']['permitted_tools'] = ['shell'] if self.shell_only else sorted(set(row['public']['permitted_tools']) | set(tools(spec)))
         self.row, self.sandbox, self.factory, self.episode_id = row, sandbox, factory, episode_id
         self.history = ObservationHistory(factory.root, episode_id) if spec.get('history') == 'evidence-ledger-v1' else None
         self.observed_files = {}
@@ -351,14 +353,27 @@ class CollectionEpisode:
             visible['user_prompt'] = augment(public['user_prompt'], factory.prompt_decompositions[row['id']])
         visible['budgets'].update({k:min(v, visible['budgets'].get(k,v)) for k,v in factory.config['limits'].items()})
         self.tool_calls = 0
+        self.invalid_action_policy = factory.config['environment'].get('invalid_action_policy', 'retry-v1')
         protocol = PROTOCOL
         if bash_only:
             from agent_harness.bash_tool import PROTOCOL as BASH_PROTOCOL
             protocol = BASH_PROTOCOL
         if factory.config['environment'].get('tool_read_policy') == 'paginate-v1':
             protocol = protocol.replace('Read at most 120 lines per call.', 'read_file returns at most 120 lines per call; larger requests return a first page with next_start_line. Follow that pointer only if needed.')
+        if self.shell_only:
+            from agent_harness.shell_tools import PROTOCOL as SHELL_PROTOCOL
+            protocol = SHELL_PROTOCOL
         if correctness_only(factory.config):
             protocol += '\nThe scored objective is factual correctness of the requested answer. Citations are optional and logged separately; they do not affect the score. Inspect source to avoid guessing.'
+        width = factory.config['environment'].get('tool_parallelism', 1)
+        if width > 1:
+            protocol += ('\nYou may batch up to ' + str(width) + ' independent read tools in one response: '
+                         '{"tool_calls":[{"tool":"search_code","arguments":{"query":"symbol"}},'
+                         '{"tool":"list_files","arguments":{"glob":"*.py"}}]}. '
+                         'Only list_files, search_code and read_file may be batched. '
+                         'Every call consumes one tool call from the remaining total budget. '
+                         'Results have zero-based call_index and preserve request order. '
+                         'Wait for results before issuing dependent calls. Never include an answer in a batch.')
         protocol += instructions(spec)
         self.messages = [{'role':'system','content':protocol.replace('TASK_ID', row['id'])}, {'role':'user','content':json.dumps(visible)}]
 
@@ -369,6 +384,8 @@ class CollectionEpisode:
         elif text.startswith('```') and text.endswith('```'):
             text = text[3:-3].strip()
         action = json.loads(text)
+        if getattr(self, 'invalid_action_policy', 'retry-v1') == 'zero-v1':
+            self._validate_action_format(action)
         if (isinstance(action, dict) and set(action) == {'action', 'arguments'}
                 and self.factory.config['environment'].get('tool_action_policy') == 'action-alias-v1'
                 and action['action'] in self.row['public']['permitted_tools']):
@@ -394,6 +411,59 @@ class CollectionEpisode:
             answer.setdefault('diagram', None)
         return action
 
+    def _validate_action_format(self, action):
+        """Check syntax/schema only; source permission and execution are separate."""
+        specs = {'list_files': ({}, {'glob':str, 'offset':int}),
+                 'search_code': ({'query':str}, {'glob':str}),
+                 'read_file': ({'path':str}, {'start_line':int, 'end_line':int})}
+        def tool(call):
+            if not isinstance(call, dict) or set(call) not in ({'tool','arguments'}, {'action','arguments'}):
+                raise PolicyFormatError('Expected tool and arguments')
+            key = 'tool' if 'tool' in call else 'action'
+            if key == 'action' and self.factory.config['environment'].get('tool_action_policy') != 'action-alias-v1':
+                raise PolicyFormatError('Action alias not enabled')
+            name, args = call[key], call['arguments']
+            if not isinstance(name, str) or name not in specs or not isinstance(args, dict):
+                raise PolicyFormatError('Invalid tool schema')
+            required, optional = specs[name]
+            if set(required)-set(args) or set(args)-set(required)-set(optional):
+                raise PolicyFormatError('Missing or extra tool arguments')
+            if any(type(value) is not {**required, **optional}[k] for k,value in args.items()):
+                raise PolicyFormatError('Invalid tool argument type')
+        if not isinstance(action, dict):
+            raise PolicyFormatError('Expected JSON object')
+        if set(action) == {'tool_calls'}:
+            calls = action['tool_calls']
+            if not isinstance(calls, list) or not calls:
+                raise PolicyFormatError('Expected nonempty tool list')
+            for call in calls: tool(call)
+        elif set(action) == {'answer','citations'}:
+            if not isinstance(action['answer'],str) or not isinstance(action['citations'],list):
+                raise PolicyFormatError('Invalid answer schema')
+            for ref in action['citations']:
+                if (not isinstance(ref,dict) or set(ref) != {'path','start_line','end_line'}
+                        or not isinstance(ref['path'],str)
+                        or any(type(ref[k]) is not int for k in ('start_line','end_line'))):
+                    raise PolicyFormatError('Invalid citation schema')
+        elif set(action) == {'answer'}:
+            answer = action['answer']
+            if not isinstance(answer,dict):
+                raise PolicyFormatError('Expected structured answer')
+            answer = dict(answer)
+            answer.setdefault('schema_version','1.0'); answer.setdefault('task_id',self.row['id']); answer.setdefault('diagram',None)
+            try: validate(answer,SUBMISSION)
+            except (ValueError,KeyError,TypeError) as exc: raise PolicyFormatError('Invalid answer schema') from exc
+        else:
+            tool(action)
+
+    def verify_invalid_format(self, trajectory):
+        submission = {'schema_version':'1.0','task_id':self.row['id'],'text':'','citations':[],'diagram':None}
+        envelope = self.recorder.finish(submission, self.factory.key, trajectory.termination)
+        atomic_json(self.factory.root/'private'/(self.episode_id+'.telemetry.json'), envelope)
+        self.sandbox.close()
+        return VerificationResult('resolved', 0.0, self.factory.reward_version, ['invalid_format'],
+                                  {'strict_score':0.0, 'training_reward':0.0, 'format_failure':True})
+
     def prepare_generation(self, remaining):
         if getattr(self, 'history', None):
             self.history.compact(self.messages)
@@ -411,7 +481,64 @@ class CollectionEpisode:
         if getattr(self, 'history', None):
             self.history.remember(observation, len(self.messages)-1)
 
+    def _parallel_commands(self, action):
+        width = self.factory.config['environment'].get('tool_parallelism', 1)
+        if not isinstance(action, dict) or set(action) != {'tool_calls'} or width <= 1:
+            raise ValueError('Parallel tool calls are not enabled')
+        calls = action['tool_calls']
+        if not isinstance(calls, list) or not 1 <= len(calls) <= width:
+            raise ValueError('Invalid parallel tool-call count')
+        left = min(getattr(self, 'remaining_tool_calls', width),
+                   self.factory.config['limits']['max_tool_calls'] - self.tool_calls,
+                   self.row['public']['budgets']['max_tool_calls'] - self.tool_calls)
+        if len(calls) > left:
+            raise ValueError('Parallel batch exceeds remaining tool-call budget')
+        commands = []
+        for call in calls:
+            if (not isinstance(call, dict) or set(call) != {'tool', 'arguments'}
+                    or call['tool'] not in ('list_files', 'search_code', 'read_file')
+                    or call['tool'] not in self.row['public']['permitted_tools']):
+                raise ValueError('Only permitted read tools may be batched')
+            commands.append(command(call['tool'], call['arguments'],
+                self.row['image_result']['snapshot_files'], '/workspace',
+                paginate_reads=self.factory.config['environment'].get('tool_read_policy') == 'paginate-v1'))
+        return commands
+
+    def action_tool_count(self, action):
+        if isinstance(action, dict) and 'tool_calls' in action:
+            self._parallel_commands(action)  # Validate the entire batch before reserving anything.
+            return len(action['tool_calls'])
+        return int(isinstance(action, dict) and 'tool' in action)
+
+    def _parallel_step(self, action):
+        commands = self._parallel_commands(action)
+        calls = action['tool_calls']
+        if self.recorder.closed:
+            raise ValueError('Closed episode')
+        # Reserve all telemetry on the owner thread before any sandbox work.
+        self.tool_calls += len(calls)
+        self.recorder.record['tool_calls'].extend(c['tool'] for c in calls)
+        started = time.monotonic()
+        try:
+            results = self.sandbox.execute_many(commands,
+                max_parallel=self.factory.config['environment']['tool_parallelism'])
+        finally:
+            # Wall duration, not the sum of overlapping command durations.
+            self.recorder.record['tool_seconds'] += time.monotonic() - started
+        if len(results) != len(calls):
+            raise InfrastructureError('Parallel command batch returned incomplete results')
+        observations = []
+        for i, (call, result) in enumerate(zip(calls, results)):
+            if call['tool'] == 'read_file' and result.exit_code == 0:
+                path = call['arguments']['path']
+                self.observed_files[path] = self.row['image_result']['snapshot_files'][path]
+            observations.append({'call_index': i, 'tool': call['tool'], 'arguments': call['arguments'],
+                                 'observation': asdict(result)})
+        return False, {'tool_results': observations}
+
     def step(self, action):
+        if isinstance(action, dict) and 'tool_calls' in action:
+            return self._parallel_step(action)
         if set(action) == {'answer'}:
             answer = action['answer']
             validate(answer, SUBMISSION)
@@ -427,6 +554,20 @@ class CollectionEpisode:
             argv = bash_command(action['arguments'])
             self.tool_calls += 1
             result = self.recorder.tool('bash', lambda: self.sandbox.execute(argv))
+            return False, asdict(result)
+        if getattr(self, 'shell_only', False):
+            from agent_harness.shell_tools import command as shell_command
+            argv, source_tool, arguments = shell_command(action['arguments'],
+                self.row['image_result']['snapshot_files'], permitted_tools=self.source_tools)
+            self.tool_calls += 1
+            result = self.recorder.tool('shell', lambda:self.sandbox.execute(argv))
+            if source_tool == 'read_file' and result.exit_code == 0 and not result.stdout_truncated:
+                content = json.loads(result.stdout)
+                path = arguments['path']
+                expected = self.row['image_result']['snapshot_files'][path]
+                if content.get('path') != path or content.get('file_sha256') != expected:
+                    raise ValueError('Shell evidence hash mismatch')
+                self.observed_files[path] = expected
             return False, asdict(result)
         from agent_harness.research_tools import TOOLS, command as research_command
         if action['tool'] == 'read_observation' and getattr(self, 'history', None):

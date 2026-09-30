@@ -1,0 +1,92 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-052.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "0ec096d9c6216f9fc8ee0dd3e8ad4183a21b6df6e214b84ce6a154cc471e65dd",
+      "question": "How does pytest's indirect parametrization mechanism resolve non-hashable dictionary items through fixture request parameters, and what internal transformations occur when parametrize decorators process mutable objects that cannot be used as cache keys?",
+      "question_sha256": "825f4146cef0e8992ce1827dbf03535d04ef55c716e7e148e1cdb17b4a4c11ab",
+      "reference_answer": "Indirect parameters are retrieved directly from callspec.params and passed into SubRequest (src/_pytest/fixtures.py:614-637). FixtureDef.cache_key returns request.param (lines1136-1137), but this value is compared rather than hashed: execute first tries bool(request_cache_key == cache_key), falling back to identity only when equality raises ValueError or RuntimeError (lines1093-1113). Consequently non-hashable dictionaries need no transformation, and distinct equal dictionaries can hit the cache. Mutating shared parameters can change comparison behavior; no immutable copy is promised.",
+      "reference_sha256": "d31f5475401ab9d4f3b0afa1a012032e17334913acc5c3d4a60b175e2fdbe453",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e00e627ca510b66a673a2f40"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "65523d248118e434a5b468a926054682b7e980642d446fae294ca3980b2640ba",
+      "question": "How does the FastFilesCompleter.__call__ method reconcile the dual glob expansion strategies for handling hidden files versus wildcard patterns, and what is the algorithmic consequence of applying prefix_dir stripping after sorting?",
+      "question_sha256": "99d10d4eb3a2495a7944a413f5f99ec3a617f77be8e696de9cf3eed720b3a227",
+      "reference_answer": "FastFilesCompleter computes a prefix_dir length, then for prefixes without * or ? adds hidden matches only for an empty prefix or trailing separator and appends * for ordinary matches. Existing wildcard prefixes are globbed directly (src/_pytest/_argcomplete.py:80-93). It sorts full matches, adds / to directories, and strips prefix_dir characters from each emitted completion (lines94-99). Output order therefore follows pre-stripping full paths, rather than a fresh sort of displayed names. There is no explicit deduplication.",
+      "reference_sha256": "82893d80105ca7cb3c643769ce8f67443f8a9f20af945ea7417cfc1f47c83618",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e0cdc230a5c178a07822d762"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "fc8c5919548fe715673c48dff9eac98844cca61df5471571e4b819c8b4b24758",
+      "question": "Why does the SysCapture class maintain consistency between its captured buffer state and the original system stream when snap() and writeorg() operations are interleaved during test execution?",
+      "question_sha256": "460951877f8de6788969f65212545c3f92fd198402020f753a24fa0266d2c095",
+      "reference_answer": "SysCapture.snap reads tmpfile then seeks and truncates it; writeorg writes and flushes the saved original stream. Both require started or suspended state (src/_pytest/capture.py:450-461). start/resume bind the system stream to tmpfile while suspend restores the original (lines402-426). This separates sequential snapshotting from bypass output, but the operations are not an atomic transaction and these methods provide no locking guarantee for concurrent writes.",
+      "reference_sha256": "2c7f2602480ba2fcc89829afbf9d962bce19cf5abe55de0304c26472095a2f29",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e8d09990db3c6eb42ddf9dd6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "74b2a90eec1897261329cd296e579c4f6f04228c533e487a5d4c674cbac52d20",
+      "question": "How does the `from_item_and_call` classmethod implement conditional logic to determine the appropriate outcome and longrepr representation based on exception type and execution phase?",
+      "question_sha256": "7f947d9b19fc7e820c670506a931a868c4690d88251facd05e1d56bf70c6763f",
+      "reference_answer": "TestReport.from_item_and_call marks no-exception calls passed, non-ExceptionInfo failures failed with their raw representation, skips skipped with item/crash location, and other exceptions failed (src/_pytest/reports.py:349-375). For call-phase failures it delegates to item.repr_failure; setup/teardown use item._repr_failure_py with configured tbstyle (lines376-381). Delegation permits item-specific formatting; it does not mean call failures ignore tbstyle\u2014Python Function.repr_failure explicitly reads that option (src/_pytest/python.py:1706-1713).",
+      "reference_sha256": "45f4e097338163bbe9bda52c44114982bb8951f313a379704a1169c6ff914a7e",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-f4bb470a3c29d36e29b968d4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "e4ae83b1e8ce89078c0bf7b206a3c910c9314843487ccdab74302882f24f7d21",
+      "question": "What is the dependency chain between the TestRequestScopeAccess class, the pytest fixture system, the parametrization mechanism, the Pytester fixture, and the internal request attribute resolution logic that validates request object attributes are correctly scoped?",
+      "question_sha256": "c49d26824d41f6fee38f53465349f7d2d5e7cad7193b611016bd280380ee6afb",
+      "reference_answer": "TestRequestScopeAccess parametrizes scope/allowed/error attributes, uses the pytester fixture to write generated tests with autouse or explicit fixtures, and runs them via inline_run (testing/python/fixtures.py:3430-3479). The generated fixtures inspect request properties. FixtureRequest\u2019s property guards provide the actual attribute restriction: function only at function scope, cls at class/function, module at module/class/function, and path additionally at package scope (src/_pytest/fixtures.py:451-489). SubRequest._check_scope instead rejects invalid fixture dependency scopes; it is a separate check (lines780-801).",
+      "reference_sha256": "7c42b37b41f407a3ed71dca3cd0b75ae9c176300dd1367f2a39fcbb8293cac79",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-f54befe4bf7353628615620b"
+    }
+  ]
+}

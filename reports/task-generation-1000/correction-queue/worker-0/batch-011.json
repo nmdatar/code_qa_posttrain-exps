@@ -1,0 +1,126 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-011.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "original_reference_sha256": "e83350c4496322f9cbc13d27bf89215ea730f6e494e918d1611682fd7c4352ee",
+      "question": "Where in the codebase are the database routing rules evaluated that determine whether fixture data for a Book model should be loaded into the 'default' or 'other' database during the test_fixture_loading execution?",
+      "question_sha256": "46f506603d0071a96a70a2a145c9cb68bb196f0415cfa5e53e5b3a52310c5f17",
+      "reference_answer": "loaddata.save_obj evaluates router.allow_migrate_model(self.using, model) before saving to that alias (django/core/management/commands/loaddata.py:198-210), and ConnectionRouter returns the first non-None router decision (django/db/utils.py:256-276). Distinct Book titles across aliases in test_fixture_loading are not selected by per-title router rules: fixture discovery also searches alias-qualified names (django/core/management/commands/loaddata.py:292-303); the test declares multidb-common and multidb fixtures and AntiPetRouter only distinguishes Pet from other models (tests/multiple_database/tests.py:1995-2011).",
+      "reference_sha256": "9846be1315fb42ffc39e38885650cef479708dcb199543434dac9ea36dce2105",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-15860ccdbb3364165d80f200"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "original_reference_sha256": "21af09915b5b9e01e6fba050e0a9d583d4d8a7698f5ceff3214d5e6d7c31018b",
+      "question": "How should the migration system architecture handle the exception hierarchy to prevent irreversible operations from being executed, and what design pattern enables safe delegation of rollback decisions across multiple migration components?",
+      "question_sha256": "98a8a7edabf45144b071d67015aff8f74fd8825278d14a876ddfaa9b76aa689c",
+      "reference_answer": "Migration.unapply first checks each top-level operation.reversible and builds intermediate states, raising IrreversibleError before its second phase executes backwards operations (django/db/migrations/migration.py:139-170). Operations supply polymorphic reversible properties; IrreversibleError derives from RuntimeError (django/db/migrations/exceptions.py:34-35). This is local preflight, not a guarantee that every nested operation or entire migration plan is reversible: SeparateDatabaseAndState delegates backwards execution directly to contained operations (django/db/migrations/operations/special.py:43-58). Transaction scope and backend behavior determine rollback of changes if execution later fails.",
+      "reference_sha256": "ad756f9feba3b5cef6dbe174718abac14c4abf7bd64581ca60f5d21ec6880154",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-1ce1b514fbfb95085d7141f2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "original_reference_sha256": "dcfd8ede2eeb7a8bd85101cd8e8077ce5a326938f6eeaa49da3d8f8b1a74d2b5",
+      "question": "How should the UUID value conversion in DatabaseOperations handle the trade-off between eager validation at conversion time versus lazy validation at database write time, considering the implications for error reporting and transaction rollback behavior across different database backends?",
+      "question_sha256": "6fb59e0168d7c27d390d42d6252386f8dc92d78484eaa02a2a96fd0d1d5919bc",
+      "reference_answer": "UUIDField.get_db_prep_value converts non-UUID values through to_python, returning a UUID for native support or hex otherwise. Invalid string/integer representations caught by to_python raise ValidationError (django/db/models/fields/__init__.py:2753-2774). Keeping this conversion provides a common field-level error before SQL execution, but does not place the error outside transactions: preparation can occur inside an existing atomic block, whose exception handling governs rollback (django/db/transaction.py:224-303). Deferring validation to a database would make behavior backend-dependent, particularly where UUIDs are stored as text.",
+      "reference_sha256": "8646dce5836ed8b4ab0ae0461164d0b5be40f51ccd1e7ac0abde694444b65240",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-2abae249aa84a3e55b6bd506"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "original_reference_sha256": "afa7377ad499963b67d58a8f6a4f8c0ee57b843228ea4ad52a54e69508b245c7",
+      "question": "Why is there a cumulative performance impact of the Field class's multiple property accessors and lazy initialization patterns when accessing field attributes millions of times in ORM operations, and how can this be optimized?",
+      "question_sha256": "9a8e0bdacdf40795bfa33954a97fd356e61a9d65e4392a45915a89627413f11d",
+      "reference_answer": "Non-cached properties can repeat work: flatchoices rebuilds a list, db_tablespace consults current settings, and db_returning uses current connection features (django/db/models/fields/__init__.py:928-937,1093-1096). Cached properties store results in instance.__dict__, bypassing their descriptor thereafter (django/utils/functional.py:39-48). Source alone does not establish a regression or its size. Profile actual hot paths before optimizing; unconditional caching needs invalidation because choices can be reassigned and settings/connection context can change (django/db/models/fields/__init__.py:548-554).",
+      "reference_sha256": "860d1160184afea66790ef763d9128f7367c365986cf959d92f06d8f6cf66f72",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-2e008fd0effc857cb5eaa555"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "original_reference_sha256": "c3a00bec6d3907cab64d6c20ef21a3e5510336ea090ba92d1a260eb7a6de2587",
+      "question": "What is the nested Prefetch dependency chain in test_nested_prefetch_is_not_overwritten_by_related_object that ensures the reverse relationship cache from the parent House object does not override the explicitly prefetched Room.house relationship, and what would break if the inner Prefetch queryset's only() clause were removed?",
+      "question_sha256": "ac39253f2579c28c824ed3f445da2ad8a2ecebbd9e4b27c5f233c40a9c20e476",
+      "reference_answer": "The chain is House.only(\"name\") -> Prefetch(\"rooms\", Room.prefetch_related(Prefetch(\"house\", House.only(\"address\")))) (tests/prefetch_related/tests.py:1975-1995). When iterating the child queryset, the reverse manager only fills Room.house if that field is not already cached (django/db/models/fields/related_descriptors.py:762-769). set_cached_value itself simply assigns (django/db/models/fields/mixins.py:30-31). The inner only clause makes different field loading visible in the regression test; removing it still fetches address and does not disable cache protection or inherently break the zero-query address access.",
+      "reference_sha256": "497cf8fe6629d093c38cf8c9e347aa0c60d3c3360a8b03d644a1876842b0f365",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-31fa259054670e03aaccc7e9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "original_reference_sha256": "e8052b9c2b100a5e4c8778d12b1a2177ab5a0ee594870ce4675c1f9a053c7174",
+      "question": "Why is there a performance regression caused by the clean() method's sequential invocation of to_python(), validate(), and run_validators() when processing large datasets, and how can this be optimized?",
+      "question_sha256": "a4018c83d661bd078b828b00034385115e6a0b7bc19a8ad6f5865b6482d81a92",
+      "reference_answer": "Field.clean converts, validates requiredness, then runs validators in that order (django/forms/fields.py:200-208). Exceptions from to_python or validate immediately abort later steps. run_validators skips empty values and collects validator errors (django/forms/fields.py:182-198). Large workloads repeat these operations, but the source does not demonstrate a performance regression. Profile conversion and validators before optimizing, and preserve normalization order, errors and validation semantics; blindly skipping unchanged fields or caching conversions can change results.",
+      "reference_sha256": "d764393dd64ebd8dfea9fb69ba9edc90988d9826c84ae631d531b9ab8d93b931",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-338c4cc17ad313af94f731c3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "original_reference_sha256": "a0b2b70609f478b2f387fd0014d8ab2d77d5e3b3742b81579dc385054cc3c5aa",
+      "question": "Why does the User model's unique constraint on the username field interact with Django's ORM transaction handling and what cascading effects would occur if this constraint were removed on an existing database with formset-based bulk operations?",
+      "question_sha256": "507a46dcc4f740e6fe3c22186ea393228aeded3ac2ca6eed5d83a103304c1038",
+      "reference_answer": "AbstractUser.username declares unique=True (django/contrib/auth/models.py:454-467). Model/form validation can detect duplicates early, while the database constraint protects against concurrent races. BaseModelFormSet.save saves existing/new objects without wrapping the whole batch in atomic (django/forms/models.py:798-814); all-or-nothing behavior requires an enclosing transaction, handled by Atomic.__exit__ (django/db/transaction.py:224-303). Removing the database constraint permits duplicate writes even if model metadata remains unique; changing metadata too changes validation and may trigger auth uniqueness checks (django/contrib/auth/checks.py:71-99). Dropping the constraint does not itself require duplicate cleanup; reintroducing uniqueness after duplicates arise does.",
+      "reference_sha256": "0febd3551fd16cd83acb512d60388c3dad37872c1c5a11f3888e3c48feb0499c",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-3585fdbf9eb6949cd2d1a51f"
+    }
+  ]
+}

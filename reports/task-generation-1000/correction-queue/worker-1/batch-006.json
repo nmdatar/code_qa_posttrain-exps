@@ -1,0 +1,92 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 1,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-006.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/cekit--cekit-6b82c4adc0e2",
+      "original_reference_sha256": "3b10676a68585bc583d298428df57078bac718d6df559699fbaf35f12dc99ebc",
+      "question": "Where are the test tag identifiers processed and transformed during behave test execution in CEKit's testing framework?",
+      "question_sha256": "55d7f46e969e300ec067036cf2afcb03ca3bf32681cca9f0bb91dc7e0b89e588",
+      "reference_answer": "Generator.get_tags returns name:version and name:latest (cekit/generator/base.py:134-136). BehaveTester.run selects the first or @wip (behave_tester.py:57-61). With no name filters, BehaveTestRunner.run computes a colon-stripped test_tag and uses @namespace,@full-name for slash-containing tags; otherwise it appends the original tag, retaining any version (behave_runner.py:44-57).",
+      "reference_sha256": "1e20fbd6b21f4af08c20534c316cafd41ca16294eac34ecb23be8a51382d7a8e",
+      "repository": {
+        "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+        "family_id": "cekit/cekit",
+        "url": "https://github.com/cekit/cekit"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/cekit--cekit-6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-50539ece6dccdfccc93ef5ff"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/cekit--cekit-6b82c4adc0e2",
+      "original_reference_sha256": "87f7deccc15d6b09bcf39d669b19b33a208c2225b89e950ce5358e8863de4bc1",
+      "question": "How does cekit's package management system handle package manager selection and validation across different container base images and build environments?",
+      "question_sha256": "af99fbeb0d233540900627fca4f3fcf74f8d9a4dd7572348e10075b8b7bb91e2",
+      "reference_answer": "The package schema restricts manager to yum, dnf, or microdnf (cekit/descriptor/packages.py:23). Image.process_defaults assigns yum when packages.manager is absent (cekit/descriptor/image.py:80-82). This is a fixed fallback, not detection of the base image package manager; users must select a suitable supported manager.",
+      "reference_sha256": "e541b86bc4664bfd441cec9fbe03fc4140fad5272b856e7188c1de73ebefecbb",
+      "repository": {
+        "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+        "family_id": "cekit/cekit",
+        "url": "https://github.com/cekit/cekit"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/cekit--cekit-6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-6e943669aae98abc2b848e34"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/cekit--cekit-6b82c4adc0e2",
+      "original_reference_sha256": "36fcf85ac18af755fd1c5bbfe802d2ccdef598c5d0220fe82ebdee711dcdf702",
+      "question": "Why does CEKit's package management system conditionally clear package manager metadata only when packages are installed rather than implementing a universal cache invalidation strategy?",
+      "question_sha256": "d9b40c9df071e9d89c88774cc735c4c1fe6594d7d4bd9037b63c6ed93182e93f",
+      "reference_answer": "The Dockerfile template emits package cleanup only when helper.packages_to_install(image) is truthy (cekit/templates/template.jinja:138-141). The cleanup macro calls the selected supported manager clean all and removes /var/cache/yum (25-29). Thus no cleanup RUN is generated when no packages are to be installed. Avoiding an unnecessary command is a consequence; the code alone does not prove historical rationale or performance gains.",
+      "reference_sha256": "4a869b94020e12838782a1545d56ad50052e6cf64a4dec10082155acf07307d6",
+      "repository": {
+        "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+        "family_id": "cekit/cekit",
+        "url": "https://github.com/cekit/cekit"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/cekit--cekit-6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-88c850cee4fae8ee2688805c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/cekit--cekit-6b82c4adc0e2",
+      "original_reference_sha256": "c81dd93a5da5af14614bb2f7aec129fda26173bdda6f20ed9ab0d03c93fe69cb",
+      "question": "Why does CEKit's test collection system require explicit tagging for behave test execution instead of running all collected tests by default?",
+      "question_sha256": "21e4369eff5fa079a5d194fdd812265c270ec9c7228da507d687d8dcf088f4b7",
+      "reference_answer": "CEKit collects shared steps, repository-root tests, module tests, and image tests (cekit/test/collector.py:53-72). BehaveTester defaults to the primary image tag or @wip (behave_tester.py:57-61), and BehaveTestRunner translates tags to selection arguments (behave_runner.py:49-57), which limits the combined suite. However, supplied test_names use --name instead of the tag loop (44-48). ~ignore is always supplied, while ~ci is added only in the tag branch when the user is not jenkins (37-64).",
+      "reference_sha256": "244902466a781833d223a7063ffbde8e43ced1f3e1ac6c098d4a2294cea26646",
+      "repository": {
+        "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+        "family_id": "cekit/cekit",
+        "url": "https://github.com/cekit/cekit"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/cekit--cekit-6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-b8bd4cfe9d85ec4625d95d88"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/cekit--cekit-6b82c4adc0e2",
+      "original_reference_sha256": "0714cff8cb0439ff0a83f481b2593e28244873db6eb3f388bc2fe19232222778",
+      "question": "What is the architecture of timeout management across different builder implementations in cekit's container build system?",
+      "question_sha256": "d7ea5af886ffe188c4714e68c7f5c37f9796dee006c1e522b22746b94f6549f7",
+      "reference_answer": "DockerBuilder reads positive integer DOCKER_TIMEOUT, default 600, as the daemon connection timeout (cekit/builders/docker_builder.py:51-62). OSBS _wait_for_osbs_task has timeout=7200 as a method default and checks current_time > timeout while polling every 20 seconds (cekit/builders/osbs.py:182-192,213-215). Buildah and Podman call subprocess.check_call(cmd) with no explicit timeout (buildah.py:52-53; podman.py:52-53). These govern different stages, not uniform maximum build durations.",
+      "reference_sha256": "d73f4acb20bf70248d03a75d9eb2f738ebc76f0e4a97b136c6471e3993f7ff23",
+      "repository": {
+        "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+        "family_id": "cekit/cekit",
+        "url": "https://github.com/cekit/cekit"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/cekit--cekit-6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-dd6ba2db772f5d50e095202f"
+    }
+  ]
+}

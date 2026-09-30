@@ -1,0 +1,338 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-0c613a2a48e168f78506c7c9",
+      "reference_sha256": "de237e5c50ac0d92d88abd9fdd6195d589e766e0058ee452eb37bc98392c864a",
+      "question_sha256": "0e9533b4fc95b02f1c8381d55e12c9ef53a289fe16d4ff57781eecedcd694a4a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "ZEA radius is calculated by zeas2x using degree sine",
+          "verdict": "supported",
+          "reason": "Radius expression matches the answer; initialization assigns the function pointer at 2672 and scale at 2662-2668.",
+          "evidence": {
+            "path": "cextern/wcslib/C/prj.c",
+            "start_line": 2831,
+            "end_line": 2842
+          }
+        },
+        {
+          "claim": "sind converts degrees",
+          "verdict": "supported",
+          "reason": "Special cases plus sin(angle*D2R).",
+          "evidence": {
+            "path": "cextern/wcslib/C/wcstrig.c",
+            "start_line": 54,
+            "end_line": 74
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-0cc45773ec185cf178d731d0",
+      "reference_sha256": "02a84b49cb911744f68e06f272696196da39126f66cf1cf7de798c17d562fcec",
+      "question_sha256": "4b7ca09e54507abab9f7caf411bb38c0b2878ace71e993482765a459a38f4ff3",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "check_download_cache raises CacheDamaged",
+          "verdict": "supported",
+          "reason": "Checks accumulate bad_files and raise at 2044; inspected module raise matches.",
+          "evidence": {
+            "path": "astropy/utils/data.py",
+            "start_line": 1997,
+            "end_line": 2044
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-16b11e3f2e95b9676b10b313",
+      "reference_sha256": "f3f71a465081e416c5cd8fadc79a07b532c905053e8e848a3c03fe95e85001f0",
+      "question_sha256": "3406425c07abf95704a1215681dc8bd46f69e0a3daf605e1a338383a3ab6d6bd",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Tests enforce parent-assignment order",
+          "verdict": "unsupported",
+          "reason": "Assertions check final names/types and shared data; they do not inspect parent assignment or its order.",
+          "evidence": {
+            "path": "astropy/table/tests/test_init_table.py",
+            "start_line": 270,
+            "end_line": 298
+          }
+        },
+        {
+          "claim": "Implementation separates conversion and parent assignment",
+          "verdict": "supported",
+          "reason": "Columns are installed then parent_table is set; _init_from_list converts at 1275 before _init_from_cols.",
+          "evidence": {
+            "path": "astropy/table/table.py",
+            "start_line": 1559,
+            "end_line": 1595
+          }
+        }
+      ],
+      "material_errors": [
+        "Final-state name assertions do not establish or enforce the claimed temporal separation."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "TestInitFromColsList checks resolved names, dtypes and copy=False sharing (astropy/table/tests/test_init_table.py:270-298); it does not directly enforce when parent references are assigned. The implementation converts inputs in _init_from_list before calling _init_from_cols (astropy/table/table.py:1262-1279), then _make_table_from_cols installs the columns and calls _set_col_parent_table_and_mask to assign parent_table (1559-1595)."
+    },
+    {
+      "task_id": "import-1bb3321682f47d86c458c9e9",
+      "reference_sha256": "ded10e9f9907322953b369c71a2bfe04c0110a38cdc1788a858bac3a711ab0e2",
+      "question_sha256": "d343bdcfc2d602c8b6d65fad3a7c453e3303fbf9b1a4528505ac249001b15dac",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Preprocessor uses Macro variadic metadata",
+          "verdict": "supported",
+          "reason": "Counts args, appends empty variadic slot or collects tail, then expands.",
+          "evidence": {
+            "path": "astropy/extern/ply/cpp.py",
+            "start_line": 514,
+            "end_line": 534
+          }
+        },
+        {
+          "claim": "Prescan and expansion handle variadic comma removal",
+          "verdict": "supported",
+          "reason": "Records var_comma_patch based on vararg and removes commas for empty final arg.",
+          "evidence": {
+            "path": "astropy/extern/ply/cpp.py",
+            "start_line": 395,
+            "end_line": 457
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-1c3b2703cfe74e88f14de19c",
+      "reference_sha256": "d64e4bd6eae300171058e60502dc5fb5e2721e47a97564cce9d4e3c2d2a4e4b6",
+      "question_sha256": "02f91a29d1bf966040f32b17b9ddeef8351dd1a72d715fc40ffd9fd6856e82b1",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Nonnegative check branches after float conversion",
+          "verdict": "supported",
+          "reason": "validate_to_float calls validate_with_unit and float; negative branch raises, otherwise returns.",
+          "evidence": {
+            "path": "astropy/cosmology/_src/parameter/converter.py",
+            "start_line": 65,
+            "end_line": 99
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-214e735279e53690253950d8",
+      "reference_sha256": "4754ca5f0c7f580dc9d757b3ecbb13f96cd017941882701706b6f51fa216cc01",
+      "question_sha256": "f64c5f354ed79416d6b8052f5f790fbda3772941f9323b0d0fd950ebd3a24538",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Smoke test has no assertions",
+          "verdict": "supported",
+          "reason": "Comment calls it hard to test; neighboring tests capture plain and ANSI output.",
+          "evidence": {
+            "path": "astropy/utils/tests/test_console.py",
+            "start_line": 67,
+            "end_line": 96
+          }
+        },
+        {
+          "claim": "Stdout is uncapturable and comprehensive tests necessarily brittle",
+          "verdict": "unsupported",
+          "reason": "Neither stated by comment nor entailed by code; capture/mocks are demonstrated.",
+          "evidence": {
+            "path": "astropy/utils/tests/test_console.py",
+            "start_line": 67,
+            "end_line": 96
+          }
+        }
+      ],
+      "material_errors": [
+        "Claims uncapturable stdout and invents detailed author intent."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "test_color_print only calls color_print twice and has the comment \"This stuff is hard to test, at least smoke test it\" (astropy/utils/tests/test_console.py:67-71). It therefore checks that these calls complete without raising. The source does not establish the detailed rationale proposed in the question; nearby tests use StringIO and FakeTTY to assert plain and ANSI output (74-96)."
+    },
+    {
+      "task_id": "import-2bb68add52f3d0d976d2c402",
+      "reference_sha256": "48b74c3a186d5559a126837275c85c75f6a209bf36714e86143aadb4e5dbcac2",
+      "question_sha256": "c2b72226a794a90ca446db99b5cf48821be6f4f029122ab60e4b510757f8c0ff",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Header mapping normalizes through Card.normalize_keyword",
+          "verdict": "supported",
+          "reason": "Calls normalizer before dictionary insertion.",
+          "evidence": {
+            "path": "astropy/io/fits/header.py",
+            "start_line": 536,
+            "end_line": 544
+          }
+        },
+        {
+          "claim": "Actual uppercase conversion is Card.normalize_keyword",
+          "verdict": "supported",
+          "reason": "Uppercases keyword while preserving record field-specifier case.",
+          "evidence": {
+            "path": "astropy/io/fits/card.py",
+            "start_line": 574,
+            "end_line": 605
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-35da7acfac96a72b76488f15",
+      "reference_sha256": "03cdbcb87a3aac9ff38c6badabab86bab50c81d23c47747e8c60b2541c4c7991",
+      "question_sha256": "58c28516fad46ec51f9b17f4f7c1b1575efd20aee9ea58ff121215dfeb4aff72",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Separability is dependency metadata, not measured coordinate optimization",
+          "verdict": "contradicted",
+          "reason": "Constructs a dense zeros matrix then fills diagonal. No coordinate evaluation, parallelism or complexity speedup is implemented here.",
+          "evidence": {
+            "path": "astropy/modeling/separable.py",
+            "start_line": 200,
+            "end_line": 214
+          }
+        }
+      ],
+      "material_errors": [
+        "Invented O(n\u00b2)-to-O(n) floating-point savings, parallelization and memory-bandwidth claims."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "Cylindrical declares _separable=True (astropy/modeling/projections.py:690-697). The separability machinery represents this with diagonal input-output dependency entries (astropy/modeling/separable.py:200-214). That lets consumers identify independent coordinates; this code does not itself parallelize transformations, reduce evaluation complexity, or demonstrate pipeline performance gains."
+    },
+    {
+      "task_id": "import-3e1b56e3c137076cff642f1b",
+      "reference_sha256": "5f6218eb7d0424ef48472d4795aa3293ade560d51f5b0aee8709fda938ba67b0",
+      "question_sha256": "5f421da9b427decc40ccfe431e14543f95f2e0b2c2baaa99480876a5687072f0",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Template regex and _parse_match delegate contextual lookup",
+          "verdict": "supported",
+          "reason": "Regex recognizes escaped/named/braced tokens; _fetch searches current, DEFAULT, then parents.",
+          "evidence": {
+            "path": "astropy/extern/configobj/configobj.py",
+            "start_line": 354,
+            "end_line": 443
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-45249a9d7cd81def7bb17466",
+      "reference_sha256": "c6a78bbc7d2635ed66a9765352b68276d6355a209732b6aa6164e2b0b0c2eb52",
+      "question_sha256": "3f94c471057fb9533e534ded185de5aede36a2a300db7c13ed973095fa0e4ee9",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Leap-second selection retains latest expiry and stops at good enough",
+          "verdict": "supported",
+          "reason": "Local/cached trials precede downloads; data_url records selected file.",
+          "evidence": {
+            "path": "astropy/utils/iers/iers.py",
+            "start_line": 1170,
+            "end_line": 1209
+          }
+        },
+        {
+          "claim": "Tests observe selected provenance",
+          "verdict": "supported",
+          "reason": "ERFA, built-in and fake future source expectations match.",
+          "evidence": {
+            "path": "astropy/utils/iers/tests/test_leap_second.py",
+            "start_line": 248,
+            "end_line": 286
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-470be69fca66775f67deb6af",
+      "reference_sha256": "96527668945eb76f7d76dbf76adb4ac5eb21b212f1c54fbc15b1e53fa2340f69",
+      "question_sha256": "2250846a4f377540debeab79a4ea798da48975e41625cb66f9384af4481eacb8",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Header copy copies each card",
+          "verdict": "supported",
+          "reason": "New header is made from copy.copy(card).",
+          "evidence": {
+            "path": "astropy/io/fits/header.py",
+            "start_line": 806,
+            "end_line": 829
+          }
+        },
+        {
+          "claim": "Construction copies supplied header",
+          "verdict": "supported",
+          "reason": "Explicit protective-copy comment and header.copy(strip=True).",
+          "evidence": {
+            "path": "astropy/io/fits/hdu/table.py",
+            "start_line": 337,
+            "end_line": 343
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-489e64e2d14c758a11a7b746",
+      "reference_sha256": "fc83f0f5302e579e46f60c589e471715e35dad7ef8b75295ff00ed959b53b8cd",
+      "question_sha256": "a1ce472c9964ac112dd1d50a4c422f644e90bc07d2088542423ca49fd3190825",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Masked broadcasting applies same resulting shape to masks",
+          "verdict": "supported",
+          "reason": "Unwraps data, broadcasts, broadcasts mask, wraps outputs; meshgrid linkage is through NumPy broadcasting rather than direct meshgrid implementation.",
+          "evidence": {
+            "path": "astropy/utils/masked/function_helpers.py",
+            "start_line": 661,
+            "end_line": 688
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

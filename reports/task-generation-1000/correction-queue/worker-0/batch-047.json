@@ -1,0 +1,75 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-047.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "4b487f56386078b4cd883187bd0892c784947084ae2ab26e7b9949bd51379ca3",
+      "question": "How would you refactor the configuration option value formatter to implement parameter validation and type checking while maintaining backward compatibility with existing callers that pass arbitrary object types?",
+      "question_sha256": "0449fe3e0ecc35e5776cb4e3d9a28f1e0143b7d3f807f2be2b26c1fa8ccd79c6",
+      "reference_answer": "Keep the existing Any input boundary and string fallback while narrowing types inside helpers. Preserve py_version precedence, recursive sequence formatting, dict formatting, match/pattern duck typing, yn truthiness, and whitespace quoting (pylint/utils/utils.py:275-293). Add an opt-in validator or validation at configuration parsing boundaries rather than rejecting arbitrary objects in the formatter. Narrow OptionDict fields and add overloads where useful, but a union containing Any does not enforce validation. New warnings also alter behavior under warnings-as-errors, so avoid enabling them by default if strict compatibility is required.",
+      "reference_sha256": "7119f58305d79e1b17f28ca813860caa903cace43516f637d6bb9828a58d8cc1",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-8a21e83c420ca7de27c9d4eb"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "2f4a0e48677372fb4bc23aaf3b073506f7f19db021b64aaaa2ae06390c797fbe",
+      "question": "Why does the memory overhead of the pickle protocol reconstruction method validated by the classes checker during repeated instantiation impact garbage collection cycles and heap fragmentation when thousands of instances are created and destroyed?",
+      "question_sha256": "f95030704de6b4e61f02e8793aa810f8b19091c902a0379bbc4fe3cbfbcd5f21",
+      "reference_answer": "This repository does not establish the claimed GC or heap-fragmentation effect. SpecialMethodsChecker statically validates that the inferred __getnewargs_ex__ result is a two-element tuple whose elements are tuple and dict when inferable (pylint/checkers/classes/special_methods_checker.py:374-403). It neither measures allocations nor runs reconstruction workloads. The returned arguments describe later reconstruction; the reference's claim that each unpickling calls this method is incorrect. Runtime memory behavior would require a separate measured workload and cannot be inferred from this lint check.",
+      "reference_sha256": "18ab8230764850057df33bfc1634ccdb05d5b44bd0616d64474976014032806d",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-994d9447e1017b59169f8976"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "88d9a87f51f468ac7318c5f7b05c368562345130fdec8efe92db7193fe448783",
+      "question": "Why does the property method that provides controlled access to a private attribute serve as a controlled accessor in the encapsulation pattern demonstrated by the test class?",
+      "question_sha256": "be82512f41f17392401e6ff6bafcb220698065bc40ebf43e44cbbcfaf0b8d165",
+      "reference_answer": "The property my_public_x exposes twice the stored _my_secret_x through attribute syntax (tests/functional/n/name/name_preset_snake_case.py:13-19). This gives a stable accessor where computation can change, but the leading underscore only signals non-public intent; callers can still access that attribute directly. Pylint recognizes property decorators and validates their names as attributes (pylint/checkers/base/name_checker/checker.py:124-139).",
+      "reference_sha256": "d9417ebc9f69972c31eea754da5e87aadd13db0ddce00feaedac50e6a1051bed",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-b8b2ff405066d0b29d909b7d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "3ab9977be576cf604d323110a90d0ea956805555390aeb83427bbd25f810d86d",
+      "question": "How should a class-creating type design iteration protocol methods to separate construction logic from iteration behavior while allowing inheriting classes to override either independently?",
+      "question_sha256": "201394e312d3b78dd6fa1120fe2279f082ac92a303c7b2e42fb67a21cc3dd61b",
+      "reference_answer": "The example defines an ordinary __iter__(cls) method on Metaclass(type), making IterableClass itself iterable (tests/functional/s/slots_checks.py:96-104). Keep metaclass construction in __new__/__init__ and class-object iteration in metaclass __iter__. To override class-object iteration or construction, subclass the metaclass and override the relevant method, using cooperative super where appropriate. A class using that metaclass can independently define instance __iter__, but that changes iteration of its instances, not iteration of the class object. This distinction is necessary for independent overrides.",
+      "reference_sha256": "ec2fbea4b6a0c37d3de9aca19b797f3408ed14efbad3c8f05c2a7405fce21be0",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-bbdf63b62e82327064fb12b5"
+    }
+  ]
+}

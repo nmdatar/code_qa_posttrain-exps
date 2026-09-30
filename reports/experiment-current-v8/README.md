@@ -1,0 +1,11 @@
+# Experiment prerequisites and current configs
+
+Prepared 43 current-campaign configs for execution procedures 1–6, pinned to training-claims-v6 and strict all-claims-v7 with definition context, pagination and action aliases. Historical runs and ledger histories remain unchanged; no new paid calls or launches occurred.
+
+Implemented verifier-tier quality/efficiency training rewards with trusted compute counters; integrated Python AST source navigation, lexical/subword-vector retrieval and bounded archived history into the collection runner; added current-version full-investigation SFT admission and remote fresh-optimizer fork support. Packaging now validates an explicit budget ceiling rather than a hardcoded $1,000. Current caps are proposed limits, not invoices or automatic launch authorization.
+
+Verification: all 43 configs validate, release/cohort/source manifests bind correctly, run/output IDs are unique, and the native renderer checks pass for admitted full-investigation targets. **543 tests passed**, including actual collection-adapter dispatch, token-bounded retrieval, source/symlink confinement, episode-isolated archive readback, reward-tier ordering and unresolved handling. A four-run frozen bundle containing SFT, dependent GRPO, efficiency and history arms packaged and passed hash verification (1,268 files). This verifies packaging, not live model execution.
+
+Remaining scientific/data work is explicit: only one full-investigation trajectory passes the current strict admission, so that SFT config is smoke-only. The separate 30-example tool-only dataset is usable, but its earlier pilot declined in quality and is not a demonstrated winning initialization. A training-only demonstration collection config is prepared to expand full-answer data. The current hybrid retrieval uses fixed subword hash vectors, not pretrained neural semantics; that larger comparison remains deferred. Verifier acceptance remains model-assessed and uncalibrated. Offline code/config checks cannot replace live validation, selection and confirmation.
+
+See [current suite](../../configs/experiments/current-v8/README.md), [readiness](readiness.json), [full test log](full-tests.log), [bundle preparation](bundle.json), and [checksums](checksums.json).

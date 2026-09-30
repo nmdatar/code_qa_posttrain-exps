@@ -1,0 +1,205 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-39feeb31b2d0a61411fad808",
+      "reference_sha256": "719616d4dbf6f7c8512e01ec8aad5bd457c5537cd2319c48dad6218739d48fed",
+      "question_sha256": "e3819cb026fcb837688f48b5057687ef2794b39924944d8a773786d9bb7cf0bc",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "SSH uses nine pools due to documented OpenSSH session limit rationale",
+          "verdict": "supported",
+          "reason": "Constants explicitly document MaxSessions ten and reserving one session; client selects SSH constant.",
+          "evidence": {
+            "path": "docker/constants.py",
+            "start_line": 32,
+            "end_line": 37
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-4e9b74e94d9bda4d05cc5588",
+      "reference_sha256": "35e1c99c18a4de37767f7cd085a94c2d42c38a0fae6d33609bdb4d66c489390d",
+      "question_sha256": "103edd733d25f0858976ea286810391e6a3b9904a8bca59ff78fb584ff80a7c7",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Standard HTTP/HTTPS always uses SSLHTTPAdapter",
+          "verdict": "partially_supported",
+          "reason": "Fallback only creates SSL adapter when tls is truthy or TLSConfig configures client.",
+          "evidence": {
+            "path": "docker/api/client.py",
+            "start_line": 182,
+            "end_line": 190
+          }
+        }
+      ],
+      "material_errors": [
+        "Fallback only creates SSL adapter when tls is truthy or TLSConfig configures client."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Host parsing is in docker/utils/utils.py:210 onward; adapter selection is APIClient.__init__ in docker/api/client.py:136-190. Parsed http+unix, npipe and ssh schemes select their specialized adapters. Ordinary URLs use normal session behavior unless TLSConfig configures the client or a truthy tls value mounts SSLHTTPAdapter for https."
+    },
+    {
+      "task_id": "import-5ec985b026ec34830c99489a",
+      "reference_sha256": "7d522183283e9bf467e9f0441224abab5b30e74f41ca9e42eb5801d01799d595",
+      "question_sha256": "5536ad8786eaaee9bc489a74752629c7471068dc0f319755f2878417ef453991",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "DockerClient wraps APIClient and exposes resource collections",
+          "verdict": "supported",
+          "reason": "Constructor stores APIClient and containers property creates ContainerCollection.",
+          "evidence": {
+            "path": "docker/client.py",
+            "start_line": 44,
+            "end_line": 45
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-7deb7f42137335445fb9c198",
+      "reference_sha256": "5291ca5034b29475af9dfab69c99fbbd17d7563f86d9bbd121bb7599b177177f",
+      "question_sha256": "bd3d34dc72aa09d4b5e08df92c1afaa21fe4bf9da5a0b059f206db23fa8d4c74",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "HTTP exceptions are classified and container model handles image lookup or exit failure",
+          "verdict": "supported",
+          "reason": "Error factory preserves response and explanation; ContainerCollection.run pulls missing image and raises ContainerError on nonzero exit.",
+          "evidence": {
+            "path": "docker/errors.py",
+            "start_line": 22,
+            "end_line": 51
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-9570ddc21f7323cb67aa7d5c",
+      "reference_sha256": "ffc9f188739f6756a07302f56d711f83d3787c6b30ed4ee095325380e217a2cd",
+      "question_sha256": "59f61e30da585675fbc9467b501c84ae78abc2e289621363308c7baa791a77e1",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Credential helper overrides default store with auth fallback",
+          "verdict": "supported",
+          "reason": "get_credential_store prioritizes per-registry helper; resolve_authconfig falls back when no stored credential.",
+          "evidence": {
+            "path": "docker/auth.py",
+            "start_line": 227,
+            "end_line": 249
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-bf87e37c5d76ddd430e1f49e",
+      "reference_sha256": "e42bbd513959e028a2283200dff1931ae6629e65873c36952725a0de369ec60f",
+      "question_sha256": "cdeacab2da8e594304e5484f78d6b3084a48af1075864be6148fb962cda31ed5",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Version detection, minimum enforcement and decorator gates define compatibility",
+          "verdict": "supported",
+          "reason": "Client retrieves ApiVersion and validates minimum; decorator checks feature minimum.",
+          "evidence": {
+            "path": "docker/api/client.py",
+            "start_line": 192,
+            "end_line": 223
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-c0e28ea8cf026491d6afc10a",
+      "reference_sha256": "040d880b7fc76a361d5456e5774634353de91c88e7efd033775d0c708b5aaeff",
+      "question_sha256": "73038fd2d62763e7fcee421a92569be4c26c1390958b870c74d042d01e5fcd88",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Every adapter is mounted on http+docker and SSL is unconditional fallback",
+          "verdict": "partially_supported",
+          "reason": "SSL mounts https conditionally; ordinary requests adapters remain without TLS.",
+          "evidence": {
+            "path": "docker/api/client.py",
+            "start_line": 143,
+            "end_line": 190
+          }
+        }
+      ],
+      "material_errors": [
+        "SSL mounts https conditionally; ordinary requests adapters remain without TLS."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "APIClient.__init__ selects transports after utils.parse_host (docker/api/client.py:136-190). Unix and named-pipe adapters mount on http+docker://, SSH on http+docker://ssh. TLSConfig configures the client, or truthy tls mounts SSLHTTPAdapter on https://. Ordinary HTTP does not pass through the custom Docker transport prefix."
+    },
+    {
+      "task_id": "import-c9610cd2e4f177d4c67526ab",
+      "reference_sha256": "dcb2b1a9408eaf7309361fab6575e674a4cbd10be4e0db1729a521f59cadbf2c",
+      "question_sha256": "369e98879791d1cd7314e24d45a0775048b22ab15277aaf4f56734404a1376f4",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "ContainerCollection implements high-level run/list/get and DockerClient exposes it",
+          "verdict": "supported",
+          "reason": "Property and collection methods match stated locations.",
+          "evidence": {
+            "path": "docker/models/containers.py",
+            "start_line": 887,
+            "end_line": 909
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-dcca3a2ee660c865c628193f",
+      "reference_sha256": "5171634fe8b95d5f5e2f70aee9ae1948d23b62cebda50f462dbafb96c74c44b2",
+      "question_sha256": "4f49a4247c17870f4361bf76e49c80459b29d562912d5faafc9b10581745b5bd",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Cleanup bypasses pool disposal and inherited Session.close cannot reach custom adapters",
+          "verdict": "contradicted",
+          "reason": "BaseHTTPAdapter.close calls super then clears a RecentlyUsedContainer configured with disposal; alleged bypass/disconnected chain is unsupported.",
+          "evidence": {
+            "path": "docker/transport/basehttpadapter.py",
+            "start_line": 4,
+            "end_line": 8
+          }
+        }
+      ],
+      "material_errors": [
+        "BaseHTTPAdapter.close calls super then clears a RecentlyUsedContainer configured with disposal; alleged bypass/disconnected chain is unsupported."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The cited code does not establish a high-concurrency cleanup failure. DockerClient.close delegates to its API session (docker/client.py:210-212); custom adapters are mounted on that session (docker/api/client.py:143-190). BaseHTTPAdapter.close calls its parent close and clears its pools (docker/transport/basehttpadapter.py:4-8), and Unix pools explicitly configure disposal with p.close (unixconn.py:71-73). CancellableStream.close shuts down its own underlying socket and explicitly rejects Paramiko SSH channels (docker/types/daemon.py:40-74). A leak or cross-stream race would require reproducing and measuring a specific failure, not inferring it from absence of async context management."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-007.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/conan-io--conan-52f43d98fe44",
+      "original_reference_sha256": "ae21da8c50427f9175fb13fcaed436c564d4e955fa90cce77c3b0903b0522721",
+      "question": "How does the workspace management interface ensure consistency when merging dependency graphs for locally developed packages into the consolidated dependency graph while preserving the original dependency relationships?",
+      "question_sha256": "48e5906db0b59cfd7f268f55c7a3285facec76370a4bce3df88d6705a1b542a7",
+      "reference_answer": "WorkspaceAPI.super_build_graph builds a new root, reuses non-editable nodes, and rejects cached nodes depending on editable nodes (conan/api/subapi/workspace.py:302-315). It records editable package options, skips editable-to-editable dependencies, and combines duplicate external requirements using aggregate before creating root edges (316-330). Requirement.aggregate merges flags and required_nodes (conan/internal/model/requires.py:235-265). This preserves the external dependency needs of collapsed packages, not every original edge or all graph metadata.",
+      "reference_sha256": "e0200c6eb89d7f7788ec5f4c060df755873b44339b4f04341827605b45ab0b4e",
+      "repository": {
+        "commit": "52f43d98fe44ab92d01317110488d0670c3e9e64",
+        "family_id": "conan-io/conan",
+        "url": "https://github.com/conan-io/conan"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/conan-io--conan-52f43d98fe44ab92d01317110488d0670c3e9e64",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-27cd34037590c0b98d4d1199"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/conan-io--conan-52f43d98fe44",
+      "original_reference_sha256": "b8b9d6f094d18837b90987988b56683f5bae0f8afb3ecf8d52a156eea794f30e",
+      "question": "How can a revision tracking data structure that maintains a chronological list of version identifiers with timestamps be redesigned to provide thread-safe revision updates with atomic persistence across distributed server instances?",
+      "question_sha256": "621fb3ccc0b18b71ce5410e9264fb3d6d5d85b93c9d23570279126b6c00d6a47",
+      "reference_answer": "RevisionList is an in-memory list with JSON serialization (conans/server/revision_list.py:9-34), while ServerStore performs separate read and write operations (conans/server/store/server_store.py:161-171), each independently locked by the disk adapter (conans/server/store/disk_adapter.py:37-45). A redesign should make the entire read-modify-write a storage transaction keyed by recipe/package identity. For multiple servers, use a shared transactional store or an atomic compare-and-swap on a persisted version, retrying actual conflicts; local object locks alone are insufficient. Preserve duplicate-latest no-op behavior and chronological listing, and test concurrent additions/removals plus failure recovery. This is a proposed design, not an existing source guarantee.",
+      "reference_sha256": "2737d6876ba73e3254a295d8c7c2efc79c32561720df568199d33cc17cc1998d",
+      "repository": {
+        "commit": "52f43d98fe44ab92d01317110488d0670c3e9e64",
+        "family_id": "conan-io/conan",
+        "url": "https://github.com/conan-io/conan"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/conan-io--conan-52f43d98fe44ab92d01317110488d0670c3e9e64",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-2c352d705596bb466a06fa25"
+    }
+  ]
+}

@@ -1,0 +1,500 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/bridgecrewio--checkov-c2091482f54d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 89,
+            "file_sha256": "d0b0cc54a4f070bcc775f18baa224610be45882cc5ecd243415a91fe8ee2547b",
+            "path": "checkov/terraform/runner.py",
+            "start_line": 24
+          },
+          {
+            "end_line": 70,
+            "file_sha256": "380f64be7fef8c60b02df9c822da95bdbb2ecacf4f0184e83c8526e6adab492b",
+            "path": "checkov/terraform/evaluation/base_variable_evaluation.py",
+            "start_line": 15
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 65,
+            "line_count": 64,
+            "path": "checkov/terraform/parser.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "checkov/terraform/parser.py",
+            "resolved_path": "checkov/terraform/parser.py",
+            "start_line": 8
+          },
+          {
+            "end_line": 21,
+            "line_count": 20,
+            "path": "checkov/terraform/checks/resource/base_resource_check.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "checkov/terraform/checks/resource/base_resource_check.py",
+            "resolved_path": "checkov/terraform/checks/resource/base_resource_check.py",
+            "start_line": 7
+          }
+        ]
+      },
+      "question": "How does Checkov's graph-based scanning architecture detect cross-resource IAM policy violations that span multiple Terraform resources?",
+      "question_sha256": "7dc33e90f44231e53e6b704fc5a8438d07276bfe2e5569e20ef632522dd78c4d",
+      "reference_answer": "At commit c2091482f, Checkov version 1.0.314 does not implement graph-based scanning architecture for detecting cross-resource IAM policy violations. Instead, it uses a single-resource scanning approach where each check operates on individual Terraform resources in isolation. The scanning architecture consists of a Parser class (checkov/terraform/parser.py: line 8-65) that uses HCL2 to parse Terraform configurations into a tf_definitions dictionary, storing each resource configuration separately. The Runner class (checkov/terraform/runner.py: line 24-89) orchestrates the scanning process by iterating through each resource and applying registered checks from block_type_registries for 'resource', 'data', and 'provider' types. IAM-related checks like CKV_AWS_62 (IAMAdminPolicyDocument) and CKV_AWS_40 (IAMPolicyAttachedToGroupOrRoles) inherit from BaseResourceCheck (checkov/terraform/checks/resource/base_resource_check.py: line 7-21) and implement scan_resource_conf methods that examine only the configuration of individual resources. While the system includes BaseVariableEvaluation functionality (checkov/terraform/evaluation/base_variable_evaluation.py: line 15-70) for resolving Terraform variables and references, this is used for variable substitution rather than cross-resource dependency analysis. The architecture lacks graph construction, cross-resource relationship modeling, or the ability to detect violations that span multiple resources, making it incapable of identifying complex IAM policy violations that require understanding relationships between aws_iam_policy, aws_iam_policy_attachment, and target principal resources.",
+      "reference_sha256": "6cc2c778148f834e7ad349eda37b873e8e344f4861690b68bc605b15273a4ce1",
+      "repository": {
+        "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+        "family_id": "bridgecrewio/checkov",
+        "url": "https://github.com/bridgecrewio/checkov"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/bridgecrewio--checkov-c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+      "task_id": "import-23617fdbcc2bc3fff2aafd4f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/bridgecrewio--checkov-c2091482f54d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 25,
+            "file_sha256": "236cd94d67647a6653d89c320f87d9c7fa238883f77ce01f8e2b2a65684ad114",
+            "path": "checkov/terraform/checks/data/aws/StarActionPolicyDocument.py",
+            "start_line": 20
+          },
+          {
+            "end_line": 26,
+            "file_sha256": "c5f5c32cc2d90ae9f5aa81dfb5b36c86564d379dcbaa88e52171267fec986a3e",
+            "path": "checkov/terraform/checks/data/aws/AdminPolicyDocument.py",
+            "start_line": 20
+          },
+          {
+            "end_line": 26,
+            "file_sha256": "b06adec75f64999fc8d8d92454388ac5429a0772436bb4badf5bed8e5072024c",
+            "path": "checkov/terraform/checks/resource/aws/IAMStarActionPolicyDocument.py",
+            "start_line": 15
+          },
+          {
+            "end_line": 28,
+            "file_sha256": "0afe94d463a8df0de157f38a9e552b0deadc34409a6348599188c0194c1234ee",
+            "path": "checkov/terraform/checks/resource/aws/IAMAdminPolicyDocument.py",
+            "start_line": 15
+          },
+          {
+            "end_line": 19,
+            "file_sha256": "8ec216bbe6f6c8602a3b25d7b410d50e83142baa0d760c115ca087c5bf0bc6bf",
+            "path": "checkov/terraform/checks/data/base_check.py",
+            "start_line": 7
+          },
+          {
+            "end_line": 20,
+            "file_sha256": "d26f24cdde832b5815fff0d35195add90a5eeffea4959ccbd42a17bdc6cb1e1c",
+            "path": "checkov/terraform/checks/resource/base_resource_check.py",
+            "start_line": 7
+          },
+          {
+            "end_line": 17,
+            "file_sha256": "bcec15181bed5f5e96a9f8dc1342b783a5c3ee319d2b23891dd04b446d0088aa",
+            "path": "checkov/terraform/checks/resource/aws/IAMPolicyAttachedToGroupOrRoles.py",
+            "start_line": 14
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What validation architecture does Checkov use to detect IAM policy statement wildcards that grant excessive privileges across AWS services?",
+      "question_sha256": "bc5a7cc8a79116dcec16511e41369f21c5cfe2fdf7cc4e16ccbee76b5f9f9d3d",
+      "reference_answer": "Checkov's IAM wildcard privilege detection operates through a two-layer validation architecture targeting different Terraform resource types. The first layer consists of data checks that validate aws_iam_policy_document resources by directly parsing Terraform configuration arrays. The StarActionPolicyDocument class (checkov/terraform/checks/data/aws/StarActionPolicyDocument.py: line 20-25, CKV_AWS_49) scans statement blocks for Action wildcards by checking if '*' exists in statement['actions'][0] arrays when effect is 'Allow'. The AdminPolicyDocument class (checkov/terraform/checks/data/aws/AdminPolicyDocument.py: line 20-26, CKV_AWS_1) performs comprehensive admin privilege detection by validating that both actions and resources contain '*' wildcards simultaneously. The second layer comprises resource checks that validate aws_iam_policy, aws_iam_role_policy, aws_iam_user_policy, and aws_iam_group_policy resources containing inline JSON policy documents. The IAMStarActionPolicyDocument class (checkov/terraform/checks/resource/aws/IAMStarActionPolicyDocument.py: line 15-26, CKV_AWS_63) uses json.loads to parse the policy JSON and checks if the Statement Action field equals '*' with Allow effect. The IAMAdminPolicyDocument class (checkov/terraform/checks/resource/aws/IAMAdminPolicyDocument.py: line 15-28, CKV_AWS_62) performs dual wildcard validation by ensuring both Action equals '*' and Resource equals '*' in the parsed JSON policy. Both layers inherit from base classes BaseDataCheck and BaseResourceCheck respectively (checkov/terraform/checks/data/base_check.py: line 7-19, checkov/terraform/checks/resource/base_resource_check.py: line 7-20), which handle registration with their respective registries and provide the common scanning interface. Additional policy attachment validation is provided by IAMPolicyAttachedToGroupOrRoles (checkov/terraform/checks/resource/aws/IAMPolicyAttachedToGroupOrRoles.py: line 14-17, CKV_AWS_40), which ensures policies are attached to groups or roles rather than directly to users to reduce access management complexity.",
+      "reference_sha256": "dea57c4d00440a0facc46043ef81424f23da8d81224c2b83121d3a7980397b5a",
+      "repository": {
+        "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+        "family_id": "bridgecrewio/checkov",
+        "url": "https://github.com/bridgecrewio/checkov"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/bridgecrewio--checkov-c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+      "task_id": "import-6bf30381062c637f49ecb2f5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/bridgecrewio--checkov-c2091482f54d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 31,
+            "file_sha256": "ac797a5755c21170bbdd83ce15b2237218dbe8c3a16a47546cdc019583ca7d21",
+            "path": "checkov/terraform/parser.py",
+            "start_line": 20
+          },
+          {
+            "end_line": 15,
+            "file_sha256": "57e3d5259b0f08e8d871914032bdca6f2214f0165393060e89c4ff8a4c53c266",
+            "path": "checkov/terraform/checks/resource/gcp/GoogleCloudSqlBackupConfiguration.py",
+            "start_line": 14
+          },
+          {
+            "end_line": 22,
+            "file_sha256": "6ab417fb769e7b230b612ccdabba13933dd7c0e6c9518f4ddd8a41e2bd3de993",
+            "path": "checkov/terraform/checks/resource/gcp/GoogleCloudSqlDatabaseRequireSsl.py",
+            "start_line": 19
+          },
+          {
+            "end_line": 17,
+            "file_sha256": "d26f24cdde832b5815fff0d35195add90a5eeffea4959ccbd42a17bdc6cb1e1c",
+            "path": "checkov/terraform/checks/resource/base_resource_check.py",
+            "start_line": 15
+          },
+          {
+            "end_line": 21,
+            "file_sha256": "3b30cd89cee91c9daa08a20fbd1d2c01ff3f2024c20c0896fefa97fa7c041609",
+            "path": "checkov/common/checks/base_check_registry.py",
+            "start_line": 17
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does Checkov's database check validation system use direct dictionary traversal with hardcoded key paths instead of a schema-based validation approach for parsing complex nested Terraform configurations?",
+      "question_sha256": "834a5f24655c1deac891ff77d8465be37d37e22f9b54edef9cb45d67cce1a1f5",
+      "reference_answer": "Checkov's database check validation system uses direct dictionary traversal with hardcoded key paths for several architectural and practical reasons rooted in how Terraform configurations are processed. When Terraform files are parsed using the hcl2.load() function (checkov/terraform/parser.py: line 20-31), they are converted into predictable nested dictionary structures where each configuration block becomes an array element, and individual properties also become arrays. This parsing approach creates consistent patterns like conf['settings'][0]['backup_configuration'][0]['enabled'] as seen in GoogleCloudSqlBackupConfiguration (checkov/terraform/checks/resource/gcp/GoogleCloudSqlBackupConfiguration.py: line 14-15) and conf['settings'][0]['ip_configuration'][0]['require_ssl'][0] in GoogleCloudSqlDatabaseRequireSsl (checkov/terraform/checks/resource/gcp/GoogleCloudSqlDatabaseRequireSsl.py: line 19-22). The BaseResourceCheck.scan_resource_conf() interface (checkov/terraform/checks/resource/base_resource_check.py: line 15-17) expects simple boolean CheckResult returns, eliminating the need for complex schema validation overhead. Each check is designed for specific Terraform resource types with well-known configuration structures, making direct access patterns more efficient than generic schema flexibility. The registration system organizes checks by supported_entities (checkov/common/checks/base_check_registry.py: line 17-21), allowing targeted validation rather than universal schema parsing. This approach prioritizes performance and simplicity for security rule validation over the flexibility that schema-based validation would provide, since each check has predetermined expectations about the structure it will encounter based on Terraform provider schemas.",
+      "reference_sha256": "45dd6659b6fc2ee46d4876fb7d711c1df4710e3b3824aefdfccf6045d9654248",
+      "repository": {
+        "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+        "family_id": "bridgecrewio/checkov",
+        "url": "https://github.com/bridgecrewio/checkov"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/bridgecrewio--checkov-c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+      "task_id": "import-70f574ef3d0364c9966d1535"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/bridgecrewio--checkov-c2091482f54d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 11,
+            "file_sha256": "2b1916295e671c350a647ef28c0c4a5471adb88487d386c663de6bf86fff0257",
+            "path": "checkov/common/runners/base_runner.py",
+            "start_line": 6
+          },
+          {
+            "end_line": 25,
+            "file_sha256": "d0b0cc54a4f070bcc775f18baa224610be45882cc5ecd243415a91fe8ee2547b",
+            "path": "checkov/terraform/runner.py",
+            "start_line": 24
+          },
+          {
+            "end_line": 17,
+            "file_sha256": "1c2225580cf9802b26d949730903e518397deb25fb0398442a5a8595eb766584",
+            "path": "checkov/cloudformation/runner.py",
+            "start_line": 16
+          },
+          {
+            "end_line": 17,
+            "file_sha256": "c21cf59e6d273deb10ea217eed1bc7fe4a1aca54ae55429815f428d0533daae8",
+            "path": "checkov/kubernetes/runner.py",
+            "start_line": 16
+          },
+          {
+            "end_line": 31,
+            "file_sha256": "ac797a5755c21170bbdd83ce15b2237218dbe8c3a16a47546cdc019583ca7d21",
+            "path": "checkov/terraform/parser.py",
+            "start_line": 8
+          },
+          {
+            "end_line": 53,
+            "file_sha256": "c69ee0570a5419dec728a8f62ba97e6d2eede95e8bb29e10872a461b3a6f6534",
+            "path": "checkov/cloudformation/parser/__init__.py",
+            "start_line": 14
+          },
+          {
+            "end_line": 142,
+            "file_sha256": "9e0847d4b63d0ca357178305d2faad82aa29a2aef43b4077801f3fed1d48ae4b",
+            "path": "checkov/cloudformation/parser/cfn_yaml.py",
+            "start_line": 125
+          },
+          {
+            "end_line": 32,
+            "file_sha256": "80a3c96d83ef3f89e8a00dddd91836eee7e0089c350f09bcb6d31771e8cabd0e",
+            "path": "checkov/kubernetes/parser/parser.py",
+            "start_line": 14
+          },
+          {
+            "end_line": 27,
+            "file_sha256": "65e51b0d92df473b41bfcbcf6271e8568401e96c37ad499a861c824d1ac8f0c5",
+            "path": "checkov/common/runners/runner_registry.py",
+            "start_line": 5
+          },
+          {
+            "end_line": 46,
+            "file_sha256": "53b2415748be76965484101d87ce2d1634b74d374c8e4438cb61d93981d5faf0",
+            "path": "checkov/common/output/report.py",
+            "start_line": 14
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the inheritance hierarchy and dependency relationships between Checkov's infrastructure-as-code parsing components across different file format handlers?",
+      "question_sha256": "8ffef4104409dd2643d7bdecd84423151d8205fb61dde67fc219c9a734ccabeb",
+      "reference_answer": "Checkov's infrastructure-as-code parsing architecture is strictly defined by an inheritance hierarchy rooted in the `BaseRunner` abstract class (`checkov/common/runners/base_runner.py: line 6-11`). This class establishes the contract for all security scanners, enforcing the implementation of a common `run()` method. It includes three primary runners -- `terraform.Runner` (`checkov/terraform/runner.py: line 24-25`), `cloudformation.Runner` (`checkov/cloudformation/runner.py: line 16-17`), and `kubernetes.Runner` (`checkov/kubernetes/runner.py: line 16-17`) -- this hierarchy is designed to be extensible. In a complete view of the architecture, this same parent class also serves as the foundation for other essential runners, such as the Serverless framework runner, the ARM template runner, and the Dockerfile runner, all of which inherit `BaseRunner` to ensure uniform execution logic.\n\nRegarding parsing dependency relationships,\neach concrete runner maintains a dependency on specialized parsing components tailored to its specific infrastructure format. The Terraform runner depends on a dedicated `Parser` class (`checkov/terraform/parser.py: line 8-31`) that utilizes the `hcl2` library to transform HashiCorp Configuration Language into Python dictionaries. The CloudFormation runner's dependency chain is more complex; it relies on a suite of parser functions (`checkov/cloudformation/parser/__init__.py: line 14-53`) that specifically employ the `MarkedLoader` class (`checkov/cloudformation/parser/cfn_yaml.py: line 125-142`). This custom YAML loader is a critical dependency because it preserves line number metadata during parsing, allowing Checkov to pinpoint the exact location of errors. Similarly, the Kubernetes runner depends on its own set of parsing functions (`checkov/kubernetes/parser/parser.py: line 14-32`) to handle multi-document YAML manifests.\n\nAdditionally, the execution flow is managed by the `RunnerRegistry` class (`checkov/common/runners/runner_registry.py: line 5-27`), which does not inherit from `BaseRunner` but rather aggregates instances of it. It acts as the orchestration layer, iterating through the registered runners and compiling their results into a unified output. Finally, all runners share a dependency on the centralized `Report` class (`checkov/common/output/report.py: line 14-46`). As files are processed, any format-specific syntax errors are captured in `parsing_errors` dictionaries within the individual runners and then bubbled up to the Report object via the `add_parsing_errors` method, ensuring that malformed infrastructure code is reported alongside security policy violations.",
+      "reference_sha256": "3efd61bf4bdb15e3a757aa202a2b0b69abdcab616be85fc67e8994b9a146c527",
+      "repository": {
+        "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+        "family_id": "bridgecrewio/checkov",
+        "url": "https://github.com/bridgecrewio/checkov"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/bridgecrewio--checkov-c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+      "task_id": "import-794a3c10f661abd4d90475e2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/bridgecrewio--checkov-c2091482f54d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 27,
+            "file_sha256": "65e51b0d92df473b41bfcbcf6271e8568401e96c37ad499a861c824d1ac8f0c5",
+            "path": "checkov/common/runners/runner_registry.py",
+            "start_line": 22
+          },
+          {
+            "end_line": 89,
+            "file_sha256": "d0b0cc54a4f070bcc775f18baa224610be45882cc5ecd243415a91fe8ee2547b",
+            "path": "checkov/terraform/runner.py",
+            "start_line": 83
+          },
+          {
+            "end_line": 110,
+            "file_sha256": "d0b0cc54a4f070bcc775f18baa224610be45882cc5ecd243415a91fe8ee2547b",
+            "path": "checkov/terraform/runner.py",
+            "start_line": 94
+          },
+          {
+            "end_line": 66,
+            "file_sha256": "3b30cd89cee91c9daa08a20fbd1d2c01ff3f2024c20c0896fefa97fa7c041609",
+            "path": "checkov/common/checks/base_check_registry.py",
+            "start_line": 44
+          },
+          {
+            "end_line": 17,
+            "file_sha256": "15d98255838d707624abed65fd495331a6fc5ae0b721e89867c117ca48e16c49",
+            "path": "checkov/cloudformation/checks/resource/aws/S3Versioning.py",
+            "start_line": 13
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does Checkov's security check execution scale linearly with repository size rather than implementing parallel processing for large-scale infrastructure scanning?",
+      "question_sha256": "3c8416a5adb6790476dfe01ea2912039c52348e1c2a5ce4f6451241c69de5360",
+      "reference_answer": "Checkov's linear scaling with repository size stems from its sequential processing architecture at multiple levels. The RunnerRegistry processes different framework runners (Terraform, CloudFormation, Kubernetes) sequentially in a for loop (checkov/common/runners/runner_registry.py: line 22-27). Within each runner, such as the Terraform runner, files are processed sequentially (checkov/terraform/runner.py: line 83-89), and within each file, individual entities like resources are processed one by one (checkov/terraform/runner.py: line 94-110). For each entity, all applicable security checks are executed sequentially through the BaseCheckRegistry scan method (checkov/common/checks/base_check_registry.py: line 44-66), which iterates through each check without any batching or parallelization. This creates an O(files \u00d7 checks) execution time complexity that becomes a performance bottleneck for large repositories. The architecture shows no evidence of parallel processing libraries - no threading, multiprocessing, or concurrent.futures imports exist in the codebase. Individual checks are implemented as simple, stateless methods (checkov/cloudformation/checks/resource/aws/S3Versioning.py: line 13-17), making them theoretically suitable for parallelization, but the current design prioritizes simplicity, maintainability, and deterministic results over performance optimization. This design choice ensures predictable behavior and easier debugging but results in linear scaling that becomes problematic for large-scale infrastructure scanning.",
+      "reference_sha256": "07471b7fef8dc0d4c35e3acce37a1f95d84519d6a4e79a6e797c3b31979608f4",
+      "repository": {
+        "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+        "family_id": "bridgecrewio/checkov",
+        "url": "https://github.com/bridgecrewio/checkov"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/bridgecrewio--checkov-c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+      "task_id": "import-d3d2a6ff6adcfcfe6f211d46"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/bridgecrewio--checkov-c2091482f54d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 20,
+            "file_sha256": "d26f24cdde832b5815fff0d35195add90a5eeffea4959ccbd42a17bdc6cb1e1c",
+            "path": "checkov/terraform/checks/resource/base_resource_check.py",
+            "start_line": 15
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "checkov/terraform/checks/resource/gcp/GoogleCloudPostgreSqlLogConnection.py",
+            "reason": "not_tracked",
+            "reference": "checkov/terraform/checks/resource/gcp/GoogleCloudPostgreSqlLogConnection.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "Where is the database type filtering logic implemented for cloud SQL security checks that need to distinguish between MySQL, PostgreSQL, and SQL Server instances?",
+      "question_sha256": "3404f4d01bcfe48f2d26c741988e9bcd84a29ed8ccb8c1f26eb21f14e7cfabba",
+      "reference_answer": "The database type filtering logic for Cloud SQL security checks is implemented within the **`scan_resource_conf`** method of individual check classes. These classes typically inherit from the base class `BaseResourceCheck`, located in `checkov/terraform/checks/resource/base_resource_check.py` (lines 15-20), which defines the standard interface for resource checks.\n\nTo distinguish between database engines such as MySQL, PostgreSQL, and SQL Server, the check implementation explicitly inspects the `database_version` or `engine` attribute from the resource configuration dictionary (`conf`). For example, in the **`GoogleCloudPostgreSqlLogConnection`** check (found in `checkov/terraform/checks/resource/gcp/GoogleCloudPostgreSqlLogConnection.py`), the `scan_resource_conf` method retrieves the `database_version` field and verifies if it contains the string `\"POSTGRES\"` before proceeding with the specific security validation. This manual filtering ensures that engine-specific checks\u2014like verifying the `log_connections` flag, which is PostgreSQL-specific\u2014are not erroneously applied to MySQL or SQL Server instances.\n\nChecks that lack this explicit filtering logic within their `scan_resource_conf` method will apply to all `google_sql_database_instance` resources regardless of the engine. This omission is the primary cause of false positives in checks like `GoogleCloudSqlBackupConfiguration` (or similar backup configuration checks), where a policy intended for one database type (e.g., MySQL-specific backup settings) might flag compliant instances of another type (e.g., SQL Server) simply because the check fails to verify the `database_version` first.",
+      "reference_sha256": "97ea3043cf4c1d2a826e24aebd5044a60f355943ed766812f11931ebd8460b27",
+      "repository": {
+        "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+        "family_id": "bridgecrewio/checkov",
+        "url": "https://github.com/bridgecrewio/checkov"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/bridgecrewio--checkov-c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+      "task_id": "import-e319435e4a94fbd52db01a02"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/bridgecrewio--checkov-c2091482f54d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 40,
+            "file_sha256": "44e96b24531556c9580d6529cfb53c6fafde1d98e2e2b5ea64957d0e590af0f3",
+            "path": "checkov/common/bridgecrew/platform_integration.py",
+            "start_line": 30
+          },
+          {
+            "end_line": 73,
+            "file_sha256": "44e96b24531556c9580d6529cfb53c6fafde1d98e2e2b5ea64957d0e590af0f3",
+            "path": "checkov/common/bridgecrew/platform_integration.py",
+            "start_line": 41
+          },
+          {
+            "end_line": 88,
+            "file_sha256": "9a672c8d0275d44488842f2f4c998fcd99613414a075dc2a7f9de566911f8f74",
+            "path": "checkov/main.py",
+            "start_line": 85
+          },
+          {
+            "end_line": 93,
+            "file_sha256": "44e96b24531556c9580d6529cfb53c6fafde1d98e2e2b5ea64957d0e590af0f3",
+            "path": "checkov/common/bridgecrew/platform_integration.py",
+            "start_line": 81
+          },
+          {
+            "end_line": 104,
+            "file_sha256": "44e96b24531556c9580d6529cfb53c6fafde1d98e2e2b5ea64957d0e590af0f3",
+            "path": "checkov/common/bridgecrew/platform_integration.py",
+            "start_line": 94
+          },
+          {
+            "end_line": 63,
+            "file_sha256": "59ad13ff34dbe0a0b63af3ccc77ba382a8f9afa509182b81571e8d653c9c41ed",
+            "path": "checkov/common/bridgecrew/wrapper.py",
+            "start_line": 43
+          },
+          {
+            "end_line": 127,
+            "file_sha256": "44e96b24531556c9580d6529cfb53c6fafde1d98e2e2b5ea64957d0e590af0f3",
+            "path": "checkov/common/bridgecrew/platform_integration.py",
+            "start_line": 106
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does Checkov implement its Bridgecrew platform integration API to authenticate with cloud services and persist scan results remotely?",
+      "question_sha256": "50c69e62bcb9c4790fc21a6e6fbaa11dcc63dab7a4ee22a00c734e5f3dc6bcd8",
+      "reference_answer": "Checkov's Bridgecrew platform integration implements a three-phase workflow for authentication and persistence. First, the BcPlatformIntegration class initializes with instance variables for API credentials, S3 client, and repository metadata (checkov/common/bridgecrew/platform_integration.py: line 30-40). Authentication occurs through the setup_bridgecrew_credentials method (checkov/common/bridgecrew/platform_integration.py: line 41-73), which POSTs the repository ID to INTEGRATIONS_API_URL using the provided API key and receives a JSON response containing temporary AWS credentials (AccessKeyId, SecretAccessKey, SessionToken), S3 bucket name, and repository path. These credentials are used to initialize a boto3 S3 client with a default region of us-west-2. Second, when integration is configured, the main runner conditionally calls persist_repository and persist_scan_results (checkov/main.py: line 85-88). The persist_repository method (checkov/common/bridgecrew/platform_integration.py: line 81-93) uploads all supported file types (.tf, .yml, .yaml, .json, .template) to S3, while persist_scan_results (checkov/common/bridgecrew/platform_integration.py: line 94-104) transforms scan reports using wrapper functions reduce_scan_reports, enrich_and_persist_checks_metadata, and persist_checks_results (checkov/common/bridgecrew/wrapper.py: line 43-63, line 79-91, line 66-76) before uploading them to structured S3 paths. Finally, commit_repository (checkov/common/bridgecrew/platform_integration.py: line 106-127) sends a PUT request to finalize the scan process. The implementation uses urllib3 for HTTP operations and boto3 for AWS S3 interactions, with comprehensive error handling for HTTP, JSON parsing, and AWS client errors.",
+      "reference_sha256": "fbe8bc326561667d2cfd9d3633c67c9eb6892ed87d617b7de4c619cc1e5885fb",
+      "repository": {
+        "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+        "family_id": "bridgecrewio/checkov",
+        "url": "https://github.com/bridgecrewio/checkov"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/bridgecrewio--checkov-c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+      "task_id": "import-e484cec6057cbdba59b7bc6d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/bridgecrewio--checkov-c2091482f54d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 19,
+            "file_sha256": "761d09782ce84e0757e24d9b46313e6bf1757c8dc34a1b985622e05887c94efd",
+            "path": "checkov/common/checks/base_check.py",
+            "start_line": 7
+          },
+          {
+            "end_line": 32,
+            "file_sha256": "a76096a3c7b5336c956d1aa63fa4d0c2f84d19271d57b878a26f09bb07a0ccfb",
+            "path": "checkov/common/output/record.py",
+            "start_line": 11
+          },
+          {
+            "end_line": 96,
+            "file_sha256": "a76096a3c7b5336c956d1aa63fa4d0c2f84d19271d57b878a26f09bb07a0ccfb",
+            "path": "checkov/common/output/record.py",
+            "start_line": 55
+          },
+          {
+            "end_line": 61,
+            "file_sha256": "53b2415748be76965484101d87ce2d1634b74d374c8e4438cb61d93981d5faf0",
+            "path": "checkov/common/output/report.py",
+            "start_line": 48
+          },
+          {
+            "end_line": 12,
+            "file_sha256": "d26f24cdde832b5815fff0d35195add90a5eeffea4959ccbd42a17bdc6cb1e1c",
+            "path": "checkov/terraform/checks/resource/base_resource_check.py",
+            "start_line": 7
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 124,
+            "line_count": 123,
+            "path": "checkov/common/checks/base_check_registry.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "checkov/common/checks/base_check_registry.py",
+            "resolved_path": "checkov/common/checks/base_check_registry.py",
+            "start_line": 92
+          }
+        ]
+      },
+      "question": "Where is the guideline URL assignment logic implemented for security check results in the Checkov output system?",
+      "question_sha256": "55938e5bc54e10ba918968c24f773dfe9a0423a480f5b6ab73a45b540f0084ad",
+      "reference_answer": "The guideline URL assignment logic is not implemented anywhere in the Checkov output system. The BaseCheck class (checkov/common/checks/base_check.py: line 7-19) serves as the foundation for all security checks but contains no guideline field or URL property, only basic attributes like id, name, categories, and supported_entities. Similarly, the Record class (checkov/common/output/record.py: line 11-32) that represents individual check results lacks any guideline URL property among its fields such as check_id, check_name, check_result, code_block, file_path, and resource. The output formatting logic in Record.__str__ (checkov/common/output/record.py: line 55-96) displays check results without any guideline URL information, and the JSON output generation in Report.get_dict (checkov/common/output/report.py: line 48-61) also omits guideline URLs from the serialized output. Even the BaseResourceCheck class (checkov/terraform/checks/resource/base_resource_check.py: line 7-12) that extends BaseCheck adds no additional guideline-related functionality. The external check loading mechanism (checkov/common/checks/base_check_registry.py: line 92-124) imports custom checks but does not extract or handle guideline URLs. This architectural gap explains why custom policy guideline URLs are not displayed in check output across all output formats including CLI, JSON, JUnit XML, and GitHub markdown.",
+      "reference_sha256": "6623cb5064dddf33fd423b11b26e44d786d288348eccea7eb114ad2584f1d100",
+      "repository": {
+        "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+        "family_id": "bridgecrewio/checkov",
+        "url": "https://github.com/bridgecrewio/checkov"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/bridgecrewio--checkov-c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+      "task_id": "import-ec635a41904c3ccb55b80735"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/bridgecrewio--checkov-c2091482f54d",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the expected state and validation structure of the RunnerFilter configuration schema within Checkov's check filtering system?",
+      "question_sha256": "0e5192ab9e5eb0db4892c9ef1f15f0478d7407b4c09db0fc668456ce12ec2dc3",
+      "reference_answer": "The RunnerFilter configuration schema defines three core fields with specific validation behaviors. The framework field defaults to 'all' and controls which scanning framework to use among 'cloudformation', 'terraform', 'kubernetes', or 'all' options. The checks field serves as a whitelist mechanism, accepting either a list of check IDs or a comma-separated string that gets automatically converted to a list during initialization. The skip_checks field provides blacklist functionality with identical string conversion behavior. The schema's validation structure operates at multiple levels: constructor-level validation converts string inputs to lists using comma-splitting, CLI-level validation ensures mutual exclusivity between checks and skip_checks parameters, and runtime validation occurs through BaseCheckRegistry integration. During execution, the BaseCheckRegistry's scan method extracts these fields as check_id_whitelist and check_id_blacklist properties to control check execution flow. When a whitelist exists, only checks in that list execute; when a blacklist exists, all checks except those in the blacklist execute; otherwise all registered checks run. The set_checks_whitelist method provides an additional interface for programmatically configuring the whitelist behavior. This multi-layered validation ensures both input normalization and logical consistency in the filtering system.",
+      "reference_sha256": "4ec6cd8cfd55f29912df55fbe707a8c6785b23ec3a9db83a76b39a5147b93278",
+      "repository": {
+        "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+        "family_id": "bridgecrewio/checkov",
+        "url": "https://github.com/bridgecrewio/checkov"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/bridgecrewio--checkov-c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+      "task_id": "import-f7d6d45327124e8ee0a90228"
+    }
+  ]
+}

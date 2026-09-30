@@ -1,0 +1,208 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-3f39a121d8a28c54fca5d810",
+      "reference_sha256": "5e4b0858c9c1a57bbefbd5bd8d5edec46bf90e8a9b012c156f8c0a0c3fbce1b0",
+      "question_sha256": "003d89da5a7af6a3de64d8ac3315925f0fe2af6d1a5b861905fa23976f5aa08d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Schemas can be inferred then edited before validation",
+          "verdict": "supported",
+          "reason": "describe_schema returns inferred resource schema; Schema mutators provide editable metadata.",
+          "evidence": {
+            "path": "frictionless/schema/schema.py",
+            "start_line": 117,
+            "end_line": 149
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-5b0c17ce8a5a26e00af2fb2a",
+      "reference_sha256": "e0448707a495499a04b140acc8cb5edfb279f31ae000a94430bd154c4d04bed6",
+      "question_sha256": "6c21bf708d7a7f3a476e362c7b5419eb9bb6f3b67a9e564b96f0f8ef1ceda47d",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Custom checks and filtering form a uniform pipeline",
+          "verdict": "partially_supported",
+          "reason": "Pipeline exists but general-tag errors bypass filtering and skip_errors resets pick result when both supplied.",
+          "evidence": {
+            "path": "frictionless/actions/validate.py",
+            "start_line": 381,
+            "end_line": 404
+          }
+        }
+      ],
+      "material_errors": [
+        "Pipeline exists but general-tag errors bypass filtering and skip_errors resets pick result when both supplied."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "validate_resource inserts a baseline check, converts functions/descriptors to Check instances and registers their error classes (frictionless/actions/validate.py:244-253). ManagedErrors filters ordinary errors by code/tags and limits their count; #general errors bypass those checks (381-388). In match, a nonempty skip_errors set resets the match decision before exclusion, so pick and skip are not simply intersected (390-404)."
+    },
+    {
+      "task_id": "import-6bd8c5df2aa4e92796beba9d",
+      "reference_sha256": "df6f4ad40fa8b7586be9fec8a39598b7c74ff49eead849da6a9c251fe4e4e54b",
+      "question_sha256": "124630c9ffa2c340484f83a30345b6147ce04e1a1797318987972350eb32b792",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Incompatible constraints raise FieldError directly",
+          "verdict": "partially_supported",
+          "reason": "metadata_validate yields FieldError records; metadata_process rebuilds type on change and falls back to AnyType.",
+          "evidence": {
+            "path": "frictionless/field.py",
+            "start_line": 446,
+            "end_line": 461
+          }
+        }
+      ],
+      "material_errors": [
+        "metadata_validate yields FieldError records; metadata_process rebuilds type on change and falls back to AnyType."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Metadata.__onchange__ clears resettable cached metadata and calls metadata_process (frictionless/metadata.py:69-76). Field.metadata_process creates the current type or falls back to AnyType. metadata_validate checks constraint names against that type plus unique and yields FieldError for unsupported constraints (frictionless/field.py:446-461). This reports incompatibility; it does not automatically remove or convert stale constraints."
+    },
+    {
+      "task_id": "import-8122e9cc13005428fee983ae",
+      "reference_sha256": "468338259d267ab5a8ed7c79f24bab3f969b3ba19ec8c8a79c3798b8fcb15ebd",
+      "question_sha256": "a4403a85e017e89f74b00a13e0f69ac114982b4e9c8a0b87e87d73b6a8536e74",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "System registry and discovery delegate factories to plugins",
+          "verdict": "supported",
+          "reason": "Registration invalidates cached methods; discovery loads external and internal plugins into ordered mappings.",
+          "evidence": {
+            "path": "frictionless/system.py",
+            "start_line": 343,
+            "end_line": 362
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-a5b0f4e248d63786cb1a7903",
+      "reference_sha256": "6f05cb4055b059047e451bf8284640cc121412c475df19ad89f91f58e45ba5f3",
+      "question_sha256": "77855168984a31d2e33223252447aacf4b35a08e6be338fd34616ebc8369cb7d",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Memory limit prevents buffer overflow and raises TaskError",
+          "verdict": "partially_supported",
+          "reason": "Check occurs only every 100000 rows; it appends an error and returns partial rather than raising, and cannot guarantee hard memory cap.",
+          "evidence": {
+            "path": "frictionless/actions/validate.py",
+            "start_line": 295,
+            "end_line": 302
+          }
+        }
+      ],
+      "material_errors": [
+        "Check occurs only every 100000 rows; it appends an error and returns partial rather than raising, and cannot guarantee hard memory cap."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "validate_resource accepts limit_memory (frictionless/actions/validate.py:190). Every 100000 rows it checks reported memory usage; exceeding the limit appends TaskError, marks partial, and stops the loop (295-302). This is periodic monitoring, not an allocation limit or buffer-overflow guarantee. Cross-row checks can retain growing state, and usage can exceed the threshold before the next sample."
+    },
+    {
+      "task_id": "import-aec47254c7b579244c2b0385",
+      "reference_sha256": "bd37dbaec7f911335bbc0dc26864313e70a5b97d320e8bc2e64ec16fca968fd1",
+      "question_sha256": "5c94997cbebc20938318cc0b61c896bfb561369e0f030b5f385afee4f375a39d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "ApiServer uses Flask routes and Gunicorn application",
+          "verdict": "supported",
+          "reason": "start builds app/server then runs; create_server configures workers and local bind.",
+          "evidence": {
+            "path": "frictionless/plugins/server/server.py",
+            "start_line": 65,
+            "end_line": 97
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-ce9a3dffc995b4c4d86e64a1",
+      "reference_sha256": "26677e1ff571b999ff880b4757d72f27fe067fc84d32d68e773e13a8a2794b35",
+      "question_sha256": "b458fa0115cfbaa6e2dc06c063567e39a570cf1d503f2121c7498e29bfbbb4f9",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Unsupported inferred format fails parser factory absent matching plugin",
+          "verdict": "supported",
+          "reason": "URL helper uses suffix/query parameter; factory tries plugins and raises FormatError on no match. Explicit format/custom plugin remains possible.",
+          "evidence": {
+            "path": "frictionless/system.py",
+            "start_line": 198,
+            "end_line": 214
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-fa8b66a817f54491e959249c",
+      "reference_sha256": "92e3ae59a846a466364a88725055b49ec694b5b9d0f18c7190775ce2a1da2f2c",
+      "question_sha256": "ad863e5ee093d2798ee2b5f87203234eab8c26a0752df93ccccfcacf4c2edf49",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Detector uses candidate scores, elimination threshold and missing-value denominator",
+          "verdict": "supported",
+          "reason": "Implementation awards plus/minus one, skips eliminated runners, assigns qualified field, and defaults unresolved fields to any.",
+          "evidence": {
+            "path": "frictionless/detector/detector.py",
+            "start_line": 485,
+            "end_line": 534
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-fef702f182535e534533bdc0",
+      "reference_sha256": "acdcf8aaec25ee0fdb0ef5ed04956e4a6bf2912f2302640310299f5e432b87c7",
+      "question_sha256": "8526aba6dd792f50a46a2b996802c848c2a5856f76cd5bf5ffa80f6ba019fcd1",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "to_pandas routes primary keys into index data",
+          "verdict": "partially_supported",
+          "reason": "Core behavior correct; Resource citation points to obsolete file/location and index creation is at 143-160.",
+          "evidence": {
+            "path": "frictionless/plugins/pandas/parser.py",
+            "start_line": 132,
+            "end_line": 160
+          }
+        }
+      ],
+      "material_errors": [
+        "Core behavior correct; Resource citation points to obsolete file/location and index creation is at 143-160."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Resource.to_pandas writes to a Resource(format=\"pandas\") and returns its data (frictionless/resource/resource.py:1201-1204). PandasParser.write_row_stream separates primary-key fields into index values (frictionless/plugins/pandas/parser.py:132-140), builds Index or DatetimeIndex for one key and MultiIndex for multiple keys (143-160), and uses remaining fields as DataFrame columns."
+    }
+  ]
+}

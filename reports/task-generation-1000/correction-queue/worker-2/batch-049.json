@@ -1,0 +1,109 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-049.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "f618fd72dd83b95b9044ec0e76071fcfc056f903a7522c2005a8cb4088a896ad",
+      "question": "Why does the repeated instantiation of FNMatcher objects in the Visitor.__init__ method impact memory consumption and traversal performance when processing large directory trees with complex filtering patterns?",
+      "question_sha256": "4aa1de666239b5e15d0583b966ac5b3f3309dbdbd3cfb9418932201d6fc01504",
+      "reference_answer": "Visitor creates FNMatcher wrappers only for string fil/rec arguments during initialization. Its recursive gen method calls self.gen on child directories and reuses self.fil/self.rec, rather than allocating matchers at every level (src/_pytest/_py/path.py:139-170). Each match does path/pattern handling and fnmatch (lines 173-196). Repeated independent visits incur wrapper creation, but source alone does not establish memory accumulation, a bottleneck, or multiplicative slowdown from those lightweight objects.",
+      "reference_sha256": "990be28c7e243d8c95b8fdcfe2b947664fb2a530f80f72b968eee68c9437103b",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-1e5a8bfd0a72ab91b09a986f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "647f81aa8fd55147db0deba86074f5cb465cee296db57d870a6955db6e42b130",
+      "question": "Why would caching the Source object initialization in setup_class impact the performance characteristics of the TestAccesses test suite when executed repeatedly across multiple test runs?",
+      "question_sha256": "eb57cfb77fd04a98679c20f19575d6991909a4bd8829556447bdeaf22524e8b7",
+      "reference_answer": "TestAccesses creates its Source once in setup_class and reuses it across its test methods (testing/code/test_source.py:76-94). Initializing a string Source splits and deindents the text (src/_pytest/_code/source.py:22-34). Moving this to module/class scope would shift the work to import and could reuse it during repeated sessions in the same still-loaded process, but would not persist it across separate process runs. The source supplies no timing evidence for an appreciable improvement; the existing class setup already avoids per-method construction.",
+      "reference_sha256": "75381736e6c1e8cceea425a11d760f7e99f85f7d020db6f7c6e6b0bb0f753788",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-2dc07b7e99a6e10cff9936ba"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "e81c27ca47c9d21b0e8d602e70f11ab4eba1a9d43f2bd58bef678ef0a09e160e",
+      "question": "How should the plugin manager architecture be redesigned to enforce plugin registration policies at the system level rather than relying on runtime assertion checks in individual test cases?",
+      "question_sha256": "38e943f500aa7743d544dcd0e7e1d2f615638e5b0d97ec2560f8a4df9bb6ed7b",
+      "reference_answer": "The premise is contradicted by test_plugin_prevent_register: after blocking abc, direct register(42, name=\"abc\") leaves the plugin set unchanged (testing/test_pluginmanager.py:442-448). PytestPluginManager.register delegates to super().register and runs its added hooks only for a non-None result (src/_pytest/config/__init__.py:492-515). Assertions verify policy enforcement; they do not implement it. Any additional policy should be centralized at the registration boundary while retaining tests of blocked registration and avoiding duplication of inherited enforcement.",
+      "reference_sha256": "41c5d16f84bfdf3834a6c6ff3de9ac74115f6b87967adc674ae4e56649f9a152",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-31088d0bb7870f55b93cb0a8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "35d051a401418ed8aa46dfdcd6d610610732f7378de5b8d5f66b6c2864356fd2",
+      "question": "Why does the repeated fixture instantiation and teardown cycle in test_package_fixture_complex impact performance when scaling to hundreds of package-scoped fixtures with autouse dependencies?",
+      "question_sha256": "5f4e3150519861ad74bc73062fcec09b2a768eef50eed885d56b7499b0d91e6d",
+      "reference_answer": "The test demonstrates package-scoped autouse and explicitly requested fixture visibility using two tests, not a scaling benchmark (testing/python/fixtures.py:1874-1915). FixtureDef.execute resolves dependencies and checks its cache, returning an existing result on a cache hit before setup or new finalizer scheduling (src/_pytest/fixtures.py:1074-1134). finish executes registered finalizers and clears the cache (lines1053-1072). More distinct scopes/parameters can require more lifecycle work, but package scope avoids per-test instantiation; the source does not establish a bottleneck at hundreds of fixtures.",
+      "reference_sha256": "00e6ccb41230afceae9c9a9329d71a8cdfa9613d73d9c716ae27e76f1baa3a02",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-3602b1eaeeab78125feb11a1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "b5e90b037f865aac10711cd69cdda8c07bd1f9de8dc3864f70f1dba1cc671ca2",
+      "question": "Where is the LocalPath class definition located that implements the comparison operators being tested in test_gt_with_strings, and how does its implementation enable mixed-type comparisons between path objects and strings?",
+      "question_sha256": "d2ab73cfc59c46e5919496d72980ea7ea162cc26fbdc0873576e32e8cfbb7eef",
+      "reference_answer": "LocalPath is in src/_pytest/_py/path.py. Its __fspath__ returns strpath (lines553-554); __lt__ and __gt__ compare os.fspath(self) with os.fspath(other) (lines579-583). Strings therefore compare with string-backed LocalPath objects through the filesystem-path protocol. Reflected comparisons reverse the operator: when a string\u2019s implementation returns NotImplemented, string > path falls back to path.__lt__(string), and string < path to path.__gt__(string).",
+      "reference_sha256": "e9dc82eb3375efa4fee1354224aa469d4da18afcec4b5199a8ef3cd9ffff80d4",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-37e1aec09ecb1457fcae3375"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "b91d567f2d07eaa603bde19efa2e8abcbdd226e184da47d99ad52e019528dfb2",
+      "question": "What external dependencies and context must be available for TestEvaluation test methods to correctly evaluate skipif conditions that reference module attributes like os.sep?",
+      "question_sha256": "acd7632b40202e568decd3a6730f174c11a3522f2ffb267d77d8e022d728a6f0",
+      "reference_answer": "evaluate_condition supplies os, sys, platform and config, merges reversed pytest_markeval_namespace hook mappings, then overlays the test function\u2019s module globals before compiling/evaluating a string (src/_pytest/skipping.py:98-118). Thus os.sep is available by default unless overwritten. Other names must be bound in those namespaces (or explicitly imported within the expression); mere importability of a module does not bind its name. A collected item/config and valid expression are required, and evaluation errors are reported as failures.",
+      "reference_sha256": "c4025ced463a34dda4ce7350951502d963a94898f3b1aa456ce17b5a45fafc4a",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-41e8dd02dc3d1e169ad44aee"
+    }
+  ]
+}

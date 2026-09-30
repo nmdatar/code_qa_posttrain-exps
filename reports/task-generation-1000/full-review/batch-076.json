@@ -1,0 +1,273 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-cf83527087d3402f2da7543b",
+      "reference_sha256": "ab3d6af8f6e593286a275c9d5267d6c4c95a3c365b31566cd58618f47fd67aa9",
+      "question_sha256": "5b0c5ecb5a9c61cc73efe3205ec3e374095ccb1dac258e4914d03ed9d0698607",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Discovery and static metadata extraction",
+          "verdict": "supported",
+          "reason": "Filters protocols/common_, checks first string token, parses remaining AST and yields metadata; wraps errors.",
+          "evidence": {
+            "path": "docs/sphinxext/ext_plugins.py",
+            "start_line": 212,
+            "end_line": 259
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-d051de2105c6c560de16454a",
+      "reference_sha256": "d41868a3c2bbfd8111a645d4fc146bcaa238b843c970d1af337c8f34e1c2f08d",
+      "question_sha256": "1aaa25a9e96a462c818d80931aa20a6a4c8874b1a033332ac616415e5a1f6bfd",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Specialized playlist fetch",
+          "verdict": "supported",
+          "reason": "Delegates HTTP with OSError and request args, explicitly sets UTF8; does not guarantee valid content.",
+          "evidence": {
+            "path": "src/streamlink/stream/hls/hls.py",
+            "start_line": 706,
+            "end_line": 711
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-d70d27760b07e3ea674edb80",
+      "reference_sha256": "ce804ba9f8a7d8880bdb98924da8b050a3a454f46e3012bbdc54ecebf1adfed0",
+      "question_sha256": "9ec8584e48ccaa973a8d4fdb7656f26081643271c6da39a6e5a8d6fbb66f4a34",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Integrity before JSON parsing",
+          "verdict": "supported",
+          "reason": "Metadata checksum algorithm validation and digest comparison precede parse.",
+          "evidence": {
+            "path": "src/streamlink/session/plugins.py",
+            "start_line": 246,
+            "end_line": 283
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-de308ef09c161ab9ef8b94b3",
+      "reference_sha256": "9263cab4ebd6ad181d97e9664ec9dd5b3f6763d378357370284e3fa5be8ce826",
+      "question_sha256": "8c273eab5a4bc1116d1e70efe78a1dfeeb8d56c9f6cc485d3653b9d010f5aa25",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Required JSON keys identifier/timestamp",
+          "verdict": "contradicted",
+          "reason": "Actual key is requestId; extra keys ignored.",
+          "evidence": {
+            "path": "src/streamlink/webbrowser/cdp/devtools/network.py",
+            "start_line": 3743,
+            "end_line": 3759
+          }
+        }
+      ],
+      "material_errors": [
+        "Wrong required key and exact-two-key restriction."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "WebSocketClosed.from_json reads top-level requestId and timestamp, passing them to RequestId.from_json and MonotonicTime.from_json (src/streamlink/webbrowser/cdp/devtools/network.py:3743-3759). Both keys must be available for those lookups; additional keys are ignored. The key is requestId, not identifier."
+    },
+    {
+      "task_id": "import-e47d2970d21c0c37916e16c8",
+      "reference_sha256": "af0a300fe523871e468e8badb4e1c54243d0513c45c8733afb409714e141ab31",
+      "question_sha256": "145bd86e6cf6f274d217c6d1a12df0513bd1bec25a9f0fcc695ba4befe232a2c",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Unhandled requests terminate session",
+          "verdict": "contradicted",
+          "reason": "True invokes fail_request; false continue_request, no exception branch.",
+          "evidence": {
+            "path": "src/streamlink/webbrowser/cdp/client.py",
+            "start_line": 436,
+            "end_line": 449
+          }
+        },
+        {
+          "claim": "Failure is protocol action",
+          "verdict": "supported",
+          "reason": "Sends Fetch.failRequest with BlockedByClient and marks handled.",
+          "evidence": {
+            "path": "src/streamlink/webbrowser/cdp/client.py",
+            "start_line": 363,
+            "end_line": 377
+          }
+        }
+      ],
+      "material_errors": [
+        "Confuses blocking request with raising session-ending CDPError."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "The requestPaused loop tries matching handlers until the request is marked handled. If none handles it, _fail_unhandled selects fail_request versus continue_request (src/streamlink/webbrowser/cdp/client.py:436-449). fail_request sends Fetch.failRequest with BlockedByClient by default and marks the request handled (363-377); this branch does not itself raise CDPError or terminate the session."
+    },
+    {
+      "task_id": "import-e6010a8861e9c33bf43e210a",
+      "reference_sha256": "3e422796f1fdb50b15b57e0a971e27c4b604415e8247a5a30413537a7a3a929e",
+      "question_sha256": "780de78a9907f2b04c587b79f3c504341ea2e20ac047804da8ebd9ffec638e58",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Delegated JSON conversion is circular dependency",
+          "verdict": "contradicted",
+          "reason": "Composite calls child conversions both ways; no reverse dependency demonstrated.",
+          "evidence": {
+            "path": "src/streamlink/webbrowser/cdp/devtools/page.py",
+            "start_line": 476,
+            "end_line": 499
+          }
+        }
+      ],
+      "material_errors": [
+        "Mislabels composition as circular dependency."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "OriginTrialTokenWithStatus contains raw_token_text, required status and optional parsed_token. Serialization delegates status.to_json and, when present, parsed_token.to_json; deserialization delegates the respective from_json methods and converts rawTokenText to str (src/streamlink/webbrowser/cdp/devtools/page.py:476-499). This is hierarchical composition with bidirectional conversion, not a circular class dependency."
+    },
+    {
+      "task_id": "import-e9182d8b629186f0d8001df6",
+      "reference_sha256": "df87e0c6d0e47f0b8c9a6895deb23566093b7f25b3d446c712cd12630a0e9808",
+      "question_sha256": "8e158e1426856a08079bd15c41ceb8fa0ca4dec10c53363a4e37e5881f764db9",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "API schema normalizes three response patterns",
+          "verdict": "supported",
+          "reason": "error/message, success/None and success/transformed content. Reference lines31-63 stale; actual92-124.",
+          "evidence": {
+            "path": "src/streamlink/plugins/chzzk.py",
+            "start_line": 92,
+            "end_line": 124
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-eaedd0c463a44c2770221374",
+      "reference_sha256": "108a024d6857e03515842e4978b9eb9a44b138459c6c76dc3a1bdb4d12df2e3b",
+      "question_sha256": "b37bf6f29e1742fd608056bb8d6e9af6500e98b833a2cc643742fe999e1479b1",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Pressure and tilt encode complete 3D force vector",
+          "verdict": "unsupported",
+          "reason": "Independent optional scalar pressure, angle and twist fields; no vector derivation.",
+          "evidence": {
+            "path": "src/streamlink/webbrowser/cdp/devtools/input_.py",
+            "start_line": 37,
+            "end_line": 50
+          }
+        }
+      ],
+      "material_errors": [
+        "Overstates completeness and conflates tilt with force direction."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "TouchPoint stores normalized tangential_pressure in [-1,1] and independent tilt_x/tilt_y orientation angles in [-90,90]. The comments define the Y-Z/stylus-Y and X-Z/stylus-X planes and positive directions (src/streamlink/webbrowser/cdp/devtools/input_.py:40-47). These describe pressure and stylus orientation; the class does not derive a complete 3D force vector from them. force and twist are separate optional properties (37-50)."
+    },
+    {
+      "task_id": "import-f45580fcbf870ee369d72731",
+      "reference_sha256": "c9c5377600535baed7cdc738a11b2ba42d5a4059123f73d7fbda8ce0caa831b7",
+      "question_sha256": "3ad52016f1b6918731ce1bf88401c9931d56e61b5192aad67af3e8d1406d798a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Current and previous hour fallback",
+          "verdict": "supported",
+          "reason": "Uses floored epoch hours and retries prior hour; clock-boundary tolerance is plausible inference, not documented author intent.",
+          "evidence": {
+            "path": "src/streamlink/plugins/albavision.py",
+            "start_line": 138,
+            "end_line": 154
+          }
+        },
+        {
+          "claim": "Token success marker",
+          "verdict": "supported",
+          "reason": "Permutation accepted only if ends OK.",
+          "evidence": {
+            "path": "src/streamlink/plugins/albavision.py",
+            "start_line": 190,
+            "end_line": 202
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-f6a1aabdca78e79121c123c2",
+      "reference_sha256": "8dceacf0eaae9a6d03c9c492f18999a5f469ecde450a8a58e9757487862fa1c4",
+      "question_sha256": "adaca260c1be37758f4dc46e041a3dd241df3c9afec58a703f565c6deffaae34",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Memory channel captures outputs",
+          "verdict": "supported",
+          "reason": "Capacity10 channel, wrappers send channel/result in finally.",
+          "evidence": {
+            "path": "tests/utils/test_processoutput.py",
+            "start_line": 40,
+            "end_line": 69
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-ff6619e1f10412384936a947",
+      "reference_sha256": "f2fe7e96bf410839c2a3351563c33fb966f0df2f2eb950205bb1c2fab929201b",
+      "question_sha256": "dc6be0cbbd91f5267e22b498582fd73d547cbfd75abc59cb0d0d4706a3ca42b4",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "SegmentPrefetch is production mechanism",
+          "verdict": "partially_supported",
+          "reason": "Test fixture builder emits tag; does not itself fetch.",
+          "evidence": {
+            "path": "tests/plugins/test_twitch.py",
+            "start_line": 161,
+            "end_line": 163
+          }
+        }
+      ],
+      "material_errors": [
+        "Fails to distinguish playlist fixture from actual prefetch implementation."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "The existing test fixture demonstrates interface-compatible extension: SegmentPrefetch subclasses Segment and overrides build(namespace) to emit #EXT-X-TWITCH-PREFETCH using inherited url(namespace) (tests/plugins/test_twitch.py:161-163). A proposed playlist-test extension can follow that pattern while leaving ordinary Segment behavior intact. This class generates test playlist text; it is not the production segment-fetching mechanism, and backward compatibility of a new fetcher requires separate behavioral validation."
+    }
+  ]
+}

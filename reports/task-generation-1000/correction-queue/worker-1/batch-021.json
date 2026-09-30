@@ -1,0 +1,58 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 1,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-021.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/hgrecco--pint-5bdf0109576b",
+      "original_reference_sha256": "75426535680c1e650911419a8036faa16827de4e8641c6bf8b351fa7580d5755",
+      "question": "Where does unit string parsing flow through the registry system when unpickling Quantity objects created from custom UnitRegistry instances?",
+      "question_sha256": "8426f1a97aee8b6137553645ec3f432b933c79423e79c05db563ab6b9674f071",
+      "reference_answer": "_unpickle_quantity rebuilds using application_registry.Quantity (pint/__init__.py:80-82). _unpickle scans UnitsContainer arguments and calls application_registry.parse_units for each unit name before constructing the object (69-77). Custom unit definitions are not carried as a custom registry by this path; the application registry must know those units. The serialized unit representation should be described as a units container, not simply one string.",
+      "reference_sha256": "82c90d6ae583c641d1e24bbd93f25b0c534e17331194169b584a82f31a2df985",
+      "repository": {
+        "commit": "5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+        "family_id": "hgrecco/pint",
+        "url": "https://github.com/hgrecco/pint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hgrecco--pint-5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-6359b8feb174527b953671e8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hgrecco--pint-5bdf0109576b",
+      "original_reference_sha256": "e9ce7675eb1965a1de1ecb2f49311203091e8423eb2285dbbba7b262ead8b930",
+      "question": "Why does Pint's statistical operation system specifically raise OffsetUnitCalculusError for variance operations on offset units like degC rather than auto-converting to delta units?",
+      "question_sha256": "b807d384dc312e1783df21cc48dcd11569a705ff50c114daa1b6f9e2dae0ac18",
+      "reference_answer": "In this revision, get_op_output_unit(\"variance\", units) derives its result through ((1*units + 1*units)**2).units (pint/numpy_func.py:195-196). For offset units this encounters Pint's restrictions on offset arithmetic and raises OffsetUnitCalculusError. That is the implementation path, not a mathematical claim that variance in squared temperature-difference units is invalid. Variance is invariant to additive shifts, and the cited code does not document a rationale for rejecting automatic delta-unit handling.",
+      "reference_sha256": "658c25fdb718b550c15b5aaec952007eaf455707992eef54ad87cac5cb7d9ea0",
+      "repository": {
+        "commit": "5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+        "family_id": "hgrecco/pint",
+        "url": "https://github.com/hgrecco/pint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hgrecco--pint-5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-bc30185425e80f6b1d4cfda3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hgrecco--pint-5bdf0109576b",
+      "original_reference_sha256": "1568e06cb9b21d35af0f3f57ef01e51bfb9471550fb9c0b92a78b7f7e2570a94",
+      "question": "How does the GitHub Actions workflow coordinate between linting and testing phases to ensure code quality validation in pint's CI pipeline?",
+      "question_sha256": "be86f216a94a29467a0238e4b10a12dfafc1872446c1920e8dd9039e77220d8a",
+      "reference_answer": "Lint and CI independently run on push and pull_request (.github/workflows/lint.yml:3; ci.yml:3). Lint executes pre-commit across files, and CI runs its Python/dependency test matrix. The ci-success job depends on test-linux only (ci.yml:110-118), not lint. Requiring both before merge needs repository merge/branch-protection configuration; these workflow files alone do not guarantee it.",
+      "reference_sha256": "5a782a9ea10899b31fbe295ea9c584731b679777b5ae32bd5e699dfb9c690ffe",
+      "repository": {
+        "commit": "5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+        "family_id": "hgrecco/pint",
+        "url": "https://github.com/hgrecco/pint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hgrecco--pint-5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-ca732085b0b4ee98c1bcb284"
+    }
+  ]
+}

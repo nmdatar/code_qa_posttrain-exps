@@ -1,0 +1,58 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 1,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-063.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "1a50dedf4414c8ccc32cc13f3b1df68ec5ba7d7aaaef74c02a62f05e5f632dd9",
+      "question": "What is the architectural rationale for LocalOutlierFactor's decision to cache _distances_fit_X_, _neighbors_indices_fit_X_, and _lrd as instance attributes during fit(), and how does this caching strategy impact the control flow of predict() versus score_samples()?",
+      "question_sha256": "f8202c44d1172720ea068c7277a0cb91b109240cb0b4edaa0730dff26c11d352",
+      "reference_answer": "fit stores _distances_fit_X_ and _lrd, but _neighbors_indices_fit_X_ is a local variable, not self._neighbors_indices_fit_X_ (sklearn/neighbors/_lof.py:290-309). Query score_samples performs query-neighbor search and computes density ratios using cached training distances and densities (lines 475-518). predict routes supplied X through decision_function and thresholds at zero; the internal _predict(None) uses cached negative_outlier_factor_ against offset_ (lines 363-390). Caching reuses training quantities, while score_samples returns continuous scores and prediction returns labels.",
+      "reference_sha256": "1abe9efbd6e87f65a3771b54c5e294603a15f056962bbbe40852ba6fa144e7d2",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e3922d09de456a389e48d130"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "75c23f1f0077c5b51710dcd5c1cd213c3a7a34cfce467eef4fa156f53a0f40ce",
+      "question": "How does AdditiveChi2Sampler's design decouple the mathematical transformation logic from input validation and sparse/dense matrix handling to maintain separation of concerns?",
+      "question_sha256": "cdfadce13dad6aabe95c9f8c4d11b88d14e77dc7e7fddcfde6dc4df492c62ed6",
+      "reference_answer": "AdditiveChi2Sampler.transform validates array format and non-negativity with validate_data, chooses/defaults sample_interval, and dispatches on sparsity (sklearn/kernel_approximation.py:717-745). _transform_dense and _transform_sparse separately implement the same feature-map formulas with dense arrays versus CSR storage (lines 778-833). This separates coordination from representation-specific arithmetic, but does duplicate core formulas and does not delegate all parameter checks externally.",
+      "reference_sha256": "fec68e8edda2a59f9e61b3a1a75e9a66ac311770cf628b21885ad1bc0433f9b8",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-f0b02694091900c5a86c7d2d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "1f99ece36fa6c9675b5717c84ce0bc34c62440dfae76d24c857c79a3308ba433",
+      "question": "How does the Splitter API handle the interaction between categorical feature splitting and missing value routing when the missing_values_bin_idx parameter is combined with the is_categorical flag, and what determines whether missing samples are routed to the left or right child node during the find_node_split operation?",
+      "question_sha256": "f00c18dc0f9772d00795249d028e68128c50e8bbd0bec7eeac6f43724393e6fa",
+      "reference_answer": "For a categorical feature, the splitter includes the missing bin as a category only if its support passes the threshold (sklearn/ensemble/_hist_gradient_boosting/splitting.pyx:967-983). It scans prefixes from both ends of a sorted category ordering, not every possible subset (lines 995-1007). The selected categories are recorded in left_cat_bitset; when missing values are present, missing_go_to_left is determined by membership of missing_values_bin_idx in that bitset (lines 1072-1084). Thus a selected missing bin goes left, otherwise right. Numerical splitting has separate missing-direction logic.",
+      "reference_sha256": "a210c645301259b17a2749a31ca1e4cb78fda891f93ec9ddafa65476350288a3",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-fff2787180a82fce7846e89b"
+    }
+  ]
+}

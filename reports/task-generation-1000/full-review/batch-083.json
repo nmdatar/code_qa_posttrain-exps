@@ -1,0 +1,232 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-8af532747c865c94110a9943",
+      "reference_sha256": "5f016386dc077e289b5337fd702128969d4644e84d4d03c04b1bdac979ae671a",
+      "question_sha256": "0f47d18096917dc882d0619a530a9a10afc7d6501726d147fd0477937428c9a2",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Overloads filtered by name argument count and encoding",
+          "verdict": "supported",
+          "reason": "Pipeline and ambiguous-error branch inspected.",
+          "evidence": {
+            "path": "web3/_utils/contracts.py",
+            "start_line": 144,
+            "end_line": 208
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-f148ffd42684f22f2be2db0d",
+      "reference_sha256": "bdb2243d99ef7a733d286a7ddb0701522ab6adef7cfc18e5d8ce6fdb6babd260",
+      "question_sha256": "c33b82ed27e37ca0b303df2f65c57dde13077e2637a5f48b4fbb0af053f84701",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Domain separator validation is demonstrated by web3 source",
+          "verdict": "partially_supported",
+          "reason": "Account delegation is visible; dependency validation internals and complete EIP712 support are not established by this snapshot.",
+          "evidence": {
+            "path": "web3/eth/base_eth.py",
+            "start_line": 48,
+            "end_line": 55
+          }
+        }
+      ],
+      "material_errors": [
+        "Account delegation is visible; dependency validation internals and complete EIP712 support are not established by this snapshot."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Web3 exposes an eth_account Account instance through BaseEth.account (web3/eth/base_eth.py:12,48-55), so local account functionality is delegated to that dependency. The repository also exposes the eth_signTypedData RPC route; its documentation warns about client support at this revision (docs/web3.eth.rst:929-933). This establishes the delegation boundary, but domain-separator validation details belong to eth-account and cannot be inferred solely from this Account assignment or typed-message test fixtures."
+    },
+    {
+      "task_id": "import-fe4ba61d4f9cc7a2482c7985",
+      "reference_sha256": "8527be103ccb012e05cbdb0eee27bf8daaa9739558d075f1558d7d08a1e53819",
+      "question_sha256": "287ebb95ba6b079d88620e971ffa640f60f265fa86a6eb631b7b7ab6e73414ac",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Module methods route formatted parameters through manager and provider middleware",
+          "verdict": "supported",
+          "reason": "process_params then request_blocking then result formatting is explicit; provider composes middleware.",
+          "evidence": {
+            "path": "web3/module.py",
+            "start_line": 53,
+            "end_line": 73
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-6e10c4f13afd089a82dd9b95",
+      "reference_sha256": "a3faa57d603639ee3ad91493f2a244227a33b1018ac4de816b003239860eba9b",
+      "question_sha256": "03e99e756c3d77656cce30ccc43476b9d28405374a01d84688eaf5064328d7c0",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Provider-specific middleware is appended to outer middleware",
+          "verdict": "supported",
+          "reason": "BaseProvider combines tuples and tester declares three middleware components.",
+          "evidence": {
+            "path": "web3/providers/base.py",
+            "start_line": 57,
+            "end_line": 84
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-228dfe7017bcbef5e6cfbe5f",
+      "reference_sha256": "e3bf9a9fc9b08db61a767d2120cb1397073476f20d4ae4e56ecb538c31cd5143",
+      "question_sha256": "b19b946f2fa64f6895be3f42a4ff348b869061e75c7e47e5c972be7a5e6007ae",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "RPC ABI definitions drive request normalization",
+          "verdict": "supported",
+          "reason": "abi_request_formatters selects positional mapping or first-dict formatting; normalizers inspected.",
+          "evidence": {
+            "path": "web3/_utils/rpc_abi.py",
+            "start_line": 225,
+            "end_line": 255
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-086985ef9320324683f46757",
+      "reference_sha256": "a7b642610e6340af422c38314830bb6c566857bd27da06d8cc5cf2c79e54e393",
+      "question_sha256": "300de762088e21bed6e61b837a6f9b0ca5a9ceb6fec121404e2b7b0f6a92d7bc",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Async stack serializes concurrent requests and uses exponential backoff",
+          "verdict": "contradicted",
+          "reason": "Construction order is not global request serialization; cache lock is per constructed middleware after network await; backoff is fixed asyncio.sleep.",
+          "evidence": {
+            "path": "web3/middleware/exception_retry_request.py",
+            "start_line": 147,
+            "end_line": 160
+          }
+        }
+      ],
+      "material_errors": [
+        "Construction order is not global request serialization; cache lock is per constructed middleware after network await; backoff is fixed asyncio.sleep."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The premise is not established. async_combine_middlewares constructs a nested callable chain (web3/middleware/__init__.py:110-124); ordered processing within a request does not serialize separate coroutines. Optional async cache middleware awaits the network request before locking only the cache update (web3/middleware/async_cache.py:60-88). Async retry awaits make_request and sleeps a fixed backoff_factor between eligible retries, allowing the event loop to run other tasks (web3/middleware/exception_retry_request.py:147-160). Middleware work, lock contention and retries can add costs, but throughput bottlenecks require profiling. AutoProvider discovery is a separate provider path, not an inherent AsyncHTTPProvider stage."
+    },
+    {
+      "task_id": "import-bbb612bb21eac73528cb7405",
+      "reference_sha256": "73ef78779f10c2204d47162a8f868e634a7bdbbbe1528468f1086a7d91b9c2a3",
+      "question_sha256": "fefb9568cf9096741e2b9e061be973d12166ff25a0a35f1be77fb04ca4e69a2a",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Dependencies establish a documented tiered pinning rationale",
+          "verdict": "partially_supported",
+          "reason": "Named runtime dependencies have lower bounds only; dev tools mix exact and lower/range bounds; historical motivation unsupported.",
+          "evidence": {
+            "path": "setup.py",
+            "start_line": 12,
+            "end_line": 42
+          }
+        }
+      ],
+      "material_errors": [
+        "Named runtime dependencies have lower bounds only; dev tools mix exact and lower/range bounds; historical motivation unsupported."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "At this revision hexbytes>=0.1.0, lru-dict>=1.1.6 and websockets>=10.0.0 have lower bounds without upper bounds (setup.py:70-86). Development dependencies mix policies: flake8 and types-protobuf are exact pins, while black, isort, mypy and many others have lower bounds; towncrier has a range (12-42). Exact pins constrain selected versions while lower bounds permit newer releases, but these declarations do not document why each bound was selected or ensure reproducibility of the whole environment. The release note records removal of GPL pylru and qualified MIT compliance (docs/releases.rst:3000), not a general pinning policy."
+    },
+    {
+      "task_id": "import-02c6c5cc4b784ea0532e687c",
+      "reference_sha256": "3cbf3ef15dcef54e67156628f2aaf8597f3e25cd546b7a854f1395229b7126bb",
+      "question_sha256": "b6a173a4daae62a47b741bbbbb1fb0615a84bfa6eb99813f166d543b6fcc7231",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "OS itself generates a universal108-character AF_UNIX validation error",
+          "verdict": "partially_supported",
+          "reason": "Web3 delegates socket connection; local source does not determine Python versus OS validation or platform-specific byte limit.",
+          "evidence": {
+            "path": "web3/providers/ipc.py",
+            "start_line": 35,
+            "end_line": 47
+          }
+        }
+      ],
+      "material_errors": [
+        "Web3 delegates socket connection; local source does not determine Python versus OS validation or platform-specific byte limit."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The relevant Web3 call site is get_ipc_socket in web3/providers/ipc.py:35-47: on non-Windows systems it creates an AF_UNIX socket and calls sock.connect(ipc_path). There is no explicit path-length check there. The validation/error comes from the underlying socket implementation; this repository does not establish which runtime layer produces the message or a portable maximum path length. Windows uses NamedPipe instead."
+    },
+    {
+      "task_id": "import-8fc8904e927b10aae810619e",
+      "reference_sha256": "83f8ceb3fca63268777131721a21011299d1c40848d22fabc93ab1dfc8693525",
+      "question_sha256": "b73fb28117b37f7ef00a34f0bd8b7e7f366334c9c2625b310580a775c39671e5",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Session cleanup lives in cache helpers and websocket context wrapper",
+          "verdict": "supported",
+          "reason": "Session stale detection, timer eviction cleanup and exception-only websocket close branches inspected.",
+          "evidence": {
+            "path": "web3/_utils/request.py",
+            "start_line": 133,
+            "end_line": 207
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-497e8b0fa73f92992db09da6",
+      "reference_sha256": "0d4abca5b717277a54a9d48f19413f0aec859fbbb7531ed418a71467a9450ffa",
+      "question_sha256": "5fc8d8eda7c7c61a72136944e92459978461d7950e98e24a00d2eb467b57330a",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Headers are merged and retries guarantee AWS authentication without reconstruction",
+          "verdict": "partially_supported",
+          "reason": "Custom headers replace defaults; generic retry does not implement cloud signing or credential refresh.",
+          "evidence": {
+            "path": "web3/providers/rpc.py",
+            "start_line": 72,
+            "end_line": 92
+          }
+        }
+      ],
+      "material_errors": [
+        "Custom headers replace defaults; generic retry does not implement cloud signing or credential refresh."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "HTTPProvider stores request_kwargs and forwards them on each make_request. get_request_kwargs adds default headers only when callers supplied no headers; it does not merge custom headers with defaults (web3/providers/rpc.py:62,72-92). AsyncHTTPProvider follows the same pattern (web3/providers/async_rpc.py:63,73-93). Retry middleware repeats the wrapped request for eligible methods/errors, so configured request arguments are reused (web3/middleware/exception_retry_request.py:147-160). This is generic HTTP plumbing; these paths do not implement AWS credential discovery, signing, token renewal, or a guarantee that expired credentials remain valid."
+    }
+  ]
+}

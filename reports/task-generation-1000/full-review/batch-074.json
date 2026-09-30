@@ -1,0 +1,274 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-52c886b242167afaa7d80d06",
+      "reference_sha256": "b2140c6859f9bb0def2e290fa70255c3bcd059659fed8e862d403c554f73f348",
+      "question_sha256": "5778930ed86b5ce9b9b1b9bf84f9560b7f452302eb70f193616f7d235250356f",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "SegmentPrefetch is production HLS presentation layer",
+          "verdict": "unsupported",
+          "reason": "Class found in test fixture, not production protocol module; formats synthetic playlist tag.",
+          "evidence": {
+            "path": "tests/plugins/test_twitch.py",
+            "start_line": 161,
+            "end_line": 163
+          }
+        }
+      ],
+      "material_errors": [
+        "Class found in test fixture, not production protocol module; formats synthetic playlist tag."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The named SegmentPrefetch is a test helper: its build method returns a Twitch prefetch tag using the fixture segment URL (tests/plugins/test_twitch.py:161-163). A corresponding Kick fixture exists in tests/plugins/test_kick.py. Its role is generating playlist input for plugin tests, not providing a production presentation-layer protocol abstraction. Production prefetch parsing must be distinguished from this fixture class."
+    },
+    {
+      "task_id": "import-5329bca939fd28f40849b205",
+      "reference_sha256": "104c4c72d8fb6e25573ee963670236dfaef23cbce0eda555b78d5c3a10b71e89",
+      "question_sha256": "3fffa0d099c54517608184a59d374b5ef272d910a7b73f9dde2a750862891907",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Two regexes repeatedly scan the same JavaScript",
+          "verdict": "unsupported",
+          "reason": "First pattern searches page response then res reassigned to JS response for second; claimed same-file scans and bottleneck unsupported.",
+          "evidence": {
+            "path": "src/streamlink/plugins/n13tv.py",
+            "start_line": 136,
+            "end_line": 148
+          }
+        }
+      ],
+      "material_errors": [
+        "First pattern searches page response then res reassigned to JS response for second; claimed same-file scans and bottleneck unsupported."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "N13TV first searches the page response for the main JavaScript path, fetches that resource, then searches the new response for user_id (src/streamlink/plugins/n13tv.py:136-148). These are two different inputs, not repeated full scans of one JavaScript file. Network fetch and search costs may affect startup, but the source does not establish the proposed multi-pattern bottleneck, increased memory behavior, or universal regex complexity."
+    },
+    {
+      "task_id": "import-5560f6cdf820314763e9bd22",
+      "reference_sha256": "1f8830b44beee309f7e53a6e318d8045f265e9db174659c451cebd14f65552fd",
+      "question_sha256": "47dce4c99c80fecdc4a2c3c2ad76a8c08f83af4ab1e02893c95ec45184b20855",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Pluto separates API and content dispatch",
+          "verdict": "supported",
+          "reason": "Content-specific methods call shared API helper, return data/paths; main dispatch processes HLS. Strategy/template terminology is interpretive, actual helpers not separate strategy class hierarchy.",
+          "evidence": {
+            "path": "src/streamlink/plugins/pluto.py",
+            "start_line": 170,
+            "end_line": 235
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-5683779b58fedcd276a3ce2a",
+      "reference_sha256": "60c44fb8dedddef8f56ff891ce2bbdf974e88c6f75ff7080da097308919e3325",
+      "question_sha256": "bc48cab74d625cd7abfab73dbd9290eca9490c4f251c73e414e5428cf204b220",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "CMmedia staged schema composition",
+          "verdict": "supported",
+          "reason": "HTML author/iframe extraction precedes iframe regex/unescape/JSON schema and error handling.",
+          "evidence": {
+            "path": "src/streamlink/plugins/cmmedia.py",
+            "start_line": 38,
+            "end_line": 107
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-58fb00435ff8c2c0b115179a",
+      "reference_sha256": "28f5cc576bcf14d8a14076afe1c63a2d571d72a1cadda17b2d77891545efa976",
+      "question_sha256": "2400dc4545fbe8611ca12dc4aeb8d7355869ed630218b1d870938a04aaa3fdca",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Screencast frame metadata serialization",
+          "verdict": "supported",
+          "reason": "Fields and conversions match units and optional timestamp; consumer may use them for alignment but class itself performs no synchronization.",
+          "evidence": {
+            "path": "src/streamlink/webbrowser/cdp/devtools/page.py",
+            "start_line": 840,
+            "end_line": 887
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-594d5d344449d8e5af47093d",
+      "reference_sha256": "c09e51238f4a6f70cafb2fe164f84b6400f8c73040437353668e3c7fc53305ff",
+      "question_sha256": "58405b764f3d1e5521604a9389ffef88047e70c5abe4d03c1f2857cda73fef89",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Per-open DASH muxer potential resource costs",
+          "verdict": "supported",
+          "reason": "Both representations cause reader opens and new muxer; ffmpegmux244 launches subprocess. Bottlenecks correctly framed as possible, not measured.",
+          "evidence": {
+            "path": "src/streamlink/stream/dash/dash.py",
+            "start_line": 399,
+            "end_line": 421
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-68d4523f07d1cbab924a1718",
+      "reference_sha256": "11fcc94f7ef77b590500ddb379e4ecde8a2e01f8b5d750e850c1882a7c9e5a81",
+      "question_sha256": "064bbdf761347a851234d371081bcc55335b3e6891166c396b6c8b9ff20286ab",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "DASH JSON deduplication test",
+          "verdict": "supported",
+          "reason": "Prepared URL mock and expected query/header mapping directly asserted.",
+          "evidence": {
+            "path": "tests/stream/test_stream_json.py",
+            "start_line": 120,
+            "end_line": 134
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-6b8da9a2f87696fec119a6ad",
+      "reference_sha256": "29228c9b6265774d9615357d36813ff6a0747239b06108b15f7578a1f274c58c",
+      "question_sha256": "a8dbed60c372f314b3005f7e1571b35705ff3129844482b09d49ce32f4a6c3f2",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Browser identifier factory conversion interface",
+          "verdict": "supported",
+          "reason": "from_json simply calls cls(json), preserving common typed protocol factory interface; future extensibility is interpretation not special validation.",
+          "evidence": {
+            "path": "src/streamlink/webbrowser/cdp/devtools/browser.py",
+            "start_line": 21,
+            "end_line": 30
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-6c48d3945d425c91bf659b58",
+      "reference_sha256": "c4a7c1d4b1488bfd5bdcdd8745602e17814ebee7a8b9ef3ae8d30bf7a3facc37",
+      "question_sha256": "4fa3d768442c3a2b5ea0fed22b4183f3fcacf2424b9d3e889795bcdfae095ffa",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Nico HLS enables bidirectional segment event sync",
+          "verdict": "partially_supported",
+          "reason": "Class stores wsclient; concrete integration is reader-open signal and reader-close client teardown, not generalized segment/event metadata synchronization.",
+          "evidence": {
+            "path": "src/streamlink/plugins/nicolive.py",
+            "start_line": 146,
+            "end_line": 167
+          }
+        }
+      ],
+      "material_errors": [
+        "Class stores wsclient; concrete integration is reader-open signal and reader-close client teardown, not generalized segment/event metadata synchronization."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "NicoLiveHLSStream stores wsclient and selects NicoLiveHLSStreamReader (src/streamlink/plugins/nicolive.py:161-167). That reader sets wsclient.opened before opening HLS and closes the WebSocket client after HLS closes (src/streamlink/plugins/nicolive.py:146-158). This coordinates stream and WebSocket lifecycle. The shown class does not itself implement bidirectional per-segment synchronization or metadata updates."
+    },
+    {
+      "task_id": "import-6f957e292cef1330f281c89d",
+      "reference_sha256": "43ab616d200ffacc1fa1110169efe64955961c10a2938dce059c9d942fdc5bd4",
+      "question_sha256": "29549159f9af10f14a45a20dbae45ed6500771e22dabf65c132068229bef7b3a",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Union nested lookups recursive and any missing key raises",
+          "verdict": "partially_supported",
+          "reason": "Nested traversal iterative; missing final key returns default, intermediate key missing errors.",
+          "evidence": {
+            "path": "src/streamlink/validate/_validate.py",
+            "start_line": 254,
+            "end_line": 276
+          }
+        }
+      ],
+      "material_errors": [
+        "Nested traversal iterative; missing final key returns default, intermediate key missing errors."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "_validate_uniongetschema applies each getter independently to the same input and collects results using schema.seq (src/streamlink/validate/_validate.py:354-356). Nested traversal is an iterative loop inside _validate_getitemschema, indexing each path component (src/streamlink/validate/_validate.py:254-266). Missing intermediate components raise ValidationError, while a missing final component returns schema.default (src/streamlink/validate/_validate.py:267-276). Thus ordered lookups need not all succeed to produce results."
+    },
+    {
+      "task_id": "import-7119bd32bbc02a3f2760f27a",
+      "reference_sha256": "f24030781f11a856e1fbebc47b44b1b676d38eee0d5ceedef0c31f62791e5135",
+      "question_sha256": "a4938fe4833b664b20fafd3cdee1eebb7b9f82cd5627dcecdd0a338a30de4745",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Slow playlist reload skips wait",
+          "verdict": "supported",
+          "reason": "Seven-second reload versus five-second interval asserts zero wait and shifted last-reload timestamp.",
+          "evidence": {
+            "path": "tests/stream/hls/test_hls.py",
+            "start_line": 488,
+            "end_line": 502
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-76b862fd08e6b8d5cfa6f47d",
+      "reference_sha256": "d767db553a086a3cddd8470eaa4b5b976a450240a3b231c514339a4aaf0a0478",
+      "question_sha256": "4aabcebb99e0688498b8d4fedace612dd4afc3b23c6bfdfe8aa64b20cb031206",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Extensibility requires hypothetical validator interface",
+          "verdict": "partially_supported",
+          "reason": "Generic proposal ignores existing singledispatch registry and error wrapping; no need to replace all validators with base interface.",
+          "evidence": {
+            "path": "src/streamlink/validate/_validate.py",
+            "start_line": 29,
+            "end_line": 64
+          }
+        }
+      ],
+      "material_errors": [
+        "Generic proposal ignores existing singledispatch registry and error wrapping; no need to replace all validators with base interface."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "Extend the existing singledispatch validate(schema, value) mechanism with a handler for a distinct schema type (src/streamlink/validate/_validate.py:48-64). Preserve existing registrations, output transformations, and ValidationError behavior; Schema.validate wraps those failures into its configured exception (src/streamlink/validate/_validate.py:29-42). Verify mixed old/new chains, invalid inputs, defaults and exception text, and avoid changing dispatch for existing schema classes. Optional new types and targeted regression coverage provide compatibility without requiring a new base Validator or dynamic plugin system."
+    }
+  ]
+}

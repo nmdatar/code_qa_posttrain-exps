@@ -1,0 +1,211 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-5031b2b7d6c927758f9a940d",
+      "reference_sha256": "0e7c2f20a0201d00efaf9c2e987720b509b5f254ca4bfcaecc77890f72cf71a3",
+      "question_sha256": "f98a3ff6af63f1e737bc5bae0028169c98720b0867704cc4fa7d1579edf582d9",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Merge preserves destination scalar properties and image override state",
+          "verdict": "supported",
+          "reason": "Recursive merge mutates desc1, skips protected fields; image records explicit artifacts/modules overrides.",
+          "evidence": {
+            "path": "cekit/descriptor/base.py",
+            "start_line": 140,
+            "end_line": 163
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-50539ece6dccdfccc93ef5ff",
+      "reference_sha256": "3b10676a68585bc583d298428df57078bac718d6df559699fbaf35f12dc99ebc",
+      "question_sha256": "55d7f46e969e300ec067036cf2afcb03ca3bf32681cca9f0bb91dc7e0b89e588",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Behave tags always lose their version suffix",
+          "verdict": "partially_supported",
+          "reason": "Only slash-containing tags use test_tag stripped at colon; non-slash tags are appended unchanged.",
+          "evidence": {
+            "path": "cekit/test/behave_runner.py",
+            "start_line": 44,
+            "end_line": 57
+          }
+        }
+      ],
+      "material_errors": [
+        "Only slash-containing tags use test_tag stripped at colon; non-slash tags are appended unchanged."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Generator.get_tags returns name:version and name:latest (cekit/generator/base.py:134-136). BehaveTester.run selects the first or @wip (behave_tester.py:57-61). With no name filters, BehaveTestRunner.run computes a colon-stripped test_tag and uses @namespace,@full-name for slash-containing tags; otherwise it appends the original tag, retaining any version (behave_runner.py:44-57)."
+    },
+    {
+      "task_id": "import-60456a08ebdf9cc210dd4eb3",
+      "reference_sha256": "85c4b77e2730b34250a6765dc2adf310f9b30c74ac0820d451d702a7b88be7fe",
+      "question_sha256": "493f761c347e7ad51382470ef81479d021f8cbf22e6945cee2dd0803e38bcd78",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Docker build call has no BuildKit secret integration",
+          "verdict": "supported",
+          "reason": "The build argument dictionary only supplies path, pull and rm.",
+          "evidence": {
+            "path": "cekit/builders/docker_builder.py",
+            "start_line": 84,
+            "end_line": 94
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-6e943669aae98abc2b848e34",
+      "reference_sha256": "87f7deccc15d6b09bcf39d669b19b33a208c2225b89e950ce5358e8863de4bc1",
+      "question_sha256": "af99fbeb0d233540900627fca4f3fcf74f8d9a4dd7572348e10075b8b7bb91e2",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Package selection validates three managers and defaults to yum",
+          "verdict": "partially_supported",
+          "reason": "These code facts are supported; distribution symlink compatibility and environment auto-detection are not established.",
+          "evidence": {
+            "path": "cekit/descriptor/image.py",
+            "start_line": 71,
+            "end_line": 82
+          }
+        }
+      ],
+      "material_errors": [
+        "These code facts are supported; distribution symlink compatibility and environment auto-detection are not established."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The package schema restricts manager to yum, dnf, or microdnf (cekit/descriptor/packages.py:23). Image.process_defaults assigns yum when packages.manager is absent (cekit/descriptor/image.py:80-82). This is a fixed fallback, not detection of the base image package manager; users must select a suitable supported manager."
+    },
+    {
+      "task_id": "import-88c850cee4fae8ee2688805c",
+      "reference_sha256": "36fcf85ac18af755fd1c5bbfe802d2ccdef598c5d0220fe82ebdee711dcdf702",
+      "question_sha256": "d9b40c9df071e9d89c88774cc735c4c1fe6594d7d4bd9037b63c6ed93182e93f",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Conditional cleanup exists for reliability/performance reasons",
+          "verdict": "partially_supported",
+          "reason": "Template condition is explicit, but historical commit attribution and performance motives are not proved by these sources.",
+          "evidence": {
+            "path": "cekit/templates/template.jinja",
+            "start_line": 138,
+            "end_line": 141
+          }
+        }
+      ],
+      "material_errors": [
+        "Template condition is explicit, but historical commit attribution and performance motives are not proved by these sources."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The Dockerfile template emits package cleanup only when helper.packages_to_install(image) is truthy (cekit/templates/template.jinja:138-141). The cleanup macro calls the selected supported manager clean all and removes /var/cache/yum (25-29). Thus no cleanup RUN is generated when no packages are to be installed. Avoiding an unnecessary command is a consequence; the code alone does not prove historical rationale or performance gains."
+    },
+    {
+      "task_id": "import-a272146f2dee703eb410045b",
+      "reference_sha256": "ad471d6bbd526b00b88c77f3e82fda7b209a5a8f3e6e82cb84e6003e41047939",
+      "question_sha256": "be7b57c2989e04d957c425f797cb81e34c922b05a4462095894b5ecb8d966797",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "DependencyHandler owns core dependency definitions and dispatch",
+          "verdict": "supported",
+          "reason": "Core git dictionary and handle_core_dependencies forwarding are explicit; components supply own dependencies.",
+          "evidence": {
+            "path": "cekit/tools.py",
+            "start_line": 130,
+            "end_line": 148
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-b8bd4cfe9d85ec4625d95d88",
+      "reference_sha256": "c81dd93a5da5af14614bb2f7aec129fda26173bdda6f20ed9ab0d03c93fe69cb",
+      "question_sha256": "21e4369eff5fa079a5d194fdd812265c270ec9c7228da507d687d8dcf088f4b7",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Explicit tags are always required for execution",
+          "verdict": "partially_supported",
+          "reason": "The name-filter branch bypasses tag selection and local CI exclusion; tagging is default rather than absolute requirement.",
+          "evidence": {
+            "path": "cekit/test/behave_runner.py",
+            "start_line": 37,
+            "end_line": 64
+          }
+        }
+      ],
+      "material_errors": [
+        "The name-filter branch bypasses tag selection and local CI exclusion; tagging is default rather than absolute requirement."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "CEKit collects shared steps, repository-root tests, module tests, and image tests (cekit/test/collector.py:53-72). BehaveTester defaults to the primary image tag or @wip (behave_tester.py:57-61), and BehaveTestRunner translates tags to selection arguments (behave_runner.py:49-57), which limits the combined suite. However, supplied test_names use --name instead of the tag loop (44-48). ~ignore is always supplied, while ~ci is added only in the tag branch when the user is not jenkins (37-64)."
+    },
+    {
+      "task_id": "import-d0da0df04b1ebb1d41f6464f",
+      "reference_sha256": "982a47e2885b08bfa8376b1f55348a8c97e95f8cf39a91f45a5d081d63edfaa8",
+      "question_sha256": "4b8092796422fe434cf7e7b7832fa89448df806dcbcb96674972b7c4bc987cb8",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Docker tag splitting fails for registry port plus image version",
+          "verdict": "supported",
+          "reason": "split colon without maxsplit is unpacked into two variables; a three-component tag necessarily raises ValueError.",
+          "evidence": {
+            "path": "cekit/builders/docker_builder.py",
+            "start_line": 162,
+            "end_line": 168
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-dd6ba2db772f5d50e095202f",
+      "reference_sha256": "0714cff8cb0439ff0a83f481b2593e28244873db6eb3f388bc2fe19232222778",
+      "question_sha256": "d7ea5af886ffe188c4714e68c7f5c37f9796dee006c1e522b22746b94f6549f7",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "All builder timeouts represent maximum build durations",
+          "verdict": "partially_supported",
+          "reason": "Docker config is daemon connection timeout, whereas OSBS default is an overridable method argument and approximate polling elapsed time.",
+          "evidence": {
+            "path": "cekit/builders/osbs.py",
+            "start_line": 182,
+            "end_line": 192
+          }
+        }
+      ],
+      "material_errors": [
+        "Docker config is daemon connection timeout, whereas OSBS default is an overridable method argument and approximate polling elapsed time."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "DockerBuilder reads positive integer DOCKER_TIMEOUT, default 600, as the daemon connection timeout (cekit/builders/docker_builder.py:51-62). OSBS _wait_for_osbs_task has timeout=7200 as a method default and checks current_time > timeout while polling every 20 seconds (cekit/builders/osbs.py:182-192,213-215). Buildah and Podman call subprocess.check_call(cmd) with no explicit timeout (buildah.py:52-53; podman.py:52-53). These govern different stages, not uniform maximum build durations."
+    }
+  ]
+}

@@ -1,0 +1,305 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-254d34fb2e1012daa0eb3f95",
+      "reference_sha256": "2d047fce9be572b7d1901b50efec0313833fde672f960ae6201725095f72ae9b",
+      "question_sha256": "abed281f711ce212ed75b80f8dec5d109892583a8fb5c1887aeafa65bee41050",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Proxy validation location",
+          "verdict": "supported",
+          "reason": "Checks capabilities and schemes with explicit skip cases.",
+          "evidence": {
+            "path": "yt_dlp/networking/common.py",
+            "start_line": 278,
+            "end_line": 313
+          }
+        },
+        {
+          "claim": "Director immediately propagates UnsupportedRequest",
+          "verdict": "contradicted",
+          "reason": "Collects validation failure and continues to another handler.",
+          "evidence": {
+            "path": "yt_dlp/networking/common.py",
+            "start_line": 94,
+            "end_line": 119
+          }
+        }
+      ],
+      "material_errors": [
+        "Wrong director definition location and failure propagation; overstates universal URL rejection."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "RequestHandler._check_proxies is in yt_dlp/networking/common.py:278-313. It checks NO_PROXY/ALL_PROXY capabilities, ignores irrelevant URL-scheme keys, optionally skips scheme validation, parses URLs and raises UnsupportedRequest for missing/invalid/unsupported schemes. RequestDirector is defined in the same file (51 onward); send catches UnsupportedRequest from handler.validate and tries another handler (94-119). Thus a backend-specific unsupported proxy is not necessarily an immediate global failure."
+    },
+    {
+      "task_id": "import-2603ce382682af3c93448e41",
+      "reference_sha256": "0e8421e7bd5b37363c7e798c59732bba783b5c99d0045e684165e450fb8e50b5",
+      "question_sha256": "0d07ed09af95303f14336d7b157bad51f2d9d38ea048b7209c80d6c22b9223ce",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Hierarchy and ignore behavior",
+          "verdict": "supported",
+          "reason": "CLI appended first but reversed argument composition gives final precedence; portable/home/user/system loaded subject to ignore flags.",
+          "evidence": {
+            "path": "yt_dlp/options.py",
+            "start_line": 43,
+            "end_line": 113
+          }
+        },
+        {
+          "claim": "Recursive loading and reverse composition",
+          "verdict": "supported",
+          "reason": "Custom files/stdin with repeated-path guard.",
+          "evidence": {
+            "path": "yt_dlp/utils/_utils.py",
+            "start_line": 4923,
+            "end_line": 4948
+          }
+        },
+        {
+          "claim": "Final argument order",
+          "verdict": "supported",
+          "reason": "Reverses configs before own args; filename alternatives are tier-specific, not universal.",
+          "evidence": {
+            "path": "yt_dlp/utils/_utils.py",
+            "start_line": 4998,
+            "end_line": 5014
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-50dde77a6e1d529114e9133f",
+      "reference_sha256": "b36ba042452b627acac307c1215c0740530f7820541ac3d3ed455c22051121a7",
+      "question_sha256": "f2fa6f34434929295c9360f0030c119a651e13cfc1f04af8c55f1d64d8ab03ad",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Extractor registration sequence",
+          "verdict": "supported",
+          "reason": "Plugins loaded first, lazy optional, fallback imported IE classes with Generic last, plugins prepended.",
+          "evidence": {
+            "path": "yt_dlp/extractor/extractors.py",
+            "start_line": 6,
+            "end_line": 28
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-5f620f2dec3858c4036260ee",
+      "reference_sha256": "b24cacd68788f72fcd16dda89763a7d62e0dbc6d94f00f7c8de7c2f6bff143e3",
+      "question_sha256": "0c94614433b649591e9cff42e85f593c88cbd073002a913ba3901f3f31251987",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Teachable terminal missing video branch",
+          "verdict": "supported",
+          "reason": "No Wistia URL, checks known lock markers then raises exact error; absence of markers does not prove successful authorization.",
+          "evidence": {
+            "path": "yt_dlp/extractor/teachable.py",
+            "start_line": 162,
+            "end_line": 174
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-7f49aee22c25bd9c0f8b207f",
+      "reference_sha256": "08d8b433c799475cd814672c18b094c55e73fedf721141e17189579000fdd3d2",
+      "question_sha256": "b4e85a57e27e3435edbfbd15d4fcdeb115301380339927aeab36221165d344c0",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Option parser yields lists",
+          "verdict": "supported",
+          "reason": "Semicolon keys and comma values parsed into lists.",
+          "evidence": {
+            "path": "yt_dlp/options.py",
+            "start_line": 1901,
+            "end_line": 1913
+          }
+        },
+        {
+          "claim": "Accessor scalar normalization",
+          "verdict": "contradicted",
+          "reason": "list(val) or iteration over val, so string becomes characters.",
+          "evidence": {
+            "path": "yt_dlp/extractor/common.py",
+            "start_line": 3865,
+            "end_line": 3876
+          }
+        }
+      ],
+      "material_errors": [
+        "False scalar-to-list normalization claim."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "--extractor-args parses IE_KEY:ARGS into extractor-specific mappings, splitting semicolon-separated assignments and comma-separated values into lists (yt_dlp/options.py:1901-1913). InfoExtractor._configuration_arg looks up the lowercased extractor key, returns the default or [] when absent, and returns values unchanged in case or lowercased according to casesense (yt_dlp/extractor/common.py:3865-3876). It expects an iterable of values; it does not wrap an arbitrary scalar string into a single-element list."
+    },
+    {
+      "task_id": "import-ad62e8857aa4109c3291b81e",
+      "reference_sha256": "a0c2aefdd5c24d80b41a2bded826462429cb1514fffe06b82f0bf816b6b400b9",
+      "question_sha256": "2c82dc3dc65dfe78c3f509a764445b0d8ffd06b42b5b78398fd7db0ee2e499ea",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Preference representation",
+          "verdict": "contradicted",
+          "reason": "Returns tuple of ordered field preferences, not aggregate score.",
+          "evidence": {
+            "path": "yt_dlp/utils/_utils.py",
+            "start_line": 5635,
+            "end_line": 5637
+          }
+        },
+        {
+          "claim": "Sorting versus choice",
+          "verdict": "partially_supported",
+          "reason": "sort_formats sorts candidate list only.",
+          "evidence": {
+            "path": "yt_dlp/YoutubeDL.py",
+            "start_line": 2714,
+            "end_line": 2717
+          }
+        }
+      ],
+      "material_errors": [
+        "Conflates lexicographic ranking with final format choice and aggregate score."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "FormatSorter defines an ordered default field list and codec/protocol preference tables (yt_dlp/utils/_utils.py:5338-5365). evaluate_params combines forced/priority fields, user ordering, extractor ordering and defaults, deduplicating fields (5489-5543). calculate_preference fills metadata and returns a tuple of field preferences (5635-5637), so sorting is lexicographic. YoutubeDL.sort_formats sorts the list with that key (yt_dlp/YoutubeDL.py:2714-2717); this ranking is input to format selection, not itself a guarantee that one highest-ranked format is always downloaded."
+    },
+    {
+      "task_id": "import-bb187ae6eb9cc7390796bd19",
+      "reference_sha256": "1804a9a01086db9b664afdabfcc3f85b6bc7ee5708acefcb3bb22a043aad670d",
+      "question_sha256": "7821857081d4c250fbcab850e0393dc305a0c1b8e2ac69bdc67abd2f05785f18",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "HTTPError message construction",
+          "verdict": "supported",
+          "reason": "Stores response/status/reason and formats exact HTTP Error message with optional redirect-loop suffix.",
+          "evidence": {
+            "path": "yt_dlp/networking/exceptions.py",
+            "start_line": 57,
+            "end_line": 73
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-d51965bf74058a0e4430bd52",
+      "reference_sha256": "1a6a0f2c77367f1da95c55270fe9056eb018ee4a1b88ce6587e419df2ea313f0",
+      "question_sha256": "58f1200b4a7952e0a3908bb51972fa87e228e674849abe859aedb1e3eab5ecc3",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Plugin finder search locations",
+          "verdict": "supported",
+          "reason": "Config, executable, sys.path and custom dirs, namespace specs.",
+          "evidence": {
+            "path": "yt_dlp/plugins.py",
+            "start_line": 50,
+            "end_line": 116
+          }
+        },
+        {
+          "claim": "Dynamic load and legacy handling",
+          "verdict": "supported",
+          "reason": "Imports plugins with error continuation, env optout; legacy handled separately from finder namespace.",
+          "evidence": {
+            "path": "yt_dlp/plugins.py",
+            "start_line": 146,
+            "end_line": 184
+          }
+        },
+        {
+          "claim": "Registry insertion",
+          "verdict": "supported",
+          "reason": "Plugin classes prepended to builtins.",
+          "evidence": {
+            "path": "yt_dlp/extractor/extractors.py",
+            "start_line": 6,
+            "end_line": 26
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-f350448a035938a26ee17cad",
+      "reference_sha256": "468cb9a82c9c9d03d1c002894f2ed61e9fe693f4d5d31a2a722a3b84c83f7625",
+      "question_sha256": "72ece1734fb1fab8257c16b79143659fb301104faf42da3f41aa39ede797a1d6",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Protocol helpers download and parse",
+          "verdict": "supported",
+          "reason": "HLS helper delegates parser with metadata arguments.",
+          "evidence": {
+            "path": "yt_dlp/extractor/common.py",
+            "start_line": 2046,
+            "end_line": 2079
+          }
+        },
+        {
+          "claim": "DASH period path",
+          "verdict": "supported",
+          "reason": "Extracts XML periods and merges.",
+          "evidence": {
+            "path": "yt_dlp/extractor/common.py",
+            "start_line": 2633,
+            "end_line": 2659
+          }
+        },
+        {
+          "claim": "Cross-protocol helper",
+          "verdict": "supported",
+          "reason": "Wowza constructs protocol URLs and aggregates formats unless skipped.",
+          "evidence": {
+            "path": "yt_dlp/extractor/common.py",
+            "start_line": 3371,
+            "end_line": 3397
+          }
+        },
+        {
+          "claim": "Ranking is separate",
+          "verdict": "supported",
+          "reason": "Common preference table ranks metadata; optimal is configured ordering, not universal quality proof.",
+          "evidence": {
+            "path": "yt_dlp/utils/_utils.py",
+            "start_line": 5338,
+            "end_line": 5359
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

@@ -94,13 +94,15 @@ def operation_estimate(config):
     return estimate(c, c['spend']['prices'], evaluation_only=c['execution']['operation'] not in {'run','fork'})
 
 
-def prepare(config_paths, output, parallel_training=False, budget_plan=None):
+def prepare(config_paths, output, parallel_training=False, budget_plan=None, autoresearch=False):
     from .config import inputs, resolve_run_config
     from .budget import ledger_lock
     output = Path(output).resolve()
     if output.exists():
         raise ConfigurationError('Bundle already exists; choose a fresh path')
     configs = [resolve_run_config(read(path)) for path in config_paths]
+    if autoresearch and parallel_training:
+        raise ConfigurationError('Autoresearch runs one training candidate at a time')
     allocation = read(budget_plan) if budget_plan else None
     if allocation:
         amounts = list(allocation['ledger_caps'].values()) + list(allocation['reserves_usd'].values())
@@ -193,6 +195,8 @@ def prepare(config_paths, output, parallel_training=False, budget_plan=None):
                 'snapshots':{s:hashlib.sha256(s.encode()).hexdigest()+'.bundle' for s in snapshots},
                 'parallel_training':parallel_training,'files':hashes,
                 'note':'Same frozen Qwen judge in both research roles; not independent evaluation.'}
+    if autoresearch:
+        manifest['autoresearch'] = {'version':'stability-v1','candidate_limit':len(configs)}
     if allocation:
         manifest['budget_allocation'] = allocation
     manifest['bundle_id'] = digest(manifest)
@@ -379,6 +383,13 @@ def worker(bundle='/bundle', state_root='/state', snapshot_root='/tmp/snapshots'
                                c['model']['checkpoint_ttl_seconds'])
             ledger.reserve_external('modal_controller',controller_reservation(c),bundle_id=m['bundle_id'])
         subprocess.run(['sync',str(state_root)],check=True)
+        if m.get('autoresearch'):
+            from .autoresearch import worker as autoresearch_worker
+            state = autoresearch_worker(m['configs'], root)
+            atomic_json(root/'status.json', {'status':state['status'], 'autoresearch':True,
+                'incumbent':state.get('incumbent'), 'stopped_run':state.get('stopped_run'),
+                'state':str(root/'autoresearch-state.json')})
+            return
         if m.get('tool_sft_probe'):
             from .tool_sft_probe import execute
             if len(m['configs']) != 1:
@@ -445,12 +456,12 @@ def worker(bundle='/bundle', state_root='/state', snapshot_root='/tmp/snapshots'
 
 def main():
     p=argparse.ArgumentParser(description=__doc__); subs=p.add_subparsers(dest='command',required=True)
-    q=subs.add_parser('prepare');q.add_argument('--configs',nargs='+',required=True);q.add_argument('--output',required=True);q.add_argument('--parallel-training',action='store_true');q.add_argument('--budget-plan')
+    q=subs.add_parser('prepare');q.add_argument('--configs',nargs='+',required=True);q.add_argument('--output',required=True);q.add_argument('--parallel-training',action='store_true');q.add_argument('--budget-plan');q.add_argument('--autoresearch',action='store_true')
     q=subs.add_parser('submit');q.add_argument('--bundle',required=True);q.add_argument('--isolated',action='store_true',help='Fresh campaign with private controller, storage and budget')
     q=subs.add_parser('status');q.add_argument('--sandbox-id',required=True)
     q=subs.add_parser('download');q.add_argument('--bundle-id',required=True);q.add_argument('--output',required=True);q.add_argument('--isolated',action='store_true',help='Read the campaign-private volume')
     subs.add_parser('worker'); a=p.parse_args()
-    if a.command=='prepare':result=prepare(a.configs,a.output,a.parallel_training,a.budget_plan)
+    if a.command=='prepare':result=prepare(a.configs,a.output,a.parallel_training,a.budget_plan,a.autoresearch)
     elif a.command=='submit':result=submit(a.bundle,a.isolated)
     elif a.command=='worker':worker();return
     elif a.command=='status':

@@ -2,10 +2,32 @@
 from dataclasses import asdict
 import json
 import time
-from training_pipeline.contracts import InfrastructureError, Trajectory, VerificationResult
+from training_pipeline.contracts import InfrastructureError, Trajectory, VerificationResult, PolicyFormatError
 from training_pipeline.budget import BudgetLimit
 from training_pipeline.storage import digest, atomic_json
 from .modal_backend import BudgetExceeded, SandboxInfrastructureError
+
+
+def observation_text(observation, cap):
+    """Preserve every parallel call identity when trimming the shared turn budget."""
+    import copy
+    value = copy.deepcopy(observation)
+    if isinstance(value, dict) and 'tool_results' in value:
+        for item in value['tool_results']:
+            item.pop('arguments', None)  # Full request remains in the durable trajectory.
+        while len(json.dumps(value, ensure_ascii=True).encode()) > cap:
+            candidates = [(len(item['observation'].get(key, '')), item['observation'], key)
+                          for item in value['tool_results'] for key in ('stdout', 'stderr')
+                          if item['observation'].get(key)]
+            if not candidates:
+                break
+            _, result, key = max(candidates, key=lambda entry: entry[0])
+            result[key] = result[key][:len(result[key]) // 2]
+            result[key + '_truncated'] = True
+    text = json.dumps(value, ensure_ascii=True)
+    if len(text.encode()) > cap:
+        text = text.encode()[:cap].decode('utf-8', errors='ignore') + '\n[output truncated]'
+    return text
 
 
 def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, episode_id,
@@ -23,6 +45,8 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
     episode = None
     output_tokens = 0
     tool_calls = 0
+    tool_turns = 0
+    max_parallel_calls = 0
     try:
         episode = measured('provision_seconds', lambda: factory.create(task, episode_id, tracker.root / 'trajectories' / (episode_id + '.json')))
         # Task-specific limits can only narrow the run limits.
@@ -35,6 +59,8 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
         for _ in range(effective['max_generations']):
             if time.monotonic() - start >= effective['latency_seconds'] or output_tokens >= effective['max_output_tokens']:
                 trajectory.termination = 'budget_exhausted'
+                trajectory.events.append({'kind':'termination_cause','reason':
+                    'output_tokens' if output_tokens >= effective['max_output_tokens'] else 'latency'})
                 break
             max_tokens = min(effective['max_tokens_per_call'], effective['max_output_tokens'] - output_tokens)
             if hasattr(episode, 'prepare_generation'):
@@ -61,12 +87,22 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
                     trajectory.events.append({'kind': 'parsed_action', 'value': action})
                 if not isinstance(action, dict):
                     raise ValueError('Action must be a JSON object')
-                if 'tool' in action:
-                    if tool_calls >= effective['max_tool_calls']:
+                count = (episode.action_tool_count(action) if hasattr(episode, 'action_tool_count')
+                         else int('tool' in action))
+                if count:
+                    if tool_calls + count > effective['max_tool_calls']:
                         raise BudgetExceeded('Tool budget exhausted')
-                    tool_calls += 1
+                    tool_calls += count
+                    tool_turns += 1
+                    max_parallel_calls = max(max_parallel_calls, count)
                 done, observation = measured('action_seconds', lambda: episode.step(action))
             except (ValueError, KeyError, TypeError) as exc:
+                is_format_failure = isinstance(exc, (json.JSONDecodeError, PolicyFormatError))
+                if is_format_failure:
+                    trajectory.events.append({'kind':'format_failure','error_type':type(exc).__name__})
+                if getattr(episode, 'invalid_action_policy', 'retry-v1') == 'zero-v1' and is_format_failure:
+                    trajectory.termination = 'invalid_format'
+                    break
                 done, observation = False, {'error': 'Invalid action: ' + type(exc).__name__,
                     'detail': str(exc)[:500], 'instruction': 'Correct the action. Return exactly one JSON object.'}
             trajectory.events.append({'kind': 'observation', 'value': observation})
@@ -74,15 +110,16 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
                 trajectory.submission = observation
                 trajectory.termination = 'completed'
                 break
-            text = json.dumps(observation, ensure_ascii=True)
-            if len(text.encode()) > effective['max_tool_output_bytes']:
-                text = text[:effective['max_tool_output_bytes']] + '\n[output truncated]'
+            text = observation_text(observation, effective['max_tool_output_bytes'])
             episode.messages.append({'role': 'user', 'content': 'Tool observation: ' + text})
             if hasattr(episode, 'remember_observation'):
                 episode.remember_observation(observation)
         else:
             trajectory.termination = 'budget_exhausted'
-        trajectory.verification = measured('verification_seconds', lambda: episode.verify(trajectory))
+            trajectory.events.append({'kind':'termination_cause','reason':'generations'})
+        trajectory.verification = measured('verification_seconds', lambda: (
+            episode.verify_invalid_format(trajectory) if trajectory.termination == 'invalid_format'
+            else episode.verify(trajectory)))
         trajectory.verification.validate()
     except BudgetLimit:
         trajectory.verification = VerificationResult('unresolved', None, factory.reward_version, ['spending ceiling'])
@@ -109,6 +146,8 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
                     ['Cleanup failed: ' + type(exc).__name__], retryable=True)
         trajectory.usage = {'input_tokens': sum(len(g.prompt) for g in trajectory.generations),
                             'output_tokens': output_tokens, 'tool_calls': tool_calls,
+                            'tool_turns': tool_turns, 'max_parallel_calls': max_parallel_calls,
+                            'mean_calls_per_tool_turn': tool_calls / tool_turns if tool_turns else 0.0,
                             'latency_seconds': time.monotonic() - start, 'cost_usd': None, **timings}
         recorder = getattr(episode, 'recorder', None)
         if recorder is not None and 'tool_seconds' in recorder.record:

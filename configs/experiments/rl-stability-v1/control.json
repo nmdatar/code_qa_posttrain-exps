@@ -1,0 +1,124 @@
+{
+  "best_checkpoint": {
+    "retention_seconds": 1209600
+  },
+  "checkpoint_every": 1,
+  "concurrency": {
+    "judges": 4,
+    "rollouts": 8
+  },
+  "environment": {
+    "grading_version": "all-claims-v7",
+    "judge_evidence_policy": "definition-context-v1",
+    "kind": "collection",
+    "manifest_sha256": "dc5f67caa93ad0c3ca3d19e4fc4d0c18eae1e4d110e9d68d29b6a1a355310bda",
+    "modal_prices": {
+      "checked_at": "2026-09-29",
+      "cpu_core_second": 3.942e-05,
+      "gib_second": 6.67e-06,
+      "source": "https://modal.com/pricing"
+    },
+    "protocol_version": "experimental-reference-v4",
+    "release": "/Users/ndatar/Documents/ChatGPT/action-interview/data/releases/repo-qa-training-claims-v6",
+    "tool_action_policy": "action-alias-v1",
+    "tool_read_policy": "paginate-v1",
+    "tool_parallelism": 4,
+    "invalid_action_policy": "retry-v1"
+  },
+  "evaluation": {
+    "cohort_manifest": "configs/experiments/grpo-autoresearch/fixes-v1-cohorts.json",
+    "cohort_sha256": "045f39a6a05d72be45f5c42dc9fa12e3fdc2838a1fa92da436ea3f478ad6382e",
+    "every": 0,
+    "max_tasks": 32,
+    "temperature": 0
+  },
+  "execution": {
+    "cpu": 2,
+    "kind": "modal",
+    "memory_mib": 4096,
+    "operation": "run",
+    "timeout_seconds": 14400
+  },
+  "group_retries": 0,
+  "judge": {
+    "base_model": "Qwen/Qwen3.5-397B-A17B",
+    "context_tokens": 65536,
+    "max_tokens": 8192,
+    "prices": {
+      "prefill": 3.0,
+      "sample": 7.5,
+      "model": "Qwen/Qwen3.5-397B-A17B",
+      "source": "https://tinker-docs.thinkingmachines.ai/tinker/models.json",
+      "checked_at": "2026-09-29T19:01:53.200503+00:00"
+    },
+    "provider_timeout_seconds": 120,
+    "renderer": "hf-chat-no-thinking-v1",
+    "repair_attempts": 1
+  },
+  "limits": {
+    "context_tokens": 8192,
+    "latency_seconds": 300,
+    "max_generations": 6,
+    "max_output_tokens": 3072,
+    "max_tokens_per_call": 512,
+    "max_tool_calls": 5,
+    "max_tool_output_bytes": 3500,
+    "provider_timeout_seconds": 120
+  },
+  "model": {
+    "base_model": "Qwen/Qwen3.5-4B",
+    "checkpoint_ttl_seconds": 172800,
+    "rank": 8
+  },
+  "output": "artifacts/experiments/stability-auto-v1-control-seed42",
+  "run_id": "stability-auto-v1-control-seed42",
+  "schema_version": "1.0",
+  "seed": 42,
+  "spend": {
+    "ledger": "artifacts/project-budget/rl-stability-v1.json",
+    "cap_usd": 1000,
+    "prices": {
+      "prefill": 0.33,
+      "sample": 1.005,
+      "train": 0.737,
+      "model": "Qwen/Qwen3.5-4B",
+      "storage_gb_month": 0.1,
+      "params": 4000000000,
+      "source": "https://tinker-docs.thinkingmachines.ai/tinker/models.json",
+      "storage_source": "https://tinker-docs.thinkingmachines.ai/tinker/models/",
+      "checked_at": "2026-09-29T19:01:53.385730+00:00"
+    }
+  },
+  "stages": [
+    {
+      "kind": "reinforce",
+      "baseline": "prior-mean-v1",
+      "learning_rate": 1e-05,
+      "batch_size": 2,
+      "group_size": 4,
+      "temperature": 1,
+      "max_batches": 8,
+      "max_updates": 8,
+      "stability": {
+        "mask_overlong": false,
+        "scale_tool_width": false
+      }
+    }
+  ],
+  "tracking": {
+    "mode": "online",
+    "notes": "User-requested bounded stability autoresearch; fresh matched seed42 control and ablations. Fixed reward and untouched confirmation. No promise of improvement.",
+    "project": "repository-qa-training",
+    "tags": [
+      "rl-stability-v1",
+      "control",
+      "reinforce",
+      "lr-1e-5",
+      "parallel-4"
+    ],
+    "experiment_id": "rl-stability-v1"
+  },
+  "training_reward": {
+    "version": "positive-coverage-v4"
+  }
+}

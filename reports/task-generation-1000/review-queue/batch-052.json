@@ -1,0 +1,363 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 259,
+            "file_sha256": "d64a895aca52417add0cf660fef24fdf4206ce17ad53a1341c138dc971aed0e2",
+            "path": "src/_pytest/assertion/rewrite.py",
+            "start_line": 248
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "d64a895aca52417add0cf660fef24fdf4206ce17ad53a1341c138dc971aed0e2",
+            "kind": "file_reference",
+            "line_count": 1215,
+            "path": "src/_pytest/assertion/rewrite.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the `_marked_for_rewrite_cache` dictionary control the data flow through `_is_marked_for_rewrite` to prevent redundant module rewrite decisions across multiple import attempts?",
+      "question_sha256": "f245fc309c5b2b6dce285a813755b36467f7644838db086b96a751d11e4123ad",
+      "reference_answer": "The dictionary caching module rewrite eligibility decisions controls data flow inside the method determining rewrite status, specifically at the beginning of that method where it performs a cache lookup.\n\nIn `src/_pytest/assertion/rewrite.py`, the `_is_marked_for_rewrite` method (lines 248-259) starts by attempting to return the cached value from `_marked_for_rewrite_cache`:\n\n```248:259:src/_pytest/assertion/rewrite.py\n    def _is_marked_for_rewrite(self, name: str, state: AssertionState) -> bool:\n        try:\n            return self._marked_for_rewrite_cache[name]\n        except KeyError:\n            for marked in self._must_rewrite:\n                if name == marked or name.startswith(marked + \".\"):\n                    state.trace(f\"matched marked file {name!r} (from {marked!r})\")\n                    self._marked_for_rewrite_cache[name] = True\n                    return True\n\n            self._marked_for_rewrite_cache[name] = False\n            return False\n```\n\nAt line 250, the method tries to return `self._marked_for_rewrite_cache[name]` immediately. If the module name exists in the cache, it returns the cached boolean value without performing any additional checks against the `_must_rewrite` set. This cache lookup intercepts the data flow at the entry point of the method, preventing redundant eligibility checks when the same module is imported multiple times.\n\nIf the cache lookup raises a `KeyError` (meaning the module hasn't been checked before), the method then performs the actual eligibility check by iterating through `_must_rewrite` (lines 252-256) and stores the result in the cache (lines 255 or 258) before returning, ensuring subsequent calls for the same module name will use the cached value.\n\nThis method is called from two locations in the `AssertionRewritingHook` class:\n1. `_early_rewrite_bailout` (line 221) - for fast filtering of modules that won't be rewritten\n2. `_should_rewrite` (line 246) - for the final decision on whether a module should be rewritten\n\nThe cache is cleared in the `mark_rewrite` method (line 277) when new modules are explicitly marked for rewriting, ensuring the cache stays consistent with the current rewrite configuration.",
+      "reference_sha256": "7379827a843e1eaa7b355e0f8f40cdc4f64b473938ab0e6f5ec493467c3e06e2",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-c4177c340bb4233a26ddafd9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1264,
+            "file_sha256": "ebf31a8738065ad418c354ceeed99562926055587c664501e9f8d194e4078202",
+            "path": "src/_pytest/python.py",
+            "start_line": 1264
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the failure mechanism when the parametrize method's validation of indirect parameter names detects that an indirect parameter references a non-existent function argument, and how does this depend on the function signature?",
+      "question_sha256": "92e5d45a82976059f447a4807123e4ff7440a815c9c380dd9a2404db2b295263",
+      "reference_answer": "The failure mechanism occurs in the `_validate_if_using_arg_names` method, which is called during the `parametrize` method execution at line 1264 of `./src/_pytest/python.py`.\n\nWhen an indirect parameter references a non-existent function argument, the validation process works as follows:\n\n1. **Initial Check**: The method iterates through each argument name in `argnames` and checks if it exists in `self.fixturenames` (line 1470). The `fixturenames` attribute contains all fixture names required by the test function, which includes:\n   - Function arguments without default values (extracted via `getfuncargnames()`)\n   - All fixtures and their dependencies (computed via `getfixtureclosure()`)\n\n2. **Default Argument Check**: If the argument name is not found in `fixturenames`, the method checks if it exists in `default_arg_names` (line 1471), which contains function arguments that have default values (extracted via `get_default_arg_names()`). If found, it raises a different error: \"function already takes an argument '{arg}' with a default value\" (lines 1472-1475).\n\n3. **Failure Determination**: If the argument is not in `fixturenames` and not in `default_arg_names`, the method determines the appropriate error message based on the `indirect` parameter type:\n   - **If `indirect` is a Sequence (list)**: It checks whether the argument name is in the `indirect` list (line 1477). If it is, the error message uses \"fixture\"; if not, it uses \"argument\".\n   - **If `indirect` is a boolean**: It uses the boolean value directly - `True` means \"fixture\", `False` means \"argument\" (line 1480).\n\n4. **Error Message**: The method then raises a failure with the message: `\"In {func_name}: function uses no {name} '{arg}'\"` (lines 1481-1484), where `{name}` is either \"fixture\" or \"argument\" depending on the determination above.\n\n**Dependence on Function Signature**: The failure mechanism depends on the function signature in two ways:\n- `self.fixturenames` is derived from the function signature through `getfuncargnames()`, which extracts mandatory function arguments (those without default values) from the function's signature using Python's `inspect.signature()`.\n- `default_arg_names` is also derived from the function signature, containing arguments that have default values.\n\nThe validation compares the parametrized argument names against these signature-derived sets to determine if they exist in the function. If an indirect parameter name doesn't appear in either set, it triggers the failure mechanism with an error message that indicates whether the missing name was expected to be a fixture or a direct function argument.",
+      "reference_sha256": "8b49a283f084419550314a10b234d892d51723fc0e1c4a72b07d64a44d6a02d7",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-ca382d379125c18ac1a07a83"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1087,
+            "file_sha256": "ebf31a8738065ad418c354ceeed99562926055587c664501e9f8d194e4078202",
+            "path": "src/_pytest/python.py",
+            "start_line": 1087
+          },
+          {
+            "end_line": 636,
+            "file_sha256": "43e60de64e464b0908ab8993e93c4cb3da915a9a68422d196ba0a031559870fa",
+            "path": "src/_pytest/fixtures.py",
+            "start_line": 620
+          },
+          {
+            "end_line": 1137,
+            "file_sha256": "43e60de64e464b0908ab8993e93c4cb3da915a9a68422d196ba0a031559870fa",
+            "path": "src/_pytest/fixtures.py",
+            "start_line": 1136
+          },
+          {
+            "end_line": 1103,
+            "file_sha256": "43e60de64e464b0908ab8993e93c4cb3da915a9a68422d196ba0a031559870fa",
+            "path": "src/_pytest/fixtures.py",
+            "start_line": 1097
+          },
+          {
+            "end_line": 475,
+            "file_sha256": "0e93e9d085b76e1a1c79605b3528736151bf0d5de8193d37342f33d57b5c0238",
+            "path": "testing/python/collect.py",
+            "start_line": 446
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does pytest's indirect parametrization mechanism resolve non-hashable dictionary items through fixture request parameters, and what internal transformations occur when parametrize decorators process mutable objects that cannot be used as cache keys?",
+      "question_sha256": "825f4146cef0e8992ce1827dbf03535d04ef55c716e7e148e1cdb17b4a4c11ab",
+      "reference_answer": "The parametrization mechanism resolves mutable dictionary objects through `request.param` without transformation. When `parametrize()` is called with `indirect=True`, the values (including mutable dictionaries) are stored directly in `CallSpec2.params` (see `src/_pytest/python.py:1087`). During fixture resolution, `getfixturevalue()` creates a `SubRequest` object and sets `request.param` to the value from `callspec.params[argname]` (see `src/_pytest/fixtures.py:620-636`). The dictionary objects are passed as-is\u2014no transformation occurs.\n\nFor caching, `FixtureDef.cache_key()` returns `request.param` directly (see `src/_pytest/fixtures.py:1136-1137`). Cache comparison first tries `==`; if that raises `ValueError` or `RuntimeError` (e.g., for objects without standard comparison), it falls back to `is` (see `src/_pytest/fixtures.py:1097-1103`). This allows non-hashable objects to work, but mutable dictionaries won't cache correctly across different instances since `is` compares object identity.\n\nThe test case `test_parametrize_with_non_hashable_values_indirect` in `testing/python/collect.py:446-475` demonstrates this: dictionary items from `archival_mapping.items()` are passed directly to fixtures via `request.param` without any transformation, and the tests pass successfully.",
+      "reference_sha256": "0ec096d9c6216f9fc8ee0dd3e8ad4183a21b6df6e214b84ce6a154cc471e65dd",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-e00e627ca510b66a673a2f40"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 88,
+            "file_sha256": "821d299daebaa782d56f60fc493e39ebc586c6f7489c64f8de6eac95886a36a5",
+            "path": "src/_pytest/_argcomplete.py",
+            "start_line": 88
+          },
+          {
+            "end_line": 93,
+            "file_sha256": "39cbebde372f4e1832a6c602e889b0dbc8221faf2428da7ffd9c255b86b7316e",
+            "path": "testing/test_argcomplete.py",
+            "start_line": 93
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the FastFilesCompleter.__call__ method reconcile the dual glob expansion strategies for handling hidden files versus wildcard patterns, and what is the algorithmic consequence of applying prefix_dir stripping after sorting?",
+      "question_sha256": "99d10d4eb3a2495a7944a413f5f99ec3a617f77be8e696de9cf3eed720b3a227",
+      "reference_answer": "The fast file completer callable method reconciles dual glob expansion strategies by conditionally applying two glob patterns and merging their results into a single list.\n\nWhen the prefix contains no wildcard characters (\"*\" or \"?\") (line 88 in `src/_pytest/_argcomplete.py`), the method uses a two-phase approach:\n\n1. **Hidden files expansion** (lines 90-91): If the prefix is empty or ends with a path separator (`os.sep`), it performs `glob(prefix + \".*\")` to match hidden files (files starting with a dot). This result is added to the `globbed` list via `globbed.extend()`.\n\n2. **Wildcard pattern expansion** (lines 92-93): The method then appends \"*\" to the prefix and performs `glob(prefix + \"*\")` to match all files matching the pattern. This result is also added to the `globbed` list.\n\nThe reconciliation happens by:\n- Combining both glob results into the same `globbed` list (line 87 initializes it, lines 91 and 93 extend it)\n- Sorting the combined results once (line 94: `for x in sorted(globbed)`)\n- Processing the unified list uniformly (lines 95-98: adding \"/\" for directories and stripping the prefix directory)\n\nThis design ensures that when completing an empty prefix or a directory path ending with a separator, both hidden files (via \".*\") and regular files (via \"*\") are included in the completion results, while maintaining a single sorted, deduplicated list for consistent processing.\n\nThe dual strategy is necessary because:\n- Hidden files (starting with \".\") are not matched by the \"*\" wildcard in Unix shells\n- The \".*\" pattern specifically targets hidden files\n- Both patterns are needed to provide complete file completion that matches bash behavior (as noted in the test comment at `testing/test_argcomplete.py:93`)\n</start_of_answer>",
+      "reference_sha256": "65523d248118e434a5b468a926054682b7e980642d446fae294ca3980b2640ba",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-e0cdc230a5c178a07822d762"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 456,
+            "file_sha256": "92e96e989751747bbbce8a2c3abe257c747471ee8bb0eb616aef41cabc3cc55e",
+            "path": "src/_pytest/capture.py",
+            "start_line": 450
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the SysCapture class maintain consistency between its captured buffer state and the original system stream when snap() and writeorg() operations are interleaved during test execution?",
+      "question_sha256": "460951877f8de6788969f65212545c3f92fd198402020f753a24fa0266d2c095",
+      "reference_answer": "The system stream capture class (SysCapture) maintains consistency between its captured buffer and the original system stream when buffer reading (snap()) and stream writing (writeorg()) operations are interleaved through a separation of concerns and state management mechanism.\n\n**Separation of Operation Targets:**\nThe two operations operate on different targets, preventing interference:\n- The `snap()` method (lines 450-456 in `src/_pytest/capture.py`) reads from and clears the captured buffer (`tmpfile`), which is a `CaptureIO` instance that stores captured output.\n- The `writeorg()` method (lines 458-461) writes directly to the original system stream (`self._old`), which is the original `sys.stdout` or `sys.stderr` that was saved before capture started.\n\n**State Machine Enforcement:**\nBoth methods use `_assert_state()` to ensure they can only be called in valid states (\"started\" or \"suspended\"), as seen in lines 451 and 459. This state machine ensures that:\n- When in \"started\" state: `sys.stdout`/`sys.stderr` point to `tmpfile`, so normal writes are captured, while `writeorg()` bypasses capture by writing directly to `self._old`.\n- When in \"suspended\" state: `sys.stdout`/`sys.stderr` are restored to `self._old`, so writes go directly to the original stream, while `snap()` can still read any remaining data from `tmpfile`.\n\n**Consistency Mechanism:**\nThe consistency is maintained because:\n1. **Independent operation targets**: `snap()` operates on `tmpfile` (the captured buffer), while `writeorg()` operates on `self._old` (the original stream). They never modify the same object.\n2. **Atomic buffer operations**: When `snap()` reads the buffer, it atomically clears it (seek to 0, then truncate), ensuring subsequent captures start from a clean state.\n3. **State-aware stream redirection**: The state machine (managed by `suspend()` and `resume()` methods in lines 416-426) ensures that `sys.stdout`/`sys.stderr` redirection matches the expected state, so interleaved operations see consistent stream targets.\n4. **No shared mutable state conflict**: Since `snap()` reads from `tmpfile` and `writeorg()` writes to `self._old`, there's no race condition or data corruption when these operations are interleaved during test execution.\n\nThis design allows the capture mechanism to safely interleave reading captured output and writing to the original stream without losing data or causing inconsistencies, which is essential for pytest's output capture functionality during test execution phases.",
+      "reference_sha256": "fc8c5919548fe715673c48dff9eac98844cca61df5471571e4b819c8b4b24758",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-e8d09990db3c6eb42ddf9dd6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 869,
+            "file_sha256": "92e96e989751747bbbce8a2c3abe257c747471ee8bb0eb616aef41cabc3cc55e",
+            "path": "src/_pytest/capture.py",
+            "start_line": 858
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the pytest capture framework ensure that stdout and stderr captured during setup and teardown phases are correctly isolated and reported separately from the test execution phase, particularly when multiple fixtures at different scopes are involved?",
+      "question_sha256": "6ad22db4188c0e4855c125f122765a92b1f80482dd67ca26e60af1e673c715f8",
+      "reference_answer": "The output capturing mechanism isolates and reports standard output and error streams separately for initialization, execution, and cleanup stages using a phase-based capture and buffer reset approach.\n\n**Core isolation mechanism:**\n\n1. **Phase-based context management**: Each phase (setup, call, teardown) uses a context manager (`item_capture`) that:\n   - Resumes global capture at the start\n   - Activates fixture capture if present (takes precedence over global capture)\n   - Executes the phase\n   - Deactivates fixture capture\n   - Suspends global capture\n   - Reads and stores captured output with a phase identifier\n\n2. **Buffer reset after each phase**: After each phase, the `snap()` method:\n   - Reads the current buffer content\n   - Immediately resets the buffer by seeking to position 0 and truncating\n   - This ensures each phase starts with a clean buffer, preventing carryover\n\n3. **Separate storage by phase**: Captured output is stored using `add_report_section(when, \"stdout\", out)` and `add_report_section(when, \"stderr\", err)`, where `when` is \"setup\", \"call\", or \"teardown\". This tags each output with its phase.\n\n**Handling test dependencies at different scopes:**\n\n- The mechanism activates and deactivates fixture capture around each phase\n- Fixture capture takes precedence over global capture when active\n- Each phase's output is read and stored immediately after that phase completes, before the next phase begins\n- This ensures outputs from fixtures at different scopes (function, class, module, session) are correctly attributed to the phase in which they execute\n\n**Implementation details:**\n\n- `CaptureManager.item_capture()` (lines 858-869 in `capture.py`) manages the phase-based capture\n- `snap()` methods (e.g., `SysCapture.snap()` at lines 450-456) reset buffers after reading\n- `read_global_capture()` (line 801-803) reads and returns captured output, which triggers the buffer reset\n- Report sections are stored with phase identifiers, allowing separate display of outputs from each phase\n\nThis design ensures that outputs from initialization, execution, and cleanup are isolated and can be reported separately, even when multiple test dependencies with different lifetimes are involved.",
+      "reference_sha256": "de7593c044857c7fd10f6e7d27824ae772e1c4a1a8d6ca59d027fb6304bd0928",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-eb9ff6ab28569c0f26164f0c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "39cbebde372f4e1832a6c602e889b0dbc8221faf2428da7ffd9c255b86b7316e",
+            "kind": "file_reference",
+            "line_count": 99,
+            "path": "testing/test_argcomplete.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the architectural pattern in the TestArgComplete class that decouples the comparison logic between FastFilesCompleter and FilesCompleter implementations to enable independent evolution of bash completion strategies?",
+      "question_sha256": "d3fa05dc475de2754812da885c8870f75b74945674cc8b87f84fd609c0b84ab3",
+      "reference_answer": "The architectural pattern is **extracting comparison logic into a separate function** that accepts both implementations as parameters, enabling the test class to compare different completion strategies without coupling to their specific implementations.\n\nIn `testing/test_argcomplete.py`, the `equal_with_bash` function (lines 15-24) is defined as a **standalone function** outside the `TestArgComplete` class. This function:\n- Accepts both implementations (`ffc` and `fc`) as callable parameters\n- Calls both with the same prefix: `res = ffc(prefix)` and `res_bash = set(fc(prefix))`\n- Compares their results: `retval = set(res) == res_bash`\n- Returns a boolean indicating whether the results match\n\nThe `TestArgComplete` test methods (lines 74-99) use this function via assertions like `assert equal_with_bash(\"\", ffc, fc, out=sys.stdout)`, but the comparison logic itself is **decoupled** from the test class.\n\nThis pattern enables:\n1. **Independent evolution**: `FastFilesCompleter` (the fast implementation using Python's `glob`) and `FilesCompleter` (the reference implementation using bash's `compgen`) can evolve independently\n2. **Reusability**: The comparison function can be used across multiple test methods\n3. **Separation of concerns**: The test class focuses on test orchestration, while comparison logic is isolated in a separate function\n4. **Polymorphism**: Both implementations follow the same callable interface (`__call__` method), allowing them to be passed as parameters to the comparison function\n\nThis is a form of the **Strategy pattern** combined with **dependency injection**, where the comparison function accepts strategy implementations as parameters rather than being tightly coupled to specific classes.",
+      "reference_sha256": "bd65adef4685dc4ed6b40a1b76f21a9dbc2496a7a71276299b5a714990570ff3",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-f35a25d4323f7fb29e68ae3d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 396,
+            "file_sha256": "ca2213f977ab6e01e8bbc0fb7527282fd62fa41af206575b262b574977d63910",
+            "path": "src/_pytest/reports.py",
+            "start_line": 334
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "a9b8074421110d12bc5bc6407da9d07f80e9e3f5bbbcda1cdafbf7a66dc7b4aa",
+            "kind": "file_reference",
+            "line_count": 308,
+            "path": "src/_pytest/outcomes.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the `from_item_and_call` classmethod implement conditional logic to determine the appropriate outcome and longrepr representation based on exception type and execution phase?",
+      "question_sha256": "7f947d9b19fc7e820c670506a931a868c4690d88251facd05e1d56bf70c6763f",
+      "reference_answer": "The `from_item_and_call` classmethod in the `TestReport` class (located in `src/_pytest/reports.py`, lines 334-396) implements conditional logic through a series of nested if-else statements that examine the exception information and execution phase.\n\n**Determining the outcome (test result status):**\n\n1. **No exception case** (line 349): If `call.excinfo` is `None`, the outcome is set to `\"passed\"` and `longrepr` is `None`.\n\n2. **Non-ExceptionInfo case** (line 359): If `excinfo` exists but is not an `ExceptionInfo` instance, the outcome is set to `\"failed\"` and `longrepr` is set directly to the `excinfo` value.\n\n3. **Skip exception case** (line 362): If `excinfo.value` is an instance of `skip.Exception` (which is the `Skipped` class from `src/_pytest/outcomes.py`), the outcome is set to `\"skipped\"`. The `longrepr` is then constructed as a tuple `(path, lineno, message)` based on the `_use_item_location` flag:\n   - If `_use_item_location` is `True`, it uses the item's location via `item.reportinfo()`\n   - Otherwise, it uses the exception's crash location from `excinfo._getreprcrash()`\n\n4. **Other exceptions** (line 374): For all other exceptions, the outcome is set to `\"failed\"`.\n\n**Determining the longrepr (failure representation) based on execution phase:**\n\nFor failed outcomes (non-skip exceptions), the `longrepr` representation depends on the `call.when` value (the execution phase):\n\n- **When `call.when == \"call\"`** (line 376-377): The method calls `item.repr_failure(excinfo)`, which provides a custom failure representation that respects the item's specific formatting (e.g., Python test items may format differently than doctest items).\n\n- **When `call.when` is `\"setup\"` or `\"teardown\"`** (line 378-381): The method calls `item._repr_failure_py(excinfo, style=item.config.getoption(\"tbstyle\", \"auto\"))`, which generates a Python-style traceback representation using the configured traceback style option (auto, short, long, line, etc.).\n\nThis conditional logic ensures that:\n- Test outcomes are correctly classified as passed, skipped, or failed\n- Failure representations are appropriately formatted based on whether the failure occurred during test execution (`call`) or during setup/teardown phases\n- Skip exceptions are handled specially with location-aware reporting\n- The traceback style configuration is respected for setup/teardown failures but not for test call failures (which use the item's custom `repr_failure` method)",
+      "reference_sha256": "74b2a90eec1897261329cd296e579c4f6f04228c533e487a5d4c674cbac52d20",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-f4bb470a3c29d36e29b968d4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 489,
+            "file_sha256": "43e60de64e464b0908ab8993e93c4cb3da915a9a68422d196ba0a031559870fa",
+            "path": "src/_pytest/fixtures.py",
+            "start_line": 451
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "e1ea3da297c5ffffd616270853a4f7636aea68cf46b2850e538b438f398a274f",
+            "kind": "file_reference",
+            "line_count": 5070,
+            "path": "testing/python/fixtures.py"
+          },
+          {
+            "file_sha256": "a846e231ae62b1d7278a9119bfd36b923057b5033b238765c9a7a64d41d798fe",
+            "kind": "file_reference",
+            "line_count": 1780,
+            "path": "src/_pytest/pytester.py"
+          },
+          {
+            "file_sha256": "43e60de64e464b0908ab8993e93c4cb3da915a9a68422d196ba0a031559870fa",
+            "kind": "file_reference",
+            "line_count": 2018,
+            "path": "src/_pytest/fixtures.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the dependency chain between the TestRequestScopeAccess class, the pytest fixture system, the parametrization mechanism, the Pytester fixture, and the internal request attribute resolution logic that validates request object attributes are correctly scoped?",
+      "question_sha256": "c49d26824d41f6fee38f53465349f7d2d5e7cad7193b611016bd280380ee6afb",
+      "reference_answer": "The dependency chain flows as follows:\n\n1. **The test class that validates scope-based request attribute access** (`TestRequestScopeAccess` in `testing/python/fixtures.py`) uses **the test parameter generation mechanism** (`pytest.mark.parametrize`) to create multiple test cases with different fixture scope configurations (session, module, class, function). This parametrization is applied at the class level via `pytestmark`, generating test methods with different `scope`, `ok`, and `error` parameters.\n\n2. **The test class** depends on **the testing utility fixture for isolated test execution** (`pytester` fixture from `src/_pytest/pytester.py`). The `pytester` fixture is injected into test methods and provides methods like `makepyfile()` and `inline_run()` to create isolated test environments and execute pytest runs programmatically.\n\n3. **The testing utility fixture** is itself part of **the core fixture management system** (the pytest fixture system in `src/_pytest/fixtures.py`). It's registered as a fixture using the `@fixture` decorator and depends on other fixtures (`FixtureRequest`, `TempPathFactory`, `MonkeyPatch`) to function, demonstrating the fixture system's dependency injection capabilities.\n\n4. **The test class** validates **the scope validation logic that enforces attribute availability based on fixture scope** (the request attribute resolution logic in `FixtureRequest`). The test creates fixtures with different scopes and verifies that request object properties (`path`, `module`, `cls`, `function`) are correctly accessible or raise `AttributeError` based on the fixture's scope, as implemented in the property methods (lines 451-489 of `src/_pytest/fixtures.py`).\n\n5. **The scope validation logic** is enforced through the `_check_scope()` method in `SubRequest` (lines 780-801) and property accessors in `FixtureRequest` that check `self.scope` against allowed scopes before returning attributes. For example, `request.function` raises `AttributeError` if `self.scope != \"function\"` (line 454), and `request.cls` is only available in \"class\" or \"function\" scoped contexts (line 462).\n\n6. **The test parameter generation mechanism** integrates with **the core fixture management system** through the `pytest_generate_tests` hook and `Metafunc.parametrize()` method, which generates multiple test items that are then processed by the fixture system to resolve dependencies and create appropriate request objects with correct scopes.\n\nThe complete chain: Parametrization generates test cases \u2192 Test class uses Pytester fixture \u2192 Pytester depends on fixture system \u2192 Test validates request attribute resolution \u2192 Attribute resolution enforces scope-based access \u2192 All components work together to ensure fixtures can only access request attributes appropriate to their scope.",
+      "reference_sha256": "e4ae83b1e8ce89078c0bf7b206a3c910c9314843487ccdab74302882f24f7d21",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-f54befe4bf7353628615620b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1456,
+            "file_sha256": "a846e231ae62b1d7278a9119bfd36b923057b5033b238765c9a7a64d41d798fe",
+            "path": "src/_pytest/pytester.py",
+            "start_line": 1373
+          },
+          {
+            "end_line": 332,
+            "file_sha256": "dc678e2bb07e1630f20595c71579d22f621a4bf4d4284fa9a659faaad44901bc",
+            "path": "src/_pytest/main.py",
+            "start_line": 276
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the subprocess execution mechanism that `pytester.runpytest_subprocess` delegates to, and how does it handle system exception propagation during test collection?",
+      "question_sha256": "d24d65a6b809b4263a88407d41c3b2c5f75459976d41fade2255d2d02b7f37ef",
+      "reference_answer": "The subprocess execution mechanism is the `run()` method in the `Pytester` class, located at lines 1373-1456 in `src/_pytest/pytester.py`.\n\n`runpytest_subprocess()` (line 1476) calls `self.run()` (line 1506), which:\n1. Uses `self.popen()` (line 1420) that invokes `subprocess.Popen` (line 1363 in `popen()`)\n2. Executes the command `sys.executable, \"-mpytest\"` plus arguments (via `_getpytestargs()` at line 1465-1466)\n3. Captures stdout and stderr to files (lines 1413-1414, 1418-1426)\n4. Waits for the subprocess to complete via `popen.wait()` (lines 1440 or 1443)\n5. Reads the exit code and converts it to an `ExitCode` (lines 1454-1455)\n\nSystem exception propagation during test collection:\n- Exceptions (including `SystemExit`, `KeyboardInterrupt`) occur in the subprocess running pytest's `main()` entry point\n- They are handled by `wrap_session()` in `src/_pytest/main.py` (lines 276-332), which:\n  - Catches `KeyboardInterrupt` and `exit.Exception` (lines 295-304), converting them to `ExitCode.INTERRUPTED` or custom exit codes\n  - Catches `BaseException` (which includes `SystemExit`) at line 305, converting to `ExitCode.INTERNAL_ERROR`\n  - Sets `session.exitstatus` accordingly\n- The subprocess exits with this exit code\n- The parent process reads the exit code via `popen.wait()` and captures any error output from stderr/stdout files\n- The parent does not directly catch exceptions from the subprocess; it relies on exit codes and captured output\n\nThis design isolates exceptions in the subprocess and communicates results via exit codes and captured output, rather than propagating exceptions across process boundaries.",
+      "reference_sha256": "61872a0b8ede4e161d0f94dc1c24792726f0145ec29b8ed1307508f64dc6401a",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-f5d5b8a1f728b442e7da9e96"
+    }
+  ]
+}

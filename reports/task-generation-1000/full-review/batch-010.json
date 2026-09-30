@@ -1,0 +1,277 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-d7e6391df86e641594b23f1e",
+      "reference_sha256": "bc6e3047de72a8a18e6fafb635553359caab8dcf7fa6ad8d32163b57ba1682b3",
+      "question_sha256": "fa61285a017a24b8a8cfa82d395fb65d430ad1bb463410f2a3fafce87d7d4273",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Compiler/architecture matrix verifies distinct flag expectations",
+          "verdict": "supported",
+          "reason": "Includes -m32/-m64, empty MSVC flags and AIX variants; rationale follows branch coverage, not proof of every supported configuration.",
+          "evidence": {
+            "path": "test/unittests/client/build/compiler_flags_test.py",
+            "start_line": 9,
+            "end_line": 37
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-df2c8c1795e9c07fbd96c5f7",
+      "reference_sha256": "706d8ecbf5fbd829a2d2acc24315b88d81aea6da1303a01c1a17af20a206f2d4",
+      "question_sha256": "c6d5b1d214e515e236c0c0b7d4b1cb023ae139026e4bb4a6f610d9bf6cb56ae2",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Version instance flows to VersionRange.contains",
+          "verdict": "supported",
+          "reason": "Passes self and resolve_prerelease directly; contains validates Version and calls condition sets at version_range.py:184-198.",
+          "evidence": {
+            "path": "conan/internal/model/version.py",
+            "start_line": 198,
+            "end_line": 201
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-df92777335fb51c4c7173747",
+      "reference_sha256": "48625e23c7792644d9c96afd7d7f470d9dde2fd554e15fdfb16fbdce141fff16",
+      "question_sha256": "626b798748e1b905bd4dc14d072825dc81605469eb6aa1acce250981dd70faa0",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Selective synthetic failure reaches generic retry path",
+          "verdict": "supported",
+          "reason": "Fails only conanfile.py requests with false ok/200; asserts two waits and three errors.",
+          "evidence": {
+            "path": "test/integration/remote/download_retries_test.py",
+            "start_line": 16,
+            "end_line": 33
+          }
+        },
+        {
+          "claim": "Generic exception retries while auth/not-found do not",
+          "verdict": "supported",
+          "reason": "Explicit exception branches; false ok/200 falls through at 83-93.",
+          "evidence": {
+            "path": "conan/internal/rest/file_downloader.py",
+            "start_line": 37,
+            "end_line": 50
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-e0b00b8d5337e853c830ff68",
+      "reference_sha256": "31f0319c93b99dd4b128e5ce6c7134e1352da9853f91964a69d99b0b766f16b1",
+      "question_sha256": "94edbe2e37801664de257e3fc7e21844c92ebec16e706479888578ecdf1455e4",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "DownloadAPI.download_full orchestrates thread pool",
+          "verdict": "supported",
+          "reason": "Parallel config selects ThreadPool and maps split package list; otherwise sequential.",
+          "evidence": {
+            "path": "conan/api/subapi/download.py",
+            "start_line": 81,
+            "end_line": 111
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-e2dd929039348918fafda9fd",
+      "reference_sha256": "08067fc3c9623cbfec6c7971180c41ef32dc470a8634ed426f3252875c319cb9",
+      "question_sha256": "f810bfc81d442e55d6404340acc49576de0ea301265ae68c7e1223ab09c3de0e",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Local source path is resolved through editable registration",
+          "verdict": "unsupported",
+          "reason": "source loads supplied path directly and uses an empty profile with global conf, not normal selected build/host profiles.",
+          "evidence": {
+            "path": "conan/api/subapi/local.py",
+            "start_line": 71,
+            "end_line": 98
+          }
+        }
+      ],
+      "material_errors": [
+        "Conflates editable graph resolution with LocalAPI.source execution and overstates profile equivalence."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "ConanApp combines global and workspace editable registries (conan/internal/conan_app.py:58-60), making those available for dependency resolution. LocalAPI.source itself loads the supplied local recipe path directly, obtains an empty profile carrying global.conf, initializes both profile contexts from it, runs layout, assigns local folders and calls run_source_method (conan/api/subapi/local.py:71-98). The integration is orchestration through shared services; it does not mean source execution uses ordinary package build profiles or requires editable registration."
+    },
+    {
+      "task_id": "import-eb57b9eaeb7bdb3777c2affb",
+      "reference_sha256": "c6f0eee5cb624a561ce58c2e7479bb1e4332a4def27d0bbd38ceec1058cabaff",
+      "question_sha256": "8a6d886e273d1253e1b899980f204ba7aa8dd320fcf332d924c59136cbf89500",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Defines become interface compile definitions with trait filtering",
+          "verdict": "supported",
+          "reason": "Extracts defines; clears only when both headers/libs are false in this branch.",
+          "evidence": {
+            "path": "conan/tools/cmake/cmakedeps/templates/target_data.py",
+            "start_line": 310,
+            "end_line": 354
+          }
+        },
+        {
+          "claim": "Component target receives INTERFACE_COMPILE_DEFINITIONS",
+          "verdict": "supported",
+          "reason": "Generated target attaches configuration-filtered definitions.",
+          "evidence": {
+            "path": "conan/tools/cmake/cmakedeps/templates/target_configuration.py",
+            "start_line": 188,
+            "end_line": 189
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-f08d28e829f4f269390cd086",
+      "reference_sha256": "8a89029a3d5eac0441e02a42610324e06afe48fec1c4bd264bc90f8c93d620f8",
+      "question_sha256": "05f2fde943a2dc4c6195f4b108703bac579f20ed83909818fee9ca3971ad691e",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Retry loop adds sequential authentication requests",
+          "verdict": "supported",
+          "reason": "Interactive failures may repeat; noninteractive failure raises immediately.",
+          "evidence": {
+            "path": "conan/internal/rest/auth_manager.py",
+            "start_line": 72,
+            "end_line": 91
+          }
+        },
+        {
+          "claim": "All failed logins are followed by a successful original API call",
+          "verdict": "contradicted",
+          "reason": "All failures raise Too many failed login attempts; no successful final retry.",
+          "evidence": {
+            "path": "conan/internal/rest/auth_manager.py",
+            "start_line": 87,
+            "end_line": 91
+          }
+        }
+      ],
+      "material_errors": [
+        "Worst-case formula includes impossible final success after all logins fail; arbitrary latency percentages are not measurements."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "Each authentication attempt performs a synchronous requester.get (conan/internal/rest/rest_client_v2.py:102-113), adding network time and possibly interactive input time. The retry loop returns on success, aborts a noninteractive failure immediately, and raises after exhausting interactive attempts (conan/internal/rest/auth_manager.py:72-91). Only successful authentication can permit retrying the original operation. If all attempts fail there is no final successful API call; actual latency depends on the requests and user input."
+    },
+    {
+      "task_id": "import-fa63173a31c8eddcf50d8127",
+      "reference_sha256": "ec46e86c3f488fa0a67b08680eb40c1c231cd93efc697323aed6f7c619ea864f",
+      "question_sha256": "1cdbf9d805a607bf022f15cfe50f66b62d8ccc96f5794d65bbacfc879c1bd05f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Back migrations filter newer versions and load scripts",
+          "verdict": "supported",
+          "reason": "Filters .py version prefixes, reverse sorts, invokes migrate and removes script even after logged execution exception.",
+          "evidence": {
+            "path": "conans/migrations.py",
+            "start_line": 59,
+            "end_line": 86
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-fc191fccf0a9757f209dc394",
+      "reference_sha256": "f23edead80d2c33d96dd8ff917d0460340c902e223b00574d7bddd82573d16f7",
+      "question_sha256": "b92ef537e1ca62bb11cccc3af98aa8e6b04fbfe8f16dd2f4555444ac6f4eb43f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Plugin exceptions abort whereas absent credentials allow fallback",
+          "verdict": "supported",
+          "reason": "Scoped ConanException on plugin error; truthy tuple returns; otherwise file/env/input chain. Tests distinguish these branches.",
+          "evidence": {
+            "path": "conan/internal/rest/remote_credentials.py",
+            "start_line": 37,
+            "end_line": 67
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-fcb1997b39de5af55485731b",
+      "reference_sha256": "2d4fc7b087119e6e6bae93054c3184984e3fbfda7af2790ef9d7948253a63f8b",
+      "question_sha256": "a88fa9fe334b37bbfd874fd6dec6a83739a715481154c85acb43b795a9599978",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Standalone conan test always sets tested_graph never-build mode",
+          "verdict": "contradicted",
+          "reason": "Call omits tested_graph; default is None, which uses requested build mode.",
+          "evidence": {
+            "path": "conan/cli/commands/test.py",
+            "start_line": 42,
+            "end_line": 53
+          }
+        }
+      ],
+      "material_errors": [
+        "Conflates standalone test and create test phase; test command does not guarantee never rebuilding."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "The standalone conan test command supplies the reference and build modes to run_test without tested_graph (conan/cli/commands/test.py:42-53). It loads the test graph, analyzes binaries and installs them before running tests (54-78); changing test sources alone does not export a new recipe here. Reuse depends on the resolved reference, package ID, available binaries and build modes. The never-build override is specifically the branch where tested_graph is supplied; otherwise evaluate_graph uses BuildMode(build_mode) (conan/internal/graph/graph_binaries.py:430-438)."
+    },
+    {
+      "task_id": "import-ffa1b9517cdfa7fbb355bdb7",
+      "reference_sha256": "af57899c0f9768c23191f9fadda18fc238b75e37bcfb7a1128c5404ad46c084b",
+      "question_sha256": "05327894d8961605060035da3f9a1cb7ca8b46d837b33cf011b2faec851fa660",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "SameMajorVersion accepts 2.5 for 2.3",
+          "verdict": "supported",
+          "reason": "2.5 is not less, major components match so sets TRUE.",
+          "evidence": {
+            "path": "conan/tools/cmake/cmakedeps2/config_version.py",
+            "start_line": 44,
+            "end_line": 63
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

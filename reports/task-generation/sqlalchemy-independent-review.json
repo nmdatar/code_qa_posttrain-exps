@@ -1,0 +1,948 @@
+{
+  "schema_version": "1.0",
+  "reviewed_at": "2026-09-28",
+  "reviewer_kind": "independent_codex_agent",
+  "human_reviewed": false,
+  "status": "needs_revision",
+  "spec_path": "examples/dataset_sources/sqlalchemy-generation-v2.json",
+  "spec_sha256": "74d9500786e2ce184bd30a9ee83c6f1254755a7db00d434de15da67fed449586",
+  "repository_commit": "749086adb0cc5b966aa3854712f16e213b979310",
+  "draft_development_only": true,
+  "training_export_allowed": false,
+  "difficulty": "unproven",
+  "answer_quality_evaluated": false,
+  "scope": "Read every required claim and its exact cited line range in pinned snapshot; reviewed prompts, all fixture code and expected outputs, author report, recorded Modal verification, and isolation report. Did not execute repository code on host or modify specs/bundles.",
+  "summary": {
+    "tasks_reviewed": 3,
+    "required_claims_reviewed": 17,
+    "supported_claims": 17,
+    "needs_revision_tasks": 2,
+    "primary_defect": "SA-GEN-03 JSON server-default quoting in prompt differs from tested fixture.",
+    "secondary_defect": "SA-GEN-01 failure control is not the fresh-run setup requested."
+  },
+  "verification_evidence": {
+    "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+    "status": "passed",
+    "assertions": 3,
+    "bundle_hash": "8caf0e2fa9181d24964d5d6a8c80364405b17a857b7de7c2d587a833838d5acc",
+    "meaning": "Recorded fixture execution verifies expected runtime outcomes; it does not establish solver quality, measured difficulty, human approval, or benchmark novelty."
+  },
+  "isolation_evidence": {
+    "path": "data/generated/sqlalchemy-generation-v2/private/isolation-report.json",
+    "passed": true,
+    "caveat": "Observed gold_absent and other isolation checks do not establish exhaustive leakage absence."
+  },
+  "tasks": [
+    {
+      "id": "sqlalchemy-savepoint-preflush-state",
+      "source_candidate_id": "SA-GEN-01",
+      "status": "needs_revision",
+      "human_reviewed": false,
+      "difficulty": "unproven",
+      "claims": [
+        {
+          "id": "unconditional-preflush",
+          "verdict": "supported",
+          "reason": "Explicit session.flush() at session.py:1102-1103 precedes the new snapshot dictionaries; documentation explicitly says unconditional regardless of autoflush. Recorded before rows and persistent item 3 agree.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/orm/session.py",
+              "start_line": 1088,
+              "end_line": 1108
+            },
+            {
+              "path": "doc/build/orm/session_transaction.rst",
+              "start_line": 195,
+              "end_line": 205
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-savepoint-preflush-state-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        },
+        {
+          "id": "outer-state-survives",
+          "verdict": "supported",
+          "reason": "Preflush precedes snapshot bookkeeping; restoration expunges only nested new states. Recorded restored value and postcommit rows match. SQL rollback boundary is additionally explained in session.py:1373-1389 and transaction documentation:147-155.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/orm/session.py",
+              "start_line": 1088,
+              "end_line": 1108
+            },
+            {
+              "path": "lib/sqlalchemy/orm/session.py",
+              "start_line": 1110,
+              "end_line": 1139
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-savepoint-preflush-state-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        },
+        {
+          "id": "selective-expiration",
+          "verdict": "supported",
+          "reason": "Documentation explicitly limits expiration to state modified since SAVEPOINT; restore expunges new states as transient. Fixture inspects expiration before reading a.value. Extend the implementation citation through line 1140 to include the actual _expire call.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/orm/session.py",
+              "start_line": 1117,
+              "end_line": 1139
+            },
+            {
+              "path": "doc/build/orm/session_transaction.rst",
+              "start_line": 207,
+              "end_line": 214
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-savepoint-preflush-state-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        },
+        {
+          "id": "nested-only-rollback",
+          "verdict": "supported",
+          "reason": "Rollback loop stops at the nested boundary and documentation states enclosing transaction remains in progress; runtime records active outer transaction and subsequent committed rows.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/orm/session.py",
+              "start_line": 1372,
+              "end_line": 1406
+            },
+            {
+              "path": "doc/build/orm/session_transaction.rst",
+              "start_line": 147,
+              "end_line": 155
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-savepoint-preflush-state-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        },
+        {
+          "id": "preflush-failure",
+          "verdict": "supported",
+          "reason": "Nested assignment follows trans._begin; preflush exception rolls back flush transaction, and DEACTIVE guard instructs Session.rollback. Recorded failure status agrees, but fixture fresh-run fidelity needs correction described below.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/orm/session.py",
+              "start_line": 1088,
+              "end_line": 1104
+            },
+            {
+              "path": "lib/sqlalchemy/orm/session.py",
+              "start_line": 1991,
+              "end_line": 2005
+            },
+            {
+              "path": "lib/sqlalchemy/orm/session.py",
+              "start_line": 4673,
+              "end_line": 4680
+            },
+            {
+              "path": "lib/sqlalchemy/orm/session.py",
+              "start_line": 982,
+              "end_line": 993
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-savepoint-preflush-state-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        }
+      ],
+      "prompt_fixture_agreement": "Normal case matches intended setup and outcomes; failure control and precommit row observation are incomplete relative to prompt.",
+      "concrete_corrections": [
+        {
+          "severity": "medium",
+          "issue": "Failure contrast does not implement the requested fresh run. It reuses the database after successful outer commit and only adds duplicate id 2; it does not repeat initial loads, item 1 outer modification, or pending pre item setup.",
+          "correction": "Create a separately seeded in-memory engine for the failure case and repeat the prompt setup with the pending new item using id 2; retain the pending object, observe its state, and verify a post-rollback query succeeds. Alternatively narrow prompt explicitly to this simpler separate-Session duplicate-only failure control."
+        },
+        {
+          "severity": "low",
+          "issue": "Prompt requests rows after nested rollback before Session commit, but fixture only reads a.value then postcommit rows.",
+          "correction": "Capture ordered rows through the same Session connection immediately after rollback and before commit; record item 3 expiration too if claiming all loaded-object expiration states."
+        },
+        {
+          "severity": "low",
+          "issue": "Restore implementation citation ends on the conditional, omitting the expiration call.",
+          "correction": "Extend session.py:1117-1139 to 1117-1140; optionally include constructor 974 and following assignment to make snapshot timing explicit."
+        }
+      ],
+      "reproducibility": {
+        "status": "recorded_modal_pass",
+        "limitations": "Reviewer inspected data and source only; no repository code executed on host and no additional independent runtime execution. Pure-Python synchronous SQLite fixture and pinned dependency avoid external database requirements."
+      },
+      "answer_leakage": {
+        "gold_leak_found": false,
+        "prompt_hinting": "Prompt names relevant mechanisms and contrastive controls; this scaffolding may reduce difficulty. No blind or question-only solver evidence establishes difficulty."
+      },
+      "incorrect_premises": "No false behavior premise found in intended fixture; prompt defects, if any, are listed in corrections.",
+      "discriminating_controls": "Modified existing item, unchanged existing item, pre-boundary new item, post-boundary new item, and flush-error control discriminate common transaction misconceptions.",
+      "redundancy": "Distinct within batch: transaction state restoration, result uniqueness, and insert omission/serialization respectively. JSON is shared vocabulary in tasks 2 and 3, not a repeated mechanism. External benchmark overlap remains unproven."
+    },
+    {
+      "id": "sqlalchemy-json-joinedload-uniquing",
+      "source_candidate_id": "SA-GEN-02",
+      "status": "supported_with_notes",
+      "human_reviewed": false,
+      "difficulty": "unproven",
+      "claims": [
+        {
+          "id": "multiplicity",
+          "verdict": "supported",
+          "reason": "Relationship guide shows distinct explicit and anonymous eager-load joins; two children on each yields four rows. Query automatic unique and legacy id fallback explain four returned tuples; recorded same_parent and payload multiplicities agree. Add JSON result processor citation to explicitly substantiate independently decoded dictionaries.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/orm/query.py",
+              "start_line": 2916,
+              "end_line": 2939
+            },
+            {
+              "path": "lib/sqlalchemy/orm/loading.py",
+              "start_line": 139,
+              "end_line": 172
+            },
+            {
+              "path": "doc/build/orm/queryguide/relationships.rst",
+              "start_line": 628,
+              "end_line": 663
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-json-joinedload-uniquing-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        },
+        {
+          "id": "mandatory-unique",
+          "verdict": "supported",
+          "reason": "loading.py:295-304 installs require_unique raising the stated InvalidRequestError for joined eager collections. Recorded missing-unique error agrees.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/orm/loading.py",
+              "start_line": 294,
+              "end_line": 304
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-json-joinedload-uniquing-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        },
+        {
+          "id": "json-modern-error",
+          "verdict": "supported",
+          "reason": "JSON.hashable=False and nonlegacy _not_hashable raise, while entity filter selects id. Fixture explicitly selects Child.payload and records nonhashable error.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/sql/sqltypes.py",
+              "start_line": 2611,
+              "end_line": 2617
+            },
+            {
+              "path": "lib/sqlalchemy/orm/loading.py",
+              "start_line": 139,
+              "end_line": 157
+            },
+            {
+              "path": "lib/sqlalchemy/orm/loading.py",
+              "start_line": 194,
+              "end_line": 211
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-json-joinedload-uniquing-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        },
+        {
+          "id": "legacy-identity-fallback",
+          "verdict": "supported",
+          "reason": "Query load options enable _legacy_uniquing and _iter calls unique; legacy known-nonhashable filter is id. Recorded four dict-bearing rows agree. JSON result conversion at sqltypes.py:2996-3004 is useful supplemental evidence.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/orm/query.py",
+              "start_line": 222,
+              "end_line": 225
+            },
+            {
+              "path": "lib/sqlalchemy/orm/query.py",
+              "start_line": 2926,
+              "end_line": 2936
+            },
+            {
+              "path": "lib/sqlalchemy/orm/loading.py",
+              "start_line": 159,
+              "end_line": 178
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-json-joinedload-uniquing-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        },
+        {
+          "id": "custom-key-semantics",
+          "verdict": "supported",
+          "reason": "Result.unique accepts strategy and set membership filters strategy outputs; two normalized payload keys preserve two rows while the parent-only key collapses both. Recorded payload values distinguish intended preservation from lossy deduplication.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/engine/result.py",
+              "start_line": 627,
+              "end_line": 664
+            },
+            {
+              "path": "lib/sqlalchemy/engine/_result_cy.py",
+              "start_line": 699,
+              "end_line": 711
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-json-joinedload-uniquing-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        },
+        {
+          "id": "entity-only-control",
+          "verdict": "supported",
+          "reason": "Filters are constructed for compile_state._entities, not all graph attributes; entity id filtering avoids hashing child JSON. Recorded one parent and two children supports control.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/orm/loading.py",
+              "start_line": 194,
+              "end_line": 211
+            },
+            {
+              "path": "lib/sqlalchemy/orm/loading.py",
+              "start_line": 294,
+              "end_line": 304
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-json-joinedload-uniquing-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        }
+      ],
+      "prompt_fixture_agreement": "Fresh Sessions, six modes, two distinct payloads, payload order, identity reuse, and entity-only child collection match prompt.",
+      "concrete_corrections": [
+        {
+          "severity": "low",
+          "issue": "Error classifier labels any InvalidRequestError lacking non-hashable text as requires_unique.",
+          "correction": "Check the expected unique() error text explicitly and re-raise unexpected InvalidRequestError so unrelated failures cannot satisfy this fixture."
+        },
+        {
+          "severity": "low",
+          "issue": "Four physical SQL rows are derived from joins and observed ORM rows but not independently counted; decoder mechanism citation is implicit.",
+          "correction": "Optionally capture compiled SQL or raw Core rows and add sqltypes.py:2996-3004 to multiplicity and legacy identity fallback evidence."
+        }
+      ],
+      "reproducibility": {
+        "status": "recorded_modal_pass",
+        "limitations": "Reviewer inspected data and source only; no repository code executed on host and no additional independent runtime execution. Pure-Python synchronous SQLite fixture and pinned dependency avoid external database requirements."
+      },
+      "answer_leakage": {
+        "gold_leak_found": false,
+        "prompt_hinting": "Prompt names relevant mechanisms and contrastive controls; this scaffolding may reduce difficulty. No blind or question-only solver evidence establishes difficulty."
+      },
+      "incorrect_premises": "No false behavior premise found in intended fixture; prompt defects, if any, are listed in corrections.",
+      "discriminating_controls": "Both under-deduplication (legacy four) and over-deduplication (parent-only one) are exposed against full semantic key two; entity-only control isolates result-column hashing from graph attributes.",
+      "redundancy": "Distinct within batch: transaction state restoration, result uniqueness, and insert omission/serialization respectively. JSON is shared vocabulary in tasks 2 and 3, not a repeated mechanism. External benchmark overlap remains unproven."
+    },
+    {
+      "id": "sqlalchemy-none-default-json-matrix",
+      "source_candidate_id": "SA-GEN-03",
+      "status": "needs_revision",
+      "human_reviewed": false,
+      "difficulty": "unproven",
+      "claims": [
+        {
+          "id": "omitted-defaults",
+          "verdict": "supported",
+          "reason": "ORM iterates only present state keys; mapper fallback None set excludes server-default columns and evaluates-none types. Fixture records all defaults for omitted attributes. This supports the intended fixture, subject to correcting the prompt default expression.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/orm/persistence.py",
+              "start_line": 343,
+              "end_line": 375
+            },
+            {
+              "path": "lib/sqlalchemy/orm/mapper.py",
+              "start_line": 2722,
+              "end_line": 2743
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-none-default-json-matrix-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        },
+        {
+          "id": "plain-versus-significant",
+          "verdict": "supported",
+          "reason": "ORM skips None only outside eval_none, and evaluates_none documentation explicitly contrasts omission/default firing with passing a present None. Fixture raw SQL storage confirms fallback versus SQL NULL.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/orm/persistence.py",
+              "start_line": 346,
+              "end_line": 364
+            },
+            {
+              "path": "lib/sqlalchemy/sql/type_api.py",
+              "start_line": 374,
+              "end_line": 403
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-none-default-json-matrix-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        },
+        {
+          "id": "json-none-flags",
+          "verdict": "supported",
+          "reason": "JSON should_evaluate_none is inverse of none_as_null; bind processor serializes None unless none_as_null is true. ORM omission condition explains why default wins on the latter in id 2.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/sql/sqltypes.py",
+              "start_line": 2929,
+              "end_line": 2967
+            },
+            {
+              "path": "lib/sqlalchemy/orm/persistence.py",
+              "start_line": 346,
+              "end_line": 353
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-none-default-json-matrix-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        },
+        {
+          "id": "explicit-null-bypass",
+          "verdict": "supported",
+          "reason": "ORM sends ClauseElement values through value_params and type documentation explicitly states null() persists SQL NULL. Raw id 3 row confirms all SQL NULL.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/orm/persistence.py",
+              "start_line": 354,
+              "end_line": 364
+            },
+            {
+              "path": "lib/sqlalchemy/sql/type_api.py",
+              "start_line": 399,
+              "end_line": 403
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-none-default-json-matrix-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        },
+        {
+          "id": "core-explicit-none",
+          "verdict": "supported",
+          "reason": "Core compiler uses explicitly supplied parameters before default branches; JSON processor differentiates none_as_null flags. Raw id 4 distinguishes JSON null from SQL NULL.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/sql/sqltypes.py",
+              "start_line": 2942,
+              "end_line": 2967
+            },
+            {
+              "path": "lib/sqlalchemy/sql/crud.py",
+              "start_line": 765,
+              "end_line": 795
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-none-default-json-matrix-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        },
+        {
+          "id": "decoded-is-ambiguous",
+          "verdict": "supported",
+          "reason": "JSON processor returns None for SQL NULL and json.loads for text; decoding JSON null also yields None. Raw and decoded fixture matrices demonstrate ambiguity.",
+          "evidence": [
+            {
+              "path": "lib/sqlalchemy/sql/sqltypes.py",
+              "start_line": 2984,
+              "end_line": 3006
+            }
+          ],
+          "runtime_evidence": {
+            "path": "data/generated/sqlalchemy-generation-v2/private/verification-report.json",
+            "assertion_id": "sqlalchemy-none-default-json-matrix-matrix",
+            "status": "passed",
+            "reviewer_executed": false
+          }
+        }
+      ],
+      "prompt_fixture_agreement": "All matrix operations and result expectations agree with intended fixture, but literal prompt default expression is wrong and can prevent faithful reproduction.",
+      "concrete_corrections": [
+        {
+          "severity": "high",
+          "issue": "Prompt server_default=text(''\"fallback\"'') is not the fixture expression. Adjacent Python string literals produce text(\"fallback\"), omitting the SQL single quotes and JSON double quotes required for the JSON string default.",
+          "correction": "Replace both JSON-default descriptions with the exact executable expression from the fixture: server_default=text(\"'\\\"fallback\\\"'\"). Include it in a fenced Python schema snippet or explicitly say SQL DEFAULT '\"fallback\"'. Repackage prompt and rerun bundle consistency checks after correction."
+        }
+      ],
+      "reproducibility": {
+        "status": "recorded_modal_pass",
+        "limitations": "Reviewer inspected data and source only; no repository code executed on host and no additional independent runtime execution. Pure-Python synchronous SQLite fixture and pinned dependency avoid external database requirements."
+      },
+      "answer_leakage": {
+        "gold_leak_found": false,
+        "prompt_hinting": "Prompt names relevant mechanisms and contrastive controls; this scaffolding may reduce difficulty. No blind or question-only solver evidence establishes difficulty."
+      },
+      "incorrect_premises": "No false behavior premise found in intended fixture; prompt defects, if any, are listed in corrections.",
+      "discriminating_controls": "Omitted versus present None versus explicit null(), plus a Core contrast and raw-versus-decoded values, discriminate all key null/default mechanisms.",
+      "redundancy": "Distinct within batch: transaction state restoration, result uniqueness, and insert omission/serialization respectively. JSON is shared vocabulary in tasks 2 and 3, not a repeated mechanism. External benchmark overlap remains unproven."
+    }
+  ],
+  "release_gates": [
+    "Correct prompt/fixture defects and regenerate affected bundle/checks.",
+    "Retain human_reviewed=false and training export blocked.",
+    "Obtain blind solver and question-only controls before claiming measured difficulty or source-dependence.",
+    "Complete benchmark overlap review before promotion."
+  ],
+  "revision_followups": [
+    {
+      "reviewed_at": "2026-09-28",
+      "spec_path": "examples/dataset_sources/sqlalchemy-generation-v2-reviewed.json",
+      "spec_sha256": "efddf7555322924891ef3ed012ad85c13355649127786821ad68fa6fa4403eb3",
+      "status": "supported_as_draft",
+      "human_reviewed": false,
+      "difficulty": "unproven",
+      "training_export_allowed": false,
+      "original_review_preserved": true,
+      "resolution": [
+        "SA-GEN-03 executable fenced model is byte-identical to the tested mapping; AST parsing confirms syntax without executing repository code.",
+        "SA-GEN-01 failure case creates a new seeded engine and repeats outer modification; restoration is verified after Session.rollback.",
+        "SA-GEN-01 records c_expired and same-Session rows after nested rollback before commit.",
+        "Restoration citations now include actual expiration line 1140; legacy JSON claim includes decoder source.",
+        "SA-GEN-02 error classification rethrows unexpected InvalidRequestError."
+      ],
+      "runtime_evidence": {
+        "path": "reports/task-generation/sqlalchemy-authoring.json",
+        "json_location": "revision_history[-1].final_changed_fixture_runs",
+        "changed_fixtures": 2,
+        "stdout_exact_match": true,
+        "exit_codes_zero": true,
+        "stderr_empty": true,
+        "defaults_fixture_unchanged": true,
+        "reviewer_executed_repository_code": false,
+        "new_bundle_verification": "Not yet inspected; parent should complete independent packaging/verification of revised spec."
+      },
+      "tasks": [
+        {
+          "id": "sqlalchemy-savepoint-preflush-state",
+          "status": "supported_as_draft",
+          "human_reviewed": false,
+          "difficulty": "unproven",
+          "claims": [
+            {
+              "id": "unconditional-preflush",
+              "verdict": "supported",
+              "reason": "Explicit session.flush() at session.py:1102-1103 precedes the new snapshot dictionaries; documentation explicitly says unconditional regardless of autoflush. Recorded before rows and persistent item 3 agree.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/orm/session.py",
+                  "start_line": 1088,
+                  "end_line": 1108
+                },
+                {
+                  "path": "doc/build/orm/session_transaction.rst",
+                  "start_line": 195,
+                  "end_line": 205
+                }
+              ]
+            },
+            {
+              "id": "outer-state-survives",
+              "verdict": "supported",
+              "reason": "Preflush precedes snapshot bookkeeping; restoration expunges only nested new states. Recorded restored value and postcommit rows match. SQL rollback boundary is additionally explained in session.py:1373-1389 and transaction documentation:147-155.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/orm/session.py",
+                  "start_line": 1088,
+                  "end_line": 1108
+                },
+                {
+                  "path": "lib/sqlalchemy/orm/session.py",
+                  "start_line": 1110,
+                  "end_line": 1140
+                }
+              ]
+            },
+            {
+              "id": "selective-expiration",
+              "verdict": "supported",
+              "reason": "Extended source citation includes _expire at 1140. Fixture inspects a/b/c expiration before attributes and captures raw rows before commit; modified a expires, b/c do not, c stays persistent and d becomes transient.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/orm/session.py",
+                  "start_line": 1117,
+                  "end_line": 1140
+                },
+                {
+                  "path": "doc/build/orm/session_transaction.rst",
+                  "start_line": 207,
+                  "end_line": 214
+                }
+              ]
+            },
+            {
+              "id": "nested-only-rollback",
+              "verdict": "supported",
+              "reason": "Rollback loop stops at the nested boundary and documentation states enclosing transaction remains in progress; runtime records active outer transaction and subsequent committed rows.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/orm/session.py",
+                  "start_line": 1372,
+                  "end_line": 1406
+                },
+                {
+                  "path": "doc/build/orm/session_transaction.rst",
+                  "start_line": 147,
+                  "end_line": 155
+                }
+              ]
+            },
+            {
+              "id": "preflush-failure",
+              "verdict": "supported",
+              "reason": "Fresh database control now repeats Session flags, loads both seed objects, modifies item 1 and inserts duplicate id 2. Nested assignment follows failing preflush; rollback loop restores outer state, expunges duplicate, and expires loaded state. Recorded final changed probe matches seed-row restoration and recovered value one.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/orm/session.py",
+                  "start_line": 1088,
+                  "end_line": 1104
+                },
+                {
+                  "path": "lib/sqlalchemy/orm/session.py",
+                  "start_line": 1991,
+                  "end_line": 2005
+                },
+                {
+                  "path": "lib/sqlalchemy/orm/session.py",
+                  "start_line": 4673,
+                  "end_line": 4680
+                },
+                {
+                  "path": "lib/sqlalchemy/orm/session.py",
+                  "start_line": 982,
+                  "end_line": 993
+                },
+                {
+                  "path": "lib/sqlalchemy/orm/session.py",
+                  "start_line": 1373,
+                  "end_line": 1389
+                },
+                {
+                  "path": "lib/sqlalchemy/orm/session.py",
+                  "start_line": 1118,
+                  "end_line": 1140
+                }
+              ]
+            }
+          ],
+          "concrete_corrections": [],
+          "original_findings_resolved": true,
+          "remaining_limitations": [
+            "Fixture execution does not measure solver quality or difficulty.",
+            "No completed external benchmark overlap audit."
+          ]
+        },
+        {
+          "id": "sqlalchemy-json-joinedload-uniquing",
+          "status": "supported_as_draft",
+          "human_reviewed": false,
+          "difficulty": "unproven",
+          "claims": [
+            {
+              "id": "multiplicity",
+              "verdict": "supported",
+              "reason": "Relationship guide shows distinct explicit and anonymous eager-load joins; two children on each yields four rows. Query automatic unique and legacy id fallback explain four returned tuples; recorded same_parent and payload multiplicities agree. Add JSON result processor citation to explicitly substantiate independently decoded dictionaries.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/orm/query.py",
+                  "start_line": 2916,
+                  "end_line": 2939
+                },
+                {
+                  "path": "lib/sqlalchemy/orm/loading.py",
+                  "start_line": 139,
+                  "end_line": 172
+                },
+                {
+                  "path": "doc/build/orm/queryguide/relationships.rst",
+                  "start_line": 628,
+                  "end_line": 663
+                }
+              ]
+            },
+            {
+              "id": "mandatory-unique",
+              "verdict": "supported",
+              "reason": "loading.py:295-304 installs require_unique raising the stated InvalidRequestError for joined eager collections. Recorded missing-unique error agrees.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/orm/loading.py",
+                  "start_line": 294,
+                  "end_line": 304
+                }
+              ]
+            },
+            {
+              "id": "json-modern-error",
+              "verdict": "supported",
+              "reason": "JSON.hashable=False and nonlegacy _not_hashable raise, while entity filter selects id. Fixture explicitly selects Child.payload and records nonhashable error.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/sql/sqltypes.py",
+                  "start_line": 2611,
+                  "end_line": 2617
+                },
+                {
+                  "path": "lib/sqlalchemy/orm/loading.py",
+                  "start_line": 139,
+                  "end_line": 157
+                },
+                {
+                  "path": "lib/sqlalchemy/orm/loading.py",
+                  "start_line": 194,
+                  "end_line": 211
+                }
+              ]
+            },
+            {
+              "id": "legacy-identity-fallback",
+              "verdict": "supported",
+              "reason": "Query load options enable _legacy_uniquing and _iter calls unique; legacy known-nonhashable filter is id. Recorded four dict-bearing rows agree. JSON result conversion at sqltypes.py:2996-3004 is useful supplemental evidence.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/orm/query.py",
+                  "start_line": 222,
+                  "end_line": 225
+                },
+                {
+                  "path": "lib/sqlalchemy/orm/query.py",
+                  "start_line": 2926,
+                  "end_line": 2936
+                },
+                {
+                  "path": "lib/sqlalchemy/orm/loading.py",
+                  "start_line": 159,
+                  "end_line": 178
+                },
+                {
+                  "path": "lib/sqlalchemy/sql/sqltypes.py",
+                  "start_line": 2996,
+                  "end_line": 3004
+                }
+              ]
+            },
+            {
+              "id": "custom-key-semantics",
+              "verdict": "supported",
+              "reason": "Result.unique accepts strategy and set membership filters strategy outputs; two normalized payload keys preserve two rows while the parent-only key collapses both. Recorded payload values distinguish intended preservation from lossy deduplication.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/engine/result.py",
+                  "start_line": 627,
+                  "end_line": 664
+                },
+                {
+                  "path": "lib/sqlalchemy/engine/_result_cy.py",
+                  "start_line": 699,
+                  "end_line": 711
+                }
+              ]
+            },
+            {
+              "id": "entity-only-control",
+              "verdict": "supported",
+              "reason": "Filters are constructed for compile_state._entities, not all graph attributes; entity id filtering avoids hashing child JSON. Recorded one parent and two children supports control.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/orm/loading.py",
+                  "start_line": 194,
+                  "end_line": 211
+                },
+                {
+                  "path": "lib/sqlalchemy/orm/loading.py",
+                  "start_line": 294,
+                  "end_line": 304
+                }
+              ]
+            }
+          ],
+          "concrete_corrections": [],
+          "original_findings_resolved": true,
+          "remaining_limitations": [
+            "Fixture execution does not measure solver quality or difficulty.",
+            "No completed external benchmark overlap audit."
+          ]
+        },
+        {
+          "id": "sqlalchemy-none-default-json-matrix",
+          "status": "supported_as_draft",
+          "human_reviewed": false,
+          "difficulty": "unproven",
+          "claims": [
+            {
+              "id": "omitted-defaults",
+              "verdict": "supported",
+              "reason": "Exact fenced mapping now matches fixture source; corrected SQL literal contains JSON string fallback. Present-key ORM loop and mapper exclusions support all omitted server defaults.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/orm/persistence.py",
+                  "start_line": 343,
+                  "end_line": 375
+                },
+                {
+                  "path": "lib/sqlalchemy/orm/mapper.py",
+                  "start_line": 2722,
+                  "end_line": 2743
+                }
+              ]
+            },
+            {
+              "id": "plain-versus-significant",
+              "verdict": "supported",
+              "reason": "ORM skips None only outside eval_none, and evaluates_none documentation explicitly contrasts omission/default firing with passing a present None. Fixture raw SQL storage confirms fallback versus SQL NULL.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/orm/persistence.py",
+                  "start_line": 346,
+                  "end_line": 364
+                },
+                {
+                  "path": "lib/sqlalchemy/sql/type_api.py",
+                  "start_line": 374,
+                  "end_line": 403
+                }
+              ]
+            },
+            {
+              "id": "json-none-flags",
+              "verdict": "supported",
+              "reason": "JSON should_evaluate_none is inverse of none_as_null; bind processor serializes None unless none_as_null is true. ORM omission condition explains why default wins on the latter in id 2.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/sql/sqltypes.py",
+                  "start_line": 2929,
+                  "end_line": 2967
+                },
+                {
+                  "path": "lib/sqlalchemy/orm/persistence.py",
+                  "start_line": 346,
+                  "end_line": 353
+                }
+              ]
+            },
+            {
+              "id": "explicit-null-bypass",
+              "verdict": "supported",
+              "reason": "ORM sends ClauseElement values through value_params and type documentation explicitly states null() persists SQL NULL. Raw id 3 row confirms all SQL NULL.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/orm/persistence.py",
+                  "start_line": 354,
+                  "end_line": 364
+                },
+                {
+                  "path": "lib/sqlalchemy/sql/type_api.py",
+                  "start_line": 399,
+                  "end_line": 403
+                }
+              ]
+            },
+            {
+              "id": "core-explicit-none",
+              "verdict": "supported",
+              "reason": "Core compiler uses explicitly supplied parameters before default branches; JSON processor differentiates none_as_null flags. Raw id 4 distinguishes JSON null from SQL NULL.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/sql/sqltypes.py",
+                  "start_line": 2942,
+                  "end_line": 2967
+                },
+                {
+                  "path": "lib/sqlalchemy/sql/crud.py",
+                  "start_line": 765,
+                  "end_line": 795
+                }
+              ]
+            },
+            {
+              "id": "decoded-is-ambiguous",
+              "verdict": "supported",
+              "reason": "JSON processor returns None for SQL NULL and json.loads for text; decoding JSON null also yields None. Raw and decoded fixture matrices demonstrate ambiguity.",
+              "evidence": [
+                {
+                  "path": "lib/sqlalchemy/sql/sqltypes.py",
+                  "start_line": 2984,
+                  "end_line": 3006
+                }
+              ]
+            }
+          ],
+          "concrete_corrections": [],
+          "original_findings_resolved": true,
+          "remaining_limitations": [
+            "Fixture execution does not measure solver quality or difficulty.",
+            "No completed external benchmark overlap audit."
+          ]
+        }
+      ],
+      "remaining_optional_improvements": [
+        "SA-GEN-02 physical SQL count is established by source join structure and ORM output, not an independent raw SQL count; optional for a future stronger fixture."
+      ],
+      "conclusion": "Both material prompt/fixture defects are resolved. All 17 required claims remain supported for the pinned revision. These are newly synthesized draft development tasks, not measured difficult solver tasks or training-ready gold."
+    }
+  ],
+  "current_revision_status": "supported_as_draft",
+  "current_spec_path": "examples/dataset_sources/sqlalchemy-generation-v2-reviewed.json",
+  "current_spec_sha256": "efddf7555322924891ef3ed012ad85c13355649127786821ad68fa6fa4403eb3"
+}

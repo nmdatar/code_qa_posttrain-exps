@@ -1,0 +1,274 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-36260be563ab9a1bfac856a0",
+      "reference_sha256": "68acb74d49959fefb00f8bdc80a00740fefba8bb2d5664c2b39251f61fc77b55",
+      "question_sha256": "6597a04971f8124cf1443fe618bd75795ceecbb5edc6942f05679b7c6237f693",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Dask caching skip meaning",
+          "verdict": "partially_supported",
+          "reason": "Skip distinguishes caching wrappers, not eager versus lazy loading exclusively: base data starts unloaded, and values computes Dask data without caching.",
+          "evidence": {
+            "path": "xarray/tests/test_backends.py",
+            "start_line": 532,
+            "end_line": 544
+          }
+        }
+      ],
+      "material_errors": [
+        "Skip distinguishes caching wrappers, not eager versus lazy loading exclusively: base data starts unloaded, and values computes Dask data without caching."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "DatasetIOBase.test_dataset_caching checks that accessing values changes MemoryCachedArray data to in-memory, while cache=False CopyOnWriteArray remains uncached (xarray/tests/test_backends.py:532-544). Dask-backed subclasses skip that inherited contract (xarray/tests/test_backends.py:2311-2324). The Dask-specific test confirms values access does not make the stored variable in-memory (xarray/tests/test_backends.py:5179-5184). Both paths may begin lazy; the distinction is whether materialization is retained by the variable, not whether values can trigger computation."
+    },
+    {
+      "task_id": "import-39d95e9396abbd507c034b6a",
+      "reference_sha256": "18c63a09e4eecdaab1a5eac6e458261ab41dfd30f1fddede663fc39a707c3cbe",
+      "question_sha256": "6a998ccc7984fec2a3ce4e405de3f4c8b317ed1a4702dba90de0fdebf4d4b663",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "NaN selection and numeric filtering",
+          "verdict": "partially_supported",
+          "reason": "Filtering is interleaved with variable reductions and includes no-reduced-dimension exception; no separate fully filtered intermediate dictionary exists.",
+          "evidence": {
+            "path": "xarray/core/dataset.py",
+            "start_line": 6787,
+            "end_line": 6819
+          }
+        }
+      ],
+      "material_errors": [
+        "Filtering is interleaved with variable reductions and includes no-reduced-dimension exception; no separate fully filtered intermediate dictionary exists."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "_create_nan_agg_method selects nanops.nancumprod for truthy skipna or eligible dtypes with skipna=None; skipna=False selects the array namespace cumprod, allowing NaNs to propagate (xarray/core/duck_array_ops.py:508-527). Dataset.reduce iterates variables, retains unaffected coordinates, excludes extension-array data, and reduces each eligible variable immediately into the result dictionary. Its condition allows variables with no reduced dimensions, or numeric_only=False, or numeric/boolean dtype (xarray/core/dataset.py:6787-6819). Thus changing skipna changes the computation, not a prior materialized numeric-only filtering stage."
+    },
+    {
+      "task_id": "import-3a37a88a0155ca4965fabbc6",
+      "reference_sha256": "67bc5f4ac355f2dcc96b8d7fe523a68c4bc7522a22a25fee1b955cda08a7d31b",
+      "question_sha256": "2ad046a6faf0f55fef3c2ae3127efe8a6b1fefd1aed253749eb5cecbadf9faf4",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "IndexVariable one-dimensional enforcement",
+          "verdict": "supported",
+          "reason": "Post-parent ndim check enforces one dimension; indexing finalizer2738-2743 returns Variable for non-1D results. Parent still validates dimension/data consistency, so regardless of dimensionality is qualified by valid inputs.",
+          "evidence": {
+            "path": "xarray/core/variable.py",
+            "start_line": 2682,
+            "end_line": 2689
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-3d1f799050430b0e0b89003e",
+      "reference_sha256": "74bfbaa0af12002a95984dc72cb312783507ab333f152e173d4f34d8bd9fc627",
+      "question_sha256": "a08f0f00206fb09052442597e9ff0417b8993f037ce6be0a4f9ee2c44b8377a4",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Missing sentinel fill_value",
+          "verdict": "supported",
+          "reason": "Method explicitly remaps -1, defaults through get_fill_value, masks with where. Other negative values are not universally missing sentinels.",
+          "evidence": {
+            "path": "xarray/core/variable.py",
+            "start_line": 826,
+            "end_line": 859
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-45ebf2152f06a1fe17e788b5",
+      "reference_sha256": "b9621233d5f2a9348855f401ebbf5df5d667aa5e2854001c6361b098818f5963",
+      "question_sha256": "abf9d46932f4ed773d1dfdb84f469a7410db509d599ebb3c094e70dccb5775ef",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Chunked group labels/edges requirement",
+          "verdict": "supported",
+          "reason": "Checks and comments explicitly avoid passes discovering groups or edges before factorization. Full-array residency is stronger than necessary, but required computation is the central supported point.",
+          "evidence": {
+            "path": "xarray/core/groupby.py",
+            "start_line": 345,
+            "end_line": 362
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-4b27ea46cbf0143f17806877",
+      "reference_sha256": "5f3925c981e62bbd37250a7a0e051fb7854d3410283af1c055c75d4ac49a2adf",
+      "question_sha256": "29b305d97775c91e7caf6721d53c5685d396bd34520bd9098eab2f1c3fd11c5c",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Rolling only applicable dimensions",
+          "verdict": "supported",
+          "reason": "Constructs rolling object for intersection of dimensions; copies others, with attrs subject to keep_attrs. No measured speedup inferred.",
+          "evidence": {
+            "path": "xarray/computation/rolling.py",
+            "start_line": 818,
+            "end_line": 846
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-5ed26c4b97f128fc7501d0a1",
+      "reference_sha256": "8055fa6e92d73457bdca48fcedcd9d69743f5652826c295f9cfa3fa311a11c27",
+      "question_sha256": "4372f567c36d129646355d132250c4d3e315a6376d7affbd7d0e96603993db14",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "In-place dataset arithmetic preserves identity",
+          "verdict": "supported",
+          "reason": "Aligns other via reindex_like, calculates non-inplace array operation, replaces dataset internals inplace and returns self.",
+          "evidence": {
+            "path": "xarray/core/dataset.py",
+            "start_line": 7616,
+            "end_line": 7638
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-6070dbef5616f9b0e1b81356",
+      "reference_sha256": "5c2e34bae47625152a79dd57d6ea700b2dd0b803003c8f2243132fba56101bd9",
+      "question_sha256": "b0f7d92586fb284fea753ed7610eeccc6bbe06ae1291de6a9191b916dba35e44",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "H5 group initialization consistency risks",
+          "verdict": "partially_supported",
+          "reason": "Two initialization paths exist, but Group plus explicit path is explicitly rejected and mutable parent/hierarchy claims are hypothetical unsupported behavior.",
+          "evidence": {
+            "path": "xarray/backends/h5netcdf_.py",
+            "start_line": 112,
+            "end_line": 135
+          }
+        }
+      ],
+      "material_errors": [
+        "Two initialization paths exist, but Group plus explicit path is explicitly rejected and mutable parent/hierarchy claims are hypothetical unsupported behavior."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "With a pre-opened File or Group and no group argument, H5NetCDFStore derives root and group path. With an explicit group argument it requires exactly h5netcdf.File, otherwise raises ValueError; both paths wrap the root in DummyFileManager (xarray/backends/h5netcdf_.py:112-135). find_root_and_group walks parents and constructs an absolute group path (xarray/backends/common.py:222-229). Access resolves that path from the managed root (xarray/backends/h5netcdf_.py:195-204). Choosing a different path selects different data, and both patterns depend on a usable root handle; the source does not demonstrate distinct stale-reference consistency bugs or supported group reparenting."
+    },
+    {
+      "task_id": "import-63788ad64cc80e41936988fb",
+      "reference_sha256": "661afa5d2438394e5500df958824ff7b8c90ebffd600c1e52631d5d10959b7ac",
+      "question_sha256": "4db40113b933967fa7915ec8ff425f0caa245b324894ea0b708f39932e5c5619",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "DataTree equivalence requires pandas-coercible indexes",
+          "verdict": "unsupported",
+          "reason": "Reference confuses Dataset.indexes and invariant checks with actual identical call; TestGetItem does not require a pandas conversion in that chain.",
+          "evidence": {
+            "path": "xarray/testing/assertions.py",
+            "start_line": 185,
+            "end_line": 195
+          }
+        }
+      ],
+      "material_errors": [
+        "Reference confuses Dataset.indexes and invariant checks with actual identical call; TestGetItem does not require a pandas conversion in that chain."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "TestGetItem uses xarray DataTree/Dataset constructors and assert_identical, with pytest.raises and xfail for error/unsupported cases (xarray/tests/test_datatree.py:281-333). NumPy and pandas support xarray generally, but these tests use simple list-valued data rather than directly exercising their full index semantics. assert_identical dispatches to each object's identical method (xarray/testing/assertions.py:185-195); Dataset compatibility compares coordinate-name sets and variable mappings (xarray/core/dataset.py:1438-1448). It does not call Dataset.indexes there, so a universal pandas-coercion restriction is not established. Coverage is constrained by these fixtures and the two expected-failure cases, and equality means xarray's identical contract rather than Python object identity except for the explicit self-index test."
+    },
+    {
+      "task_id": "import-6499bff264a4ce5471ce2427",
+      "reference_sha256": "9d844d357bb1b903789dbdbd905c6c354a81e159e881de8d27c24da9eded562a",
+      "question_sha256": "fe47d3e27832d8cc6ef2f6df1cc4b72e4c73921e0512f34f2332edf86713ed7a",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Eviction callback follows FIFO order",
+          "verdict": "partially_supported",
+          "reason": "Removal then callback is correct but access moves keys to end, making order least recently used rather than insertion FIFO.",
+          "evidence": {
+            "path": "xarray/backends/lru_cache.py",
+            "start_line": 53,
+            "end_line": 65
+          }
+        }
+      ],
+      "material_errors": [
+        "Removal then callback is correct but access moves keys to end, making order least recently used rather than insertion FIFO."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "_enforce_size_limit removes the first OrderedDict entry and then invokes on_evict if present before the next loop iteration (xarray/backends/lru_cache.py:60-65). __getitem__ moves accessed keys to the end (xarray/backends/lru_cache.py:53-58), so eviction is least-recently-used order, not insertion FIFO. The callback receives an already removed key/value; it can perform cleanup. If it raises, removal has happened and the loop does not proceed normally, so cleanup completion is not unconditional."
+    },
+    {
+      "task_id": "import-6688bc78875d18bf296dffb7",
+      "reference_sha256": "4c0cf913fa0e28d9ab968b310d2d3c5644eac048f4cced0170c44d6ab581167b",
+      "question_sha256": "6482cbb063f4ed8962a702027c8e5505e2e577942a4f78129be406df3179690e",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Tree style character propagation",
+          "verdict": "supported",
+          "reason": "ContStyle76 passes glyphs; parent26-40 stores and validates equal widths; rendering picks branch and continuation prefixes.",
+          "evidence": {
+            "path": "xarray/core/datatree_render.py",
+            "start_line": 223,
+            "end_line": 235
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-731c605f25721122eff417f6",
+      "reference_sha256": "586131a2c7bf3a21ed9326139fffb1af373d4b783dac29f9858dced524a8374c",
+      "question_sha256": "aaff42c438659d2d0efc75791d53a0b0a47e0a05949640f6d5f747c7741fa32c",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Dimension strategy delegates constraints",
+          "verdict": "supported",
+          "reason": "Passes key strategy, bounded integer values and dictionary min/max sizes. Satisfiable inputs required; no promise for too few distinct keys or contradictory bounds.",
+          "evidence": {
+            "path": "xarray/testing/strategies.py",
+            "start_line": 177,
+            "end_line": 185
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    }
+  ]
+}

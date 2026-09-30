@@ -1,0 +1,277 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-74bda56d926ef4560e3b4c41",
+      "reference_sha256": "d2255cd62bd0754e92c5d6f8a9c2d73863cb197fb86894dfb8ab9021d0ae0106",
+      "question_sha256": "bc01570155bb95b871705637c92f334cce452c9f60075c77f60e4271924fd9fe",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "String operations specify output dtype",
+          "verdict": "supported",
+          "reason": "Defaults to obj.dtype; fixture covers str and bytes.",
+          "evidence": {
+            "path": "xarray/core/accessor_str.py",
+            "start_line": 111,
+            "end_line": 141
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-83a042c74cb587a4ceb41a5c",
+      "reference_sha256": "f31306abd5043e0e459ef80e576513ef2758ed1044decb9375f0be039a1e8887",
+      "question_sha256": "ec2f080992615afaeebe3f8fa522921127fec8dacbe3db517f7133263621b18f",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Frozen variables allocates a merged dict with chained lookup",
+          "verdict": "partially_supported",
+          "reason": "The expression uses a ChainMap operand; the reference treats dict union as an ordinary merged dict and provides unmeasured performance claims.",
+          "evidence": {
+            "path": "xarray/core/datatree.py",
+            "start_line": 695,
+            "end_line": 702
+          }
+        }
+      ],
+      "material_errors": [
+        "The expression uses a ChainMap operand; the reference treats dict union as an ordinary merged dict and provides unmeasured performance claims."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "DataTree.variables constructs a Frozen wrapper around the union of data variables and a coordinate ChainMap (xarray/core/datatree.py:559-563,695-702). These accesses construct mapping objects; they do not copy the Variable data buffers. Frozen enforces a read-only mapping interface. The source does not quantify lookup or allocation cost. A caller making repeated accesses can retain the returned mapping when appropriate; caching inside DataTree would require accounting for coordinate inheritance and mutations."
+    },
+    {
+      "task_id": "import-a625b2709474cc6ce0247883",
+      "reference_sha256": "465e0c8dc82b1e2774a5afa55be8ad8272f7ffd875445ef5adee35a2f28bd946",
+      "question_sha256": "7f66d91a503ce62d9213b3cc613c332fd0e738e6886cdfdaa2953164aea072ff",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Methods injected with setattr on subclass creation",
+          "verdict": "supported",
+          "reason": "Direct dynamic injection through __init_subclass__.",
+          "evidence": {
+            "path": "xarray/computation/ops.py",
+            "start_line": 293,
+            "end_line": 316
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-ab4db8ead9fe0ddfcfa7d333",
+      "reference_sha256": "08a8fbaa1fb45f6bd2a4b07ee015b63575dd670ad16650a46a9acd5b7941ccc5",
+      "question_sha256": "2d940d4ee7006e58f9c4362fea819670866949bc338bfc426b35e92a3240110c",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Each write gets its own copy and reads stay lazy",
+          "verdict": "partially_supported",
+          "reason": "_copied prevents repeated copies on the same wrapper; reads delegate to underlying indexer whose evaluation behavior may vary.",
+          "evidence": {
+            "path": "xarray/core/indexing.py",
+            "start_line": 786,
+            "end_line": 826
+          }
+        }
+      ],
+      "material_errors": [
+        "_copied prevents repeated copies on the same wrapper; reads delegate to underlying indexer whose evaluation behavior may vary."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "CopyOnWriteArray wraps an indexable array with _copied=False. The first mutation calls _ensure_copied, replacing the wrapped array with np.array(self.array) and setting _copied=True; later writes on that wrapper reuse the copy. Indexed reads return new CopyOnWriteArray wrappers and do not invoke _ensure_copied, but underlying indexing can evaluate data, so this is not a blanket laziness guarantee (xarray/core/indexing.py:786-826)."
+    },
+    {
+      "task_id": "import-ab6e4a25593aa93c9a2c8eff",
+      "reference_sha256": "e14f5e165b3197419521ce3587ad0912c8fb1642ececba6552458a8399e82235",
+      "question_sha256": "2a9b34efd88ca27a8c8f4efc07292167e6ef7b16f860dc10f4d08334d94f52e8",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Conflicting non-None fill values rejected",
+          "verdict": "supported",
+          "reason": "Comparison and ValueError explicit.",
+          "evidence": {
+            "path": "xarray/coding/variables.py",
+            "start_line": 278,
+            "end_line": 300
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-b3a3034800814aaddeb67f0d",
+      "reference_sha256": "12202df7cb6e159a6bbb72c5c76e3d5e682d3fdd8a6c376a6cffdc797a4b0eff",
+      "question_sha256": "31173b30811a0ab702d9cc14dc6258fcde7e87526601205ee84f995d64498f46",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Three-way expected dtype mode",
+          "verdict": "supported",
+          "reason": "None tests Python type, False bypasses, other value compares dtype.",
+          "evidence": {
+            "path": "xarray/tests/test_variable.py",
+            "start_line": 165,
+            "end_line": 187
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-b576bfacdb0f93b25551bc54",
+      "reference_sha256": "2ddfdb0acb00cb7d676975779e4152c1cecfa8cd31e361a9399d42aa9f5edb52",
+      "question_sha256": "3131c6f8efc05a9ff8d703da758970b9422a163245f632e4b2d74aeb0fb56735",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Factory pattern costs 2-3x materialization versus direct assignment",
+          "verdict": "contradicted",
+          "reason": "Base methods do not mandate allocation; assign_coords is misattributed to set_xindex implementation; quantitative claims unsupported.",
+          "evidence": {
+            "path": "xarray/core/common.py",
+            "start_line": 653,
+            "end_line": 665
+          }
+        }
+      ],
+      "material_errors": [
+        "Base methods do not mandate allocation; assign_coords is misattributed to set_xindex implementation; quantitative claims unsupported."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The premise is not established by this source. The test demonstrates a factory pattern allowing a custom index to generate extra coordinate variables (xarray/tests/test_indexes.py:761-778). Coordinates.from_xindex calls create_variables once and wraps the result (xarray/core/coordinates.py:363-389). assign_coords shallow-copies the object and updates coordinates (xarray/core/common.py:653-665). Index.create_variables explicitly permits reusing index data or returning existing variables (xarray/core/indexes.py:168-179). Object and mapping construction may cost time, but data materialization, throughput, and any 2-3x comparison require a specific index implementation and measurements."
+    },
+    {
+      "task_id": "import-b577be473bd59bd6f68b7117",
+      "reference_sha256": "dc1a1abad737abd116937ef271eb49145e8495e3bf7b96fa41c9a8e2cb751a71",
+      "question_sha256": "27ce462d492d5e1b979bf845aa88be0f1154708fdc5b7b7274a8704436ec4811",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Lazy Dask imports prove circular dependency prevention",
+          "verdict": "partially_supported",
+          "reason": "Deferred imports exist but no actual dependency cycle or measured tradeoff is shown.",
+          "evidence": {
+            "path": "xarray/tests/test_parallelcompat.py",
+            "start_line": 71,
+            "end_line": 96
+          }
+        }
+      ],
+      "material_errors": [
+        "Deferred imports exist but no actual dependency cycle or measured tradeoff is shown."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "DummyChunkManager imports Dask helpers when the methods are called, for example normalize_chunks, from_array and compute (xarray/tests/test_parallelcompat.py:71-96). Deferring imports can avoid importing a dependency during initial module setup and can help with a potential cycle, but these methods do not demonstrate an actual circular dependency. Import work is shifted to first use; later calls still execute import statements with Python module caching. No performance measurement or unconditional cycle-prevention guarantee follows from this code."
+    },
+    {
+      "task_id": "import-b8a9792985c01575ecd7878f",
+      "reference_sha256": "8c1ff05332a3b7e3626a4983fdcc980e6ae32e66f2a5a78a1f833e7a3cea2834",
+      "question_sha256": "f7449aedd241219dce0adc7897e7a895e43891220625128a838d99fb1da2d7de",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Dask vectorized indexing has narrow fallback",
+          "verdict": "supported",
+          "reason": "IndexError fallback explicitly limits dimensions/chunks/indexer and maps blocks.",
+          "evidence": {
+            "path": "xarray/core/indexing.py",
+            "start_line": 1696,
+            "end_line": 1725
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-b9e8d3e82a85ccda2bcc883d",
+      "reference_sha256": "b3bec3167bb328f37025dc31aa8db8ff084581d0733652ae1b4d29efa56499b5",
+      "question_sha256": "bb6d9196a5dec95f0fc04b1ee575259eec261f8a207a3028b886b2c615b0db04",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Deep copy isolates bins mutation across reuse",
+          "verdict": "supported",
+          "reason": "Comment states purpose and deep-copy implementation.",
+          "evidence": {
+            "path": "xarray/core/groupby.py",
+            "start_line": 317,
+            "end_line": 325
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-bc9cce2ef59eff88ac7f0dcc",
+      "reference_sha256": "fcb453622dc46e461f979a32ef571d2f9513274d0cb6a6ba0a274b48bc0c0552",
+      "question_sha256": "35b27b87b02e65f5858e98210af5cefea8fdf1509da633328a1e862faf175913",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Encoding survives regardless of transformations",
+          "verdict": "partially_supported",
+          "reason": "Tests cover specified operations only; isel selects integer positions rather than coordinate labels.",
+          "evidence": {
+            "path": "xarray/tests/test_variable.py",
+            "start_line": 453,
+            "end_line": 465
+          }
+        }
+      ],
+      "material_errors": [
+        "Tests cover specified operations only; isel selects integer positions rather than coordinate labels."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The test treats encoding as serialization metadata retained by the listed structural operations and copies, verifying the encoding dictionary after transpose, full slicing, squeeze, positional isel, set_dims and deep/shallow copy (xarray/tests/test_variable.py:453-465). _replace shallow-copies _encoding when no replacement is supplied (xarray/core/variable.py:960-976). This is a scoped preservation contract, not proof that every transformation preserves encoding or guarantees serialization integrity."
+    },
+    {
+      "task_id": "import-c0308d6990a7fa700b7354ab",
+      "reference_sha256": "aee6eb9515dbde2161bc1faa8cbdde7beccfa2fc29b3323c10a6dd730c4f5d84",
+      "question_sha256": "5b062890abe24926106ea4f1e702b2f45a7958eeeaea0667e0a23828ce75cb5f",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "39 instantiations have significant redundant overhead",
+          "verdict": "partially_supported",
+          "reason": "Count is correct, significance unmeasured; fresh objects isolate mutable test cases.",
+          "evidence": {
+            "path": "xarray/tests/test_backends.py",
+            "start_line": 5842,
+            "end_line": 5928
+          }
+        }
+      ],
+      "material_errors": [
+        "Count is correct, significance unmeasured; fresh objects isolate mutable test cases."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The test calls a fresh-dataset helper 13 times for each of three attribute scopes, for 39 constructions. This repeats construction of the same small data and coordinate arrays, while keeping mutations isolated (xarray/tests/test_backends.py:5842-5928). Reusing one dataset per scope and clearing all affected attributes between cases could reduce construction work, provided serialization side effects are also reset. Parameterization can make coverage explicit but does not itself reduce construction count. The source supplies no timing evidence that construction is a significant bottleneck relative to netCDF writes."
+    }
+  ]
+}

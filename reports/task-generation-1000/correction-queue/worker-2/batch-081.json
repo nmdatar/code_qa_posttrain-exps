@@ -1,0 +1,126 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-081.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/tox-dev--tox-984ce025ad8e",
+      "original_reference_sha256": "59e9f74cd87fbd26e941f9ad58f70b7e71a77c28cd1a87de5cc5ec18b5871fe8",
+      "question": "How does the documentation system coordinate between Sphinx configuration, static asset handling, and CSS styling to ensure cross-browser SVG rendering compatibility?",
+      "question_sha256": "2d23ad4480d7ed7e18d9785b3f554a087b64c807071f75c2678c63205e86de33",
+      "reference_answer": "The premise is not established by this source. docs/conf.py:68-83 selects img/tox.png as the HTML logo and includes _static. docs/_static/custom.css:1-17 provides general document-width and image-margin rules, without an SVG-specific compatibility mechanism. These configure asset delivery and layout; they do not demonstrate cross-browser SVG testing or guarantee SVG rendering compatibility.",
+      "reference_sha256": "5633fb6d9244984ec4fa0c1af868bf8369b95be8d21e5ce31e66c7efb30e6a00",
+      "repository": {
+        "commit": "984ce025ad8e75e323877fb5f34128abcfba950d",
+        "family_id": "tox-dev/tox",
+        "url": "https://github.com/tox-dev/tox"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/tox-dev--tox-984ce025ad8e75e323877fb5f34128abcfba950d",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-300de5be57b63f9b6b072a9a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/tox-dev--tox-984ce025ad8e",
+      "original_reference_sha256": "b063a8c4818b9c78c40cf13ac57b2f82ad0ca9b106235cd9a9178891a9b0c862",
+      "question": "How does tox implement the virtual environment reuse algorithm to determine when to recreate versus reuse existing environments?",
+      "question_sha256": "9d54dd9aa66d406751e84f115515a6946b5bbdac4fcedcce0e368d42f109941e",
+      "reference_answer": "VirtualEnv.update reads the saved creation config, then chooses a recreation reason for recreate, missing config, or a mismatch with _getliveconfig; no reason means reuse (src/tox/venv.py:214-244). CreationConfig.matches_with_reason compares python, python hash, tox version, sitepackages, usedevelop and alwayscopy, then dependency sets. In subset mode it permits the current dependency set to be a subset of the saved set; otherwise sets must match (80-102). A failed check causes creation and dependency installation. This is a saved-input comparison, not validation of every installed package or a general safety guarantee for extra dependencies.",
+      "reference_sha256": "25b943a2dd2931a91841998562b60943e0aa5c24b8684c914e1511e8488e7893",
+      "repository": {
+        "commit": "984ce025ad8e75e323877fb5f34128abcfba950d",
+        "family_id": "tox-dev/tox",
+        "url": "https://github.com/tox-dev/tox"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/tox-dev--tox-984ce025ad8e75e323877fb5f34128abcfba950d",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-8e518364bbd6f1e3d3114832"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/tox-dev--tox-984ce025ad8e",
+      "original_reference_sha256": "1da71d8adf1927f78b25affcb3d923d51d6d78e381bbf26d44dfa766cf7a63a9",
+      "question": "What are the core components and processing stages of tox's configuration variable substitution and expansion system?",
+      "question_sha256": "5147de42547d6f42d2c286b2e86aae3c176ab07bf2c0227c6608d3fd3a2656ce",
+      "reference_answer": "SectionReader._replace manages a substitution stack and invokes Replacer (src/tox/config/__init__.py:1406-1422). RE_ITEM_REF recognizes brace expressions (1426-1435). Replacer.do_replace repeatedly substitutes until the string stops changing, not necessarily until all braces disappear (1441-1455). _replace_match dispatches environment, terminal, cross-section and ordinary substitutions; opts/packages placeholders can remain for later handling (1457-1494). SetenvDict provides lazy environment expansion, and _ArgvlistReader integrates substitution with command parsing (308-352,1539-1576).",
+      "reference_sha256": "85a532c5b288db3f08dac7e147d561ffb5b874371e5fe97c4798607c36e7337a",
+      "repository": {
+        "commit": "984ce025ad8e75e323877fb5f34128abcfba950d",
+        "family_id": "tox-dev/tox",
+        "url": "https://github.com/tox-dev/tox"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/tox-dev--tox-984ce025ad8e75e323877fb5f34128abcfba950d",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-96a7c2e8468752a573783483"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/tox-dev--tox-984ce025ad8e",
+      "original_reference_sha256": "282702f3b503fec2bf3851f9e62b8b439cd8b6c9ff1b4824421f52d26f10193d",
+      "question": "Why does tox's configuration validation system exhibit performance bottlenecks when processing large numbers of test environments with complex factor combinations?",
+      "question_sha256": "9cb44d1668adc8e5546b1f316320c2b295e9ba7fe6e43b3d3fc3e2fd3c5a6442",
+      "reference_answer": "The code shows potential repeated work, not a demonstrated bottleneck. Each environment reads registered attributes using type-specific getters (src/tox/config/__init__.py:1125-1139). String processing applies factors before and after substitution; the comment explains the second pass is needed for factor expressions introduced by expansion (1374-1380). Factor processing performs regex matching and factor checks (1390-1404), while substitutions iterate until stable (1441-1455). More environments and longer expansions can increase work, but profiling representative configurations is needed to identify dominant costs or quantify degradation.",
+      "reference_sha256": "ab0f93da962b187d1e29848010fbe432caeaab2acc8048e0333032d4b18de375",
+      "repository": {
+        "commit": "984ce025ad8e75e323877fb5f34128abcfba950d",
+        "family_id": "tox-dev/tox",
+        "url": "https://github.com/tox-dev/tox"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/tox-dev--tox-984ce025ad8e75e323877fb5f34128abcfba950d",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-c48ad593468cbf9e28a2a2cb"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/tox-dev--tox-984ce025ad8e",
+      "original_reference_sha256": "8389fc6379ea73f6a531de553781ddebb70f291e2c61ebdc544b39816964fb37",
+      "question": "How does tox's interpreter discovery system resolve Python factor specifications (like py310, pypy38) into actual executable paths across different operating systems?",
+      "question_sha256": "5756f15dee64fcb6c1f3360d7ded849be2a5f0ef7b1da3fc0f0f2bbedb121ac8",
+      "reference_answer": "At this revision py310 and pypy38 are not built-in interpreter factors: DEFAULT_FACTORS is constructed from CPython2.7/3.4-3.8 and PyPy2.7/3.5 (src/tox/constants.py:32-38). basepython_default only recognizes entries in that table; otherwise it uses explicit basepython or sys.executable. Recognized factor conflicts warn, unless ignore_basepython_conflict forces the implied interpreter (src/tox/config/__init__.py:534-569). Interpreters caches executable lookup by environment name and metadata by executable (src/tox/interpreters.py:15-44). The default Unix hook uses the current executable for a matching version name, otherwise sysfind. Windows additionally checks conventional locations and uses the Python launcher for matched python version names; its regex accepts only a single minor-version digit (122-174).",
+      "reference_sha256": "b7b1d7a6576548dc004fc613318b0b6ebb1c52bceea5fd11263a827542769b55",
+      "repository": {
+        "commit": "984ce025ad8e75e323877fb5f34128abcfba950d",
+        "family_id": "tox-dev/tox",
+        "url": "https://github.com/tox-dev/tox"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/tox-dev--tox-984ce025ad8e75e323877fb5f34128abcfba950d",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-ca933f96d2a6cecdca8f9d49"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/tox-dev--tox-984ce025ad8e",
+      "original_reference_sha256": "2752cc59981d2f35d74e4725315b68a9d70252d163c60394204d5b243f1b9455",
+      "question": "Where are deprecated configuration option warnings (such as whitelist_externals) generated and handled in the tox codebase?",
+      "question_sha256": "219c07a06cbfa055a015512dabd4feb0485d57f444f2b5232007f0da824dadd7",
+      "reference_answer": "This snapshot does not identify whitelist_externals itself as deprecated here. VirtualEnv._check_external_allowed_and_warn warns when a resolved external command is not allowed by is_allowed_external. The message says this behavior will become an error in tox4 (src/tox/venv.py:190-201). is_allowed_external checks whitelist_externals patterns, including Windows executable suffix handling (203-212). The warning is emitted through reporter.warning; it concerns unapproved external execution rather than configuring the whitelist option.",
+      "reference_sha256": "d7c94093d1b27938a106ae6db48c4f68acf5e002881531a761a29adb9623f99d",
+      "repository": {
+        "commit": "984ce025ad8e75e323877fb5f34128abcfba950d",
+        "family_id": "tox-dev/tox",
+        "url": "https://github.com/tox-dev/tox"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/tox-dev--tox-984ce025ad8e75e323877fb5f34128abcfba950d",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-cb824cbec21aa8e57fa9980b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/tox-dev--tox-984ce025ad8e",
+      "original_reference_sha256": "fde61006d81e36cac22075fadc535965eba8620bc3daf7d34fa6675624155cf2",
+      "question": "Why does tox's configuration system rely on ad-hoc validation through ConfigError exceptions rather than implementing a formal schema validation framework?",
+      "question_sha256": "81e805f6c393620a6abdd5a8826e7c94c413c70c85aea2e25a8adc7792f25ce2",
+      "reference_answer": "The implementation registers testenv attributes with type strings and optional postprocessors (src/tox/config/__init__.py:79-94), then dispatches to SectionReader getters while constructing environments (1125-1139). This places conversion and validation alongside value lookup, substitution and postprocessing. It accommodates runtime-registered attributes, but the cited code does not document why maintainers chose this design over a formal schema framework. Any claim that schemas were deliberately rejected or unsuitable would need separate design evidence.",
+      "reference_sha256": "f375dee29b0612e69c406f29511f89d828284c5f61ac260dc09a54ee4ccc0e5f",
+      "repository": {
+        "commit": "984ce025ad8e75e323877fb5f34128abcfba950d",
+        "family_id": "tox-dev/tox",
+        "url": "https://github.com/tox-dev/tox"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/tox-dev--tox-984ce025ad8e75e323877fb5f34128abcfba950d",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-ce670626d5c661783db927f4"
+    }
+  ]
+}

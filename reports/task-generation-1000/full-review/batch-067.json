@@ -1,0 +1,387 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-8a1b4bc29f4fbb3746430985",
+      "reference_sha256": "963a6c83c99cf690919a165dbaf368e91749b5870f088052dbb323dd4bb2fdc5",
+      "question_sha256": "ae6ca1c1fcd79b01da3f3f5e7bc78e0812a7f1f9107ab5fe5a5616551d5c79d8",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Analyzer classifies execution versus documentation",
+          "verdict": "unsupported",
+          "reason": "Extracts comments, annotations and definition locations, no execution classification.",
+          "evidence": {
+            "path": "sphinx/pycode/__init__.py",
+            "start_line": 136,
+            "end_line": 160
+          }
+        },
+        {
+          "claim": "used records documentation backlinks",
+          "verdict": "supported",
+          "reason": "Maps fullname to docname, not runtime usage.",
+          "evidence": {
+            "path": "sphinx/ext/viewcode.py",
+            "start_line": 120,
+            "end_line": 147
+          }
+        }
+      ],
+      "material_errors": [
+        "Invents execution classification."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "There is no such execution-versus-documentation classification here. ModuleAnalyzer.analyze extracts comments, annotations, overloads and definition tags (sphinx/pycode/__init__.py:136-160). viewcode has_tag records the documenting page in used[fullname], not whether a function executes (sphinx/ext/viewcode.py:120-147). An empty function cannot be classified as documentation-only from those records."
+    },
+    {
+      "task_id": "import-8fadaa46ebcbc01e44c5e1a0",
+      "reference_sha256": "480217ecedac31f5942969c6aab9caf284efc8a0522efa9f9e9c372aa41741fa",
+      "question_sha256": "c7afaae2f94d1fdea5d6e9f775458b01dd4c04ce4d27f5c60ede5842173651c0",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Class and exception index semantics",
+          "verdict": "supported",
+          "reason": "Class uses translated templates; exception is bare name.",
+          "evidence": {
+            "path": "sphinx/domains/python/__init__.py",
+            "start_line": 216,
+            "end_line": 224
+          }
+        },
+        {
+          "claim": "Translation occurs on append",
+          "verdict": "contradicted",
+          "reason": "Percent formatting already invokes __str__, before append.",
+          "evidence": {
+            "path": "sphinx/locale/__init__.py",
+            "start_line": 70,
+            "end_line": 74
+          }
+        }
+      ],
+      "material_errors": [
+        "Incorrect translation timing."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "PyClasslike.get_index_text branches on objtype: classes use translated built-in/module-context templates, exceptions return the bare name, and other types return an empty string (sphinx/domains/python/__init__.py:216-224). The translation proxy resolves gettext in __str__ (sphinx/locale/__init__.py:33-38); its __mod__ invokes that during percent interpolation (70-71). Thus get_index_text already returns the formatted string, rather than deferring translation until index insertion."
+    },
+    {
+      "task_id": "import-93990936cb40a5b0c2b44781",
+      "reference_sha256": "1c22944ab2a17a9b00e2dd776b02efaa801e5a2df74d7267cdcb05f169d3e4b2",
+      "question_sha256": "a42e84d6e9cc2f9c1115eda8fb870f9538fa0aae8e623d742a4b40b9a258b51b",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Selection at initialization and instantiation in get_formatter",
+          "verdict": "supported",
+          "reason": "HTML branch else LaTeX with PYG; stored arguments override supplied kwargs.",
+          "evidence": {
+            "path": "sphinx/highlighting.py",
+            "start_line": 98,
+            "end_line": 134
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-96e05f6078a9243ca7183ae5",
+      "reference_sha256": "901be28ada9910c9a0cbc8a43b341ef0926b3cc73354ee0c9eb8b7c5028ac24e",
+      "question_sha256": "2b93a0bad398169e13fc465f2fc7872d7558b47307ed420ed6018e1c66ca500e",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Type guard precedes field equality",
+          "verdict": "supported",
+          "reason": "Returns NotImplemented on mismatch, otherwise compares id and arg.",
+          "evidence": {
+            "path": "sphinx/util/cfamily.py",
+            "start_line": 223,
+            "end_line": 233
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-9802de50f1c951e1213e045a",
+      "reference_sha256": "e37683572622b2274c3e443e270b7c71459ceb59dc43308cedd2800bbdcdb12f",
+      "question_sha256": "cf6b123c768b369eea1febf23bc91d828ca533fce5b1a17bc55566e5b9df5ba3",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Repeated parsing and transforms",
+          "verdict": "supported",
+          "reason": "Creates document and transformer, parses then applies configured transforms.",
+          "evidence": {
+            "path": "sphinx/util/docutils.py",
+            "start_line": 837,
+            "end_line": 896
+          }
+        },
+        {
+          "claim": "Recursive assertions prove bottleneck",
+          "verdict": "unsupported",
+          "reason": "Recursion follows requested pattern; no timing evidence or unconditional full-tree traversal.",
+          "evidence": {
+            "path": "sphinx/testing/util.py",
+            "start_line": 31,
+            "end_line": 75
+          }
+        }
+      ],
+      "material_errors": [
+        "Unmeasured bottleneck and overbroad full-transform/cross-reference claims."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "Each testing parse call creates an RSTParser and calls _parse_str_to_doctree with registry transforms (sphinx/testing/restructuredtext.py:14-46). That helper creates a document and transformer, parses the text and applies reader, supplied and parser transforms (sphinx/util/docutils.py:837-896). assert_node recursively checks the supplied shape and attributes (sphinx/testing/util.py:31-75). These are candidate repeated costs; the code alone does not establish a bottleneck or quantify slowdown. Profile representative tests before reusing parsed trees, since parsing and transforms mutate document/environment state."
+    },
+    {
+      "task_id": "import-9af5bd08ca046158c470a2b2",
+      "reference_sha256": "37f1c2d7fbc5efbe80187ffcdd98aae7d4ba413e9f53b9a1c1e16922f4a08c76",
+      "question_sha256": "b5ace5551e453d3961d7b3faf2a6762a7e597921e15fc1f87537f23d0f0c3653",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "HelloDirective returns paragraph node list",
+          "verdict": "supported",
+          "reason": "run returns a list containing constructed paragraph, registered as directive.",
+          "evidence": {
+            "path": "doc/development/tutorials/examples/helloworld.py",
+            "start_line": 18,
+            "end_line": 30
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-acf27031026a9e7b6bdfe2ac",
+      "reference_sha256": "918117281d7a49c2c39116108fcf6b35f990e8be0460726dd42ffd0845b00904",
+      "question_sha256": "1967ffc06b0de3342b63e9addc55e381b538d202f35bf417ba05b83a4b670625",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "MRO performs redundant fallback lookups",
+          "verdict": "contradicted",
+          "reason": "Breaks on first matching visitor.",
+          "evidence": {
+            "path": "sphinx/util/docutils.py",
+            "start_line": 772,
+            "end_line": 786
+          }
+        },
+        {
+          "claim": "Dedicated no-op handler exists",
+          "verdict": "supported",
+          "reason": "Direct handler matches captioned_literal_block.",
+          "evidence": {
+            "path": "sphinx/writers/latex.py",
+            "start_line": 2200,
+            "end_line": 2204
+          }
+        }
+      ],
+      "material_errors": [
+        "Invented measured decline and incorrect multi-level dispatch explanation."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "captioned_literal_block is a container subclass (sphinx/builders/latex/nodes.py:8-11). Dispatch searches the MRO but stops at the first matching visitor (sphinx/util/docutils.py:772-786); LaTeX supplies direct visit/depart handlers (sphinx/writers/latex.py:2200-2204). The source does not establish a performance decline from repeated fallback lookups. Additional wrapper nodes entail traversal work, but any material slowdown needs measurement."
+    },
+    {
+      "task_id": "import-addfe691d348e020fddb5945",
+      "reference_sha256": "29de05d2feb2c092941ba65cd5dce5cb7dd9dadff42a274875d950bb7c79fa47",
+      "question_sha256": "4e4aa8917ac2fdf84819b5a607f7f010dc49473907bd6bf0ceec4a50bc88ef80",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Consumes deque to exhaustion",
+          "verdict": "supported",
+          "reason": "Loop appends next while nonempty.",
+          "evidence": {
+            "path": "sphinx/ext/napoleon/docstring.py",
+            "start_line": 567,
+            "end_line": 571
+          }
+        },
+        {
+          "claim": "next removes leftmost line",
+          "verdict": "supported",
+          "reason": "popleft or StopIteration.",
+          "evidence": {
+            "path": "sphinx/ext/napoleon/docstring.py",
+            "start_line": 57,
+            "end_line": 75
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-aeb7dd01a07689a657eedb9c",
+      "reference_sha256": "b0fdfedb12c9f56524068216d6eb9829ea67fe96617d128bca9ad75f8f1a6836",
+      "question_sha256": "deb294c3ffd748b5b72e7b62d212e4473eba50d3d082b3d24d41cd212de88339",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Cache lifetime",
+          "verdict": "supported",
+          "reason": "Builder initialization resets name mapping; misses request serial.",
+          "evidence": {
+            "path": "sphinx/builders/_epub_base.py",
+            "start_line": 165,
+            "end_line": 190
+          }
+        },
+        {
+          "claim": "Parallel disabled through inheritance",
+          "verdict": "contradicted",
+          "reason": "StandaloneHTMLBuilder sets allow_parallel True.",
+          "evidence": {
+            "path": "sphinx/builders/html/__init__.py",
+            "start_line": 110,
+            "end_line": 119
+          }
+        }
+      ],
+      "material_errors": [
+        "False inherited parallel flag; pickling does not promise stable filename IDs across runs."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "make_id caches names within the builder and generates epub-N on a miss; init resets the cache (sphinx/builders/_epub_base.py:165-190). Environment pickling copies state and restores it, but does not persist the builder cache or promise stable filename-to-ID assignment across runs (sphinx/environment/__init__.py:241-253). Preserved counters would advance rather than regenerate previous values. The claim that parallel processing is disabled is false: StandaloneHTMLBuilder sets allow_parallel=True (sphinx/builders/html/__init__.py:110-119). make_id itself has no lock, so these snippets provide no general concurrent-access guarantee."
+    },
+    {
+      "task_id": "import-b3d1dd7177e62157bd6db590",
+      "reference_sha256": "203dc2a13c7af0642469351dc4e0fe3d13f3795232faecff6584d4eadfb4b818",
+      "question_sha256": "d1194dd92547993b746459afc4dcda3320ff850543a9a1a0fdf07a0cea63d0f7",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Different wrapper protocols",
+          "verdict": "supported",
+          "reason": "Overload wrapper supports string equality and matching hash.",
+          "evidence": {
+            "path": "sphinx/util/inspect.py",
+            "start_line": 581,
+            "end_line": 594
+          }
+        },
+        {
+          "claim": "Concrete ellipsis comparison",
+          "verdict": "supported",
+          "reason": "Equality detects placeholder defaults for replacement.",
+          "evidence": {
+            "path": "sphinx/ext/autodoc/_documenters.py",
+            "start_line": 1281,
+            "end_line": 1289
+          }
+        },
+        {
+          "claim": "Display wrapper",
+          "verdict": "supported",
+          "reason": "Only init and repr; architectural intent beyond observable protocol is inference.",
+          "evidence": {
+            "path": "sphinx/ext/autodoc/preserve_defaults.py",
+            "start_line": 31,
+            "end_line": 36
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-ba4bde9b48c1622df7603686",
+      "reference_sha256": "321557ef220a03ff2230e66263539c7530b87453e55a0bee13d9ef8a6f8c2608",
+      "question_sha256": "3f80bc98b3051d9b8c33d067b716e437ef3e94c66a7233f7d405f9eec4b2e633",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Events delegate collector lifecycle",
+          "verdict": "supported",
+          "reason": "Connects read/merge/purge methods.",
+          "evidence": {
+            "path": "sphinx/environment/collectors/__init__.py",
+            "start_line": 31,
+            "end_line": 39
+          }
+        },
+        {
+          "claim": "Download tracking and setup",
+          "verdict": "supported",
+          "reason": "Registers readable local files, purges and merges env.dlfiles.",
+          "evidence": {
+            "path": "sphinx/environment/collectors/asset.py",
+            "start_line": 137,
+            "end_line": 179
+          }
+        },
+        {
+          "claim": "Mapping merge semantics",
+          "verdict": "supported",
+          "reason": "Path keys map doc sets and destination; merges selected docnames.",
+          "evidence": {
+            "path": "sphinx/util/_files.py",
+            "start_line": 64,
+            "end_line": 96
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-c12184a1bcbb300cb7b99a7b",
+      "reference_sha256": "7d1c735ac307113629ab272f664290d30923f3bc816b0fa354a7b516d9a0101c",
+      "question_sha256": "48c9e00d5458206a852794148e9546f2cc5f575330fb1038eb05980bdf7ab1ce",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Duplicates both stored",
+          "verdict": "contradicted",
+          "reason": "Same typename/fieldarg assignment replaces previous content.",
+          "evidence": {
+            "path": "sphinx/util/docfields.py",
+            "start_line": 439,
+            "end_line": 448
+          }
+        },
+        {
+          "claim": "Fixture duplicates same argument",
+          "verdict": "contradicted",
+          "reason": "Six distinct argument names test aliases.",
+          "evidence": {
+            "path": "tests/roots/test-ext-napoleon-paramtype/pkg/foo.py",
+            "start_line": 4,
+            "end_line": 28
+          }
+        }
+      ],
+      "material_errors": [
+        "Mistakes overwrite for duplicate storage and misreads fixture."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "First distinguish alias handling from repeated parsing. Napoleon registers paramtype and kwtype for its keyword field (sphinx/ext/napoleon/__init__.py:352-360). DocFieldTransformer resolves each tag through typemap, then stores content under types[typedesc.name][fieldarg]; repeated keys overwrite rather than retain two types (sphinx/util/docfields.py:387-448). The cited fixture tests separate arguments, not duplicate tags on one argument (tests/roots/test-ext-napoleon-paramtype/pkg/foo.py:4-28). If profiling establishes duplicate work, normalize aliases to that existing logical key and optionally skip identical content while preserving defined conflict precedence. A check at this stage cannot avoid initial reStructuredText parsing because field nodes already exist."
+    }
+  ]
+}

@@ -87,7 +87,7 @@ def decide(task, submission, semantic, checks):
 
 
 def evaluate(task, submission, metrics_envelope, experiment, root, key, role="evaluation",
-             semantic_envelope=None, call=None):
+             semantic_envelope=None, call=None, diagnostic_machine_review=False, automated_review=None):
     validate_task(task)
     validate(experiment, EXPERIMENT)
     submission_error = None
@@ -119,7 +119,7 @@ def evaluate(task, submission, metrics_envelope, experiment, root, key, role="ev
         det = [{"name": "submission_schema", "status": "failure", "detail": submission_error}]
         evidence, graph, svg, fingerprint = {}, None, None, None
     else:
-        det, evidence, graph, svg, fingerprint = inspect(task, submission, metrics, root)
+        det, evidence, graph, svg, fingerprint = inspect(task, submission, metrics, root, diagnostic_machine_review=diagnostic_machine_review, automated_review=automated_review)
     checks += det
     semantic = None
     if not any(c["status"] in {"failure", "unresolved"} for c in checks):

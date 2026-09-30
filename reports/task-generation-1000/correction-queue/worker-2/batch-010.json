@@ -1,0 +1,58 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-010.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/conan-io--conan-52f43d98fe44",
+      "original_reference_sha256": "08067fc3c9623cbfec6c7971180c41ef32dc470a8634ed426f3252875c319cb9",
+      "question": "What architectural mechanism does the local development operations interface use to integrate editable package registration with profile-driven configuration for source execution?",
+      "question_sha256": "f810bfc81d442e55d6404340acc49576de0ea301265ae68c7e1223ab09c3de0e",
+      "reference_answer": "ConanApp combines global and workspace editable registries (conan/internal/conan_app.py:58-60), making those available for dependency resolution. LocalAPI.source itself loads the supplied local recipe path directly, obtains an empty profile carrying global.conf, initializes both profile contexts from it, runs layout, assigns local folders and calls run_source_method (conan/api/subapi/local.py:71-98). The integration is orchestration through shared services; it does not mean source execution uses ordinary package build profiles or requires editable registration.",
+      "reference_sha256": "aefcb57b18dce1e5181db744fdd6f245d33c94b31bf48850e185301f3fad0cab",
+      "repository": {
+        "commit": "52f43d98fe44ab92d01317110488d0670c3e9e64",
+        "family_id": "conan-io/conan",
+        "url": "https://github.com/conan-io/conan"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/conan-io--conan-52f43d98fe44ab92d01317110488d0670c3e9e64",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e2dd929039348918fafda9fd"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/conan-io--conan-52f43d98fe44",
+      "original_reference_sha256": "8a89029a3d5eac0441e02a42610324e06afe48fec1c4bd264bc90f8c93d620f8",
+      "question": "Why does the repeated login retry loop in the credential retrieval and authentication retry mechanism affect the overall latency of a remote API call when authentication initially fails?",
+      "question_sha256": "05f2fde943a2dc4c6195f4b108703bac579f20ed83909818fee9ca3971ad691e",
+      "reference_answer": "Each authentication attempt performs a synchronous requester.get (conan/internal/rest/rest_client_v2.py:102-113), adding network time and possibly interactive input time. The retry loop returns on success, aborts a noninteractive failure immediately, and raises after exhausting interactive attempts (conan/internal/rest/auth_manager.py:72-91). Only successful authentication can permit retrying the original operation. If all attempts fail there is no final successful API call; actual latency depends on the requests and user input.",
+      "reference_sha256": "e114090494cbb9a5f900b2844dfde5d2941196ca5666a879019934e0b030e7d6",
+      "repository": {
+        "commit": "52f43d98fe44ab92d01317110488d0670c3e9e64",
+        "family_id": "conan-io/conan",
+        "url": "https://github.com/conan-io/conan"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/conan-io--conan-52f43d98fe44ab92d01317110488d0670c3e9e64",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-f08d28e829f4f269390cd086"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/conan-io--conan-52f43d98fe44",
+      "original_reference_sha256": "2d4fc7b087119e6e6bae93054c3184984e3fbfda7af2790ef9d7948253a63f8b",
+      "question": "How does the internal Conan logic resolve the package reference for a \"test\" command to prevent rebuilding when only test files are altered?",
+      "question_sha256": "a88fa9fe334b37bbfd874fd6dec6a83739a715481154c85acb43b795a9599978",
+      "reference_answer": "The standalone conan test command supplies the reference and build modes to run_test without tested_graph (conan/cli/commands/test.py:42-53). It loads the test graph, analyzes binaries and installs them before running tests (54-78); changing test sources alone does not export a new recipe here. Reuse depends on the resolved reference, package ID, available binaries and build modes. The never-build override is specifically the branch where tested_graph is supplied; otherwise evaluate_graph uses BuildMode(build_mode) (conan/internal/graph/graph_binaries.py:430-438).",
+      "reference_sha256": "431aa779e856e740754110f48d9205edc7f134b7351736950f372326a719472e",
+      "repository": {
+        "commit": "52f43d98fe44ab92d01317110488d0670c3e9e64",
+        "family_id": "conan-io/conan",
+        "url": "https://github.com/conan-io/conan"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/conan-io--conan-52f43d98fe44ab92d01317110488d0670c3e9e64",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-fcb1997b39de5af55485731b"
+    }
+  ]
+}

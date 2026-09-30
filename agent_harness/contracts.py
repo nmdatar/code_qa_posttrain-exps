@@ -20,6 +20,7 @@ class ToolSpec:
     max_output_bytes: int = 32_000
     description: str = ""
     required_resources: tuple[str, ...] = ()
+    parallel_safe: bool = False
 
 
 @dataclass
@@ -52,6 +53,11 @@ class ToolCall:
 
 
 @dataclass(frozen=True)
+class ToolCallBatch:
+    calls: tuple[ToolCall, ...]
+
+
+@dataclass(frozen=True)
 class FinalAnswer:
     value: Any
 
@@ -65,7 +71,7 @@ class Usage:
 
 @dataclass(frozen=True)
 class ModelResponse:
-    action: ToolCall | FinalAnswer
+    action: ToolCall | ToolCallBatch | FinalAnswer
     usage: Usage = field(default_factory=Usage)
     token_ids: tuple[int, ...] | None = None
     logprobs: tuple[float, ...] | None = None
@@ -84,6 +90,7 @@ class RunLimits:
     max_output_tokens: int = 16_000
     wall_time_seconds: float = 300.0
     max_context_chars: int = 64_000
+    max_parallel_tool_calls: int = 1
 
 
 @dataclass(frozen=True)

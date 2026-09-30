@@ -1,0 +1,126 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-085.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "original_reference_sha256": "93d7d1a171d0610ea3c3899ebb74c17549f439e81510755bd26e2b76cc3697d8",
+      "question": "Why does PSyclone's transformation engine separate dependency analysis validation from transformation application, considering the scalability impacts on large HPC codebases with complex loop nests?",
+      "question_sha256": "a49146c88878af69744eff7a13857726e9f82fdc4039829ac8c4dcf9841e25e5",
+      "reference_answer": "ParallelLoopTrans.apply first calls validate before wrapping a loop with directives, allowing legality checks and diagnostics to be considered separately from application. Options include forcing parallelization or ignoring selected dependencies, so validation is not an unconditional safety guarantee (src/psyclone/psyir/transformations/parallel_loop_trans.py:298-323). DependencyTools compares each write with other accesses for a variable, at up to W*A pair checks, and can stop at an unsafe variable (src/psyclone/psyir/tools/dependency_tools.py:649-665,817-863). Large access sets and symbolic tests can increase analysis cost; these sources do not establish measured scalability or quadratic cost in the number of loops.",
+      "reference_sha256": "6246755cbdb86932cb5e071651bd4a0864c7a52dc7b9cffea5ae934fb46aa71b",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "source_inventory_mode": "git_objects_primary",
+      "source_scope": "Primary repository regular Git blobs only; symbolic links are target metadata and submodules are unavailable pinned metadata. No repository execution.",
+      "task_id": "import-8cf10c0c4a274c5334fe19a0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "original_reference_sha256": "e5b55d4dffe8f9b92ef78a423e520b69859da5fd1a0d1ded18803e03754957d8",
+      "question": "What are the core components and their responsibilities in PSyclone's GitHub Actions CI/CD workflow architecture?",
+      "question_sha256": "e64501b0fb548e32c07168b666df1dcbab3bee6141dad84d0529a5af277e0f14",
+      "reference_answer": "The main python-package workflow builds documentation and runs tests, lint, examples and tutorials across its configured Python matrix, uploading coverage from the test job (.github/workflows/python-package.yml:56-167). compilation.yml runs compiler-heavy examples/tutorials and tests on mirror-only self-hosted runners; lfric_test.yml, nemo_tests.yml and nemo_v5_tests.yml provide domain integration jobs (.github/workflows/compilation.yml:64-134; .github/workflows/lfric_test.yml:39-79; .github/workflows/nemo_tests.yml:39-101; .github/workflows/nemo_v5_tests.yml:39-78). linkcheck.yml runs Linkspector for pull requests, while repo-sync.yml pushes public-repository changes to the mirror (.github/workflows/linkcheck.yml:1-16; .github/workflows/repo-sync.yml:38-87). Coverage uploads and explicit skip-ci checks are job-specific, not common to all seven workflows.",
+      "reference_sha256": "4454c5c863f84888b94b8c0ee5cb394f9288a46824ebab5bdeebfe206dddeaa3",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "source_inventory_mode": "git_objects_primary",
+      "source_scope": "Primary repository regular Git blobs only; symbolic links are target metadata and submodules are unavailable pinned metadata. No repository execution.",
+      "task_id": "import-584a3d79de6cd1988916e143"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "original_reference_sha256": "676d77e655fd175a53582376a42fbcb80e382a2ca8b069e31ffcdfe643ef98a0",
+      "question": "Why does PSyclone's dependency analysis system create performance bottlenecks when analyzing deeply nested loop structures for parallelization transformations in large scientific kernels?",
+      "question_sha256": "f879c67ea55d899008604c07212e1fb819c704a9f44753cf719982305a612a74",
+      "reference_answer": "Potential cost comes from collecting loop access information and checking variables, with array analysis comparing each write against other accesses (src/psyclone/psyir/tools/dependency_tools.py:649-665,817-863). Read-only arrays bypass pair checks, and the default analysis returns after the first unsafe variable. Privatisation checks locality and references following the loop (src/psyclone/psyir/transformations/parallel_loop_trans.py:84-119). Large access sets and difficult symbolic subscripts can make this work expensive, but nesting depth alone does not establish exponential growth or prove a runtime bottleneck. Profiling representative kernels is needed for that claim.",
+      "reference_sha256": "4aeae2d66c5ea5e6fced141928773c1cc3330341ec7c01ed202df19c7b71cb68",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "source_inventory_mode": "git_objects_primary",
+      "source_scope": "Primary repository regular Git blobs only; symbolic links are target metadata and submodules are unavailable pinned metadata. No repository execution.",
+      "task_id": "import-8c644074cd4e2351d243b4a1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "original_reference_sha256": "8748759ab10d97da6848ba403dd580e8ce5c480c513de44afcee61a772f44bc4",
+      "question": "Why does PSyclone's build system fail to scale efficiently under parallel compilation conditions when using the -j flag with make?",
+      "question_sha256": "2034656d84d9933190af05976b026b8fe12cee241fa28b67820b7b82dc51edea",
+      "reference_answer": "The cited files do not establish general failure to scale under make -j. examples/top_level.mk declares separate example targets and invokes recursive MAKE for each, allowing make to schedule independent prerequisites (examples/top_level.mk:49-75). The NEMO eg1 transform recipe runs several commands in sequence but explicitly has no compilation target implementation (examples/nemo/eg1/Makefile:40-50). LFRic eg17 records main_alg.f90 as depending on main_psy.f90, whose recipe generates both files (examples/lfric/eg17/full_example/Makefile:85-90). Serial recipe steps or missing dependencies may warrant specific investigation, but neither recursive make nor differing local F90FLAGS proves the asserted global serialization or race failures.",
+      "reference_sha256": "db469abf925746ead38fcf786f734ee489543c99c235f1f04ae1f50af1590d8d",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "source_inventory_mode": "git_objects_primary",
+      "source_scope": "Primary repository regular Git blobs only; symbolic links are target metadata and submodules are unavailable pinned metadata. No repository execution.",
+      "task_id": "import-e90581de25fdc24433dd62f2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "original_reference_sha256": "5fc0dd25c88287d29e0e4ea9d6008a905b6658997cc8a8ba50ae48f7466dc083",
+      "question": "Why does PSyclone's dependency analysis system fail to scale efficiently when analyzing variable references across deeply nested scoping regions in large PSyIR trees?",
+      "question_sha256": "8a952db90d9edd9898b495589b84419715893d833bf7f71bdf9f38d22abad222",
+      "reference_answer": "Node.reference_accesses defaults to visiting each child, so collecting accesses requires traversal of the selected subtree (src/psyclone/psyir/nodes/node.py:1484-1493). VariablesAccessInfo maps signatures to access information in a dictionary; that fact does not imply linear key searches or O(depth*symbols) analysis (src/psyclone/core/variables_access_info.py:51-90). SymbolTable.lookup obtains scope-limited symbols and uses a normalized-name dictionary key (src/psyclone/psyir/symbols/symbol_table.py:950-965). Repeated analyses and large trees can add cost, but the asserted poor scalability and scope-confusion failure require a concrete workload or counterexample, not these implementation facts alone.",
+      "reference_sha256": "7336ca60e858c7b82e2ca1eea9ec826696a5259f9748e30ec1e66eaeced4dea8",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "source_inventory_mode": "git_objects_primary",
+      "source_scope": "Primary repository regular Git blobs only; symbolic links are target metadata and submodules are unavailable pinned metadata. No repository execution.",
+      "task_id": "import-7a27d85aae27e3df1afac2c6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "original_reference_sha256": "96156de10a2a4c682c651211623e2de3115ffc1e035bad4479a8f3eff89cfd6f",
+      "question": "How does PSyclone's data movement analysis algorithm determine which variables require host-device synchronization in OpenACC directive transformations?",
+      "question_sha256": "c26fd2f15ae600c5bf589de1d765c2b8fb11b13a29e6cc286775d4f7cf1c9912",
+      "reference_answer": "ACCUpdateTrans identifies contiguous host-code blocks outside ACC kernels/parallel regions, treating potentially computing calls as boundaries and recursing into host loops/conditions (src/psyclone/psyir/transformations/acc_update_trans.py:177-223). It obtains read/write signatures through CallTreeUtils.get_in_out_parameters, adds outputs to inputs to protect partially written arrays, and treats CodeBlock references conservatively as both. Host inputs require host updates and outputs device updates. It then checks textual and loop-carried synchronization needs and moves updates toward outer schedules where safe, aiming to avoid loop-internal transfers and merge neighboring directives (same file:240-324). This is conservative data-use analysis, not simply a mandatory update immediately before/after each device region.",
+      "reference_sha256": "ed3f6c2935ca5b479977ea55d177f454c986504914965e23904e657558451198",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "source_inventory_mode": "git_objects_primary",
+      "source_scope": "Primary repository regular Git blobs only; symbolic links are target metadata and submodules are unavailable pinned metadata. No repository execution.",
+      "task_id": "import-123ecdad968e7ea36e4a5f6a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/stfc--PSyclone-0a0cfa6f0577",
+      "original_reference_sha256": "a4d0310c9aa5fef3554babb69cf742b67c3ddf52b5f3b3a291d18916218d0966",
+      "question": "Why does the symbol table import resolution mechanism in PSyclone exhibit poor scalability when processing large codebases with multiple nested modules and wildcard imports?",
+      "question_sha256": "598145427b519a34a3fc217f033d52d57e657f344fff76d96189c3246347549f",
+      "reference_answer": "resolve_imports scans selected containers, their public non-container symbols, and descendant ScopingNodes; matching unresolved symbols can trigger additional reference walks (src/psyclone/psyir/symbols/symbol_table.py:1616-1694). A coarse scan count can grow with containers times symbols times scopes, with extra work in matching branches. Wildcard imports copy missing public symbols into the local table, while symbol_target filters and can return early (same file:1644-1648,1696-1760). These are potential scaling costs, not evidence that all large inputs are prohibitively slow. Nested ContainerSymbols are explicitly skipped here, and string-based access tracking is not demonstrated to be the bottleneck.",
+      "reference_sha256": "7ada5510f4e2fb18288b57004980952029acf92d51d9167598e6d61c49041fd2",
+      "repository": {
+        "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+        "family_id": "stfc/psyclone",
+        "url": "https://github.com/stfc/PSyclone"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/stfc--PSyclone-0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+      "source_inventory_mode": "git_objects_primary",
+      "source_scope": "Primary repository regular Git blobs only; symbolic links are target metadata and submodules are unavailable pinned metadata. No repository execution.",
+      "task_id": "import-a38d8c6a4c053daff0d79957"
+    }
+  ]
+}

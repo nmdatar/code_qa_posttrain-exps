@@ -1,0 +1,87 @@
+{
+  "run_id": "offline-sft-grpo",
+  "backend": "fake",
+  "model": "fake",
+  "train_tasks": [
+    {
+      "id": "fake-train",
+      "split": "train",
+      "system_prompt": "Use repository evidence.",
+      "user_prompt": "Explain the example.",
+      "repository": {
+        "family_id": "fake-train",
+        "commit": "0000000000000000000000000000000000000000",
+        "url": "fixture://fake-train"
+      },
+      "permitted_tools": [
+        "list_files",
+        "search_code",
+        "read_file"
+      ],
+      "environment_id": "fake",
+      "budgets": {
+        "max_tool_calls": 4,
+        "max_output_tokens": 1024,
+        "latency_seconds": 60,
+        "max_submission_bytes": 8000
+      }
+    }
+  ],
+  "eval_tasks": [
+    {
+      "id": "fake-dev",
+      "split": "development",
+      "system_prompt": "Use repository evidence.",
+      "user_prompt": "Explain the example.",
+      "repository": {
+        "family_id": "fake-dev",
+        "commit": "0000000000000000000000000000000000000000",
+        "url": "fixture://fake-dev"
+      },
+      "permitted_tools": [
+        "list_files",
+        "search_code",
+        "read_file"
+      ],
+      "environment_id": "fake",
+      "budgets": {
+        "max_tool_calls": 4,
+        "max_output_tokens": 1024,
+        "latency_seconds": 60,
+        "max_submission_bytes": 8000
+      }
+    }
+  ],
+  "sft_examples": [
+    {
+      "id": "fake-sft",
+      "split": "train",
+      "status": "accepted",
+      "provenance": {
+        "synthetic": true
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Explain the example."
+        },
+        {
+          "role": "assistant",
+          "content": "Supported example."
+        }
+      ]
+    }
+  ],
+  "stages": [
+    {
+      "algorithm": "sft",
+      "max_updates": 1,
+      "learning_rate": 1e-05
+    },
+    {
+      "algorithm": "grpo",
+      "max_updates": 2,
+      "learning_rate": 1e-05
+    }
+  ]
+}

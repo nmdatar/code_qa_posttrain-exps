@@ -1,0 +1,548 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 128,
+            "file_sha256": "f9a293dfc0bf3f7854ec7d51b397fb0716458c9054e9568a1ec2e743cf684306",
+            "path": "xarray/tests/test_parallelcompat.py",
+            "start_line": 59
+          },
+          {
+            "end_line": 186,
+            "file_sha256": "44b19e1aacdfdb529f6de099ff4cd11ee4a78bd21e8291421939a700dc88d5ec",
+            "path": "xarray/namedarray/parallelcompat.py",
+            "start_line": 186
+          },
+          {
+            "end_line": 57,
+            "file_sha256": "44b19e1aacdfdb529f6de099ff4cd11ee4a78bd21e8291421939a700dc88d5ec",
+            "path": "xarray/namedarray/parallelcompat.py",
+            "start_line": 57
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "7f6413aee854c7620a814c93f70191dc42e3cf86bf08a5011cfc90f406d8916c",
+            "kind": "file_reference",
+            "line_count": 103,
+            "path": "doc/internals/chunked-arrays.rst"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does DummyChunkManager implement the ChunkManagerEntrypoint interface to enable polymorphic chunk management across different backend systems, and what architectural implications arise from delegating operations to Dask while maintaining abstraction boundaries?",
+      "question_sha256": "0a7216a5b66049ce3ce515882272d2b37fe70cb6bb412f6ceccccf00c6d2150d",
+      "reference_answer": "The test chunk manager implementation (DummyChunkManager) satisfies the abstract interface (ChunkManagerEntrypoint) by implementing all required abstract methods while delegating core operations to Dask, thereby demonstrating how multiple backend systems can be supported through a unified interface.\n\n**Implementation Details:**\n\nDummyChunkManager is defined in `xarray/tests/test_parallelcompat.py` (lines 59-128) and inherits from `ChunkManagerEntrypoint` (defined in `xarray/namedarray/parallelcompat.py`, line 186). It implements the required abstract methods:\n\n1. **`is_chunked_array()`** (line 65-66): Checks if data is an instance of `DummyChunkedArray`, maintaining type identity for the test array type.\n\n2. **`chunks()`** (line 68-69): Returns the chunks attribute directly from the array, satisfying the interface requirement to expose chunking information.\n\n3. **`normalize_chunks()`** (lines 71-81): Delegates to `dask.array.core.normalize_chunks`, importing and calling the Dask function directly. This demonstrates how a chunk manager can reuse existing normalization logic from another backend.\n\n4. **`from_array()`** (lines 83-88): Delegates to `dask.array.from_array`, creating Dask arrays but returning them as `DummyChunkedArray` type. This shows how the interface abstracts array creation while allowing backend-specific implementations.\n\n5. **`compute()`** (lines 93-96): Delegates to `dask.array.compute`, demonstrating how computation is abstracted through the interface.\n\n6. **`apply_gufunc()`** (lines 98-128): Delegates to `dask.array.gufunc.apply_gufunc`, showing how generalized ufunc operations are routed through the interface.\n\n**Enabling Multiple Backend Support:**\n\nThe ChunkManagerEntrypoint interface (documented in `doc/internals/chunked-arrays.rst`) enables polymorphic chunk management by:\n\n1. **Unified Interface**: All chunk managers must implement the same abstract methods, allowing xarray to dispatch operations without knowing the specific backend (dask, cubed, etc.).\n\n2. **Entrypoint System**: Chunk managers are registered via Python entrypoints (`xarray.chunkmanagers`), allowing multiple backends to coexist and be discovered dynamically (see `list_chunkmanagers()` in `parallelcompat.py`, line 57).\n\n3. **Type Abstraction**: Each chunk manager maintains its own array type (`array_cls` attribute) while exposing operations through the common interface. DummyChunkManager uses `DummyChunkedArray` but delegates operations to Dask, showing how abstraction boundaries are maintained.\n\n4. **Polymorphic Dispatch**: Xarray uses `get_chunked_array_type()` (line 143) to detect which chunk manager to use based on array types, and `guess_chunkmanager()` (line 94) to select the appropriate manager, enabling runtime polymorphism.\n\nThe test implementation demonstrates that the interface successfully abstracts backend differences, allowing xarray to work with any parallel computing framework that implements the ChunkManagerEntrypoint interface, whether it's Dask, Cubed, or a custom implementation.",
+      "reference_sha256": "b3d38890b0eb04d5e9859ad454c3358bc81c1e0f2787449e710da78915ca39f1",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-0605181b03a9578272c653c8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 115,
+            "file_sha256": "de0735de7121e0b495f5685b371fee75ac869bb1546782aa6a3583daeea87837",
+            "path": "xarray/computation/arithmetic.py",
+            "start_line": 109
+          },
+          {
+            "end_line": 146,
+            "file_sha256": "732a2152fbbf61d3a0aca80da6c23aa4efb73d805d88491d11896c89f6023a24",
+            "path": "xarray/core/common.py",
+            "start_line": 105
+          },
+          {
+            "end_line": 268,
+            "file_sha256": "2e40973e64c5fa33da3827202ff08cf3c79708cd32edb0e9ae6dce9eee9c6f12",
+            "path": "xarray/computation/ops.py",
+            "start_line": 244
+          },
+          {
+            "end_line": 508,
+            "file_sha256": "77d04de324babd11f1cb94b9a17cdd8a05fdf5e52cf738051bc8768365b4d7d3",
+            "path": "xarray/core/_typed_ops.py",
+            "start_line": 190
+          },
+          {
+            "end_line": 115,
+            "file_sha256": "de0735de7121e0b495f5685b371fee75ac869bb1546782aa6a3583daeea87837",
+            "path": "xarray/computation/arithmetic.py",
+            "start_line": 115
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the mechanism in the inheritance chain from DatasetArithmetic through ImplementsDatasetReduce and DatasetOpsMixin that resolves potential method conflicts when arithmetic operations interact with dataset reduction methods, and what role does __array_priority__ play in disambiguating operator precedence across these composed interfaces?",
+      "question_sha256": "20c239b58ea3852e2bd9edacb7113ab368be937b40a97b93f9f40dcd57c5bd75",
+      "reference_answer": "The mechanism that resolves potential method conflicts in the inheritance chain from `DatasetArithmetic` through `ImplementsDatasetReduce` and `DatasetOpsMixin` is **Python's Method Resolution Order (MRO)** algorithm, which determines the order in which base classes are searched when resolving method calls.\n\n**Inheritance Structure:**\nFrom `xarray/computation/arithmetic.py` (lines 109-115), `DatasetArithmetic` is defined as:\n```python\nclass DatasetArithmetic(\n    ImplementsDatasetReduce,\n    SupportsArithmetic,\n    DatasetOpsMixin,\n):\n    __slots__ = ()\n    __array_priority__ = 50\n```\n\n**MRO Resolution:**\nPython's MRO follows the C3 linearization algorithm, which:\n1. Searches classes in left-to-right order of the inheritance list\n2. Maintains depth-first search while avoiding duplicates\n3. Ensures that a class always appears before its base classes\n\nFor `DatasetArithmetic`, the MRO determines that when a method is called:\n- If `ImplementsDatasetReduce` defines it, that implementation is used\n- Otherwise, `SupportsArithmetic` is checked\n- Finally, `DatasetOpsMixin` is checked\n\n**Separation of Concerns:**\nThe design avoids direct method conflicts by separating responsibilities:\n- `ImplementsDatasetReduce` (from `xarray/core/common.py`, lines 105-146) provides `_reduce_method()` which is used by `inject_reduce_methods()` to dynamically inject reduction methods like `sum()`, `mean()`, `max()`, etc. (see `xarray/computation/ops.py`, lines 244-268)\n- `DatasetOpsMixin` (from `xarray/core/_typed_ops.py`, lines 190-508) provides arithmetic operator methods like `__add__()`, `__sub__()`, `__mul__()`, etc., which delegate to `_binary_op()` or `_unary_op()`\n\n**Role of `__array_priority__`:**\nThe `__array_priority__ = 50` attribute (line 115 in `arithmetic.py`) is used by NumPy's binary operator dispatch mechanism, not Python's MRO. When xarray objects interact with NumPy arrays in operations like `ds + np.array(...)`, NumPy checks `__array_priority__` to determine which class's operator method should be called. With priority 50, xarray's methods take precedence over NumPy's default priority of 0, ensuring xarray's arithmetic operations are used instead of NumPy's generic array operations.\n\n**Conflict Resolution in Practice:**\nSince `ImplementsDatasetReduce` and `DatasetOpsMixin` provide different sets of methods (reduction methods vs. operator methods), there are no actual naming conflicts. However, if conflicts existed, Python's MRO would resolve them by selecting the method from the leftmost class in the inheritance list that defines it, which in this case would be `ImplementsDatasetReduce` before `DatasetOpsMixin`.",
+      "reference_sha256": "dbf24ed33ce6204b61c4d02da7f946e438afb2f82b444f4193c98e04e8d645cd",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-0ccc017740cc72ba478d6212"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1482,
+            "file_sha256": "19ad3b404c5fcf8274dc7996fd94990546072924d6376bb4a7d52cca156d4f78",
+            "path": "xarray/core/groupby.py",
+            "start_line": 1441
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "357f6454d10ae8532fa59f5c5b0d4f963081170960f28f15d22a22bd00deccc9",
+            "kind": "file_reference",
+            "line_count": 914,
+            "path": "xarray/core/duck_array_ops.py"
+          },
+          {
+            "file_sha256": "79e30ae648bb2f034a86b804922860343cdf12a8c433c9eaa93239d96af37d42",
+            "kind": "file_reference",
+            "line_count": 316,
+            "path": "xarray/core/nputils.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where in the codebase is the skipna parameter handling logic implemented for the first() and last() functions when operating on multi-dimensional arrays with NaN values?",
+      "question_sha256": "56a86180f7ae9183a8a27a6d0fcd662b8f2f3861691e3d6c2db3fb5df3905a8c",
+      "reference_answer": "The logic that handles the parameter controlling whether missing values are skipped for the functions that return the first and last elements along an axis is implemented in multiple locations within the xarray codebase:\n\n**Primary Implementation Location:**\nThe main handling logic is in `xarray/core/duck_array_ops.py` within the `first()` and `last()` functions (lines 812-837). These functions:\n1. Check if the skipna parameter is True or None (default behavior)\n2. Verify if the array's dtype can hold NaN values (excluding signed integers and strings)\n3. Route to appropriate implementations based on whether the array is chunked or not\n\n**Core NaN Skipping Logic:**\nThe actual implementation for finding the first/last non-missing values in multi-dimensional arrays is in `xarray/core/nputils.py`:\n- `nanfirst()` function (lines 48-57): Uses `np.argmax(~pd.isnull(values), axis=axis)` to find the first non-NaN index along the specified axis, then selects that element using `_select_along_axis()`\n- `nanlast()` function (lines 60-70): Reverses the array along the axis, finds the first non-NaN value in the reversed array, then calculates the corresponding index in the original array\n\n**Chunked Array Handling:**\nFor chunked arrays (like Dask arrays), the logic is in `xarray/core/duck_array_ops.py`:\n- `chunked_nanfirst()` (line 909) and `chunked_nanlast()` (line 913) functions wrap the nputils functions using `_chunked_first_or_last()` to handle distributed computation\n\n**Call Chain:**\nWhen called from groupby operations (in `xarray/core/groupby.py`, lines 1441-1482), the `first()` and `last()` methods call `_first_or_last()`, which eventually invokes `duck_array_ops.first()` or `duck_array_ops.last()` with the skipna parameter passed through the reduction mechanism.\n\nThe implementation handles multi-dimensional arrays by operating along a specified axis, using numpy's `argmax` with boolean masking to efficiently locate the first or last non-missing value across all positions along that axis.",
+      "reference_sha256": "654967704ceec886512b0fd8be8d657873b5bddb4f0f5c06b6d9094974560b47",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-1286486da6b74ddb5248c1bc"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1228,
+            "file_sha256": "7c089619621c151ac14772d370510e80d51b9ac0961c5b48d8cf7dedea8234fd",
+            "path": "xarray/core/datatree.py",
+            "start_line": 1150
+          },
+          {
+            "end_line": 334,
+            "file_sha256": "a87f09e2d0d9761c5decc6b15553114d96430704cf044700f34db09d0efabeea",
+            "path": "xarray/tests/test_datatree.py",
+            "start_line": 281
+          },
+          {
+            "end_line": 538,
+            "file_sha256": "091a52b05961b8f5b142606dcbe734033bb5c57f87f0e87bdd4b24557a7a1e39",
+            "path": "xarray/core/treenode.py",
+            "start_line": 538
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "asv_bench/benchmarks/datatree.py",
+              "xarray/core/datatree.py"
+            ],
+            "end_line": 920,
+            "path": "datatree.py",
+            "reason": "ambiguous_basename",
+            "reference": "datatree.py",
+            "start_line": 920
+          }
+        ]
+      },
+      "question": "What is the implicit dependency chain between the test methods in TestGetItem and the DataTree.from_dict factory method that affects how the test suite validates hierarchical node access patterns?",
+      "question_sha256": "101af3c1d98dc0bacc69cfbd9943d5d2cd47f4677b9cc70429e7f84be9749d24",
+      "reference_answer": "The implicit dependency chain works as follows:\n\n**1. Factory Method Creates Tree Structure:**\nThe `from_dict` factory method (in `xarray/core/datatree.py`, lines 1150-1228) constructs hierarchical DataTree structures from dictionaries mapping path strings to data objects. It processes paths like `\"/results/highres\"` and:\n\n- Sorts paths by depth (line 1211: `sorted(d_cast.items(), key=depth)`) to ensure parent nodes are created before children (addressing GH issue #9276)\n- Uses `_set_item()` with `new_nodes_along_path=True` (lines 1219-1223) to automatically create intermediate nodes along the path when they don't exist\n- This means when given `{\"/results/highres\": DataTree()}`, it creates both the \"results\" intermediate node and the \"highres\" child node\n\n**2. Test Methods Depend on This Structure:**\nThe test methods in `TestGetItem` (in `xarray/tests/test_datatree.py`, lines 281-334) use `from_dict` to create test fixtures, then validate hierarchical access via `__getitem__`:\n\n- `test_getitem_node` (lines 282-290): Creates a tree with `from_dict({\"/results/highres\": DataTree()})`, then accesses `folder1[\"results\"]` and `folder1[\"results/highres\"]`\n- `test_getitem_single_data_variable_from_node` (lines 301-308): Creates `folder1[\"results/highres/temp\"]` and validates access to nested data variables\n- `test_getitem_nonexistent_node` (lines 310-313): Tests that accessing non-existent paths raises KeyError\n\n**3. The Dependency Chain:**\nThe implicit dependency is that:\n- `from_dict`'s depth-sorting ensures parent nodes exist before children are accessed\n- `from_dict`'s `new_nodes_along_path=True` parameter (passed to `_set_item` at line 1223) creates intermediate nodes automatically, which the tests assume will exist\n- The `__getitem__` method (line 920 in datatree.py) calls `_get_item` (inherited from TreeNode, line 538 in treenode.py), which traverses the path created by `from_dict`\n- If `from_dict` didn't create intermediate nodes or didn't sort by depth, the test methods' path-based access would fail\n\n**4. How It Affects Validation:**\nThe test suite validates that hierarchical node access patterns work correctly, but this validation is only meaningful because `from_dict` guarantees:\n- All intermediate nodes in a path exist (via `new_nodes_along_path=True`)\n- Nodes are created in the correct order (via depth-sorting)\n- The tree structure matches the path structure specified in the dictionary\n\nThis creates an implicit contract: the factory method must create a complete, correctly-ordered tree structure for the indexing tests to validate access patterns successfully.",
+      "reference_sha256": "9956bdf6c26afbe7d81999a3ef51209433a25e78cdc0e5efa7d4254f3af592b0",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-17422b22d16d64b11ac50cbc"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "80e2ac7c744b01cebc0ac77eb44e8ff885607e8e8f11d9480bda02996c4be8ba",
+            "kind": "file_reference",
+            "line_count": 615,
+            "path": "xarray/backends/h5netcdf_.py"
+          },
+          {
+            "file_sha256": "25179db07e66c5ebc43d239b7eac7067d758743600df8e91573a777e8c7bc574",
+            "kind": "file_reference",
+            "line_count": 807,
+            "path": "xarray/backends/netCDF4_.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the architectural mechanism demonstrated by the test_write_inconsistent_chunks method that shows the need for explicit encoding metadata management when bridging between dask's distributed chunk representation and h5netcdf's file-level chunk specification?",
+      "question_sha256": "812b87d39081b074920925fce0c5a3414fb6fe16554f328d6280d3d4ab7993bd",
+      "reference_answer": "The test demonstrates the architectural mechanism of **explicit encoding metadata as a bridge between distributed chunk representation and file-level chunk specification**.\n\nWhen writing dask arrays to netCDF files (via the h5netcdf backend), xarray must bridge two chunk representations:\n\n1. **Distributed chunk representation** (dask): Dask arrays have chunks that represent how data is distributed across workers/memory. Different variables in the same dataset can have different dask chunk sizes (e.g., `chunks=(50, 100)` vs `chunks=(100, 50)`).\n\n2. **File-level chunk specification** (h5netcdf/netCDF4): NetCDF/HDF5 files require explicit chunk sizes to be specified when creating variables. This is independent of how data is chunked in memory.\n\nThe test (`test_write_inconsistent_chunks` in both `TestNetCDF4ViaDaskData` and `TestH5NetCDFViaDaskData` classes) shows that when variables have different dask chunk sizes, you must explicitly set `encoding[\"chunksizes\"]` metadata to tell the backend what chunk sizes to use in the file. Without this explicit metadata, the backend cannot automatically infer the desired file chunk sizes from dask chunks alone, especially when different variables need different file chunk sizes.\n\nThe implementation shows this bridging in:\n- **`h5netcdf_.py`** (line 336): `encoding[\"chunks\"] = encoding.pop(\"chunksizes\", None)` - converts encoding metadata to file chunk specification\n- **`h5netcdf_.py`** (line 216): When reading, `\"chunksizes\": var.chunks` - extracts file chunks back to encoding\n- **`netCDF4_.py`** (lines 282-298): Validates and handles `chunksizes` encoding metadata\n\nThis mechanism ensures that the desired file-level chunking is preserved across read/write cycles, independent of the dask chunk representation used during computation.",
+      "reference_sha256": "aee2206a94321dcfd8e7a7de9c49228b2ef17b70e8067212bf49ab3934daea48",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-188040463405615ffa93ff21"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 4893,
+            "file_sha256": "6d967aef6c6df57dda8d5cfb13f2f3c3b05d84ea1af82d12bba3cdea5c360e92",
+            "path": "xarray/tests/test_dataarray.py",
+            "start_line": 4893
+          },
+          {
+            "end_line": 517,
+            "file_sha256": "357f6454d10ae8532fa59f5c5b0d4f963081170960f28f15d22a22bd00deccc9",
+            "path": "xarray/core/duck_array_ops.py",
+            "start_line": 509
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "357f6454d10ae8532fa59f5c5b0d4f963081170960f28f15d22a22bd00deccc9",
+            "kind": "file_reference",
+            "line_count": 914,
+            "path": "xarray/core/duck_array_ops.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the test_min function conditionally handle NaN indices differently based on data type kind and skipna parameter rather than applying a uniform reduction strategy across all array types?",
+      "question_sha256": "e7908a8473a6c60686a0a65d8ca89a4b201f2f3e2561f5a9cef659168407cbb3",
+      "reference_answer": "The minimum reduction test conditionally handles null positions differently based on dtype kind and skipna because object dtype arrays (`dtype.kind == \"O\"`) have different NaN propagation behavior in NumPy compared to numeric types when `skipna=False`.\n\n**Technical Details:**\n\nThe test is located in `xarray/tests/test_dataarray.py` at line 4893 (class `TestReduce1D`). The conditional logic appears at lines 4916-4923:\n\n```python\nresult2 = ar.min(skipna=False)\nif nanindex is not None and ar.dtype.kind != \"O\":\n    expected2 = ar.isel(x=nanindex, drop=True)\n    expected2.attrs = {}\nelse:\n    expected2 = expected1\n```\n\n**Why the distinction exists:**\n\n1. **For non-object types** (float, int, etc.): When `skipna=False` and NaN values are present, NumPy's reduction operations properly propagate NaN. The test expects the result to be the element at the NaN index position, correctly reflecting NaN propagation.\n\n2. **For object types** (`dtype.kind == \"O\"`): NumPy's regular `min()` function on object arrays does not reliably handle NaN propagation the same way. When `skipna=False` is explicitly passed to the reduction function in `xarray/core/duck_array_ops.py` (via `_create_nan_agg_method`), the code path uses `xp.min()` (NumPy's regular min) rather than `nanops.nanmin()`. However, NumPy's `min()` on object arrays containing NaN values has inconsistent behavior - it may not correctly identify NaN as the minimum or may raise warnings/errors.\n\n3. **Implementation behavior**: In `duck_array_ops.py` (lines 509-517), when `skipna=False` is explicitly set, the code uses the standard array namespace `min` function rather than the NaN-aware version. For object types, this leads to unreliable NaN handling, so the test accounts for this by expecting the same result as when `skipna=True` (the minimum non-NaN value) rather than expecting NaN propagation.\n\n**The test parameters** (lines 4869-4877) include an object dtype test case with NaN values, and the test expects that even with `skipna=False`, object arrays should return the minimum non-NaN value rather than attempting to propagate NaN, which would be unreliable.\n\nThis conditional handling ensures the test accurately reflects the actual behavior of NumPy's reduction operations on different array types, rather than enforcing an idealized uniform behavior that doesn't match NumPy's implementation.",
+      "reference_sha256": "978a6646e6bf2d588029e35712b759211c534b1f570df21eeb5cdea2566020bd",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-19ae734d0dabcf8ee646e50a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1694,
+            "file_sha256": "cc1a41e926680cf21c5525380667734dd0fd032d7098253bf5a80f77eb6fc73d",
+            "path": "xarray/core/indexing.py",
+            "start_line": 1685
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the fallback mechanism for handling NotImplementedError in orthogonal indexing operations implemented within DaskIndexingAdapter, and what is the sequential logic for reconstructing indexed values across multiple axes?",
+      "question_sha256": "b3d2639e3abaa6849725ebffdecfd15886047be36bffecdde8ff5ef9476e08cf",
+      "reference_answer": "The fallback mechanism for handling indexing failures in orthogonal indexing is implemented in the `_oindex_get` method of the `DaskIndexingAdapter` class, located in `xarray/core/indexing.py` at lines 1685-1694.\n\nThe implementation works as follows:\n\n1. **Primary attempt**: The method first tries to index the dask array directly using `self.array[key]` (line 1688).\n\n2. **Fallback trigger**: If this raises a `NotImplementedError` (line 1689), indicating that the dask array doesn't support direct orthogonal indexing, the code falls back to manual orthogonal indexing.\n\n3. **Sequential reconstruction logic**: The fallback mechanism reconstructs the indexed values by iterating through axes in reverse order (from the last axis to the first) and applying each subkey one axis at a time:\n   ```python\n   value = self.array\n   for axis, subkey in reversed(list(enumerate(key))):\n       value = value[(slice(None),) * axis + (subkey,)]\n   return value\n   ```\n\nThis sequential approach ensures that:\n- Each axis is indexed independently\n- The indexing pattern `(slice(None),) * axis + (subkey,)` applies the subkey only to the current axis while keeping all previous axes unchanged\n- The reverse iteration (from last to first axis) allows proper reconstruction of the multi-dimensional indexing result\n\nThis fallback mechanism enables orthogonal indexing on dask arrays even when the underlying dask array implementation doesn't natively support it, by decomposing the multi-axis indexing operation into a series of single-axis indexing operations applied sequentially.",
+      "reference_sha256": "2e401f53b82933584746f72607b7dc63c440bdc9ad6e5a895448713b9ff9f979",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-19e9bb1ce7326cfc87908604"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 5219,
+            "file_sha256": "fb56ab39f72e87639fa66eef101559d44124773137d2bbf6106cd8f0e70b5736",
+            "path": "xarray/core/dataset.py",
+            "start_line": 5171
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the architectural mechanism in the iterative invocation of `_stack_once` within the `stack` method's loop that maintains data integrity and coordinate consistency when stacking multiple dimension groups sequentially, particularly when intermediate results contain MultiIndex structures that must be preserved across iterations?",
+      "question_sha256": "d9d31ce271b2adf178119ab4bd87041d3780629aead7c285c3af3abff83a8343",
+      "reference_answer": "The architectural mechanism that maintains data integrity and coordinate consistency in the dimension-stacking method's iterative loop is an **immutable replacement pattern with synchronized index and variable management**.\n\nThe `stack` method in `xarray/core/dataset.py` (lines 5171-5219) iterates through dimension groups, calling `_stack_once` for each group:\n\n```python\nresult = self\nfor new_dim, dims in dim.items():\n    result = result._stack_once(dims, new_dim, index_cls, create_index)\nreturn result\n```\n\nThe key mechanism in `_stack_once` (lines 5111-5168) ensures integrity through three synchronized operations:\n\n1. **Index Management** (lines 5163-5164): The method rebuilds the index dictionary by filtering out indexes for stacked coordinates and merging new indexes:\n   ```python\n   indexes = {k: v for k, v in self._indexes.items() if k not in drop_indexes}\n   indexes.update(new_indexes)\n   ```\n   This preserves existing MultiIndex structures from previous iterations while adding new ones.\n\n2. **Variable Synchronization** (lines 5127-5161): Variables are updated to match the new dimension structure, and MultiIndex coordinate variables are created and integrated. The code explicitly maintains \"consistent multi-index coordinate order\" (line 5157) by removing old coordinate variables before adding new ones.\n\n3. **Atomic State Update** (lines 5166-5168): All changes are applied together via `_replace_with_new_dims`, which creates a new Dataset with synchronized variables, coordinates, dimensions, and indexes:\n   ```python\n   return self._replace_with_new_dims(\n       new_variables, coord_names=new_coord_names, indexes=indexes\n   )\n   ```\n\nThis ensures each iteration receives a fully consistent Dataset object where variables, indexes, and coordinates are always synchronized. The MultiIndex structures are preserved because the index dictionary is carefully filtered (removing only indexes for dimensions being stacked) and merged (adding new indexes) rather than being rebuilt from scratch, maintaining referential integrity across iterations.",
+      "reference_sha256": "8049a194f1703a5e4b6cb8d171fde63f617cd4277ebd395c326eac0823afd3ea",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-268cc538309c6cacd996bb20"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 459,
+            "file_sha256": "d659957faef2eb9fc4ab1986df12da5da8f354d88d73e8434c41c92676013c77",
+            "path": "xarray/core/dataarray.py",
+            "start_line": 459
+          },
+          {
+            "end_line": 461,
+            "file_sha256": "d659957faef2eb9fc4ab1986df12da5da8f354d88d73e8434c41c92676013c77",
+            "path": "xarray/core/dataarray.py",
+            "start_line": 461
+          },
+          {
+            "end_line": 462,
+            "file_sha256": "d659957faef2eb9fc4ab1986df12da5da8f354d88d73e8434c41c92676013c77",
+            "path": "xarray/core/dataarray.py",
+            "start_line": 462
+          },
+          {
+            "end_line": 467,
+            "file_sha256": "d659957faef2eb9fc4ab1986df12da5da8f354d88d73e8434c41c92676013c77",
+            "path": "xarray/core/dataarray.py",
+            "start_line": 467
+          },
+          {
+            "end_line": 1193,
+            "file_sha256": "e66538484d4492e01973bc14d2b49b73ef47745b7e1ce8b232d27b072aabebea",
+            "path": "xarray/tests/test_combine.py",
+            "start_line": 1125
+          },
+          {
+            "end_line": 245,
+            "file_sha256": "e66538484d4492e01973bc14d2b49b73ef47745b7e1ce8b232d27b072aabebea",
+            "path": "xarray/tests/test_combine.py",
+            "start_line": 245
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "asv_bench/benchmarks/dataset.py",
+              "xarray/core/dataset.py"
+            ],
+            "end_line": 216,
+            "path": "dataset.py",
+            "reason": "ambiguous_basename",
+            "reference": "dataset.py",
+            "start_line": 212
+          }
+        ]
+      },
+      "question": "Why does the repeated instantiation of DataArray and Dataset objects across multiple test methods in TestCombineMixedObjectsbyCoords impact overall test suite execution time, and what optimization strategy would minimize redundant object creation while preserving test isolation?",
+      "question_sha256": "229796847f8da77870e250bbabc13b387067b5d684d65763ebef1b8ba5868c69",
+      "reference_answer": "Repeated instantiation of labeled array and dataset instances across multiple test methods in the coordinate-based combination test class impacts test suite execution time because:\n\n1. **Heavy instantiation overhead**: Creating `DataArray` and `Dataset` instances involves:\n   - Data validation and shape checking (`_check_data_shape` in `dataarray.py:459`)\n   - Coordinate inference and processing (`_infer_coords_and_dims` in `dataarray.py:461`)\n   - Index creation for dimension coordinates (pandas indexes are created by default for 1D variables with matching dimension names, as seen in `dataset.py:212-216`)\n   - Variable creation with attribute handling (`Variable` instantiation in `dataarray.py:462`)\n   - Multiple dictionary operations and copies (coordinate copying in `dataarray.py:467`)\n\n2. **Repeated work across test methods**: The test class `TestCombineMixedObjectsbyCoords` (lines 1125-1193 in `test_combine.py`) contains 5 test methods, each creating new `DataArray` and `Dataset` objects from scratch:\n   - `test_combine_by_coords_mixed_unnamed_dataarrays` creates 4 instances\n   - `test_combine_coords_mixed_datasets_named_dataarrays` creates 3 instances\n   - `test_combine_by_coords_all_unnamed_dataarrays` creates 3 instances\n   - `test_combine_by_coords_all_named_dataarrays` creates 4 instances\n   - `test_combine_by_coords_all_dataarrays_with_the_same_name` creates 2 instances\n\n3. **No object reuse**: Unlike other test classes in the repository that use fixtures with `scope=\"module\"` or `scope=\"class\"` (e.g., `create_combined_ids` fixture at line 245 in `test_combine.py`), this test class creates objects fresh in each method, leading to redundant computation.\n\n4. **Index creation cost**: Each `DataArray`/`Dataset` instantiation triggers index creation for dimension coordinates (pandas indexes), which involves coordinate validation, index building, and memory allocation.\n\nThe cumulative effect of these operations across multiple test methods adds significant overhead to test execution time, especially when the same or similar objects could be reused across tests.",
+      "reference_sha256": "62f7466dd1a6bb316ab451c063338f9a85ce8c16d55fd96c22393db601d0ebfb",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-29f14948a0198770ace2e117"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2776,
+            "file_sha256": "597654505291e5df53df404bb28b01b45d2e93a03d01d7fbde39257884355fdc",
+            "path": "xarray/core/variable.py",
+            "start_line": 2776
+          },
+          {
+            "end_line": 222,
+            "file_sha256": "de8e33f65d0220a537283d6111396c9463a210bdfc985f87b1ac1d6abf6a7cbb",
+            "path": "xarray/core/utils.py",
+            "start_line": 207
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "79e30ae648bb2f034a86b804922860343cdf12a8c433c9eaa93239d96af37d42",
+            "kind": "file_reference",
+            "line_count": 316,
+            "path": "xarray/core/nputils.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the IndexVariable.concat() method handle heterogeneous pandas index types (PeriodIndex, MultiIndex, string dtypes) while preserving type information and positional semantics across concatenation operations?",
+      "question_sha256": "69185723ebbdbb53679840ad84c428dd00d6700985655cfa3e34e996883ec0f1",
+      "reference_answer": "The class method that concatenates dimension coordinate wrapper objects (IndexVariable.concat) handles different pandas index subclasses while maintaining their specific index types and reordering elements according to specified position arrays through a multi-step process:\n\n**1. Index Extraction and Concatenation:**\nThe method extracts the underlying pandas Index objects from each IndexVariable using `v._data.array` (line 2776 in `xarray/core/variable.py`). It then uses pandas Index's native `append()` method to concatenate them:\n```python\ndata = indexes[0].append(indexes[1:])\n```\nPandas Index.append() preserves the index type when concatenating compatible types. For example:\n- PeriodIndex objects concatenate to produce a PeriodIndex (tested in `test_concat_periods`)\n- MultiIndex objects concatenate to produce a MultiIndex (tested in `test_concat_multiindex`)\n- String-dtype indexes concatenate, but pandas converts them to object dtype\n\n**2. Positional Semantics Handling:**\nWhen the `positions` parameter is provided, the method handles reordering using inverse permutation:\n```python\nif positions is not None:\n    indices = nputils.inverse_permutation(np.concatenate(positions))\n    data = data.take(indices)\n```\nThe `inverse_permutation()` function (in `xarray/core/nputils.py`) computes the inverse permutation array that maps from the desired final positions back to the original concatenated order. The `data.take(indices)` method then reorders the concatenated index according to these positions, preserving positional semantics across the concatenation operation.\n\n**3. String Dtype Preservation:**\nFor string dtypes, the method uses `maybe_coerce_to_str()` (line 2788) to restore the original string dtype:\n```python\ndata = maybe_coerce_to_str(data, variables)\n```\nThis function (in `xarray/core/utils.py`, lines 207-222) checks the original coordinate dtypes using `dtypes.result_type()` to determine if the original coordinates were strings. Since pandas Index uses object dtype to store strings, `maybe_coerce_to_str()` converts the result back to a NumPy string array when the original coordinates had string dtypes, ensuring type preservation for string coordinates (tested in `test_concat_str_dtype`).\n\n**4. Type Preservation Mechanism:**\nThe method preserves index types by:\n- Using pandas Index.append() which maintains the index subclass type for compatible concatenations\n- Wrapping the result back in an IndexVariable, which uses PandasIndexingAdapter to preserve the pandas Index object\n- For string dtypes, explicitly coercing back to string arrays to avoid pandas' object dtype conversion\n\nThis approach avoids converting Index objects to NumPy arrays (as stated in the docstring, line 2759), which would lose type information for specialized index types like PeriodIndex and MultiIndex.",
+      "reference_sha256": "f32aabefb6becfeb12d3f16f7a0fd5006323148164dfec08279b8317c0b3c73a",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-2cd473d74c28806e0acfd8bf"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 672,
+            "file_sha256": "de8e33f65d0220a537283d6111396c9463a210bdfc985f87b1ac1d6abf6a7cbb",
+            "path": "xarray/core/utils.py",
+            "start_line": 649
+          },
+          {
+            "end_line": 646,
+            "file_sha256": "cc1a41e926680cf21c5525380667734dd0fd032d7098253bf5a80f77eb6fc73d",
+            "path": "xarray/core/indexing.py",
+            "start_line": 645
+          },
+          {
+            "end_line": 64,
+            "file_sha256": "0362bbfcf224a00f80edc21c75a60bf8f14eb07a9af6207f534b2209fc636d9d",
+            "path": "xarray/coding/common.py",
+            "start_line": 62
+          },
+          {
+            "end_line": 593,
+            "file_sha256": "cc1a41e926680cf21c5525380667734dd0fd032d7098253bf5a80f77eb6fc73d",
+            "path": "xarray/core/indexing.py",
+            "start_line": 582
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does NDArrayMixin implement the delegation pattern to achieve ndarray interface conformance while maintaining flexibility for subclasses to override dtype, shape, and __getitem__ behaviors?",
+      "question_sha256": "fedc7324c053b51227ebb1d91da42055f770cc8d54e07998008c905f808a964d",
+      "reference_answer": "The mixin class in the core utils module (`xarray/core/utils.py`, lines 649-672) implements the delegation pattern by providing default implementations of three key interface methods that delegate to a wrapped array object stored in the `array` attribute.\n\n**Default Delegation Implementation:**\n\nThe mixin provides default implementations that forward calls to `self.array`:\n\n```python\n@property\ndef dtype(self: Any) -> np.dtype:\n    return self.array.dtype\n\n@property\ndef shape(self: Any) -> tuple[int, ...]:\n    return self.array.shape\n\ndef __getitem__(self: Any, key):\n    return self.array[key]\n```\n\nThis ensures that by default, the mixin conforms to the standard array interface by delegating all operations to the wrapped array object.\n\n**Flexibility for Subclasses:**\n\nThe mixin's docstring explicitly states: \"A subclass should set the `array` property and override one or more of `dtype`, `shape` and `__getitem__`.\" This design allows subclasses to selectively override any of these three methods while inheriting default behavior for others.\n\n**Examples of Overrides:**\n\n1. **Shape Override**: `LazilyIndexedArray` (lines 645-646 in `xarray/core/indexing.py`) overrides `shape` to compute dimensions from indexing keys rather than delegating:\n   ```python\n   @property\n   def shape(self) -> _Shape:\n       return self._shape  # Computed from key, not self.array.shape\n   ```\n\n2. **Dtype Override**: `_ElementwiseFunctionArray` (lines 62-64 in `xarray/coding/common.py`) overrides `dtype` to use a stored dtype instead of delegating:\n   ```python\n   @property\n   def dtype(self) -> np.dtype:\n       return np.dtype(self._dtype)  # Uses stored _dtype, not self.array.dtype\n   ```\n\n3. **Indexing Override**: `ImplicitToExplicitIndexingAdapter` (lines 582-593 in `xarray/core/indexing.py`) overrides `__getitem__` to convert implicit indexing to explicit indexers before delegating.\n\n**Inheritance Chain:**\n\nThe mixin inherits from `NdimSizeLenMixin`, which provides `ndim`, `size`, and `__len__` based on the `shape` property. This means subclasses that override `shape` automatically get correct `ndim` and `size` values, demonstrating how the delegation pattern extends through the inheritance hierarchy.\n\nThis design achieves interface conformance through default delegation while allowing subclasses to customize behavior for specific use cases (lazy indexing, type conversion, custom indexing logic) without breaking the interface contract.",
+      "reference_sha256": "fe86a8eb816186fc187c3b3ea31795f4a07aa4e705750085ce3c8d2cba420b7a",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-2ec98971fdc7abbb9599adfc"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1089,
+            "file_sha256": "d659957faef2eb9fc4ab1986df12da5da8f354d88d73e8434c41c92676013c77",
+            "path": "xarray/core/dataarray.py",
+            "start_line": 1012
+          },
+          {
+            "end_line": 994,
+            "file_sha256": "d659957faef2eb9fc4ab1986df12da5da8f354d88d73e8434c41c92676013c77",
+            "path": "xarray/core/dataarray.py",
+            "start_line": 994
+          },
+          {
+            "end_line": 991,
+            "file_sha256": "dee192049c76de3cb7b80769d9d7e7482ec442e6758f1b6446aa33e806977f62",
+            "path": "xarray/core/coordinates.py",
+            "start_line": 986
+          },
+          {
+            "end_line": 1863,
+            "file_sha256": "fb56ab39f72e87639fa66eef101559d44124773137d2bbf6106cd8f0e70b5736",
+            "path": "xarray/core/dataset.py",
+            "start_line": 1768
+          },
+          {
+            "end_line": 1647,
+            "file_sha256": "0a3b316abe8cf13bc2439d23f56706f71a94d7a051cc031ccffe54def2202f43",
+            "path": "xarray/core/indexes.py",
+            "start_line": 1647
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the reset_coords method coordinate with the DataArrayCoordinates and Indexes subsystems to transform coordinate variables into data variables while maintaining index consistency across the underlying data structure?",
+      "question_sha256": "fe81cad2dea045ed892587c951005db2d28f6d3f1a21a53bc33601438b655192",
+      "reference_answer": "The `reset_coords` method coordinates with `DataArrayCoordinates` and the `Indexes` subsystem through a multi-step process that preserves index consistency:\n\n**1. Index Exclusion in reset_coords:**\nIn `DataArray.reset_coords()` (located at `xarray/core/dataarray.py:1012-1089`), the method first excludes index coordinates from being reset:\n```python\nif names is None:\n    names = set(self.coords) - set(self._indexes)\n```\nThis ensures that only non-index coordinates can be converted to data variables, preventing index corruption.\n\n**2. DataArrayCoordinates.to_dataset() Preserves Indexes:**\nThe method calls `self.coords.to_dataset()` where `self.coords` returns a `DataArrayCoordinates` object (`xarray/core/dataarray.py:994`). The `DataArrayCoordinates.to_dataset()` method (`xarray/core/coordinates.py:986-991`) explicitly preserves indexes when creating the intermediate Dataset:\n```python\ndef to_dataset(self) -> Dataset:\n    coords = {k: v.copy(deep=False) for k, v in self._data._coords.items()}\n    indexes = dict(self._data.xindexes)  # Preserves indexes\n    return Dataset._construct_direct(coords, set(coords), indexes=indexes)\n```\nThis ensures that when coordinates are converted to a Dataset for processing, all index information is maintained.\n\n**3. Dataset.reset_coords() Validates and Preserves Indexes:**\nThe Dataset's `reset_coords()` method (`xarray/core/dataset.py:1768-1863`) performs validation to prevent resetting index coordinates:\n```python\nbad_coords = set(names) & set(self._indexes)\nif bad_coords:\n    raise ValueError(\n        f\"cannot remove index coordinates with reset_coords: {bad_coords}\"\n    )\n```\nWhen resetting coordinates, it only removes names from `_coord_names` (line 1859) but does not modify `_indexes`, ensuring indexes remain intact:\n```python\nobj._coord_names.difference_update(names)  # Removes from coord_names only\n```\n\n**4. Indexes Subsystem Maintains Consistency:**\nThe `Indexes` class (`xarray/core/indexes.py:1647`) is an immutable proxy that maintains the mapping between coordinate names and their index objects. It stores both `_indexes` (the index objects) and `_variables` (the coordinate variables) and ensures they remain synchronized. When coordinates are reset to data variables, the `Indexes` object continues to maintain the index-to-coordinate mapping for coordinates that remain as coordinates (i.e., index coordinates).\n\n**Result:**\nThis coordination ensures that:\n- Index coordinates cannot be reset (they must remain as coordinates)\n- Non-index coordinates are successfully transformed to data variables\n- Index consistency is maintained because indexes are preserved in the `_indexes` dictionary even when their associated coordinates are moved from `_coord_names` to data variables\n- The `Indexes` subsystem continues to provide correct index mappings for all remaining coordinate variables\n\nThe key insight is that `reset_coords` never modifies the `_indexes` dictionary\u2014it only changes which variables are considered coordinates (`_coord_names`) versus data variables, while the `Indexes` subsystem continues to maintain the immutable mapping between indexes and their coordinate variables.",
+      "reference_sha256": "a500658c1420d847cf88a8408089141cec1dfbe93c689e902c3e155e7ce2598a",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-2f62436038689e7a08ed6f40"
+    }
+  ]
+}

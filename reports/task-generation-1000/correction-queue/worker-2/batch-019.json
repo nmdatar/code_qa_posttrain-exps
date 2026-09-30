@@ -1,0 +1,92 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-019.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/geopandas--geopandas-7d460d9efff5",
+      "original_reference_sha256": "c7e6d0b1afd40296139bc759fe8b10e3d1160f8bc8f778da65bcf92e3e152eed",
+      "question": "Why does geopandas legend rendering fail to scale efficiently when plotting categorical data with large numbers of unique categories in both static and interactive visualization modes?",
+      "question_sha256": "b8af82352ba95017e7aedb23188b892511c089bc8bbc7ff9b27f4abf53a7e3a5",
+      "reference_answer": "Static legends create a Line2D handle per category (geopandas/plotting.py:910-946); interactive legends append an HTML list item per category (geopandas/explore.py:890-902). Neither shown loop limits category count. More categories therefore produce more objects/HTML and larger legends, a plausible source of overhead. Whether legend work dominates geometry rendering and the exact runtime scaling require measurement.",
+      "reference_sha256": "0d6dd51bfe77eae248d70aba7cad79f4160fc5445947779d8806b82bef1e4c12",
+      "repository": {
+        "commit": "7d460d9efff57720c970fd6a040914286846c589",
+        "family_id": "geopandas/geopandas",
+        "url": "https://github.com/geopandas/geopandas"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/geopandas--geopandas-7d460d9efff57720c970fd6a040914286846c589",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-1966c4ed643617951d3f3400"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/geopandas--geopandas-7d460d9efff5",
+      "original_reference_sha256": "495bfbd64259a601b26b1670de568d41e8b61f7a778d548427a72804fee41fca",
+      "question": "Why do equality and inequality operations in GeometryArray use Python loops while other binary predicates like intersects and within use vectorized shapely functions?",
+      "question_sha256": "6d80d61b66ee5dd0d4454c55c35a48e10dc07705aa8b37c17768e17836c174e2",
+      "reference_answer": "GeometryArray._binop broadcasts scalar right operands, defers pandas containers with NotImplemented, checks lengths and applies the operator pairwise using a Python comprehension (geopandas/array.py:1662-1687). Spatial methods instead call vectorized Shapely through _binary_method (688-699). This is the implementation split in this revision; it does not establish that pandas requires Python loops or prohibits equivalent vectorization. Equality operators must preserve their scalar equality semantics, which differ from topological predicates.",
+      "reference_sha256": "65c2d52aac10ca58375206b428e35e8cb8255991bb382523674c1b5240ec0194",
+      "repository": {
+        "commit": "7d460d9efff57720c970fd6a040914286846c589",
+        "family_id": "geopandas/geopandas",
+        "url": "https://github.com/geopandas/geopandas"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/geopandas--geopandas-7d460d9efff57720c970fd6a040914286846c589",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-685a6003896e8843746f4ae6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/geopandas--geopandas-7d460d9efff5",
+      "original_reference_sha256": "91e30f19afe382bc44b1fc36a762e17ab04fc4bc17d994ff6cd8e0a48529b485",
+      "question": "How does geopandas implement HTTP range request detection and fallback logic for remote geospatial data sources in its file I/O system?",
+      "question_sha256": "7e22321956954e5611df4a3af58cafa12abe8feed2b4afdac3f2537c209b3c21",
+      "reference_answer": "_read_file opens detected URLs with urllib.request.urlopen(filename), then checks response.headers.get(\"Accept-Ranges\") == \"bytes\" (geopandas/io/file.py:282-291). If not, it reads the response into memory and sets from_bytes=True; otherwise the original URL is retained for the selected engine. This revision does not send a bytes=0-1 probe or catch connection exceptions as a fallback.",
+      "reference_sha256": "ca81fc59d51e3364f98974a07228b09cf85f1bea53b83bf0d78e99d64bc64d73",
+      "repository": {
+        "commit": "7d460d9efff57720c970fd6a040914286846c589",
+        "family_id": "geopandas/geopandas",
+        "url": "https://github.com/geopandas/geopandas"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/geopandas--geopandas-7d460d9efff57720c970fd6a040914286846c589",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-83c7982eff348d996687a28c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/geopandas--geopandas-7d460d9efff5",
+      "original_reference_sha256": "2385c5bea89365bdedbc0a9886330fd5a73f3c7a64b514955f96d13763270eb3",
+      "question": "How does geopandas handle pandas data type conversion parameters when reading parquet files with complex data types?",
+      "question_sha256": "b190dc632e5e60573af2c63461153275e52161a32988fba1d7f14fcc1f10a58f",
+      "reference_answer": "The Arrow conversion separates geometry columns and calls table_attr.to_pandas() without conversion keyword arguments (geopandas/io/arrow.py:526-527), then reconstructs geometry columns. Nongeometry dtype conversion therefore follows PyArrow defaults in this pinned implementation. This code does not forward types_mapper or integer_object_nulls to to_pandas, so those cannot be assumed to work as GeoPandas read_parquet options.",
+      "reference_sha256": "f8ed0975afb8a3fd17cb0c3e25fc1540312ff22a97bc298c35b5b81a064dabdc",
+      "repository": {
+        "commit": "7d460d9efff57720c970fd6a040914286846c589",
+        "family_id": "geopandas/geopandas",
+        "url": "https://github.com/geopandas/geopandas"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/geopandas--geopandas-7d460d9efff57720c970fd6a040914286846c589",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-89ee261aef574400411cc2b6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/geopandas--geopandas-7d460d9efff5",
+      "original_reference_sha256": "f93981136ed2e96f450b772cb6c91b8151e39002627abae3eb41dd147c64619a",
+      "question": "Why does the interactive explore() method experience performance degradation and high CPU consumption when rendering large GeoDataFrames with complex styling and multiple layers?",
+      "question_sha256": "1e5757d30016e35520e0f53fb3f04774ff478aa59f1a8f0a42ccb2a55ce0946d",
+      "reference_answer": "_explore eagerly obtains a FeatureCollection through the filtered frame\u2019s __geo_interface__, loops over feature properties to escape template braces, and passes the result with styling, tooltip and popup callbacks to folium.GeoJson (geopandas/explore.py:647-669). Larger feature/property payloads and repeated layers increase preparation and map content. These are plausible costs, but the source does not measure high CPU usage or prove which stage dominates; it does not call GeoDataFrame.to_json here.",
+      "reference_sha256": "68d73dee992e13a7dc8bb4e3c07df4e2953975d4c3c77fea5885e341f1dce7d6",
+      "repository": {
+        "commit": "7d460d9efff57720c970fd6a040914286846c589",
+        "family_id": "geopandas/geopandas",
+        "url": "https://github.com/geopandas/geopandas"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/geopandas--geopandas-7d460d9efff57720c970fd6a040914286846c589",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-da439129d2082bbaebc50bc2"
+    }
+  ]
+}

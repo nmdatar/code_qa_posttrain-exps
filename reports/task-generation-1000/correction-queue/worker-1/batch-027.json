@@ -1,0 +1,92 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 1,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-027.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/microsoft--pybryt-4506ddccd82b",
+      "original_reference_sha256": "9c99beefae014c0ba56a6350d89d39ff2d1157aaabcf88d2d150c2dba0ebb9de",
+      "question": "How does PyBryt's annotation system implement the Registry pattern to coordinate between different annotation types (Value, Import, Complexity) while maintaining type safety and enabling dynamic annotation discovery?",
+      "question_sha256": "76a2e9073c3fb35420d2ad7f1831ac94e148d243c2b5505e377b96f38877c4e7",
+      "reference_answer": "Annotation._track adds instances to the module-level tracked list unless tracking is disabled or a name limit is reached; it removes tracked children for composite annotations (pybryt/annotations/annotation.py:70-96). get_tracked_annotations returns that same list and reset clears list, name indices and counter (98-117). Annotation subclasses share an abstract interface, but the registry itself is a mutable instance collection, not a validated type registry or factory.",
+      "reference_sha256": "110cd6ea5d0f0eb252273f71b2a37800a957bdf343835dcd9b9c3e1ee710d583",
+      "repository": {
+        "commit": "4506ddccd82b3a3a4ca517ca586266b18f47a7a0",
+        "family_id": "microsoft/pybryt",
+        "url": "https://github.com/microsoft/pybryt"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/microsoft--pybryt-4506ddccd82b3a3a4ca517ca586266b18f47a7a0",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-76323dd02cea0964008b7263"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/microsoft--pybryt-4506ddccd82b",
+      "original_reference_sha256": "2e8936e73afb174257d0b8640bee6dbfb0b3abc8855f14eec07bb873f02544b9",
+      "question": "Why does PyBryt's multiprocessing implementation in `generate_student_impls` fail to scale efficiently under high-concurrency conditions when processing large batches of student notebook submissions?",
+      "question_sha256": "45b59b266f73dc17509870ef8b58880d6bab7ad719670e7f36935d823f29afe7",
+      "reference_answer": "generate_student_impls starts one Process per input, joins every process, then drains a Queue into a dictionary and reconstructs input order (pybryt/student.py:278-306). There is no bounded worker pool or streaming consumption here. Process startup and simultaneous footprints can add overhead; joining producers before draining results can also be problematic for large queued payloads. The code alone does not quantify throughput degradation.",
+      "reference_sha256": "cee4f990d9e1a32e90b12ba2c5c8aa2d10a11711335d8d05d7980264c93cb84d",
+      "repository": {
+        "commit": "4506ddccd82b3a3a4ca517ca586266b18f47a7a0",
+        "family_id": "microsoft/pybryt",
+        "url": "https://github.com/microsoft/pybryt"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/microsoft--pybryt-4506ddccd82b3a3a4ca517ca586266b18f47a7a0",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-78f981947157f3fc68935c03"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/microsoft--pybryt-4506ddccd82b",
+      "original_reference_sha256": "d01503ae12ec8ef8d67f9678660dc0cce46c30dac4e5542a301c6585ca14864c",
+      "question": "Why does PyBryt's time complexity analysis system use least squares fitting with pre-defined complexity transformations instead of more scalable machine learning approaches for classifying algorithmic complexity from execution traces?",
+      "question_sha256": "49276bfcde9a9df2d1f198b95fcf23456e1f61a998590c8d38d4b26a7bbda934",
+      "reference_answer": "Built-in classes transform input sizes/step counts and use numpy.linalg.lstsq, returning residual or infinity for unusable fits (pybryt/annotations/complexity/complexities.py:51-82). TimeComplexity.check compares built-ins plus addl_complexities, inserting a custom asserted class when necessary, and preserves the first fit within EPS (annotation.py:97-115). This avoids training data, but source does not prove an ML design comparison, universal stability, or inability to add complexity models.",
+      "reference_sha256": "e0a75f778e6f06d94487c5bd6ced17f934e90ca0468879d559d12f230e7a8d1b",
+      "repository": {
+        "commit": "4506ddccd82b3a3a4ca517ca586266b18f47a7a0",
+        "family_id": "microsoft/pybryt",
+        "url": "https://github.com/microsoft/pybryt"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/microsoft--pybryt-4506ddccd82b3a3a4ca517ca586266b18f47a7a0",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-b19e6dd8d190c5f455e0e65a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/microsoft--pybryt-4506ddccd82b",
+      "original_reference_sha256": "10042481f15c72f57610203dd45d45a141e4ba7c6c8628207932bf414a27f360",
+      "question": "What is the expected state and error recovery mechanism when student notebook execution fails during PyBryt's memory footprint collection process?",
+      "question_sha256": "fa32953bbdad0e3df383e815531a75dd158e3a63c49848801755c76e7a0c1c25",
+      "reference_answer": "Notebook execution uses ExecutePreprocessor(allow_errors=True), then reads the generated footprint file and removes it (pybryt/execution/__init__.py:81-97). Thus ordinary cell error outputs can coexist with a partial footprint, but timeout/kernel/preprocessing or missing-file failures are not universally recovered here. The check context manager always turns tracing off on exit and creates a report only without an exception or with report_on_error enabled (pybryt/student.py:423-439).",
+      "reference_sha256": "97be58f0747ba44595e020f2bda912549e0441d0aaaf5b660b724a1e247bc075",
+      "repository": {
+        "commit": "4506ddccd82b3a3a4ca517ca586266b18f47a7a0",
+        "family_id": "microsoft/pybryt",
+        "url": "https://github.com/microsoft/pybryt"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/microsoft--pybryt-4506ddccd82b3a3a4ca517ca586266b18f47a7a0",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-db220c52daf5914fdb8abda0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/microsoft--pybryt-4506ddccd82b",
+      "original_reference_sha256": "547032fad75a3ef772f6172b7ab391f1981d88346ac603b2e546fe534bd92e88",
+      "question": "How does pybryt implement tolerance-based value comparison algorithm in its auto-assessment system to handle different data types and numeric precision requirements?",
+      "question_sha256": "753ea9d032667a3ddbb0137fa97b7c2d73ad8aa6ca628d561a059301850614a7",
+      "reference_answer": "Value.check_values_equal honors a custom equivalence function, then checks iterable/shape compatibility and uses scalar/array tolerance bounds or numpy.allclose for numeric iterables (pybryt/annotations/value.py:224-288). Other values use equality; iterable results are reduced, with paired pandas missing values treated equal (290-304). The set branch sorts/pairs values but constructs np.array from a generator (283-286), so its correctness should be reviewed rather than asserting it reliably checks every paired tolerance.",
+      "reference_sha256": "d7fe8c6b9e8b78fac312802c002890306c6f63c430ffe525d8047451f342468a",
+      "repository": {
+        "commit": "4506ddccd82b3a3a4ca517ca586266b18f47a7a0",
+        "family_id": "microsoft/pybryt",
+        "url": "https://github.com/microsoft/pybryt"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/microsoft--pybryt-4506ddccd82b3a3a4ca517ca586266b18f47a7a0",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-ef55d75e39a9a07a52dc1a39"
+    }
+  ]
+}

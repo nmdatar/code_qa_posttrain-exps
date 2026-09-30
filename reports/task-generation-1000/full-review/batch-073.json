@@ -1,0 +1,317 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-2591ea49469a2939a6e3f5e0",
+      "reference_sha256": "c04a6a619bd20b07361fbde209e2353fbe64a571bf2948f5b8d25eb26fbdc0c6",
+      "question_sha256": "390d537640d7b7ef2d33bd88638e45d7ad2b3bd6639eaf09a8a3fb8d12a9c299",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Stateless authentication and replay prevention",
+          "verdict": "unsupported",
+          "reason": "Caches device ID and submits timestamp; no replay validation or stateless guarantee.",
+          "evidence": {
+            "path": "src/streamlink/plugins/streann.py",
+            "start_line": 70,
+            "end_line": 135
+          }
+        },
+        {
+          "claim": "Session state mutated",
+          "verdict": "supported",
+          "reason": "Retains domain and changes HTTP session headers.",
+          "evidence": {
+            "path": "src/streamlink/plugins/streann.py",
+            "start_line": 137,
+            "end_line": 176
+          }
+        }
+      ],
+      "material_errors": [
+        "Invents security guarantees and statelessness."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "Streann extracts the iframe URL and domain, decrypts its configuration using a page-derived passphrase, then requests a token (src/streamlink/plugins/streann.py:137-176). get_token sends base64 domain and time with Referer/X-Requested-With headers, validates the response shape and extracts token (97-135). The device ID is cached on the instance (70-83), and session headers are mutated (160). This is stateful client behavior; the code alone does not establish replay prevention or server-side authentication guarantees."
+    },
+    {
+      "task_id": "import-25b89b4f74cf6e1716e28100",
+      "reference_sha256": "39ef034dd8ad239e5dd7ba778d6faf3f16c8a33cad3d9b92c1bba898c94386a9",
+      "question_sha256": "37626c7f9ce14e778afdbda4c806d1599d50ce83c59ee8c7c04b3c070f7aa223",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Nested drag payload conversion",
+          "verdict": "supported",
+          "reason": "Required items/mask, optional files/title/base URL; coercion rather than exhaustive validation.",
+          "evidence": {
+            "path": "src/streamlink/webbrowser/cdp/devtools/input_.py",
+            "start_line": 141,
+            "end_line": 200
+          }
+        },
+        {
+          "claim": "Event uses DragData",
+          "verdict": "supported",
+          "reason": "from_json delegates nested data; docstring links interception and dispatch.",
+          "evidence": {
+            "path": "src/streamlink/webbrowser/cdp/devtools/input_.py",
+            "start_line": 690,
+            "end_line": 705
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-2acb011b61bfe150d6119ec8",
+      "reference_sha256": "a1c8d0eea62cebae70e69a91dfa0c4b1a7f07288515ddcc9b9c07bacbf97065f",
+      "question_sha256": "05f91fb2bc8ccabfbe1463e48ecd70f0254914f50192d0cd5d3f343466edadd7",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Event implements coordinated scheduler state machine",
+          "verdict": "unsupported",
+          "reason": "Only registered dataclass and deserialization; navigation explicitly not guaranteed.",
+          "evidence": {
+            "path": "src/streamlink/webbrowser/cdp/devtools/page.py",
+            "start_line": 3583,
+            "end_line": 3606
+          }
+        }
+      ],
+      "material_errors": [
+        "Invented scheduling priorities and race prevention."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "FrameScheduledNavigation is registered as Page.frameScheduledNavigation and deserializes frameId, delay, reason and URL into typed fields (src/streamlink/webbrowser/cdp/devtools/page.py:3583-3606). It reports a potential navigation, explicitly not guaranteed to start. This binding supplies event data to protocol consumers; it does not itself coordinate network/DOM/runtime state, prioritize navigation or prevent races."
+    },
+    {
+      "task_id": "import-2e33d82a865b9e8b22764c78",
+      "reference_sha256": "6812aab083414eee0b759a186ab0d33d52e8172af40796e8c3dbcc729f5f7de8",
+      "question_sha256": "ab701deb903219981fac6fa2c0d288d72c0fc57846e44dd3d4120d217c7a7060",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Actual low latency effects",
+          "verdict": "partially_supported",
+          "reason": "Worker reloads per segment and retains prefetch; reader clamps live edge and enables streaming segment data.",
+          "evidence": {
+            "path": "src/streamlink/plugins/kick.py",
+            "start_line": 77,
+            "end_line": 124
+          }
+        }
+      ],
+      "material_errors": [
+        "Generic partial-segment/buffer explanation omits actual options."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "KickHLSStream stores low_latency (src/streamlink/plugins/kick.py:118-124). Its worker sets reload_time to segment and retains prefetch segments only in low-latency mode (77-92). Its reader clamps hls-live-edge between 1 and LOW_LATENCY_MAX_LIVE_EDGE and enables hls-segment-stream-data before parent initialization (100-115). Those concrete settings affect how close playback starts to the live edge and how segment data is delivered; this code does not specify a generic smaller byte-buffer or partial-segment protocol."
+    },
+    {
+      "task_id": "import-35a8723fccd9ec1b3bd9ca75",
+      "reference_sha256": "5034393a9c89ed9e816ecfcd056c7d3816c77310a095a158ff50e3b3a1f8ece8",
+      "question_sha256": "f1cc408238d27d1d17977fc92a9dea8c74c7c161dc9eede2da88b774a8fadf41",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Constructor merges inherited options",
+          "verdict": "supported",
+          "reason": "Metaclass copies inherited matcher and argument collections.",
+          "evidence": {
+            "path": "src/streamlink/plugin/plugin.py",
+            "start_line": 245,
+            "end_line": 249
+          }
+        },
+        {
+          "claim": "Constructor options behavior",
+          "verdict": "contradicted",
+          "reason": "Wraps provided options, no parent/child default merge shown.",
+          "evidence": {
+            "path": "src/streamlink/plugin/plugin.py",
+            "start_line": 299,
+            "end_line": 324
+          }
+        }
+      ],
+      "material_errors": [
+        "Misidentifies constructor merging."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "The class-level inheritance handling is PluginMeta.__init__ in src/streamlink/plugin/plugin.py:245-249: it creates new Matchers and Arguments collections from inherited values. Plugin.__init__ merely constructs Options(options) from supplied instance options (299-310); it does not implement the claimed parent/child/default constructor-option merge."
+    },
+    {
+      "task_id": "import-3b8415527a3c22eba622a258",
+      "reference_sha256": "830fa31c128d459c18dadc959a9c544019a58ea823ed1bd94e61b9f5f27076a3",
+      "question_sha256": "00feb3ad56895d7a493864190963bc0150c4cd62e648e1dc52e3c324eedd1a90",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "AES/NONE/AES transition test",
+          "verdict": "supported",
+          "reason": "Six segments with two keys and NONE interval; expected concatenation checks plaintext output. Header propagation is ancillary to this central transition assertion.",
+          "evidence": {
+            "path": "tests/stream/hls/test_hls.py",
+            "start_line": 953,
+            "end_line": 983
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-455e99a1e256fc7647b00a36",
+      "reference_sha256": "cbeddf59462fa4429cb2942ca5f17fe65c43bc4389dfa5f4759d868585d45088",
+      "question_sha256": "4acd7dd00290902238c8f7795e7ea4a49707447bc46821775e4302d3d4d824ad",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "requires cycle checks",
+          "verdict": "supported",
+          "reason": "Tracks dependency names and raises exact RuntimeError; supplied range ends too early for second check.",
+          "evidence": {
+            "path": "src/streamlink/options.py",
+            "start_line": 286,
+            "end_line": 307
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-47efc403ac14234eca78d3f1",
+      "reference_sha256": "8c8d4ebda5b4495848cb5e7ee7b4b5fbbf480c660f07ca8718f69c5fd29f8aaf",
+      "question_sha256": "eff3cbe78b57a6e564bbc1e5a2678669d2b46b188495bcd90a3b75213df14687",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Debugger URL acquisition",
+          "verdict": "contradicted",
+          "reason": "HTTP GET with fixed10 retries and schema, not num/raises parameters or websocket connect.",
+          "evidence": {
+            "path": "src/streamlink/webbrowser/chromium.py",
+            "start_line": 194,
+            "end_line": 209
+          }
+        }
+      ],
+      "material_errors": [
+        "Invented parameters/context-manager handling and conflation with websocket connection."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "ChromiumWebbrowser.get_websocket_url delegates to session.http.get for /json/version with retries=10, backoff and max-backoff 0.25, timeout 0.1 and an empty HTTP proxy override (src/streamlink/webbrowser/chromium.py:194-209). It brackets IPv6 hosts and validates/extracts a ws URL from JSON. This method discovers the URL; it neither opens the WebSocket nor defines num/raises parameters or its own timeout-catching loop."
+    },
+    {
+      "task_id": "import-4983d8f203739c93b405e41a",
+      "reference_sha256": "4b593642034420eb621e65e000ef988f7794cff51145375d6339b0f28fe60506",
+      "question_sha256": "488c5f61ea2464f7dc69e66d616dd6502833a41572cc7e927f877e0edb637fea",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Session dispatch branch",
+          "verdict": "supported",
+          "reason": "sessionId presence chooses handler; unknown session raises CDPError.",
+          "evidence": {
+            "path": "src/streamlink/webbrowser/cdp/connection.py",
+            "start_line": 347,
+            "end_line": 366
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-49ca4f26b78dabe104a283b9",
+      "reference_sha256": "eeb7a2ebc1e5198ab2a452bfde6149140cea40b6bcde807edbbf267ceda5b220",
+      "question_sha256": "6c5b6f78f54907a1d0ae1b2ef773d59f51dfee22d1569ba0eb2ad7512f8e88e6",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Domain generation orchestration",
+          "verdict": "supported",
+          "reason": "Parses domain parts, formats header and generates types/commands/events.",
+          "evidence": {
+            "path": "script/generate-cdp.py",
+            "start_line": 834,
+            "end_line": 885
+          }
+        },
+        {
+          "claim": "Computed dependencies rationale explicit",
+          "verdict": "supported",
+          "reason": "Collects cross-domain refs; comment explains declared dependencies insufficient.",
+          "evidence": {
+            "path": "script/generate-cdp.py",
+            "start_line": 887,
+            "end_line": 920
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-4a6d5066e06bc9dd2da09bf3",
+      "reference_sha256": "c4b66233390bc714913c17b82900042578ea6da0dff974fbb1d2e5f9ea957e47",
+      "question_sha256": "8aa1be6e80865daead662d644603631995f2d242c69941f272c7764f05a78cef",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "OpenSSL derivation",
+          "verdict": "supported",
+          "reason": "Iterative MD5 digest accumulation split into key/IV; Salted__ salt extraction and CBC decryption.",
+          "evidence": {
+            "path": "src/streamlink/utils/crypto.py",
+            "start_line": 21,
+            "end_line": 43
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-4f1831120b7ec90aba0a8822",
+      "reference_sha256": "f717434aa23d003c3d45d05a58eefc4bb0c220155d2509044d65d38928ce1371",
+      "question_sha256": "b4b7e307575618c76de7815430fd6e0eb791b0a92a5bafab6284d26803cf075a",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Enum represents exemption reasons",
+          "verdict": "partially_supported",
+          "reason": "Values and serialization supported; comprehensive/backward-compatible rationale absent.",
+          "evidence": {
+            "path": "src/streamlink/webbrowser/cdp/devtools/network.py",
+            "start_line": 1482,
+            "end_line": 1503
+          }
+        }
+      ],
+      "material_errors": [
+        "Unsupported design guarantees beyond generated enum."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "CookieExemptionReason represents protocol reasons a cookie otherwise blocked by 3PCD is exempted (src/streamlink/webbrowser/cdp/devtools/network.py:1482-1503). It enumerates None, user settings, metadata, deprecation trials, heuristics, enterprise policy, storage access, scheme and sandbox reasons. to_json returns the protocol value and from_json constructs the enum. The source documents this representation purpose, not a proof of completeness, backward compatibility or the policy rationale for each exemption."
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 1,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-057.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "original_reference_sha256": "e9eae37eb85d1a04484e66e9761bb56272306b805629d4e97ac36051007c97ed",
+      "question": "What is the effect of assigning a custom client state persistence manager to the test application fixture on the framework's state serialization during test execution?",
+      "question_sha256": "a3cf150cd45015efc965bb77d116a1061d2568f6b26d91fb6d6c4ced7e0d8013",
+      "reference_answer": "Changing the app state manager selects persistence behavior. Memory manager get/set retain live BaseState objects (reflex/istate/manager/memory.py:29-60). Disk serializes touched substates (reflex/istate/manager/disk.py:198-200); Redis also serializes touched state on set (reflex/istate/manager/redis.py:336-337). Redis retrieval deserializes bytes and recreates state on a schema mismatch (lines 229-240). Thus tests using persistent managers exercise a persistence serialization cycle that memory storage does not; this does not mean all other framework serialization disappears with memory storage.",
+      "reference_sha256": "b817c5d43e4ef46990d28fd1119fadf4dc0359a97bb5891218cf318d8bdfe9d5",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-a8ce2b719b0e88532d6755fd"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "original_reference_sha256": "8f27062b9cabe43d739b08a5e2f9ca12c66c365790470f27d98fa222c301fde0",
+      "question": "Why does the rendering method of the paste event handling component replace the property containing element identifiers for event listener attachment with a key derived from that property?",
+      "question_sha256": "b52ed78e208e82fbe6d89a1f0f7387a92e1daef8b68bfa01f3616849c5bb31ca",
+      "reference_answer": "Clipboard._render removes the targets prop from the Fragment and uses self.targets as its key; the comment explicitly says this ensures a different Fragment whenever targets differ (reflex/components/core/clipboard.py:57-60). Targets are separately passed to usePasteHandler in generated hook code (lines 74-92). The key controls React identity of the rendered Fragment while the hook handles listener attachment; these lines alone do not prove a parent hook must remount or that effect reruns depend solely on this key.",
+      "reference_sha256": "6000a2e8b515e816af37d7a1224e4f7a23e8b1268c3e059c4776c66516c7df96",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-bd99c9e90b968d8b907f3a7a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "original_reference_sha256": "1ba547a0165d472857909099a91c012ec42774a5843c8eacde0fc2e6d1917fba",
+      "question": "Why does the design constraint prioritize framework infrastructure hooks before other hook categories in the code generation process for the hook ordering function?",
+      "question_sha256": "3c20a64033ca4a014547baa79f355a9b65f2d3605d956200cfc75717346be7ff",
+      "reference_answer": "_sort_hooks partitions hooks into INTERNAL, PRE_TRIGGER and POST_TRIGGER lists and returns them in that order; missing metadata defaults to PRE_TRIGGER (reflex/compiler/templates.py:20-50). This lets templates place infrastructure before code that depends on it and user hooks around trigger setup. It is an ordering mechanism, not by itself a guarantee of all React hook rules or proof of undocumented architectural intent.",
+      "reference_sha256": "5a2f3879af5d4839234ffbbe6b0111f2eafaef534154a14ee155b4113ad3ad4b",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-c05ebc7f9443ab6925cff508"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "original_reference_sha256": "c283d3320f724825e5f84f8e32e3f0c7d1ca231e6f78b3ffb6fe174ee8b97db2",
+      "question": "Where is the subsequent control branch determined when a state validation error is raised?",
+      "question_sha256": "9b5e83bc95c714f4d52e6b534f99bee23b19450e3d88635a50b835727785d17a",
+      "reference_answer": "For BaseState.get_state, the immediate branch is the try/except around _get_state_from_cache: a ValueError falls through to _get_state_from_redis (reflex/state.py:1608-1615). Both cache and Redis helpers can raise StateMismatchError on an unexpected state type (lines 1570-1594). Schema validation on persisted Redis data has a different branch: StateSchemaMismatchError is suppressed and a new state is constructed (reflex/istate/manager/redis.py:229-240). The question must specify which validation error and call context before asserting a single propagation path.",
+      "reference_sha256": "b91a526f94fb6dcfb5b7b738dcf2f35eac8da675d94a1d3cab11273018affba7",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-c8437fe8534e7917400d1752"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "original_reference_sha256": "c9a09aad16219b683b5f5d3b1b5677ae6a4ecd75cad34f60a6cba184d2eb1e2d",
+      "question": "What is the effect of setting the boundary collision prevention setting to true with a non-zero collision detection buffer zone on the positioning of the nested menu content component when the auto-hide-when-trigger-occluded setting is enabled?",
+      "question_sha256": "41b45cc3fcfb2de4f5ad5b103891ece7d2ff045d3d3fda82bfd1302ef64928f6",
+      "reference_answer": "For submenu content, avoid_collisions permits overriding preferred positioning to avoid boundary edges; collision_padding sets the inset at which collision detection occurs. hide_when_detached requests hiding when the trigger is fully occluded (reflex/components/radix/themes/components/dropdown_menu.py:190-200). The wrapper does not establish DOM removal or that collision calculation only runs while partially visible; sticky is a separate setting for that positioning policy.",
+      "reference_sha256": "bb9342e8d85cdf7287c38480f28fa744b7dad13f89df2b25221c94eb7b5030ad",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-ca67e65958271860bc9d65d9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "original_reference_sha256": "6c7704fabdba083fea70bc1cbaa8b72c9640ecd53973efd15005afc500fe55d5",
+      "question": "What is the effect of conditional selection between a multi-process ASGI server with strong process isolation and a single-process asynchronous ASGI server with event loop-based concurrency in the backend server startup function on process isolation and resource allocation within the server architecture?",
+      "question_sha256": "dc2d41df893cbd63801834de6c7c5f6b257499b3615c1e8d209c549256346c6c",
+      "reference_answer": "should_use_granian honors the parsed REFLEX_USE_GRANIAN value when set; otherwise missing uvicorn or gunicorn selects Granian (reflex/utils/exec.py:296-310). Production Granian defaults GRANIAN_WORKERS through _get_backend_workers unless explicitly supplied (lines 678-679), which delegates to processes.get_num_workers; without Redis it returns one (reflex/utils/processes.py:36-46). The Uvicorn production route also uses a worker-capable server (reflex/utils/exec.py:598 onward). Process isolation and memory duplication follow worker configuration; the code does not support a blanket Granian-versus-Uvicorn strong/weak isolation or measured overhead contrast.",
+      "reference_sha256": "2962682c83f1b3261328cdd64a47d8fe2d73dc2fac80a8b8b9825403fccb0fce",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-d071a7cff0ec3332e1937b8b"
+    }
+  ]
+}

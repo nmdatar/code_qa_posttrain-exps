@@ -1,0 +1,1619 @@
+{
+  "strong": {
+    "import-13e632d561c0b1740b2074fa": {
+      "coverage": 0.2857142857142857,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "The Pipeline class rejects the `sample_weight` parameter when the underlying estimator does not declare support via metadata routing because, with routing enabled, it strictly validates which parameters can be passed to each step."
+          ],
+          "answer_span_ids": [
+            "a1"
+          ],
+          "answer_spans": [
+            {
+              "end": 230,
+              "id": "a1",
+              "start": 0,
+              "text": "The Pipeline class rejects the `sample_weight` parameter when the underlying estimator does not declare support via metadata routing because, with routing enabled, it strictly validates which parameters can be passed to each step."
+            }
+          ],
+          "credit": 0.5,
+          "evidence_ids": [
+            "e2",
+            "context-verified-12"
+          ],
+          "id": "c1",
+          "reason": "The candidate states that the Pipeline validates parameters against steps ('strictly validates which parameters can be passed to each step'), which aligns with the claim that validation occurs against the routing graph. However, the candidate does not explicitly contrast this with validating 'only the final estimator' as the claim requires, nor does it mention the 'routing graph' mechanism specifically, though it implies the scope.",
+          "verdict": "partial",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [
+            "The error message in `Pipeline.fit` (lines 457-463) explicitly states that unnamed parameters like `sample_weight` are not accepted unless routed to specific steps using the `stepname__parameter` format, ensuring only declared parameters are forwarded."
+          ],
+          "answer_span_ids": [
+            "a3"
+          ],
+          "answer_spans": [
+            {
+              "end": 588,
+              "id": "a3",
+              "start": 336,
+              "text": "The error message in `Pipeline.fit` (lines 457-463) explicitly states that unnamed parameters like `sample_weight` are not accepted unless routed to specific steps using the `stepname__parameter` format, ensuring only declared parameters are forwarded."
+            }
+          ],
+          "credit": 1.0,
+          "evidence_ids": [
+            "e2",
+            "context-verified-12"
+          ],
+          "id": "c2",
+          "reason": "The candidate explains that unnamed parameters like `sample_weight` are rejected if not routed to specific steps, which directly supports the claim that `validate_metadata` rejects names routed to no object.",
+          "verdict": "supported",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [],
+          "answer_span_ids": [],
+          "answer_spans": [],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1",
+            "context-verified-10"
+          ],
+          "id": "c3",
+          "reason": "The candidate does not discuss the specific behavior of the `True` alias (forwarding a requested value) at a metadata consumer.",
+          "verdict": "missing",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [],
+          "answer_span_ids": [],
+          "answer_spans": [],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1",
+            "context-verified-10"
+          ],
+          "id": "c4",
+          "reason": "The candidate does not discuss the specific behavior of the `False` alias (ignoring the value) at a metadata consumer.",
+          "verdict": "missing",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [],
+          "answer_span_ids": [],
+          "answer_spans": [],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1",
+            "context-verified-10"
+          ],
+          "id": "c5",
+          "reason": "The candidate does not discuss the specific behavior of the `None` alias (marking a supplied value as unrequested to raise an error) at a metadata consumer.",
+          "verdict": "missing",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [],
+          "answer_span_ids": [],
+          "answer_spans": [],
+          "credit": 0.0,
+          "evidence_ids": [
+            "context-verified-6",
+            "context-verified-5"
+          ],
+          "id": "c6",
+          "reason": "The candidate does not mention that intermediate pipeline steps can request `sample_weight` even if the final estimator does not, which is a key reason for the routing architecture.",
+          "verdict": "missing",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [
+            "If an estimator hasn't declared support for `sample_weight`, passing it would be ambiguous or erroneous.",
+            "The error message in `Pipeline.fit` (lines 457-463) explicitly states that unnamed parameters like `sample_weight` are not accepted unless routed to specific steps using the `stepname__parameter` format, ensuring only declared parameters are forwarded."
+          ],
+          "answer_span_ids": [
+            "a2",
+            "a3"
+          ],
+          "answer_spans": [
+            {
+              "end": 335,
+              "id": "a2",
+              "start": 231,
+              "text": "If an estimator hasn't declared support for `sample_weight`, passing it would be ambiguous or erroneous."
+            },
+            {
+              "end": 588,
+              "id": "a3",
+              "start": 336,
+              "text": "The error message in `Pipeline.fit` (lines 457-463) explicitly states that unnamed parameters like `sample_weight` are not accepted unless routed to specific steps using the `stepname__parameter` format, ensuring only declared parameters are forwarded."
+            }
+          ],
+          "credit": 0.5,
+          "evidence_ids": [
+            "e1",
+            "e2",
+            "context-verified-10"
+          ],
+          "id": "c7",
+          "reason": "The candidate mentions that passing unsupported parameters is 'erroneous' and requires explicit routing (`stepname__parameter`), which touches on the distinction between missing support and unset requests. However, it does not explicitly articulate the conceptual distinction that 'explicit metadata requests avoid forwarding to the wrong consumer' or clearly separate 'missing support' from 'unset request' as distinct states defined by the routing flags.",
+          "verdict": "partial",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-a310b982f5e345029dee1a29ab3b34f1",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-39feeb31b2d0a61411fad808": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "The SSH transport adapter does not use a hardcoded default of 9.",
+            "The premise that the SSH adapter specifically uses 9 while others use 25 is not supported by the visible code in `sshconn.py`, which delegates these values to shared constants."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a4"
+          ],
+          "answer_spans": [
+            {
+              "end": 64,
+              "id": "a1",
+              "start": 0,
+              "text": "The SSH transport adapter does not use a hardcoded default of 9."
+            },
+            {
+              "end": 585,
+              "id": "a4",
+              "start": 409,
+              "text": "The premise that the SSH adapter specifically uses 9 while others use 25 is not supported by the visible code in `sshconn.py`, which delegates these values to shared constants."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c1",
+          "reason": "The candidate explicitly denies that the SSH adapter uses a default of 9, stating the premise is unsupported. However, the source evidence (e1) defines `DEFAULT_NUM_POOLS_SSH = 9` with a comment explaining the OpenSSH session limit rationale, confirming the claim is factually correct and the candidate's denial is incorrect.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-620c336ca8f7479ea079866ad74dbde3",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": null,
+      "termination": "completed"
+    },
+    "import-53601a04918107064022733c": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [],
+          "answer_span_ids": [],
+          "answer_spans": [],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c1",
+          "reason": "The candidate answer describes the mechanism of cache invalidation (popping keys from __dict__) but does not state or imply that the cache invalidation has 'defective literal keys' as claimed in the reference. The candidate presents the mechanism as functional without noting the defect regarding literal keys.",
+          "verdict": "missing",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-c1eb6e3dd44d459da61c2360a56b013f",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-61119dd3437675675599db61": {
+      "coverage": 1.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "The assertLoginRedirectURLEqual helper method (lines 1027-1029) implicitly depends on self.login() (lines 79-88) to establish an authenticated session.",
+            "The login method posts credentials and asserts SESSION_KEY exists in self.client.session, confirming session middleware is active and functioning."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a2"
+          ],
+          "answer_spans": [
+            {
+              "end": 151,
+              "id": "a1",
+              "start": 0,
+              "text": "The assertLoginRedirectURLEqual helper method (lines 1027-1029) implicitly depends on self.login() (lines 79-88) to establish an authenticated session."
+            },
+            {
+              "end": 298,
+              "id": "a2",
+              "start": 152,
+              "text": "The login method posts credentials and asserts SESSION_KEY exists in self.client.session, confirming session middleware is active and functioning."
+            }
+          ],
+          "credit": 1.0,
+          "evidence_ids": [
+            "e1",
+            "verified-2"
+          ],
+          "id": "c1",
+          "reason": "The candidate correctly states that assertLoginRedirectURLEqual depends on self.login() to establish an authenticated session and notes that login asserts SESSION_KEY exists, which aligns with the source code showing the dependency and the session assertion.",
+          "verdict": "supported",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [
+            "There is no explicit CSRF token handling in these specific methods; the dependency relies on the test client and middleware configuration to handle CSRF automatically during the POST request, as no manual token retrieval or insertion is present in the login helper."
+          ],
+          "answer_span_ids": [
+            "a3"
+          ],
+          "answer_spans": [
+            {
+              "end": 564,
+              "id": "a3",
+              "start": 299,
+              "text": "There is no explicit CSRF token handling in these specific methods; the dependency relies on the test client and middleware configuration to handle CSRF automatically during the POST request, as no manual token retrieval or insertion is present in the login helper."
+            }
+          ],
+          "credit": 1.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c2",
+          "reason": "The candidate correctly identifies that there is no explicit CSRF token handling in the login method (source confirms no token usage in the POST data), implying a dependency on default behavior/configuration where CSRF checks are bypassed or handled automatically by the test client in this context.",
+          "verdict": "supported",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-004429bff1a24d4f92866f4291a737b2",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": null,
+      "termination": "completed"
+    },
+    "import-6eb252a9807d12bd2e517e08": {
+      "coverage": 1.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "In `src/_pytest/assertion/rewrite.py`, `find_spec` (line 91) invokes `_early_rewrite_bailout` (line 100) to decide whether to proceed.",
+            "`_early_rewrite_bailout` (lines 188-225) avoids expensive `PathFinder.find_spec` calls by first populating `_basenames_to_check_rewrite` with basenames from `session._initialpaths` (lines 196-203) if not already done.",
+            "It then checks if the module's final name part exists in this set (line 207); if so, it returns `False` (proceed to rewrite).",
+            "If not, it performs quick pattern matching against `fnpats` (lines 213-219) and checks `_is_marked_for_rewrite` (line 221).",
+            "Only if all these fast checks fail does it return `True`, causing `find_spec` to return `None` early and skip the expensive filesystem lookup inherent in the subsequent `_find_spec` call."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a2",
+            "a3",
+            "a4",
+            "a5"
+          ],
+          "answer_spans": [
+            {
+              "end": 134,
+              "id": "a1",
+              "start": 0,
+              "text": "In `src/_pytest/assertion/rewrite.py`, `find_spec` (line 91) invokes `_early_rewrite_bailout` (line 100) to decide whether to proceed."
+            },
+            {
+              "end": 352,
+              "id": "a2",
+              "start": 135,
+              "text": "`_early_rewrite_bailout` (lines 188-225) avoids expensive `PathFinder.find_spec` calls by first populating `_basenames_to_check_rewrite` with basenames from `session._initialpaths` (lines 196-203) if not already done."
+            },
+            {
+              "end": 478,
+              "id": "a3",
+              "start": 353,
+              "text": "It then checks if the module's final name part exists in this set (line 207); if so, it returns `False` (proceed to rewrite)."
+            },
+            {
+              "end": 602,
+              "id": "a4",
+              "start": 479,
+              "text": "If not, it performs quick pattern matching against `fnpats` (lines 213-219) and checks `_is_marked_for_rewrite` (line 221)."
+            },
+            {
+              "end": 790,
+              "id": "a5",
+              "start": 603,
+              "text": "Only if all these fast checks fail does it return `True`, causing `find_spec` to return `None` early and skip the expensive filesystem lookup inherent in the subsequent `_find_spec` call."
+            }
+          ],
+          "credit": 1.0,
+          "evidence_ids": [
+            "e1",
+            "verified-2",
+            "verified-3",
+            "verified-8",
+            "verified-19"
+          ],
+          "id": "c1",
+          "reason": "The candidate correctly explains that `find_spec` invokes `_early_rewrite_bailout` to gate the spec lookup. It details how `_early_rewrite_bailout` uses the `_basenames_to_check_rewrite` set (populated from session paths) and other fast checks to determine if the expensive `PathFinder.find_spec` call (via `_find_spec`) should be skipped. The logic described matches the source code where returning `True` from the bailout function causes `find_spec` to return `None` early.",
+          "verdict": "supported",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-1a11cd8000ab4dbd9baa209605d05046",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-8fe9c930cb14735ab568ea01": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "The provided test file `tests/cli/output/test_file.py` does not contain logic for determining a 'modification tracking indicator state' after loading cached data.",
+            "The tests cover basic file output operations like opening, writing, closing, and stdout handling for the `FileOutput` class, but do not address modification tracking indicators or cached data loading state logic."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a2"
+          ],
+          "answer_spans": [
+            {
+              "end": 162,
+              "id": "a1",
+              "start": 0,
+              "text": "The provided test file `tests/cli/output/test_file.py` does not contain logic for determining a 'modification tracking indicator state' after loading cached data."
+            },
+            {
+              "end": 375,
+              "id": "a2",
+              "start": 163,
+              "text": "The tests cover basic file output operations like opening, writing, closing, and stdout handling for the `FileOutput` class, but do not address modification tracking indicators or cached data loading state logic."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c1",
+          "reason": "The candidate claims the test file `tests/cli/output/test_file.py` does not contain the logic and that the tests do not address modification tracking. However, the reference evidence (e1) shows that `tests/test_cache.py` contains the test `test_load_data` which explicitly asserts the dirty flag state (`assert cache._dirty is dirty`) after loading cached data via `cache.get()`. The candidate identified the wrong file and incorrectly stated the logic is missing from the test suite.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-963d8e79a8964b9997f6fcdaf8e62d21",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-9701f44e1692a89b3ac45607": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "The control flow in TestIsValidCIDR.test_invalid does not branch based on the parametrized `value`.",
+            "All parametrized invalid inputs trigger the same assertion path in the test, relying on the function's internal logic to handle different failure modes."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a5"
+          ],
+          "answer_spans": [
+            {
+              "end": 99,
+              "id": "a1",
+              "start": 0,
+              "text": "The control flow in TestIsValidCIDR.test_invalid does not branch based on the parametrized `value`."
+            },
+            {
+              "end": 555,
+              "id": "a5",
+              "start": 403,
+              "text": "All parametrized invalid inputs trigger the same assertion path in the test, relying on the function's internal logic to handle different failure modes."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "context-verified-2"
+          ],
+          "id": "c1",
+          "reason": "The candidate claims the test control flow does not branch based on the parameter and that all inputs trigger the same path. However, the source evidence shows the test is parametrized with diverse invalid inputs (e.g., missing slash, non-integer mask, out-of-range mask, invalid IP). These different values cause the `is_valid_cidr` function to take different internal branches (e.g., the `else` block for missing slash vs. `try/except` blocks for parsing errors), meaning the execution path through the validation logic is indeed dependent on the parameter value.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-8d45dc49a42244968c84235b893ae09d",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-9d6847f23a7ae3108a173ffa": {
+      "coverage": 1.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "The string output of the document root compilation (returned by `compiler.compile_document_root`) is used by the `reflex/app.py` module.",
+            "Specifically, in the `compile_` method, the tuple containing the output path and source code string is appended to the `compile_results` list (line 1353-1363)."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a2"
+          ],
+          "answer_spans": [
+            {
+              "end": 136,
+              "id": "a1",
+              "start": 0,
+              "text": "The string output of the document root compilation (returned by `compiler.compile_document_root`) is used by the `reflex/app.py` module."
+            },
+            {
+              "end": 296,
+              "id": "a2",
+              "start": 137,
+              "text": "Specifically, in the `compile_` method, the tuple containing the output path and source code string is appended to the `compile_results` list (line 1353-1363)."
+            }
+          ],
+          "credit": 1.0,
+          "evidence_ids": [
+            "verified-2",
+            "verified-3",
+            "verified-7"
+          ],
+          "id": "c1",
+          "reason": "The candidate correctly identifies that the `reflex/app.py` module relies on the output by appending the result of `compiler.compile_document_root` to the `compile_results` list, as confirmed by the source code in `app.py` (lines 1353-1363) and `compiler.py`.",
+          "verdict": "supported",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-cfff47d5cc5b4d82869dc6d7ce5eb2ba",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-a7acedd96acb00285642ade2": {
+      "coverage": 1.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "The base wrapper class `CodeWrapper` propagates compilation failures by catching `CalledProcessError` exceptions raised when external compiler tools fail during the `_process_files` method.",
+            "When this occurs, it raises a `CodeWrapError` exception that includes the failed command and the compiler's output message."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a2"
+          ],
+          "answer_spans": [
+            {
+              "end": 189,
+              "id": "a1",
+              "start": 0,
+              "text": "The base wrapper class `CodeWrapper` propagates compilation failures by catching `CalledProcessError` exceptions raised when external compiler tools fail during the `_process_files` method."
+            },
+            {
+              "end": 313,
+              "id": "a2",
+              "start": 190,
+              "text": "When this occurs, it raises a `CodeWrapError` exception that includes the failed command and the compiler's output message."
+            }
+          ],
+          "credit": 1.0,
+          "evidence_ids": [
+            "e1",
+            "verified-2",
+            "verified-3"
+          ],
+          "id": "c1",
+          "reason": "The candidate correctly states that the base wrapper catches `CalledProcessError` in `_process_files` and raises a `CodeWrapError` containing the command and output, which matches the source code logic.",
+          "verdict": "supported",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [
+            "This exception propagates through the `wrap_code` method's try-finally block, ensuring cleanup occurs before the error reaches the caller."
+          ],
+          "answer_span_ids": [
+            "a3"
+          ],
+          "answer_spans": [
+            {
+              "end": 452,
+              "id": "a3",
+              "start": 314,
+              "text": "This exception propagates through the `wrap_code` method's try-finally block, ensuring cleanup occurs before the error reaches the caller."
+            }
+          ],
+          "credit": 1.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c2",
+          "reason": "The candidate correctly explains that the exception propagates through the `wrap_code` method's try-finally block, ensuring that cleanup (like changing directories and removing temporary files) occurs before the error is raised to the caller.",
+          "verdict": "supported",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-4fdf90d0ae06432d8ce92a64d9857112",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-aeb7dd01a07689a657eedb9c": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [],
+          "answer_span_ids": [],
+          "answer_spans": [],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1",
+            "e2"
+          ],
+          "id": "c1",
+          "reason": "The candidate answer discusses the `id_cache` initialization and the `make_id` logic, and infers that the cache is not pickled based on a comment. However, it does not explicitly state or verify the claim that the EPUB cache reset (initialization in `init()`) is separate from the persisted environment (the `BuildEnvironment` object which undergoes pickling via `__getstate__`). The candidate fails to articulate the architectural separation between the builder's transient state and the environment's persistent state as required by the claim.",
+          "verdict": "missing",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-35322689885f4392b0f302f388e60aa7",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-b8b2ff405066d0b29d909b7d": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "In the demonstrated pattern, the `@property` decorator defines the getter to return the private value, while the `@prop2.setter` decorator defines a method to validate or transform data (e.g., multiplying by 2) before assigning it to the private attribute."
+          ],
+          "answer_span_ids": [
+            "a2"
+          ],
+          "answer_spans": [
+            {
+              "end": 444,
+              "id": "a2",
+              "start": 188,
+              "text": "In the demonstrated pattern, the `@property` decorator defines the getter to return the private value, while the `@prop2.setter` decorator defines a method to validate or transform data (e.g., multiplying by 2) before assigning it to the private attribute."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c1",
+          "reason": "The reference claim states that the property 'doubles nonpublic value without access security' (implying no setter/validation logic is present in the specific test case). The candidate answer incorrectly claims the demonstrated pattern includes a setter that validates or transforms data (e.g., multiplying by 2) before assignment. The source evidence (e1) shows the multiplication happens in the getter ('return self._my_secret_x * 2'), and no setter is defined in the 'MyClass' example, meaning the claim's 'without access security' (no write control) is contradicted by the candidate's assertion of a transforming setter.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-91c2dce402a6432b9a387fcfcbdfbe6b",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-c59dfd91bb122c33e16f882c": {
+      "coverage": 0.5,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "It ensures integrity by testing round-trip conversion (cosmology \u2192 HTML \u2192 cosmology) and handling cases where HTML tables lack columns defined as default parameters in the cosmology class."
+          ],
+          "answer_span_ids": [
+            "a2"
+          ],
+          "answer_spans": [
+            {
+              "end": 350,
+              "id": "a2",
+              "start": 162,
+              "text": "It ensures integrity by testing round-trip conversion (cosmology \u2192 HTML \u2192 cosmology) and handling cases where HTML tables lack columns defined as default parameters in the cosmology class."
+            }
+          ],
+          "credit": 1.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c1",
+          "reason": "The candidate states the tests handle cases where HTML tables lack columns defined as default parameters, which aligns with the source evidence showing the test fills in missing info with the default value.",
+          "verdict": "supported",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [],
+          "answer_span_ids": [],
+          "answer_spans": [],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c2",
+          "reason": "The candidate mentions handling missing columns via defaults but does not explicitly state that the resulting read-back cosmology instance differs from the original instance, which is the specific claim made in c2 and verified by the assertion `assert got != cosmo` in the source.",
+          "verdict": "missing",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-0e2d71e41e5448cc810b5c65942f7eb3",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-d1ac8a8041fcf21ed9326cc4": {
+      "coverage": 1.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "Using a singleton pattern (UNSET = _Unset()) instead of repeatedly instantiating the _Unset class reduces memory overhead because only one instance of the class exists in memory, shared across all default parameter checks."
+          ],
+          "answer_span_ids": [
+            "a1"
+          ],
+          "answer_spans": [
+            {
+              "end": 222,
+              "id": "a1",
+              "start": 0,
+              "text": "Using a singleton pattern (UNSET = _Unset()) instead of repeatedly instantiating the _Unset class reduces memory overhead because only one instance of the class exists in memory, shared across all default parameter checks."
+            }
+          ],
+          "credit": 1.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c1",
+          "reason": "The candidate explicitly states that the singleton pattern ensures 'only one instance of the class exists in memory, shared across all default parameter checks,' which directly supports the claim that a shared sentinel avoids repeated explicit allocation. The source evidence confirms the implementation `UNSET = _Unset()` creates a single shared instance.",
+          "verdict": "supported",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-bdc8a01e23d3460e931c4c25286a275d",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 1.0,
+      "termination": "completed"
+    },
+    "import-d2ce02cf263d96667caca3ca": {
+      "coverage": 1.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "The `_get_lib_flags` method (lines 151-218) constructs the Libs line by iterating over `cpp_info.libs`, `cpp_info.system_libs`, and framework lists.",
+            "It formats system libraries with the `-l` flag and appends them to the `libflags` string, which is then rendered into the `Libs:` field of the pkg-config template (line 24)."
+          ],
+          "answer_span_ids": [
+            "a2",
+            "a3"
+          ],
+          "answer_spans": [
+            {
+              "end": 267,
+              "id": "a2",
+              "start": 119,
+              "text": "The `_get_lib_flags` method (lines 151-218) constructs the Libs line by iterating over `cpp_info.libs`, `cpp_info.system_libs`, and framework lists."
+            },
+            {
+              "end": 441,
+              "id": "a3",
+              "start": 268,
+              "text": "It formats system libraries with the `-l` flag and appends them to the `libflags` string, which is then rendered into the `Libs:` field of the pkg-config template (line 24)."
+            }
+          ],
+          "credit": 1.0,
+          "evidence_ids": [
+            "e1",
+            "verified-3"
+          ],
+          "id": "c1",
+          "reason": "The candidate correctly identifies that `cpp_info.system_libs` are processed in the `_get_lib_flags` method (evidence e1 shows `system_libs = [\"-l%s\" % li for li in (cpp_info.libs + cpp_info.system_libs)]`) and that the resulting flags are used in the `Libs:` line of the pkg-config template (evidence verified-3 shows `Libs: {{ libflags }}`). The candidate explicitly states that system libraries are formatted with `-l` and added to the `libflags` string rendered into the `Libs` field.",
+          "verdict": "supported",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-7dfe688ce30943e88aae923a9f7ff26d",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-ec635a41904c3ccb55b80735": {
+      "coverage": 1.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "The guideline URL assignment logic is not visible in the inspected base class `BaseResourceCheck` (checkov/cloudformation/checks/resource/base_resource_check.py), which only handles check registration and scanning delegation.",
+            "The search for 'guideline' and 'guideline_url' yielded no matches in the repository, suggesting the URL assignment may be hardcoded in individual check definitions, handled in a different base class (e.g., in `checkov/common`), or constructed dynamically in the output/reporting module rather than the check definition itself."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a2"
+          ],
+          "answer_spans": [
+            {
+              "end": 225,
+              "id": "a1",
+              "start": 0,
+              "text": "The guideline URL assignment logic is not visible in the inspected base class `BaseResourceCheck` (checkov/cloudformation/checks/resource/base_resource_check.py), which only handles check registration and scanning delegation."
+            },
+            {
+              "end": 552,
+              "id": "a2",
+              "start": 226,
+              "text": "The search for 'guideline' and 'guideline_url' yielded no matches in the repository, suggesting the URL assignment may be hardcoded in individual check definitions, handled in a different base class (e.g., in `checkov/common`), or constructed dynamically in the output/reporting module rather than the check definition itself."
+            }
+          ],
+          "credit": 1.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c1",
+          "reason": "The candidate states that the guideline URL assignment logic is not visible in the inspected code and that searches for 'guideline' yielded no matches. This aligns with the reference claim that no guideline assignment exists in the snapshot output model (Record class), which is confirmed by evidence e1 showing the Record class attributes do not include a guideline URL field.",
+          "verdict": "supported",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-162404c567624c9ca62a6f8b0e3458e0",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-fb251bfe1f21351861faed14": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "Both mechanisms ultimately populate the ScriptInfo object's `create_app` attribute, which the loader uses to instantiate the application (src/flask/cli.py:670-674)."
+          ],
+          "answer_span_ids": [
+            "a4"
+          ],
+          "answer_spans": [
+            {
+              "end": 686,
+              "id": "a4",
+              "start": 522,
+              "text": "Both mechanisms ultimately populate the ScriptInfo object's `create_app` attribute, which the loader uses to instantiate the application (src/flask/cli.py:670-674)."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1",
+            "context-e1"
+          ],
+          "id": "c1",
+          "reason": "The candidate claims both mechanisms populate the ScriptInfo's `create_app` attribute. However, the source evidence (e1, context-e1) shows that if `create_app` is None, the loader uses the `app_import_path` attribute to locate the app via import discovery. The import path mechanism populates `app_import_path`, not `create_app`.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-e97730c392d74ec683d51a54cc76c111",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    }
+  },
+  "student": {
+    "import-13e632d561c0b1740b2074fa": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "The Pipeline.fits() method does not explicitly reject sample_weight; instead, it silently passes unrecognized fit_params to the underlying estimator.",
+            "This behavior is consistent with scikit-learn's design, where unrecognized metadata_routing parameters are forwarded without validation."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a2"
+          ],
+          "answer_spans": [
+            {
+              "end": 149,
+              "id": "a1",
+              "start": 0,
+              "text": "The Pipeline.fits() method does not explicitly reject sample_weight; instead, it silently passes unrecognized fit_params to the underlying estimator."
+            },
+            {
+              "end": 286,
+              "id": "a2",
+              "start": 150,
+              "text": "This behavior is consistent with scikit-learn's design, where unrecognized metadata_routing parameters are forwarded without validation."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e2",
+            "context-e2"
+          ],
+          "id": "c1",
+          "reason": "The candidate claims Pipeline does not explicitly reject sample_weight and forwards unrecognized parameters without validation. The source evidence (e2) shows that MetadataRouter.validate_metadata explicitly raises a TypeError for extra keys not routed to any object, contradicting the claim of silent forwarding.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [
+            "The Pipeline.fits() method does not explicitly reject sample_weight; instead, it silently passes unrecognized fit_params to the underlying estimator.",
+            "This behavior is consistent with scikit-learn's design, where unrecognized metadata_routing parameters are forwarded without validation."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a2"
+          ],
+          "answer_spans": [
+            {
+              "end": 149,
+              "id": "a1",
+              "start": 0,
+              "text": "The Pipeline.fits() method does not explicitly reject sample_weight; instead, it silently passes unrecognized fit_params to the underlying estimator."
+            },
+            {
+              "end": 286,
+              "id": "a2",
+              "start": 150,
+              "text": "This behavior is consistent with scikit-learn's design, where unrecognized metadata_routing parameters are forwarded without validation."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e2",
+            "context-e2"
+          ],
+          "id": "c2",
+          "reason": "The candidate states unrecognized parameters are forwarded without validation. The source evidence (e2) demonstrates that validate_metadata raises a TypeError when parameters are not routed to any object, directly contradicting the candidate's assertion.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [],
+          "answer_span_ids": [],
+          "answer_spans": [],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1",
+            "context-e1"
+          ],
+          "id": "c3",
+          "reason": "The candidate answer does not address the specific behavior of the 'True' alias forwarding a requested value at a metadata consumer.",
+          "verdict": "missing",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [],
+          "answer_span_ids": [],
+          "answer_spans": [],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1",
+            "context-e1"
+          ],
+          "id": "c4",
+          "reason": "The candidate answer does not address the specific behavior of the 'False' alias ignoring a value at a metadata consumer.",
+          "verdict": "missing",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [],
+          "answer_span_ids": [],
+          "answer_spans": [],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1",
+            "context-e1"
+          ],
+          "id": "c5",
+          "reason": "The candidate answer does not address the specific behavior of the 'None' alias marking a supplied value as unrequested and raising an error.",
+          "verdict": "missing",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [],
+          "answer_span_ids": [],
+          "answer_spans": [],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1",
+            "e2",
+            "context-e1",
+            "context-e2"
+          ],
+          "id": "c6",
+          "reason": "The candidate answer does not mention that intermediate pipeline steps can request sample_weight even when the final estimator does not, which is a key reason for the routing graph validation.",
+          "verdict": "missing",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [
+            "The Pipeline.fits() method does not explicitly reject sample_weight; instead, it silently passes unrecognized fit_params to the underlying estimator.",
+            "This behavior is consistent with scikit-learn's design, where unrecognized metadata_routing parameters are forwarded without validation."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a2"
+          ],
+          "answer_spans": [
+            {
+              "end": 149,
+              "id": "a1",
+              "start": 0,
+              "text": "The Pipeline.fits() method does not explicitly reject sample_weight; instead, it silently passes unrecognized fit_params to the underlying estimator."
+            },
+            {
+              "end": 286,
+              "id": "a2",
+              "start": 150,
+              "text": "This behavior is consistent with scikit-learn's design, where unrecognized metadata_routing parameters are forwarded without validation."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1",
+            "e2",
+            "context-e1",
+            "context-e2"
+          ],
+          "id": "c7",
+          "reason": "The candidate claims parameters are forwarded without validation and implies missing support is handled silently. The source evidence shows that explicit requests are required and missing support with an unset request leads to errors (UnsetMetadataPassedError or TypeError), contradicting the idea that they are distinct only in configuration but not in enforcement.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-a3e4384718a041fa91c5cbf932f52104",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-39feeb31b2d0a61411fad808": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "The provided repository commit does not contain an SSH transport adapter.",
+            "The file 'docker/transport/sshadapter.py' referenced in the source catalog is not present in the pinned source, making it impossible to examine the default pool size configuration or the rationale for the difference between SSH and other adapters."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a2"
+          ],
+          "answer_spans": [
+            {
+              "end": 73,
+              "id": "a1",
+              "start": 0,
+              "text": "The provided repository commit does not contain an SSH transport adapter."
+            },
+            {
+              "end": 321,
+              "id": "a2",
+              "start": 74,
+              "text": "The file 'docker/transport/sshadapter.py' referenced in the source catalog is not present in the pinned source, making it impossible to examine the default pool size configuration or the rationale for the difference between SSH and other adapters."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c1",
+          "reason": "The candidate claims the SSH adapter and its configuration are missing from the source, but evidence e1 explicitly defines DEFAULT_NUM_POOLS_SSH = 9 and documents the OpenSSH session limit rationale.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-c5df4e9667cf4d5c827c5d589ff2ee7f",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-53601a04918107064022733c": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "The BaseSegment class uses a `SegmentMetaclass` to generate immutable cache keys (`_cache_key`) for cached properties instead of manual invalidation.",
+            "Property recalculation is handled via Python's `@lru_cache` mechanism on cached properties, which automatically invalidates and recalculates when segment attributes change.",
+            "The class relies on id-based hashing within the metaclass rather than explicit mutation tracking."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a2",
+            "a3"
+          ],
+          "answer_spans": [
+            {
+              "end": 149,
+              "id": "a1",
+              "start": 0,
+              "text": "The BaseSegment class uses a `SegmentMetaclass` to generate immutable cache keys (`_cache_key`) for cached properties instead of manual invalidation."
+            },
+            {
+              "end": 322,
+              "id": "a2",
+              "start": 150,
+              "text": "Property recalculation is handled via Python's `@lru_cache` mechanism on cached properties, which automatically invalidates and recalculates when segment attributes change."
+            },
+            {
+              "end": 420,
+              "id": "a3",
+              "start": 323,
+              "text": "The class relies on id-based hashing within the metaclass rather than explicit mutation tracking."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1",
+            "context-e1",
+            "context-verified-7"
+          ],
+          "id": "c1",
+          "reason": "The candidate claims the system uses immutable cache keys and automatic invalidation via `@lru_cache` instead of manual invalidation. However, the source evidence (e1, context-verified-7) explicitly shows a manual `_recalculate_caches` method that pops specific literal string keys (e.g., 'is_code', 'raw') from `__dict__`, and an `invalidate_caches` method that calls it. The candidate's denial of manual invalidation and specific key usage contradicts the source code which demonstrates both.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-20bfd3e49b0845b1b816d99292c72bd0",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-61119dd3437675675599db61": {
+      "coverage": 0.5,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "The `assertLoginRedirectURLEqual` helper invokes `self.login()` (inherited from `AuthViewsTestCase`) to start a session for the test.",
+            "As the helper is a test utility, `self.login()` handles CSRF token and session middleware to create a user and redirect them according to `LOGIN_REDIRECT_URL` settings."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a2"
+          ],
+          "answer_spans": [
+            {
+              "end": 133,
+              "id": "a1",
+              "start": 0,
+              "text": "The `assertLoginRedirectURLEqual` helper invokes `self.login()` (inherited from `AuthViewsTestCase`) to start a session for the test."
+            },
+            {
+              "end": 302,
+              "id": "a2",
+              "start": 134,
+              "text": "As the helper is a test utility, `self.login()` handles CSRF token and session middleware to create a user and redirect them according to `LOGIN_REDIRECT_URL` settings."
+            }
+          ],
+          "credit": 1.0,
+          "evidence_ids": [
+            "e1",
+            "verified-2"
+          ],
+          "id": "c1",
+          "reason": "The candidate states that the helper invokes `self.login()` to start a session, which aligns with the source code showing `self.login()` is called and asserts the presence of `SESSION_KEY`.",
+          "verdict": "supported",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [
+            "As the helper is a test utility, `self.login()` handles CSRF token and session middleware to create a user and redirect them according to `LOGIN_REDIRECT_URL` settings."
+          ],
+          "answer_span_ids": [
+            "a2"
+          ],
+          "answer_spans": [
+            {
+              "end": 302,
+              "id": "a2",
+              "start": 134,
+              "text": "As the helper is a test utility, `self.login()` handles CSRF token and session middleware to create a user and redirect them according to `LOGIN_REDIRECT_URL` settings."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1",
+            "context-verified-7"
+          ],
+          "id": "c2",
+          "reason": "The candidate claims `self.login()` handles CSRF token handling. However, the source code for `self.login()` (e1) only performs a POST request and checks for a session key; it does not implement or mention any CSRF token bypass or handling logic. The test class imports CSRF middleware but the `login` method itself does not interact with it as described.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-fc20497106a84a41abb18be81b5bae5c",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-6eb252a9807d12bd2e517e08": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "Expensive `find_spec` operations are bypassed when `_early_rewrite_bailout` returns `False`."
+          ],
+          "answer_span_ids": [
+            "a1"
+          ],
+          "answer_spans": [
+            {
+              "end": 92,
+              "id": "a1",
+              "start": 0,
+              "text": "Expensive `find_spec` operations are bypassed when `_early_rewrite_bailout` returns `False`."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1",
+            "verified-5",
+            "verified-10"
+          ],
+          "id": "c1",
+          "reason": "The candidate claims that expensive operations are bypassed when `_early_rewrite_bailout` returns `False`. However, the source code (e1, verified-5) shows that the method returns `True` to indicate an 'early skip' (bailout), and `find_spec` (verified-10) proceeds to expensive operations only if the method returns `False` (i.e., `if self._early_rewrite_bailout(name, state): return None`). The candidate has inverted the boolean logic.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-7d4f39923b324afbb76e4945d42a2e09",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 1.0,
+      "termination": "completed"
+    },
+    "import-8fe9c930cb14735ab568ea01": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "No logic for modification tracking indicator states after loading cached data was found in the tested file input/output operations within the repository at the pinned revision.",
+            "The code/searches yielded no matches for relevant terms."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a2"
+          ],
+          "answer_spans": [
+            {
+              "end": 176,
+              "id": "a1",
+              "start": 0,
+              "text": "No logic for modification tracking indicator states after loading cached data was found in the tested file input/output operations within the repository at the pinned revision."
+            },
+            {
+              "end": 233,
+              "id": "a2",
+              "start": 177,
+              "text": "The code/searches yielded no matches for relevant terms."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c1",
+          "reason": "The candidate claims no logic or test for the modification tracking indicator (dirty flag) after loading cached data was found. However, source evidence e1 explicitly shows the test method `test_load_data` which asserts `cache._dirty is dirty` immediately after calling `cache.get(\"foo\")` (which loads the cached data), confirming the dirty flag expectation is tested.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-12c0721a432446d69c59cc843ff7c460",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-9701f44e1692a89b3ac45607": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [],
+          "answer_span_ids": [],
+          "answer_spans": [],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c1",
+          "reason": "The candidate answer states that the control flow cannot be identified without accessing test files, failing to describe the parameter-dependent branches in the `is_valid_cidr` function (checking for exactly one '/', valid mask integer, mask range 1-32, and valid IP) which are fully documented in the provided source evidence.",
+          "verdict": "missing",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-1dc04da1e5824ee89a17d2c038634b49",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-9d6847f23a7ae3108a173ffa": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [],
+          "answer_span_ids": [],
+          "answer_spans": [],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1",
+            "verified-2",
+            "verified-3",
+            "verified-4",
+            "verified-10",
+            "context-verified-2",
+            "context-verified-3",
+            "context-verified-4",
+            "context-verified-10"
+          ],
+          "id": "c1",
+          "reason": "The candidate answer describes how the document root string is generated but fails to identify the specific modules or components that rely on this output. The source evidence (specifically `app_root_template` in `templates.py`) shows that the `app_root_template` function imports and relies on the `Layout` component exported by the document root template (`import { Layout as AppLayout } from './_document';`). The candidate does not mention the app root component, the app template, or any specific consumer of the generated string.",
+          "verdict": "missing",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-9ab158142f3144d888e2bbaada9c2cb7",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-a7acedd96acb00285642ade2": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "Inspection of the sympy repository at the specified commit revealed no code matching 'propagate compilation failure' or identifiable 'autowrap' module implementation details.",
+            "Consequently, the specific mechanism for propagating compilation failure exceptions in such a wrapper class could not be identified from the provided source."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a3"
+          ],
+          "answer_spans": [
+            {
+              "end": 174,
+              "id": "a1",
+              "start": 0,
+              "text": "Inspection of the sympy repository at the specified commit revealed no code matching 'propagate compilation failure' or identifiable 'autowrap' module implementation details."
+            },
+            {
+              "end": 506,
+              "id": "a3",
+              "start": 349,
+              "text": "Consequently, the specific mechanism for propagating compilation failure exceptions in such a wrapper class could not be identified from the provided source."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c1",
+          "reason": "The candidate claims no code matching the mechanism was found and the mechanism could not be identified. However, the source evidence (e1) explicitly shows the `_process_files` method in the `CodeWrapper` class catching `CalledProcessError` and raising a `CodeWrapError`, which is the specific propagation mechanism requested.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        },
+        {
+          "answer_quotes": [
+            "Inspection of the sympy repository at the specified commit revealed no code matching 'propagate compilation failure' or identifiable 'autowrap' module implementation details.",
+            "Consequently, the specific mechanism for propagating compilation failure exceptions in such a wrapper class could not be identified from the provided source."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a3"
+          ],
+          "answer_spans": [
+            {
+              "end": 174,
+              "id": "a1",
+              "start": 0,
+              "text": "Inspection of the sympy repository at the specified commit revealed no code matching 'propagate compilation failure' or identifiable 'autowrap' module implementation details."
+            },
+            {
+              "end": 506,
+              "id": "a3",
+              "start": 349,
+              "text": "Consequently, the specific mechanism for propagating compilation failure exceptions in such a wrapper class could not be identified from the provided source."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c2",
+          "reason": "The candidate states the mechanism could not be identified. The source evidence (e1) demonstrates the cleanup process: the `wrap_code` method uses a `try...finally` block to ensure `os.chdir` is called and `shutil.rmtree` is executed to remove the temporary work directory if it was not user-specified, even if an exception occurs during compilation.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-542524b4020d400192cfc657d20cf640",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-aeb7dd01a07689a657eedb9c": {
+      "coverage": 0.0,
+      "coverage_claims": [],
+      "deterministic_empty_answer_failure": true,
+      "episode_id": "ep-9cfb29c83b13498ba8bca660f372031a",
+      "strict_reasons": [
+        "missing_answer_or_citations"
+      ],
+      "strict_score": 0.0,
+      "termination": "budget_exhausted"
+    },
+    "import-b8b2ff405066d0b29d909b7d": {
+      "coverage": 0.0,
+      "coverage_claims": [],
+      "deterministic_empty_answer_failure": true,
+      "episode_id": "ep-3e9c1bd91f274fd2ab776f7db813c756",
+      "strict_reasons": [
+        "missing_answer_or_citations"
+      ],
+      "strict_score": 0.0,
+      "termination": "budget_exhausted"
+    },
+    "import-c59dfd91bb122c33e16f882c": {
+      "coverage": 0.0,
+      "coverage_claims": [],
+      "deterministic_empty_answer_failure": true,
+      "episode_id": "ep-547a8723e3b049b78663b233fa6c9993",
+      "strict_reasons": [
+        "missing_answer_or_citations"
+      ],
+      "strict_score": 0.0,
+      "termination": "budget_exhausted"
+    },
+    "import-d1ac8a8041fcf21ed9326cc4": {
+      "coverage": 1.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "Using a singleton for _Unset reduces memory overhead by ensuring only one instance exists instead of creating new objects for every default parameter check.",
+            "This prevents unnecessary object allocation."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a2"
+          ],
+          "answer_spans": [
+            {
+              "end": 156,
+              "id": "a1",
+              "start": 0,
+              "text": "Using a singleton for _Unset reduces memory overhead by ensuring only one instance exists instead of creating new objects for every default parameter check."
+            },
+            {
+              "end": 201,
+              "id": "a2",
+              "start": 157,
+              "text": "This prevents unnecessary object allocation."
+            }
+          ],
+          "credit": 1.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c1",
+          "reason": "The candidate states that using a singleton ensures 'only one instance exists instead of creating new objects' and 'prevents unnecessary object allocation', which directly supports the claim that a shared sentinel avoids repeated explicit allocation.",
+          "verdict": "supported",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-a5b12327772843bbb92660d820f0af3f",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 1.0,
+      "termination": "completed"
+    },
+    "import-d2ce02cf263d96667caca3ca": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "The repository does not contain C++ files (.cpp/.cc) referencing 'system library property' of 'build_info' to populate the 'Libs' line of a pkg-config file based on the available code base.",
+            "The search terms 'system_library_property' and 'system library property' yielded no matches in standard source files."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a2"
+          ],
+          "answer_spans": [
+            {
+              "end": 189,
+              "id": "a1",
+              "start": 0,
+              "text": "The repository does not contain C++ files (.cpp/.cc) referencing 'system library property' of 'build_info' to populate the 'Libs' line of a pkg-config file based on the available code base."
+            },
+            {
+              "end": 307,
+              "id": "a2",
+              "start": 190,
+              "text": "The search terms 'system_library_property' and 'system library property' yielded no matches in standard source files."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1"
+          ],
+          "id": "c1",
+          "reason": "The candidate claims the code does not exist and search terms yielded no matches. However, source evidence e1 shows the code explicitly adds system libraries (cpp_info.system_libs) to the lib flags in the _get_lib_flags method within pkgconfigdeps.py.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-8198da79bab443cdb1c39de531b51136",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-ec635a41904c3ccb55b80735": {
+      "coverage": 1.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "The guideline URL assignment logic is not explicitly implemented in the inspected Code.",
+            "The system populates the resource_id and variable evaluations but does not embed a specific 'guideline URL' in the Read documents."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a3"
+          ],
+          "answer_spans": [
+            {
+              "end": 87,
+              "id": "a1",
+              "start": 0,
+              "text": "The guideline URL assignment logic is not explicitly implemented in the inspected Code."
+            },
+            {
+              "end": 458,
+              "id": "a3",
+              "start": 328,
+              "text": "The system populates the resource_id and variable evaluations but does not embed a specific 'guideline URL' in the Read documents."
+            }
+          ],
+          "credit": 1.0,
+          "evidence_ids": [
+            "e1",
+            "verified-7"
+          ],
+          "id": "c1",
+          "reason": "The candidate correctly states that no guideline URL assignment logic exists in the inspected code. The source evidence (record.py and runner.py) confirms the Record object contains fields like check_id and check_result but lacks any field or logic for assigning a guideline URL.",
+          "verdict": "supported",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-6a36403937f840e4a43adf8fad00a652",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    },
+    "import-fb251bfe1f21351861faed14": {
+      "coverage": 0.0,
+      "coverage_claims": [
+        {
+          "answer_quotes": [
+            "No CLI helper class with 'callable factory' and 'import path' parameters was found in the search.",
+            "The repository files list for cli_helper.py returned empty, and direct searches for the specified patterns yielded no matches in the Flask codebase at this revision.",
+            "The premise of the question may rely on a class not present in the pinned commit or confusion with a different class."
+          ],
+          "answer_span_ids": [
+            "a1",
+            "a2",
+            "a3"
+          ],
+          "answer_spans": [
+            {
+              "end": 97,
+              "id": "a1",
+              "start": 0,
+              "text": "No CLI helper class with 'callable factory' and 'import path' parameters was found in the search."
+            },
+            {
+              "end": 263,
+              "id": "a2",
+              "start": 98,
+              "text": "The repository files list for cli_helper.py returned empty, and direct searches for the specified patterns yielded no matches in the Flask codebase at this revision."
+            },
+            {
+              "end": 381,
+              "id": "a3",
+              "start": 264,
+              "text": "The premise of the question may rely on a class not present in the pinned commit or confusion with a different class."
+            }
+          ],
+          "credit": 0.0,
+          "evidence_ids": [
+            "e1",
+            "verified-4"
+          ],
+          "id": "c1",
+          "reason": "The candidate claims no such class exists and that the premise is wrong, but the source evidence explicitly defines the `ScriptInfo` class in `src/flask/cli.py` with both `create_app` (callable factory) and `app_import_path` (import path) parameters.",
+          "verdict": "contradicted",
+          "weight": 1.0
+        }
+      ],
+      "deterministic_empty_answer_failure": false,
+      "episode_id": "ep-959ac9313f8c4bc2b04bb54e7459079d",
+      "strict_reasons": [
+        "Deterministic weighted reference-claim coverage"
+      ],
+      "strict_score": 0.0,
+      "termination": "completed"
+    }
+  }
+}

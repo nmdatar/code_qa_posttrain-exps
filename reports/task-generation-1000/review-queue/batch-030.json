@@ -1,0 +1,743 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/numba--numba-6bb29300254a",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 204,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 199
+          },
+          {
+            "end_line": 224,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 190
+          },
+          {
+            "end_line": 731,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 707
+          },
+          {
+            "end_line": 280,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 277
+          },
+          {
+            "end_line": 814,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 811
+          },
+          {
+            "end_line": 368,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 360
+          },
+          {
+            "end_line": 826,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 795
+          },
+          {
+            "end_line": 33,
+            "file_sha256": "f4c17b644d1046cc5da5341d2f4b5c1581fcf0241a7216bdf29893a366d9295e",
+            "path": "numba/core/compiler_lock.py",
+            "start_line": 5
+          },
+          {
+            "end_line": 287,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 281
+          },
+          {
+            "end_line": 799,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 795
+          },
+          {
+            "end_line": 816,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 801
+          },
+          {
+            "end_line": 826,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 817
+          },
+          {
+            "end_line": 815,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 811
+          },
+          {
+            "end_line": 293,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 288
+          },
+          {
+            "end_line": 229,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 226
+          },
+          {
+            "end_line": 232,
+            "file_sha256": "21370bf7f79559d4b1d35ca466129769b1adf50688f14ec11317ed24e96e1ef7",
+            "path": "numba/core/utils.py",
+            "start_line": 213
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": 118,
+            "path": "numba/dispatcher.c",
+            "reason": "not_tracked",
+            "reference": "numba/dispatcher.c",
+            "start_line": 101
+          }
+        ]
+      },
+      "question": "What are the core components and their coordination mechanisms in Numba's dispatcher lifecycle management system?",
+      "question_sha256": "3724cc179bc884be13994fd3370c89472141ad39148c72f66985cddcb17fab3c",
+      "reference_answer": "Numba's dispatcher lifecycle management is centered on a Python-level Dispatcher that owns compilation state and cooperates with a C-extension dispatcher for fast call-time dispatch. The Python dispatcher maintains an ordered mapping from argument-type signatures to compilation results (overloads) (numba/core/dispatcher.py: line 199-204), and it constructs the underlying C dispatcher with argument metadata and flags such as can_fallback (numba/core/dispatcher.py: line 190-224). On the C side, the dispatcher object stores lifecycle-related switches like can_compile and can_fallback (numba/dispatcher.c: line 101-118).Two contexts are core to coordination across the lifecycle: typingctx and targetctx. Dispatcher.__init__ binds both from the target descriptor and also inserts the dispatcher into the typing context as a global (numba/core/dispatcher.py: line 707-731). The typing side is used to form and work with signatures (e.g., exposing nopython_signatures from compiled results) (numba/core/dispatcher.py: line 277-280), while the target side is used to register and unregister compiled entry points (numba/core/dispatcher.py: line 811-814; line 261-264).Compile-on-demand is driven by converting runtime values to Numba types and then compiling for the resulting type signature. _compile_for_args() computes argtypes (using typeof_pyval) and then calls self.compile(tuple(argtypes)) (numba/core/dispatcher.py: line 360-368). Compilation is synchronized using the global compiler lock: compile() is decorated with @global_compiler_lock (numba/core/dispatcher.py: line 795-826), and the lock implementation is a re-entrant lock wrapper used to prevent multiple compiler executions (numba/core/compiler_lock.py: line 5-33; line 46-53). The dispatcher can also refuse new compilation at call time: disable_compile() toggles _can_compile (numba/core/dispatcher.py: line 281-287), and compile() raises if compilation is disabled (numba/core/dispatcher.py: line 795-799).Caching is integrated directly into the compilation lifecycle. compile() first checks for an existing specialization in overloads, then tries to load an overload from the cache, and on a cache hit it still registers the result so it becomes callable through the dispatcher (numba/core/dispatcher.py: line 801-816). On a miss, it compiles through self._compiler.compile(...), registers the result, and saves it back to the cache (numba/core/dispatcher.py: line 817-826). The \"compiled result\" (cres) is the value stored in overloads and it carries the callable entry_point and mode/library metadata that drive registration decisions (numba/core/dispatcher.py: line 811-815; line 288-293).Registration and dispatch-table coordination happen when a new compilation result is added. add_overload() inserts the cres.entry_point into the underlying dispatcher's dispatch table (_insert(...)) and records the compilation result in self.overloads keyed by the argument types (numba/core/dispatcher.py: line 288-293). Finally, cleanup is handled via weakref.finalize: _DispatcherBase registers a finalizer that iterates the compiled results and removes each entry point from the target context, while avoiding holding references to self and skipping work during interpreter shutdown (numba/core/dispatcher.py: line 226-229; line 244-266). The shutdown-detection helper is utils.shutting_down() and it is designed specifically for safe use in finalizers at interpreter exit (numba/core/utils.py: line 213-232).",
+      "reference_sha256": "9c9e265725ffc29b439242624b0ccb94804685245d26ae8adc2d61adaa573739",
+      "repository": {
+        "commit": "6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+        "family_id": "numba/numba",
+        "url": "https://github.com/numba/numba"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/numba--numba-6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+      "task_id": "import-1c90508d3e209f7c0675a5bb"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/numba--numba-6bb29300254a",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 77,
+            "file_sha256": "550c8011683a8a8e415ffa9687e604a03139c517e36d8b62d9fa23774c858c40",
+            "path": "setup.py",
+            "start_line": 52
+          },
+          {
+            "end_line": 87,
+            "file_sha256": "550c8011683a8a8e415ffa9687e604a03139c517e36d8b62d9fa23774c858c40",
+            "path": "setup.py",
+            "start_line": 80
+          },
+          {
+            "end_line": 354,
+            "file_sha256": "550c8011683a8a8e415ffa9687e604a03139c517e36d8b62d9fa23774c858c40",
+            "path": "setup.py",
+            "start_line": 353
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "550c8011683a8a8e415ffa9687e604a03139c517e36d8b62d9fa23774c858c40",
+            "kind": "file_reference",
+            "line_count": 356,
+            "path": "setup.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 343,
+            "path": "/testbed/setup.py",
+            "reason": "unsafe_path",
+            "reference": "/testbed/setup.py",
+            "start_line": 343
+          }
+        ]
+      },
+      "question": "Why does numba's setup.py implement conditional build logic that defers numpy import until extension compilation phase rather than declaring it as a standard build dependency?",
+      "question_sha256": "3c0f3a7089f90d48c766e9ddd6fe42d01a2025d75d0137a475fe0ba91b64fbf5",
+      "reference_answer": "Numba defers the NumPy import in setup.py to handle pip\u2019s two-phase installation workflow, where dependency discovery occurs before build dependencies are installed. During the metadata phase (e.g., `setup.py egg_info`), NumPy is not yet available. Importing it at the top level would cause an ImportError and prevent pip from discovering that NumPy is a required build dependency. To address this, setup.py uses an `is_building()` check (setup.py: line 52-77) to distinguish metadata queries from actual build steps. The NumPy import is deferred to `get_ext_modules()` (setup.py: line 80-87), which is only executed during the build phase. NumPy is still declared in `setup_requires` (/testbed/setup.py: line 343), ensuring it is installed before compilation, while `ext_modules` is conditionally assigned only when building is requested (setup.py: line 353-354). This design resolves the circular dependency between dependency discovery and usage, while still allowing NumPy\u2019s C API to be used during extension compilation.",
+      "reference_sha256": "5cffc97e04296fd9a254182b8b4b843bf527216d57910e45cf764f352691fd87",
+      "repository": {
+        "commit": "6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+        "family_id": "numba/numba",
+        "url": "https://github.com/numba/numba"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/numba--numba-6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+      "task_id": "import-3758bbb4a5d715e4f1ca46c5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/numba--numba-6bb29300254a",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 625,
+            "file_sha256": "377bc56d01a6a54ffdbb9da67a504287bbe77f12f194d9f6eb598bc3c787c12b",
+            "path": "numba/core/compiler.py",
+            "start_line": 599
+          },
+          {
+            "end_line": 336,
+            "file_sha256": "377bc56d01a6a54ffdbb9da67a504287bbe77f12f194d9f6eb598bc3c787c12b",
+            "path": "numba/core/compiler.py",
+            "start_line": 306
+          },
+          {
+            "end_line": 361,
+            "file_sha256": "377bc56d01a6a54ffdbb9da67a504287bbe77f12f194d9f6eb598bc3c787c12b",
+            "path": "numba/core/compiler.py",
+            "start_line": 348
+          },
+          {
+            "end_line": 69,
+            "file_sha256": "ada882d9e678ec842d3d90e760dbdf4c722ca56b93a519ca10fac7d2ab390a97",
+            "path": "numba/core/untyped_passes.py",
+            "start_line": 52
+          },
+          {
+            "end_line": 333,
+            "file_sha256": "e1a1402a8bb6f21913e569ae613039f3b44e5c351618b07b5f72a19945fd7004",
+            "path": "numba/core/compiler_machinery.py",
+            "start_line": 318
+          },
+          {
+            "end_line": 416,
+            "file_sha256": "377bc56d01a6a54ffdbb9da67a504287bbe77f12f194d9f6eb598bc3c787c12b",
+            "path": "numba/core/compiler.py",
+            "start_line": 378
+          },
+          {
+            "end_line": 450,
+            "file_sha256": "377bc56d01a6a54ffdbb9da67a504287bbe77f12f194d9f6eb598bc3c787c12b",
+            "path": "numba/core/compiler.py",
+            "start_line": 433
+          },
+          {
+            "end_line": 481,
+            "file_sha256": "377bc56d01a6a54ffdbb9da67a504287bbe77f12f194d9f6eb598bc3c787c12b",
+            "path": "numba/core/compiler.py",
+            "start_line": 453
+          },
+          {
+            "end_line": 88,
+            "file_sha256": "ada882d9e678ec842d3d90e760dbdf4c722ca56b93a519ca10fac7d2ab390a97",
+            "path": "numba/core/untyped_passes.py",
+            "start_line": 72
+          },
+          {
+            "end_line": 103,
+            "file_sha256": "c3807efff414ee10489ad3c75f24a5b5346e8ff391c6106ebfeb8847f7a49ff3",
+            "path": "numba/core/typed_passes.py",
+            "start_line": 79
+          },
+          {
+            "end_line": 152,
+            "file_sha256": "c3807efff414ee10489ad3c75f24a5b5346e8ff391c6106ebfeb8847f7a49ff3",
+            "path": "numba/core/typed_passes.py",
+            "start_line": 149
+          },
+          {
+            "end_line": 494,
+            "file_sha256": "377bc56d01a6a54ffdbb9da67a504287bbe77f12f194d9f6eb598bc3c787c12b",
+            "path": "numba/core/compiler.py",
+            "start_line": 483
+          },
+          {
+            "end_line": 464,
+            "file_sha256": "c3807efff414ee10489ad3c75f24a5b5346e8ff391c6106ebfeb8847f7a49ff3",
+            "path": "numba/core/typed_passes.py",
+            "start_line": 422
+          },
+          {
+            "end_line": 105,
+            "file_sha256": "e1a1402a8bb6f21913e569ae613039f3b44e5c351618b07b5f72a19945fd7004",
+            "path": "numba/core/compiler_machinery.py",
+            "start_line": 29
+          },
+          {
+            "end_line": 342,
+            "file_sha256": "e1a1402a8bb6f21913e569ae613039f3b44e5c351618b07b5f72a19945fd7004",
+            "path": "numba/core/compiler_machinery.py",
+            "start_line": 161
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the structure of the compilation pass pipeline in Numba's compiler architecture?",
+      "question_sha256": "8ec4fbd7868939cbe78d47dff9b5fc7341d513c0327b71b2973d076356e91a07",
+      "reference_answer": "Numba's compilation pass pipeline is an ordered call path in which the entry point compile_extra() instantiates a compiler pipeline class (default Compiler) and dispatches to pipeline.compile_extra(func) (numba/core/compiler.py: line 599-625); the compiler instance (via CompilerBase.__init__) creates a shared StateDict (self.state) that stores compilation artifacts (e.g., bc, func_ir, typemap, calltypes, cr) and is passed through all passes (numba/core/compiler.py: line 306-336), and before any PassManager pipeline runs CompilerBase.compile_extra() executes a pre-pipeline pass by directly calling ExtractByteCode().run_pass(self.state) to populate state['bc']\u2014this happens outside PassManager.run() and therefore is not part of any PassManager.passes list (numba/core/compiler.py: line 348-361; numba/core/untyped_passes.py: line 52-69; numba/core/compiler_machinery.py: line 318-333); next, CompilerBase._compile_core() obtains an ordered list of PassManager pipelines from define_pipelines() and runs them in sequence until a compile result (state.cr) is produced (numba/core/compiler.py: line 378-416), where the default Compiler.define_pipelines() selects nopython first and then fallbacks to objectmode and interpreted pipelines depending on flags/status (numba/core/compiler.py: line 433-450); pipeline composition is handled by DefaultPassBuilder, where the nopython pipeline is explicitly assembled as untyped \u2192 typed \u2192 lowering by concatenating sub-pipelines (numba/core/compiler.py: line 453-481), with representative untyped work including TranslateByteCode producing state[\"func_ir\"] from bytecode (numba/core/untyped_passes.py: line 72-88) and typed work including NopythonTypeInference (implemented in BaseTypeInference.run_pass) writing state.typemap/state.calltypes (numba/core/typed_passes.py: line 79-103; numba/core/typed_passes.py: line 149-152), and lowering work including NoPythonBackend (a LoweringPass) generating native code and setting state.cr (numba/core/compiler.py: line 483-494; numba/core/typed_passes.py: line 422-464); execution is driven by PassManager.run(state), which iterates the pipeline's pass list, retrieves each registered CompilerPass, and invokes _runPass(..., state) to call each pass's run_initialization, run_pass, and run_finalizer hooks on the same shared state (numba/core/compiler_machinery.py: line 29-105; numba/core/compiler_machinery.py: line 161-342).",
+      "reference_sha256": "824877b883849944cbfab9884e425c1d8ec02dca8e233b8a94a3f28d297f8906",
+      "repository": {
+        "commit": "6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+        "family_id": "numba/numba",
+        "url": "https://github.com/numba/numba"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/numba--numba-6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+      "task_id": "import-3e66f75281102767ac8f1152"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/numba--numba-6bb29300254a",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 45,
+            "file_sha256": "c20109b20d2f18ff1abcf268a82efe79132e32110923df1e3610463274d8fdf3",
+            "path": "docs/source/conf.py",
+            "start_line": 38
+          },
+          {
+            "end_line": 299,
+            "file_sha256": "c20109b20d2f18ff1abcf268a82efe79132e32110923df1e3610463274d8fdf3",
+            "path": "docs/source/conf.py",
+            "start_line": 293
+          },
+          {
+            "end_line": 328,
+            "file_sha256": "c20109b20d2f18ff1abcf268a82efe79132e32110923df1e3610463274d8fdf3",
+            "path": "docs/source/conf.py",
+            "start_line": 309
+          },
+          {
+            "end_line": 19,
+            "file_sha256": "938e290a1e23a84a33807344465e01039ccf815863bb27975678939477fd79f0",
+            "path": "docs/source/developer/listings.rst",
+            "start_line": 11
+          },
+          {
+            "end_line": 279,
+            "file_sha256": "29cbaf1abf9ac0c1034d73bca7df845b2fc49b45e090d4aa29e980f40cbc2ed3",
+            "path": "numba/misc/help/inspector.py",
+            "start_line": 276
+          },
+          {
+            "end_line": 297,
+            "file_sha256": "29cbaf1abf9ac0c1034d73bca7df845b2fc49b45e090d4aa29e980f40cbc2ed3",
+            "path": "numba/misc/help/inspector.py",
+            "start_line": 297
+          },
+          {
+            "end_line": 31,
+            "file_sha256": "29cbaf1abf9ac0c1034d73bca7df845b2fc49b45e090d4aa29e980f40cbc2ed3",
+            "path": "numba/misc/help/inspector.py",
+            "start_line": 30
+          },
+          {
+            "end_line": 50,
+            "file_sha256": "c20109b20d2f18ff1abcf268a82efe79132e32110923df1e3610463274d8fdf3",
+            "path": "docs/source/conf.py",
+            "start_line": 47
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "c20109b20d2f18ff1abcf268a82efe79132e32110923df1e3610463274d8fdf3",
+            "kind": "file_reference",
+            "line_count": 331,
+            "path": "docs/source/conf.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "_listing.rst",
+            "reason": "not_tracked",
+            "reference": "_listing.rst",
+            "start_line": null
+          },
+          {
+            "candidates": [],
+            "end_line": 75,
+            "path": "docs/source/ext/ghfiles.py",
+            "reason": "not_tracked",
+            "reference": "docs/source/ext/ghfiles.py",
+            "start_line": 70
+          }
+        ]
+      },
+      "question": "How does Numba's autogenerated documentation system integrate Sphinx extensions with the inspector module to create cross-referenced API documentation?",
+      "question_sha256": "43fa38f79c7b8f9fafdccf947b255934a66fd90ee6659213c5b58767aefe283e",
+      "reference_answer": "Numba's autogenerated documentation integrates Sphinx extensions with the inspector module by generating ReStructuredText (RST) source files during the Sphinx build, and then letting Sphinx index those directives and resolve cross-references (including external ones via intersphinx).The Sphinx configuration enables the relevant extensions (sphinx.ext.autodoc, sphinx.ext.intersphinx, and numpydoc) (docs/source/conf.py: line 38-45), and configures external cross-references through intersphinx_mapping (docs/source/conf.py: line 293-299). In the same config file, _autogenerate() runs and calls numba.misc.help.inspector.write_listings(..., output_format='rst') for several packages, producing autogen_*_listing.rst files under docs/source/developer/ (docs/source/conf.py: line 309-328). Those generated listing pages are then included into the documentation via a toctree (docs/source/developer/listings.rst: line 11-19).On the inspector side, write_listings() selects the RST output path and uses ReSTFormatter (numba/misc/help/inspector.py: line 276-279; line 373-401). ReSTFormatter emits standard RST function directives such as .. function:: module.item, which Sphinx can index as documentation targets (numba/misc/help/inspector.py: line 297). It also adds source traceability by embedding GitHub source links generated from a commit-based URL template (numba/misc/help/inspector.py: line 30-31; line 310-320).Separately, the docs also include a small custom Sphinx extension ghfiles (enabled from conf.py) which registers a :ghfile: role for linking to repository paths (docs/source/conf.py: line 47-50; docs/source/ext/ghfiles.py: line 70-75); this role is available to the documentation, but the inspector-generated RST listings themselves use normal RST hyperlinks rather than :ghfile:.",
+      "reference_sha256": "cf3d48ae325d89b0cfdf1cd0dd96f72f272c2d61f521e9ae2eac3eebd173d5ce",
+      "repository": {
+        "commit": "6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+        "family_id": "numba/numba",
+        "url": "https://github.com/numba/numba"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/numba--numba-6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+      "task_id": "import-5822aa8702215124f14c2b08"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/numba--numba-6bb29300254a",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 207,
+            "file_sha256": "268455d902294c5b53778d652bccdc5460ac80e7b7785a3fe75eedd09405f999",
+            "path": "numba/core/annotations/pretty_annotate.py",
+            "start_line": 66
+          },
+          {
+            "end_line": 282,
+            "file_sha256": "268455d902294c5b53778d652bccdc5460ac80e7b7785a3fe75eedd09405f999",
+            "path": "numba/core/annotations/pretty_annotate.py",
+            "start_line": 224
+          },
+          {
+            "end_line": 133,
+            "file_sha256": "9d4d30a91e183514c655373ef4982942fc0c5bd2056f817ed064b5eefbdf7624",
+            "path": "numba/core/annotations/template.html",
+            "start_line": 7
+          },
+          {
+            "end_line": 186,
+            "file_sha256": "34549643dadb569c6edd9e30f3e88e5ed210e6652f8ee7d9d0ac06ddd47317bc",
+            "path": "numba/core/annotations/type_annotations.py",
+            "start_line": 150
+          },
+          {
+            "end_line": 268,
+            "file_sha256": "34549643dadb569c6edd9e30f3e88e5ed210e6652f8ee7d9d0ac06ddd47317bc",
+            "path": "numba/core/annotations/type_annotations.py",
+            "start_line": 246
+          },
+          {
+            "end_line": 199,
+            "file_sha256": "268455d902294c5b53778d652bccdc5460ac80e7b7785a3fe75eedd09405f999",
+            "path": "numba/core/annotations/pretty_annotate.py",
+            "start_line": 165
+          },
+          {
+            "end_line": 133,
+            "file_sha256": "9d4d30a91e183514c655373ef4982942fc0c5bd2056f817ed064b5eefbdf7624",
+            "path": "numba/core/annotations/template.html",
+            "start_line": 99
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "docs/dagmap/template.html",
+              "numba/core/annotations/template.html"
+            ],
+            "end_line": null,
+            "path": "template.html",
+            "reason": "ambiguous_basename",
+            "reference": "template.html",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "Where are the CSS class identifiers for type annotation visualization (like 'object_tag', 'lifted_tag', 'annotation_table') defined and referenced throughout Numba's annotation rendering system?",
+      "question_sha256": "5cdc8c44f7744066c806cf5fc3dba890a3ce7f871d78804230abc94c7c7b30ae",
+      "reference_answer": "The CSS class identifiers used for Numba's type-annotation visualization (e.g., annotation_table, object_tag, lifted_tag) are defined in two template sources, and they are referenced through a simple data\u2192template pipeline.First, pretty_annotate.get_html_template() embeds an HTML+CSS template directly in Python. Its <style> section defines the core classes (including .annotation_table, td.object_tag, td.lifted_tag, and span.object_tag/span.lifted_tag), and the template markup applies them via <table class=\"annotation_table ...\">, <td class=\"{{ ...python_tags... }}\">, and <span class=\"object_tag\">...</span> (numba/core/annotations/pretty_annotate.py: line 66-207). This embedded template is used by the notebook-oriented renderer: Annotate._repr_html_() returns get_html_template().render(...) (numba/core/annotations/pretty_annotate.py: line 224-282).Second, a standalone template.html file contains nearly the same CSS class definitions and applies the same class attributes in the HTML structure (numba/core/annotations/template.html: line 7-133). This external template is used by TypeAnnotation.html_annotate(), which reads template.html, renders it with Jinja2, and writes the resulting HTML (numba/core/annotations/type_annotations.py: line 150-186).The key coordination point is where the class names are assigned to source lines. TypeAnnotation.annotate_raw() populates func_data['python_tags'][line_number] and sets it to 'lifted_tag' for lifted-loop lines or 'object_tag' when a line's IR annotation indicates pyobject (numba/core/annotations/type_annotations.py: line 246-268, line 210-234). The templates then reference python_tags to emit the final <td class=\"...\"> values (numba/core/annotations/pretty_annotate.py: line 165-199; numba/core/annotations/template.html: line 99-133).",
+      "reference_sha256": "7c73ea0cea9743558f2bdb679fce5bb44052176f1beef542418d6cfe2b07d3da",
+      "repository": {
+        "commit": "6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+        "family_id": "numba/numba",
+        "url": "https://github.com/numba/numba"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/numba--numba-6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+      "task_id": "import-74bd588a89ba4be7e7240c9f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/numba--numba-6bb29300254a",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 481,
+            "file_sha256": "377bc56d01a6a54ffdbb9da67a504287bbe77f12f194d9f6eb598bc3c787c12b",
+            "path": "numba/core/compiler.py",
+            "start_line": 465
+          },
+          {
+            "end_line": 103,
+            "file_sha256": "c3807efff414ee10489ad3c75f24a5b5346e8ff391c6106ebfeb8847f7a49ff3",
+            "path": "numba/core/typed_passes.py",
+            "start_line": 85
+          },
+          {
+            "end_line": 10,
+            "file_sha256": "7ee311f9b253cb855c557df3568bd54d43eaf51c64e64cb54dfafb43d451c19c",
+            "path": "numba/parfors/parfor.py",
+            "start_line": 6
+          },
+          {
+            "end_line": 515,
+            "file_sha256": "377bc56d01a6a54ffdbb9da67a504287bbe77f12f194d9f6eb598bc3c787c12b",
+            "path": "numba/core/compiler.py",
+            "start_line": 497
+          },
+          {
+            "end_line": 318,
+            "file_sha256": "c3807efff414ee10489ad3c75f24a5b5346e8ff391c6106ebfeb8847f7a49ff3",
+            "path": "numba/core/typed_passes.py",
+            "start_line": 231
+          },
+          {
+            "end_line": 443,
+            "file_sha256": "c3807efff414ee10489ad3c75f24a5b5346e8ff391c6106ebfeb8847f7a49ff3",
+            "path": "numba/core/typed_passes.py",
+            "start_line": 423
+          },
+          {
+            "end_line": 484,
+            "file_sha256": "b603a2e7ab21d88fe99422cee3e3281964decc11d02d487f3bf105770ae3e478",
+            "path": "numba/parfors/parfor_lowering.py",
+            "start_line": 482
+          },
+          {
+            "end_line": 271,
+            "file_sha256": "3607cf615ba0ac58c766a5b5a28df891e17e7911c256c49b8df053748a4a83de",
+            "path": "numba/core/lowering.py",
+            "start_line": 270
+          },
+          {
+            "end_line": 40,
+            "file_sha256": "b603a2e7ab21d88fe99422cee3e3281964decc11d02d487f3bf105770ae3e478",
+            "path": "numba/parfors/parfor_lowering.py",
+            "start_line": 28
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does data flow through Numba's parallel execution pipeline from initial NumPy operations to final parallel LLVM code generation?",
+      "question_sha256": "86178e7626061d6c8a8254788efef532818b4f1dae22831b5b7fad03790d42de",
+      "reference_answer": "Data flows through Numba's parallel execution pipeline as the program's computation is progressively re-expressed: high-level NumPy-style array operations in Numba IR are transformed into Parfor (parallel loop) IR, and then lowered into parallel-capable low-level IR that the normal backend turns into LLVM IR and machine code. The nopython pipeline is explicitly composed as untyped \u2192 typed \u2192 lowering (numba/core/compiler.py: line 465-481), so the parallel path is coordinated across these phases rather than being a single monolithic step.In the typed phase, type inference runs and populates the compiler state with typemap and calltypes, which are required inputs for subsequent transformations (numba/core/typed_passes.py: line 85-103). This does not by itself perform the full \"parallel array analysis\", but it provides the essential type and call-signature foundation that the parallel conversion relies on. The parfors subsystem is designed to \"transform data-parallel operations such as Numpy calls into 'Parfor' nodes\" and also implements optimizations such as loop fusion (numba/parfors/parfor.py: line 6-10). When auto_parallel is enabled, the typed pipeline runs PreParforPass and then ParforPass, and ParforPass is explicitly documented as converting \"data-parallel computations into Parfor nodes\" (numba/core/compiler.py: line 497-515; numba/core/typed_passes.py: line 231-318). After this step, the function IR contains Parfor statements representing the parallel regions.In lowering, the backend stage runs native lowering to generate LLVM IR from Numba IR (numba/core/typed_passes.py: line 423-443). Parfor-specific lowering is plugged into the general lowering mechanism: Parfor is registered in the lowering extension table so that Parfor nodes are handled by _lower_parfor_parallel (numba/parfors/parfor_lowering.py: line 482-484), and the Lowerer dispatches such special nodes via lower_extensions during instruction lowering (numba/core/lowering.py: line 270-271, line 440-445). _lower_parfor_parallel describes how it lowers a Parfor into parallel execution structure (scheduling, gufunc body compilation, reduction handling) that can then be emitted through the normal LLVM/codegen path (numba/parfors/parfor_lowering.py: line 28-40).Finally, in terms of \"data flow\" in the literal sense, the runtime array buffers remain the same underlying inputs; what flows through the pipeline is the compiler's representation and scheduling strategy for operating on that data (NumPy-style ops \u2192 Parfor IR \u2192 lowered parallel structure \u2192 LLVM/codegen).",
+      "reference_sha256": "8642799c6f64263ef81201238cb09eb4bb07d63f5d1a3d7a0592e7d032c1b49b",
+      "repository": {
+        "commit": "6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+        "family_id": "numba/numba",
+        "url": "https://github.com/numba/numba"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/numba--numba-6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+      "task_id": "import-78bca87934b9dbeb04ab5a17"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/numba--numba-6bb29300254a",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 527,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 480
+          },
+          {
+            "end_line": 549,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 529
+          },
+          {
+            "end_line": 569,
+            "file_sha256": "deeece8d353d8bee7b6ebc549d004c8930fc6c9eb07d59c220355344be6d01ba",
+            "path": "numba/core/dispatcher.py",
+            "start_line": 551
+          },
+          {
+            "end_line": 333,
+            "file_sha256": "7fdbcdfb022ea9c3a497619c715be6abd884fdf0a1fee7f262027663bea52a02",
+            "path": "numba/core/codegen.py",
+            "start_line": 326
+          },
+          {
+            "end_line": 344,
+            "file_sha256": "7fdbcdfb022ea9c3a497619c715be6abd884fdf0a1fee7f262027663bea52a02",
+            "path": "numba/core/codegen.py",
+            "start_line": 335
+          },
+          {
+            "end_line": 78,
+            "file_sha256": "7fdbcdfb022ea9c3a497619c715be6abd884fdf0a1fee7f262027663bea52a02",
+            "path": "numba/core/codegen.py",
+            "start_line": 55
+          },
+          {
+            "end_line": 60,
+            "file_sha256": "f9d0bbaa96c7fb6699c60037b6419ad8ab0112e9aca9393de22fdeeb7396b1fb",
+            "path": "numba/misc/inspection.py",
+            "start_line": 43
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 283,
+            "line_count": 282,
+            "path": "numba/core/annotations/pretty_annotate.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "numba/core/annotations/pretty_annotate.py",
+            "resolved_path": "numba/core/annotations/pretty_annotate.py",
+            "start_line": 224
+          }
+        ]
+      },
+      "question": "How does Numba implement its multi-layered visualization architecture to provide code annotations, CFG inspection, and disassembly rendering across different output formats?",
+      "question_sha256": "71a53aa8555f05f55fdc289f2b924145c6dcb08285f0307f74a47a88367640fa",
+      "reference_answer": "Numba's inspection/visualization support is implemented as cooperating pieces rather than a single explicitly named \"visualization architecture\". The user-facing entry points are the dispatcher methods: inspect_types() is documented to print/return Numba IR\u2013annotated code and supports pretty=True, which returns an Annotate object for rich display (numba/core/dispatcher.py: line 480-527). inspect_cfg() returns either a single CFG for a given signature or, if no signature is provided, a dict mapping signatures to results (numba/core/dispatcher.py: line 529-549). inspect_disasm_cfg() likewise returns either a single disassembly-CFG result for a given signature or a per-signature dict (numba/core/dispatcher.py: line 551-569).Under the hood, the dispatcher delegates to the compiled library. CodeLibrary.get_function_cfg() extracts an LLVM function CFG via ll.get_function_cfg(fn) and wraps the DOT graph in a _CFG object (numba/core/codegen.py: line 326-333). CodeLibrary.get_disasm_cfg() obtains an ELF object and forwards it to disassemble_elf_to_cfg(elf) (numba/core/codegen.py: line 335-344).Different output formats are handled by representation hooks on the returned objects. _CFG.__repr__() returns DOT text and _CFG.display() delegates viewing/rendering to ll.view_dot_graph(...) (numba/core/codegen.py: line 55-78). Annotate._repr_html_() provides HTML for notebooks and Annotate.__repr__() provides an ANSI/text form for terminals (numba/core/annotations/pretty_annotate.py: line 224-283). For disassembly CFGs, disassemble_elf_to_cfg() returns a DisasmCFG object with _repr_svg_() for notebook SVG output and __repr__() for terminal text output (numba/misc/inspection.py: line 43-60).",
+      "reference_sha256": "af084d02231c64bf65022ff443e39cc93f04f5fa391de14eb88ff9bab9950a42",
+      "repository": {
+        "commit": "6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+        "family_id": "numba/numba",
+        "url": "https://github.com/numba/numba"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/numba--numba-6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+      "task_id": "import-94e3e635bbb4697abde55464"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/numba--numba-6bb29300254a",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 710,
+            "file_sha256": "1aaa06ad7bde50f5ce12f95b5fe155f139131b8dff95b1e56e3fc033a4681ac2",
+            "path": "numba/core/types/containers.py",
+            "start_line": 707
+          },
+          {
+            "end_line": 399,
+            "file_sha256": "1aaa06ad7bde50f5ce12f95b5fe155f139131b8dff95b1e56e3fc033a4681ac2",
+            "path": "numba/core/types/containers.py",
+            "start_line": 395
+          },
+          {
+            "end_line": 280,
+            "file_sha256": "1aaa06ad7bde50f5ce12f95b5fe155f139131b8dff95b1e56e3fc033a4681ac2",
+            "path": "numba/core/types/containers.py",
+            "start_line": 268
+          },
+          {
+            "end_line": 142,
+            "file_sha256": "1aaa06ad7bde50f5ce12f95b5fe155f139131b8dff95b1e56e3fc033a4681ac2",
+            "path": "numba/core/types/containers.py",
+            "start_line": 139
+          },
+          {
+            "end_line": 320,
+            "file_sha256": "a3aa25701b3ecbed369d5273de5979b1b1c89f851afc87ff1c3fe2987632c9bd",
+            "path": "numba/core/types/abstract.py",
+            "start_line": 314
+          },
+          {
+            "end_line": 650,
+            "file_sha256": "1aaa06ad7bde50f5ce12f95b5fe155f139131b8dff95b1e56e3fc033a4681ac2",
+            "path": "numba/core/types/containers.py",
+            "start_line": 648
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What inheritance relationships exist between LiteralStrKeyDict and other container types in Numba's type system hierarchy?",
+      "question_sha256": "07e054723c0cb5c4261e99d05b0e5a55c4bf6f164e4f6eb300a40b5d58280a5d",
+      "reference_answer": "LiteralStrKeyDict is a composite tuple-like container type in Numba's type hierarchy: it uses multiple inheritance from Literal and NamedTuple (numba/core/types/containers.py: line 707-710). This places it on the NamedTuple/BaseTuple (tuple-like) branch rather than the standard dictionary container branch: NamedTuple inherits from _HeterogeneousTuple and BaseNamedTuple (numba/core/types/containers.py: line 395-399), both of which derive from BaseTuple (numba/core/types/containers.py: line 268-280; line 373-374), and BaseTuple derives from ConstSized and Hashable (numba/core/types/containers.py: line 139-142), which ultimately derive from Type (numba/core/types/abstract.py: line 314-320; line 308-312; line 239-243; line 80-83). In contrast, the regular dict container type is DictType(IterableType, InitialValue) (numba/core/types/containers.py: line 648-650), so LiteralStrKeyDict is not a DictType subclass (numba/core/types/containers.py: line 707-710).",
+      "reference_sha256": "ea5aa9097cc7bd61df6df78ebfbfb2feea7b5a617d0ec8d0017a24e5f17861e6",
+      "repository": {
+        "commit": "6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+        "family_id": "numba/numba",
+        "url": "https://github.com/numba/numba"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/numba--numba-6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+      "task_id": "import-b2f9efff3579ee2b64061a4e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/numba--numba-6bb29300254a",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 481,
+            "file_sha256": "377bc56d01a6a54ffdbb9da67a504287bbe77f12f194d9f6eb598bc3c787c12b",
+            "path": "numba/core/compiler.py",
+            "start_line": 465
+          },
+          {
+            "end_line": 555,
+            "file_sha256": "377bc56d01a6a54ffdbb9da67a504287bbe77f12f194d9f6eb598bc3c787c12b",
+            "path": "numba/core/compiler.py",
+            "start_line": 520
+          },
+          {
+            "end_line": 277,
+            "file_sha256": "ada882d9e678ec842d3d90e760dbdf4c722ca56b93a519ca10fac7d2ab390a97",
+            "path": "numba/core/untyped_passes.py",
+            "start_line": 268
+          },
+          {
+            "end_line": 103,
+            "file_sha256": "c3807efff414ee10489ad3c75f24a5b5346e8ff391c6106ebfeb8847f7a49ff3",
+            "path": "numba/core/typed_passes.py",
+            "start_line": 85
+          },
+          {
+            "end_line": 228,
+            "file_sha256": "c3807efff414ee10489ad3c75f24a5b5346e8ff391c6106ebfeb8847f7a49ff3",
+            "path": "numba/core/typed_passes.py",
+            "start_line": 205
+          },
+          {
+            "end_line": 450,
+            "file_sha256": "377bc56d01a6a54ffdbb9da67a504287bbe77f12f194d9f6eb598bc3c787c12b",
+            "path": "numba/core/compiler.py",
+            "start_line": 437
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does Numba's compilation pipeline separate typed and untyped compiler passes into distinct phases rather than interleaving type inference with other optimizations?",
+      "question_sha256": "5626aa1116965b602a4dbfb7d7ad4eef8e81ffbf066a4bcb5989faff96438ea6",
+      "reference_answer": "Numba separates untyped and typed passes because the pipeline is explicitly assembled as sequential phases, and many later transformations require stable type information. The default nopython pipeline is composed by extending a PassManager with an untyped pipeline, then a typed pipeline, and finally a lowering pipeline (numba/core/compiler.py: line 465-481). The untyped pipeline is described as \"pre typing\" and performs structural IR work such as IR processing, with-lifting, semantic rewrites, inlining, and (optionally) SSA reconstruction before any type inference is run (numba/core/compiler.py: line 520-555). A concrete example of why this phase is kept untyped is noted directly in an untyped pass: it can simplify the CFG, but it cannot do certain cleanups because \"typing information is not available\" (numba/core/untyped_passes.py: line 268-277).The typed phase begins with type inference and writes the resulting typemap and calltypes into compiler state (numba/core/typed_passes.py: line 85-103). Subsequent typed passes are explicitly \"after type inference\" and require this data to exist; for example, NopythonRewrites asserts that state.typemap and state.calltypes are present before applying post-inference rewrites (numba/core/typed_passes.py: line 205-228). This is why interleaving type inference with earlier, IR-mutating untyped transformations would be costly and fragile: those transformations change the IR shape, while the later optimizations assume a settled IR plus settled type information.This separation also aligns with how the compiler selects pipelines (e.g., trying nopython first and optionally falling back to objectmode as a separate pipeline) (numba/core/compiler.py: line 437-450).",
+      "reference_sha256": "19096ba4cccc04aa10e53e06175e9788af59913c62dcd36d59f7346459da0ca8",
+      "repository": {
+        "commit": "6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+        "family_id": "numba/numba",
+        "url": "https://github.com/numba/numba"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/numba--numba-6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+      "task_id": "import-c1f8678c11d2498fbf922c11"
+    }
+  ]
+}

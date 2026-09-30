@@ -1,0 +1,490 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 389,
+            "file_sha256": "b0f2b36a1aad831692eced32f44fcdcd424d503c930fa3381a40eb56ed9f5376",
+            "path": "src/flask/ctx.py",
+            "start_line": 380
+          },
+          {
+            "end_line": 1510,
+            "file_sha256": "5c6aa0151b0b8018732280761d27eda0c4c83378630e21faadd57b73783720a7",
+            "path": "src/flask/app.py",
+            "start_line": 1510
+          },
+          {
+            "end_line": 1322,
+            "file_sha256": "5c6aa0151b0b8018732280761d27eda0c4c83378630e21faadd57b73783720a7",
+            "path": "src/flask/app.py",
+            "start_line": 1321
+          },
+          {
+            "end_line": 128,
+            "file_sha256": "e056e80bc5cbe46cf616c335b08fc0fd6aad513f3fb1f8fe2d02807dfe0c504c",
+            "path": "docs/lifecycle.rst",
+            "start_line": 127
+          },
+          {
+            "end_line": 146,
+            "file_sha256": "76ebd81a608687f1f772032ecb6a1e4a3ac2b02bcbca517808128e5e9374426b",
+            "path": "src/flask/sessions.py",
+            "start_line": 141
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where in the request processing flow does the orchestration between the method that loads session data at request start and the method that persists session data at request end occur to handle concurrent requests with potential race conditions?",
+      "question_sha256": "6b972853e9de0fd7c4d6a7003d09b91b45382493fcdc59f730d3564c6babcc5f",
+      "reference_answer": "The orchestration occurs at two points in the request processing flow:\n\n1. Session loading (open_session): In `RequestContext.push()` in `src/flask/ctx.py` (lines 380-389). Called when the request context is pushed at the start of handling, after the application context is established and before URL matching. The code shows:\n   ```python\n   if self.session is None:\n       session_interface = self.app.session_interface\n       self.session = session_interface.open_session(self.app, self.request)\n   ```\n   This happens in `Flask.wsgi_app()` (line 1510 in `src/flask/app.py`) when `ctx.push()` is called.\n\n2. Session saving (save_session): In `Flask.process_response()` in `src/flask/app.py` (lines 1321-1322). Called after response generation, after `after_request` functions, and before the request context is popped. The code shows:\n   ```python\n   if not self.session_interface.is_null_session(ctx.session):\n       self.session_interface.save_session(self, ctx.session, response)\n   ```\n   This is invoked from `Flask.finalize_request()` (line 941), which is called after `full_dispatch_request()` completes.\n\nThe lifecycle documentation (`docs/lifecycle.rst`, lines 127-128 and 147-148) confirms:\n- Step 6: \"The session is opened, loading any existing session data using the app's session_interface\"\n- Step 15: \"The session is saved, persisting any modified session data using the app's session_interface\"\n\nRegarding concurrent requests and race conditions, `SessionInterface` documentation (`src/flask/sessions.py`, lines 141-146) states: \"Multiple requests with the same session may be sent and handled concurrently. When implementing a new session interface, consider whether reads or writes to the backing store must be synchronized. There is no guarantee on the order in which the session for each request is opened or saved, it will occur in the order that requests begin and end processing.\"\n\nThe orchestration relies on per-request context isolation (via `contextvars`) so each request has its own session instance. Synchronization for concurrent access to shared session storage is the responsibility of the `SessionInterface` implementation.",
+      "reference_sha256": "bfb392cc1a7f267379ec2d572ffaabc4e014341335b672800f4d9c881fe87510",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-d3bcd834dd0920db8bb91097"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 846,
+            "file_sha256": "76d9cc13d30d2053a8c036eee7167f069a566cbe6b945d2d058cad9b7c703dc7",
+            "path": "src/flask/sansio/app.py",
+            "start_line": 823
+          },
+          {
+            "end_line": 126,
+            "file_sha256": "c120125d8745456266a9c2f45eaf93ecdf8f0d55128851af8cef643d9839f1b9",
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 123
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where in the error handler resolution method does the lookup sequence traverse blueprint scopes then HTTP status codes then exception class method resolution order?",
+      "question_sha256": "ec9235c1b33b5bf22e3b70b10711bc9cc581843620df236c085720d8b3b2872e",
+      "reference_answer": "The lookup sequence occurs within the `_find_error_handler` method in `./src/flask/sansio/app.py` (lines 823-846). The method performs a three-level nested traversal:\n\n**First Level: HTTP Status Code Priority**\nThe method first determines the exception class and HTTP status code using `_get_exc_class_and_code(type(e))`. It then iterates through codes in priority order: first the specific HTTP status code (if the exception has one), then `None` for non-HTTP exceptions or as a fallback. This is implemented in line 834: `for c in (code, None) if code is not None else (None,)`.\n\n**Second Level: Blueprint Scope Priority**\nFor each code, the method iterates through blueprint names, checking blueprint-specific handlers first, then application-wide handlers. The `names` tuple is constructed as `(*blueprints, None)` on line 832, where `None` represents the application-level scope. This means blueprint handlers take precedence over application handlers for the same code and exception class.\n\n**Third Level: Exception Class Method Resolution Order**\nFor each scope (blueprint or app) and code combination, the method accesses `error_handler_spec[name][c]` to get the handler map (line 836). It then traverses the exception's Method Resolution Order (`exc_class.__mro__`) on line 841, checking each class in the inheritance hierarchy from most specific to most general. The first matching handler found in the MRO is returned (lines 842-845).\n\n**Data Structure Structure**\nThe `error_handler_spec` is a nested dictionary with the structure `{blueprint_name: {code: {exception_class: handler}}}` as defined in `./src/flask/sansio/scaffold.py` (lines 123-126). This structure allows the three-level lookup: first by blueprint scope, then by HTTP status code, then by exception class.\n\n**Interaction Between Exception Hierarchy and HTTP Status Codes**\nWhen an HTTP exception is raised, `_get_exc_class_and_code` returns both the exception class and its associated status code. The lookup first tries to find a handler registered for that specific code, then falls back to handlers registered with `code=None`. Within each code level, the exception's MRO is traversed, allowing handlers registered for parent classes to catch exceptions from child classes if no more specific handler exists. This means a handler registered for `HTTPException` with `code=None` will catch all HTTP exceptions, but a handler registered for `code=404` will take precedence for 404 errors, and a handler registered for a specific exception class like `NotFound` will take precedence over both.\n\nThe exact sequence is: (1) try specific code, then None; (2) for each code, try blueprints in order, then app-level; (3) for each scope+code combination, traverse MRO from most specific to most general exception class.",
+      "reference_sha256": "3230d477a5152c5a8d87eb137bd0671bad639ae58b365cfb7b23492b15c702d7",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-dee784cda1141aca2941bca5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 118,
+            "file_sha256": "57715cab1ba6470c821eb2a3a94af98cf73a9380de9b1af3f30b504ea77c921d",
+            "path": "tests/test_testing.py",
+            "start_line": 118
+          },
+          {
+            "end_line": 323,
+            "file_sha256": "b0f2b36a1aad831692eced32f44fcdcd424d503c930fa3381a40eb56ed9f5376",
+            "path": "src/flask/ctx.py",
+            "start_line": 323
+          },
+          {
+            "end_line": 188,
+            "file_sha256": "ea3bf9653e8a50d2007f60ccfdbda7af518bc5c391edda0cbb5c214fea81eba9",
+            "path": "src/flask/helpers.py",
+            "start_line": 188
+          },
+          {
+            "end_line": 195,
+            "file_sha256": "8d492fe2655e93622ae21c3177846faab20c6faf41bf43c49438162e6779391a",
+            "path": "src/flask/wrappers.py",
+            "start_line": 180
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "src/flask/app.py",
+              "src/flask/sansio/app.py",
+              "tests/test_apps/cliapp/app.py"
+            ],
+            "end_line": 425,
+            "path": "app.py",
+            "reason": "ambiguous_basename",
+            "reference": "app.py",
+            "start_line": 425
+          },
+          {
+            "candidates": [],
+            "end_line": 70,
+            "path": "sansio/blueprints.py",
+            "reason": "not_tracked",
+            "reference": "sansio/blueprints.py",
+            "start_line": 64
+          },
+          {
+            "candidates": [],
+            "end_line": 103,
+            "path": "sansio/blueprints.py",
+            "reason": "not_tracked",
+            "reference": "sansio/blueprints.py",
+            "start_line": 103
+          },
+          {
+            "candidates": [
+              "src/flask/app.py",
+              "src/flask/sansio/app.py",
+              "tests/test_apps/cliapp/app.py"
+            ],
+            "end_line": 1423,
+            "path": "app.py",
+            "reason": "ambiguous_basename",
+            "reference": "app.py",
+            "start_line": 1423
+          },
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "sansio/app.py",
+            "reason": "not_tracked",
+            "reference": "sansio/app.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "What is the dependency chain in the test function that verifies subdomain routing through configuration, route registration, and request context creation?",
+      "question_sha256": "f4fe89cf78f9fb9606a235414d2f8aebc6c3a959220ba6ed858fe4acb343e0b7",
+      "reference_answer": "The dependency chain in the test function that verifies subdomain routing works as follows:\n\n1. Application-level subdomain matching configuration: The test creates a Flask application with `subdomain_matching=True` (line 118 in `test_testing.py`). This enables subdomain-aware routing in the application's URL adapter creation (see `create_url_adapter` in `app.py` line 425).\n\n2. Blueprint registration with subdomain: When a Blueprint is created with a `subdomain` parameter (line 123: `flask.Blueprint(\"company\", __name__, subdomain=\"xxx\")`), this subdomain is stored in the Blueprint instance. During registration via `app.register_blueprint(bp)` (line 129), the `BlueprintSetupState` class (in `sansio/blueprints.py` lines 64-70) captures the subdomain from either the registration options or the blueprint's own subdomain attribute. This subdomain is then passed to `add_url_rule` (line 103 in `sansio/blueprints.py`), which sets it as an option when registering URL rules with the application.\n\n3. Request context creation with subdomain: When `app.test_request_context(\"/\", subdomain=\"xxx\")` is called (line 131), it creates a `RequestContext` that includes the subdomain in the WSGI environment. The `test_request_context` method (defined in `app.py` line 1423) accepts a `subdomain` parameter that is passed to Werkzeug's `EnvironBuilder`, which constructs the request environment with the appropriate `SERVER_NAME` including the subdomain.\n\n4. URL adapter creation and route matching: During `RequestContext` initialization (in `ctx.py` line 323), `app.create_url_adapter(self.request)` is called. The URL adapter uses the request's subdomain information to match routes. When a route matches, Werkzeug's routing system sets `request.blueprint` to the name of the blueprint that owns the matched route (verified in line 135: `assert ctx.request.blueprint == bp.name`).\n\n5. URL resolution consistency: The `url_for` function (in `helpers.py` line 188) and the application's `url_for` method (in `sansio/app.py`) use the current request context's blueprint information and subdomain to build URLs consistently. The `request.blueprints` property (in `wrappers.py` lines 180-195) provides access to the blueprint hierarchy, which is used during URL building to inject appropriate defaults and ensure the subdomain is included in generated URLs.\n\nThe dependency ensures that:\n- The application must have `subdomain_matching=True` for subdomain routing to work.\n- Blueprints must be registered with their subdomain information stored in the URL rules.\n- Request contexts must be created with matching subdomain parameters.\n- URL resolution uses the request context's blueprint and subdomain information to generate consistent URLs.\n\nThis chain ensures that URL resolution remains consistent whether using `test_request_context` directly or through the test client, as both create request contexts with the same subdomain information that matches the registered blueprint's subdomain constraint.",
+      "reference_sha256": "74f6517f872d51ceadf2bf5acc2b6ad6f709458d8d8bb94cff02b7b04721c203",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-dfccc70e3617e5d08cde95ed"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 387,
+            "file_sha256": "76ebd81a608687f1f772032ecb6a1e4a3ac2b02bcbca517808128e5e9374426b",
+            "path": "src/flask/sessions.py",
+            "start_line": 387
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "76ebd81a608687f1f772032ecb6a1e4a3ac2b02bcbca517808128e5e9374426b",
+            "kind": "file_reference",
+            "line_count": 399,
+            "path": "src/flask/sessions.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does repeated invocation of the method that instantiates cryptographic serializers within the session persistence handler create a performance bottleneck under high-concurrency conditions?",
+      "question_sha256": "e3901d925eebd9bbda860fb5b13740a7804f9cfe3d091c93a350d808ced8b7fd",
+      "reference_answer": "Yes, repeated invocation of `get_signing_serializer` within `save_session` creates a performance bottleneck under high concurrency because each call creates a new `URLSafeTimedSerializer` instance with cryptographic setup overhead, even though the serializer configuration remains constant across requests.\n\n**The Problem:**\n\nIn `src/flask/sessions.py`, the `save_session` method (line 351) calls `get_signing_serializer(app)` on line 387 every time it needs to serialize session data:\n\n```387:387:src/flask/sessions.py\nval = self.get_signing_serializer(app).dumps(dict(session))  # type: ignore[union-attr]\n```\n\nEach invocation of `get_signing_serializer` (lines 317-335) performs expensive operations:\n\n1. **Key list construction** (lines 321-326): Creates a new list, checks for `SECRET_KEY_FALLBACKS` configuration, and builds the key chain\n2. **Serializer instantiation** (lines 327-335): Creates a new `URLSafeTimedSerializer` object with:\n   - Cryptographic key derivation setup (`key_derivation: \"hmac\"`)\n   - Digest method initialization (`digest_method`)\n   - Salt configuration (`salt: \"cookie-session\"`)\n   - Serializer binding (`serializer: session_json_serializer`)\n\n**Why This Causes Bottlenecks:**\n\nUnder high concurrency, multiple requests are processed simultaneously. Each request that modifies a session triggers `save_session`, which instantiates a new serializer. The cryptographic setup (HMAC key derivation, digest method initialization) has computational overhead that accumulates across concurrent requests. Since the serializer configuration (secret key, salt, key derivation method, digest method) doesn't change between requests for the same application instance, this repeated instantiation is wasteful.\n\n**The Root Cause:**\n\nThe `SecureCookieSessionInterface` class doesn't cache or memoize serializer instances. The serializer could be stored as an instance variable or cached per application instance, since the configuration parameters (`app.secret_key`, `app.config[\"SECRET_KEY_FALLBACKS\"]`, `self.salt`, `self.key_derivation`, `self.digest_method`) remain constant for a given application instance.\n\n**Optimization Approach:**\n\nThe serializer instantiation could be optimized by:\n1. Caching the serializer instance per application instance (e.g., using a weak reference dictionary keyed by application)\n2. Storing the serializer as an instance variable and invalidating it only when secret keys change\n3. Using lazy initialization with memoization to create the serializer once per app configuration\n\nThis would eliminate the repeated cryptographic setup overhead and improve performance under high-concurrency conditions.",
+      "reference_sha256": "76748c88a48ac95007cfe77a1241d58cea3d33129f1da08fd40fba94d64ac7ba",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-e3142892c90740145751e1c7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 148,
+            "file_sha256": "cefdd0dfdde6bb6f73e7b853aa789de432e2af52a8c920c1c2af17228235b72c",
+            "path": "src/flask/json/provider.py",
+            "start_line": 144
+          },
+          {
+            "end_line": 54,
+            "file_sha256": "f6c73c61a602ee3b8b87bfa90284fbc96e567b77c3a6d86c0e3919c5f12b64c6",
+            "path": "tests/test_json.py",
+            "start_line": 48
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the relationship between the ASCII-only encoding control parameter in the framework's JSON serialization provider and Unicode character representation in serialized output?",
+      "question_sha256": "57dce721f1eddb206e2b4563bb7273e0c02c77b04352a4a662dc1dd0341db290",
+      "reference_answer": "The `ensure_ascii` attribute on `DefaultJSONProvider` (defaults to `True`) controls whether non-ASCII characters are escaped as Unicode escape sequences in JSON output.\n\nIn `src/flask/json/provider.py` (lines 144-148), `ensure_ascii` is documented as: \"Replace non-ASCII characters with escape sequences. This may be more compatible with some clients, but can be disabled for better performance and size.\"\n\nThe `dumps` method (lines 166-179) passes this attribute to Python's standard library `json.dumps()` via `kwargs.setdefault(\"ensure_ascii\", self.ensure_ascii)`.\n\nWhen `ensure_ascii=True` (default): non-ASCII characters are escaped as `\\uXXXX` sequences. For example, the snowman character (\u2603, U+2603) becomes `\"\\\\u2603\"`.\n\nWhen `ensure_ascii=False`: non-ASCII characters are kept as literal characters. The same snowman character becomes `\"\\u2603\"` (the actual character).\n\nThis is demonstrated in `tests/test_json.py` (lines 48-54): setting `app.json.ensure_ascii = True` produces `'\"\\\\u2603\"'`, while `False` produces `'\"\\u2603\"'`.\n\nThe relationship: `ensure_ascii` directly controls the Unicode representation strategy \u2014 escaping for ASCII compatibility when `True`, or preserving literal characters when `False`.",
+      "reference_sha256": "b15bbeb888129eb32c718ea443a66dc130433a115d49aa81bb90ec4b93e8e837",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-e7241e0671b61cec057fda60"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 475,
+            "file_sha256": "4ea7beec4919fad6d67219bc883a027c3f38f1fd3fde72efe8d3637883ef1f03",
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 461
+          },
+          {
+            "end_line": 148,
+            "file_sha256": "63592f00e0151b8f4362fdae5fa231c42ca638cb4d2b94fabe216e39f3874142",
+            "path": "tests/test_blueprints.py",
+            "start_line": 131
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why would performance degradation occur if the custom template filter registration mechanism used in blueprint test cases were repeated across multiple distinct blueprint objects during application startup?",
+      "question_sha256": "3be115fadd7d305107b0ae5804f621d25d0dc314bcd9d9091f9e00bac5c14d70",
+      "reference_answer": "Performance degradation occurs because the `record_once` mechanism in Flask's blueprint system only prevents re-registration when the same blueprint instance is registered multiple times, not when different blueprint instances register the same template filter.\n\nWhen a blueprint registers a template filter using `add_app_template_filter()` or the `@app_template_filter()` decorator (found in `src/flask/sansio/blueprints.py` lines 461-475), it uses `record_once()` which wraps the registration function. The `record_once` method (lines 233-244) ensures the registration callback only executes when `state.first_registration` is `True`. However, `first_registration` is determined by checking if the blueprint instance (`self`) has been registered before (line 316: `first_bp_registration = not any(bp is self for bp in app.blueprints.values())`).\n\nIf multiple distinct blueprint objects are created (even with the same name), each is a different Python object. When each blueprint instance is registered, `first_bp_registration` will be `True` for each one because the identity check (`bp is self`) fails for different instances. This causes each blueprint's filter registration callback to execute, repeatedly assigning to the same dictionary key: `state.app.jinja_env.filters[name or f.__name__] = f` (line 473).\n\nDuring application startup, this results in:\n1. **Unnecessary dictionary operations**: Each blueprint instance overwrites the same filter entry in `app.jinja_env.filters`, causing redundant dictionary assignments\n2. **Wasted initialization time**: The deferred function execution and dictionary updates occur multiple times when they only need to happen once\n3. **Potential memory churn**: While Python dictionaries handle overwrites efficiently, repeated assignments during startup add unnecessary overhead\n\nThe impact on `render_template` execution time during concurrent requests is minimal because:\n- Filter registration happens during application initialization, not during request handling\n- Once registered, filter lookup during template rendering is a simple O(1) dictionary lookup from `jinja_env.filters`\n- Flask uses thread-local storage for request contexts, so concurrent requests don't interfere with each other's template rendering\n\nHowever, the performance degradation primarily affects application startup time, which can be significant if many blueprint instances are created and registered, each attempting to register the same filters. This is particularly problematic in test scenarios where multiple blueprint instances might be created for different test cases.\n\nThe test case `test_blueprint_url_defaults` (lines 131-148 in `tests/test_blueprints.py`) demonstrates this scenario where the same blueprint instance is registered twice with different names, but the issue would be more pronounced if different blueprint instances were created for each registration.",
+      "reference_sha256": "f785133f28c95c9747e15010b9ea7ff8593b4cedfca50e48e0a8ebd42309271f",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-ebf43e16c9d7e714408632f7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 102,
+            "file_sha256": "53416203889a17bbb591a2ff4082f473c4d5fc4e80988eda1200aef048df3a09",
+            "path": "tests/test_helpers.py",
+            "start_line": 102
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "53416203889a17bbb591a2ff4082f473c4d5fc4e80988eda1200aef048df3a09",
+            "kind": "file_reference",
+            "line_count": 360,
+            "path": "tests/test_helpers.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the test class that validates URL generation with anchors, schemes, and HTTP methods defined?",
+      "question_sha256": "f14e30b78db5d886418aa4dd65f7665f761353373d6ed8ad1da2a5623c8bd8b9",
+      "reference_answer": "The test class that validates URL generation with anchors, schemes, and HTTP methods is defined in `tests/test_helpers.py` at line 102.\n\nThe class is named `TestUrlFor` and contains test methods for Flask's `url_for` helper:\n- `test_url_for_with_anchor` \u2014 tests URL generation with anchor fragments\n- `test_url_for_with_scheme` \u2014 tests URL generation with custom schemes (e.g., HTTPS)\n- `test_url_for_with_scheme_not_external` \u2014 tests scheme handling when external is False\n- `test_url_for_with_alternating_schemes` \u2014 tests switching between HTTP and HTTPS schemes\n- `test_url_with_method` \u2014 tests URL generation based on HTTP methods (GET, POST)\n- `test_url_for_with_self` \u2014 tests URL generation with a parameter named \"self\"\n\nThe complete file path is: `./tests/test_helpers.py`\n\nTo import and instantiate this test class, you would use:\n```python\nfrom tests.test_helpers import TestUrlFor\n```\n\nOr with the full module path:\n```python\nfrom tests.test_helpers import TestUrlFor\ninstance = TestUrlFor()\n```\n\nThe module hierarchy for import is: `tests.test_helpers.TestUrlFor`",
+      "reference_sha256": "3a65508f6d510f73619d916d57f500c3b1f1e24071a5b712e1e494338c687ecf",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-ed5816a3e38a30cd474bd6bf"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "3c6203852b56fde7d18e969adf31c8a68fa1b52b49391e35229dce2563d8070a",
+            "kind": "file_reference",
+            "line_count": 178,
+            "path": "src/flask/debughelpers.py"
+          },
+          {
+            "file_sha256": "c70de929b0db0e71713336d6bc112519934488543c245afc8c387a340f48d32a",
+            "kind": "file_reference",
+            "line_count": 523,
+            "path": "docs/errorhandling.rst"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What architectural decisions are reflected by the dual inheritance from both AssertionError and UnicodeError in the debug-mode exception class for unexpected unicode or binary data regarding separation between validation failures and encoding issues in Flask's layered architecture?",
+      "question_sha256": "86040176e6294f738ef41f221241df1a22829cf7494aab35d43ac59f6f73e98f",
+      "reference_answer": "The dual inheritance from both `AssertionError` and `UnicodeError` in the debug-mode exception class for unexpected unicode or binary data (defined in `src/flask/debughelpers.py` as `UnexpectedUnicodeError`) reflects several architectural decisions in Flask's layered architecture:\n\n**1. Separation of Error Categories:**\nThe dual inheritance enables the exception to be caught by handlers for either error category:\n- `AssertionError` represents programming errors and validation failures (conditions that should not occur in correct code)\n- `UnicodeError` represents encoding/decoding issues (runtime data format problems)\n\nThis allows Flask's error handling system to distinguish between:\n- **Validation failures**: Programming errors where the code assumes certain data types or formats\n- **Encoding issues**: Runtime problems with character encoding or binary data handling\n\n**2. Debug-Mode Enhanced Error Reporting:**\nThe exception is part of Flask's debug-mode architecture (located in `debughelpers.py` alongside other debug-specific exceptions like `DebugFilesKeyError` and `FormDataRoutingRedirect`). In debug mode, Flask provides enhanced error messages to help developers identify and fix issues. The dual inheritance ensures that:\n- Handlers expecting `AssertionError` (validation/assertion failures) can catch it\n- Handlers expecting `UnicodeError` (encoding problems) can also catch it\n- Both error handling paths receive the enhanced debug information\n\n**3. Flexible Exception Handling:**\nThe multiple inheritance pattern allows the exception to participate in both exception hierarchies simultaneously. This is particularly important in Flask's layered architecture where:\n- Different layers may handle errors differently (application layer vs. framework layer)\n- Error handlers can be registered for specific exception types (as documented in `docs/errorhandling.rst`)\n- The exception hierarchy determines which handler is invoked (more specific handlers take precedence)\n\n**4. Architectural Consistency:**\nThis pattern is consistent with other debug helper exceptions in the same module:\n- `DebugFilesKeyError(KeyError, AssertionError)` - combines domain error (`KeyError`) with validation error (`AssertionError`)\n- `FormDataRoutingRedirect(AssertionError)` - debug-mode validation error\n\nThe dual inheritance pattern allows Flask to maintain clear separation between different error categories while providing a unified mechanism for enhanced debug-mode error reporting, enabling the framework to handle both validation failures and encoding issues appropriately within its layered error handling architecture.",
+      "reference_sha256": "da855fa32626d264a4b550bdeb3126c7ab78fb4b29a81f304c20e6177578a5d6",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-f9a9324d4d417a121b8defc7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "d82e3ff54ee177e2b929653d99f2a312baed9ea3cafe41ee1456e2814c2c4c39",
+            "kind": "file_reference",
+            "line_count": 1127,
+            "path": "src/flask/cli.py"
+          },
+          {
+            "file_sha256": "c1d5a162364e71546a8a8b76eb7fba0381582b8546ad14189f6431e647b7a547",
+            "kind": "file_reference",
+            "line_count": 1,
+            "path": "tests/test_apps/helloworld/wsgi.py"
+          },
+          {
+            "file_sha256": "af73c96a28f1343bafb20832691088ab5600b67e4af51d79a23dfaabddfa293a",
+            "kind": "file_reference",
+            "line_count": 118,
+            "path": "docs/patterns/appfactories.rst"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "src/flask/app.py",
+              "src/flask/sansio/app.py",
+              "tests/test_apps/cliapp/app.py"
+            ],
+            "end_line": null,
+            "path": "app.py",
+            "reason": "ambiguous_basename",
+            "reference": "app.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "Why does the CLI helper class that manages Flask application loading provide both a direct callable factory parameter and an import path parameter as alternative instantiation mechanisms?",
+      "question_sha256": "d6165b75f45c234e4ac2d7c7923cfbb79ba199d7fbea3af7c7efaae1526482c1",
+      "reference_answer": "The CLI helper class (`ScriptInfo` in `src/flask/cli.py`) provides both mechanisms to support different use cases and levels of control in Flask's application loading system.\n\n**Direct callable factory parameter (`create_app`):**\n- Used when you have programmatic control over app creation, such as in custom Click scripts or testing scenarios\n- Allows passing the factory function directly to `ScriptInfo` or `FlaskGroup` (see lines 566, 589, 671)\n- Provides immediate, explicit control without requiring import path resolution\n- Example from tests (line 268): `ScriptInfo(create_app=create_app)` where `create_app` is a function defined in the same scope\n\n**Import path parameter (`app_import_path`):**\n- Used when the app location is specified via command-line (`--app` option) or environment variables (`FLASK_APP`)\n- Supports the discovery-based approach where Flask automatically finds apps or factories in modules\n- Enables the CLI to work with apps defined in separate modules without requiring direct function references\n- The `--app` option callback (line 440-446) sets `app_import_path`, which then gets processed by `locate_app()` (lines 344-349) to find apps or factory functions like `create_app` or `make_app` in the target module\n\n**Priority and fallback logic:**\nThe `load_app()` method (lines 333-372) implements a priority system:\n1. First checks if `create_app` callable is provided (line 341) - highest priority for programmatic control\n2. Then checks if `app_import_path` is provided (line 344) - for command-line/environment-based discovery\n3. Finally falls back to searching for `wsgi.py` or `app.py` files (lines 351-356) - for convention-based discovery\n\n**Reflection of Flask's philosophy:**\nThis dual-path approach reflects Flask's philosophy of providing flexibility and choice:\n- **Programmatic control** for advanced users who want explicit control (custom scripts, testing frameworks)\n- **Discovery-based loading** for convenience and convention-over-configuration (standard CLI usage)\n- **Backward compatibility** with existing patterns while supporting the application factory pattern\n\nThe application factory pattern (documented in `docs/patterns/appfactories.rst`) allows creating multiple app instances with different configurations. The dual mechanisms support this by:\n- Allowing direct factory functions for programmatic instantiation\n- Supporting import-based discovery that can locate and call factory functions in modules\n- Enabling both patterns to coexist, giving developers the choice of how to structure and load their applications\n\nThis design allows Flask to serve both simple use cases (automatic discovery) and complex scenarios (custom scripts, testing, multiple instances) without forcing a single approach on all users.",
+      "reference_sha256": "a8f9ea556b8856895c78b3e8c271a852361139ce2952defe26edc6911a4adba0",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-fb251bfe1f21351861faed14"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 180,
+            "file_sha256": "c73271ea826a18495386d12085937b65018cc394c3172b91c5491e73046e0280",
+            "path": "src/flask/views.py",
+            "start_line": 165
+          },
+          {
+            "end_line": 223,
+            "file_sha256": "166328b1cef85fcd8f4336ac1c1a27e40444c9d26c54b46a1321fbfc11a4fca9",
+            "path": "tests/test_views.py",
+            "start_line": 207
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the subclass initialization hook in the HTTP method-dispatching view class resolve conflicting methods attributes when inheriting from multiple parent classes?",
+      "question_sha256": "7b34125959629a518ab895236c5d914cd61953618b0f8021bd402f71fb654c2b",
+      "reference_answer": "The subclass initialization hook (`__init_subclass__`) in MethodView resolves conflicting `methods` attributes from multiple parent classes by merging them into a unified set.\n\nWhen a subclass is created, the `__init_subclass__` method (defined at `src/flask/views.py:165-180`) executes the following logic:\n\n1. **Explicit definition check**: It first checks if the subclass has explicitly defined `methods` in its `__dict__` using `if \"methods\" not in cls.__dict__` (line 168). If the subclass explicitly defines `methods`, the automatic resolution is skipped entirely.\n\n2. **Base class iteration**: If `methods` is not explicitly defined, it iterates through all direct parent classes via `cls.__bases__` (line 171). This gives all parent classes in the order they appear in the class definition, following Python's multiple inheritance model.\n\n3. **Methods merging**: For each parent class, if it has a `methods` attribute (checked with `getattr(base, \"methods\", None)`), the code uses `methods.update(base.methods)` (line 173) to merge those methods into a set. This means:\n   - If Parent1 has `methods = [\"GET\", \"POST\"]` and Parent2 has `methods = [\"DELETE\", \"PUT\"]`, the child class will get `methods = {\"GET\", \"POST\", \"DELETE\", \"PUT\"}`\n   - If both parents define overlapping methods (e.g., both have \"GET\"), the set automatically deduplicates them\n   - The order of parents in `cls.__bases__` determines the order of iteration, but since sets are unordered, the final result is a set of unique method names\n\n4. **HTTP method detection**: After merging parent methods, the hook also scans the class itself for HTTP method functions (get, post, delete, etc.) defined in `http_method_funcs` (lines 175-177). If the class or any of its inherited methods define these functions, they are added to the methods set in uppercase.\n\n5. **Final assignment**: If any methods were found, `cls.methods` is set to the merged set (line 180).\n\nThis mechanism is demonstrated in the test case `test_multiple_inheritance` (`tests/test_views.py:207-223`), where `GetDeleteView` inherits from both `GetView` (which defines a `get` method) and `DeleteView` (which defines a `delete` method). The resulting `GetDeleteView.methods` is `{\"DELETE\", \"GET\"}`, showing that methods from both parents are successfully merged.\n\nThe key aspect of conflict resolution is that conflicts are resolved through **union/merging** rather than selection - all methods from all parents are included, with duplicates automatically handled by the set data structure. This ensures that a subclass inheriting from multiple MethodView parents will support all HTTP methods defined across its entire inheritance hierarchy.",
+      "reference_sha256": "f34369d248e637b487147bdb7b334b1ef42ddafb94b35dc792b7dc0b9dce1976",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-fb7295517f5f9074cd3579cb"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 51,
+            "file_sha256": "311ea43751a836c3d585a40f08fa54a60d783a232aa50c5ea1225b689e9ac683",
+            "path": "tests/test_logging.py",
+            "start_line": 48
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "f2c33758c4ee6e2d5c05bd9cfe53e45a937427c74c02aae029160b2e2d5d0952",
+            "kind": "file_reference",
+            "line_count": 79,
+            "path": "src/flask/logging.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the test that checks handler behavior when a stream handler exists on the root logger verify that the application logger's handlers list is empty after adding a stream handler to the root logger?",
+      "question_sha256": "326b700c645513dba8fe04853654955e3c8489fd6db532b1740e5e8456c55f25",
+      "reference_answer": "The test verifies that the application logger's handlers list is empty because Flask's logger initialization only adds its default handler when no handler exists in the logging hierarchy that can handle the logger's effective level.\n\nIn `src/flask/logging.py`, the `create_logger` function (called when accessing `app.logger`) checks `has_level_handler(logger)` before adding the default handler:\n\n```python\nif not has_level_handler(logger):\n    logger.addHandler(default_handler)\n```\n\nThe `has_level_handler` function walks up the logging hierarchy (checking the logger and its parent loggers) to see if any handler can handle the logger's effective level. When a stream handler is added to the root logger before accessing `app.logger`, `has_level_handler` returns `True` because the root logger is a parent in the hierarchy, so Flask does not add its default handler.\n\nThis avoids duplicate handlers and respects existing logging configuration. The test in `tests/test_logging.py` (lines 48-51) confirms this: after adding a handler to the root logger, `app.logger.handlers` is empty because Flask detected an existing handler in the hierarchy and skipped adding its own.\n\nThis design allows Flask to integrate with existing logging setups without forcing its own handler when one already exists.",
+      "reference_sha256": "a0e31e6a5f07bb8df35374548222b8f27efb16c8a9629d39d7f6aae0ac3be09e",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-fbdfb244b7d6e7078b752398"
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-005.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/bridgecrewio--checkov-c2091482f54d",
+      "original_reference_sha256": "dea57c4d00440a0facc46043ef81424f23da8d81224c2b83121d3a7980397b5a",
+      "question": "What validation architecture does Checkov use to detect IAM policy statement wildcards that grant excessive privileges across AWS services?",
+      "question_sha256": "bc5a7cc8a79116dcec16511e41369f21c5cfe2fdf7cc4e16ccbee76b5f9f9d3d",
+      "reference_answer": "Data checks iterate statements and test actions for wildcard membership (checkov/terraform/checks/data/aws/StarActionPolicyDocument.py:20-25; AdminPolicyDocument.py:20-26). JSON resource checks parse policy[0], inspect only Statement[0], require its Effect to equal Allow and its Action[0] to equal *. The admin check additionally requires Resource == * (checkov/terraform/checks/resource/aws/IAMStarActionPolicyDocument.py:15-26; IAMAdminPolicyDocument.py:15-28). Parse/shape exceptions are swallowed and the checks then pass, so this is limited pattern matching, not exhaustive IAM privilege analysis.",
+      "reference_sha256": "4c76deb3cd46c6a8d3b15bd9de2dc14c99d0fff076acc7719ac1076110731b77",
+      "repository": {
+        "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+        "family_id": "bridgecrewio/checkov",
+        "url": "https://github.com/bridgecrewio/checkov"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/bridgecrewio--checkov-c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-6bf30381062c637f49ecb2f5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/bridgecrewio--checkov-c2091482f54d",
+      "original_reference_sha256": "45dd6659b6fc2ee46d4876fb7d711c1df4710e3b3824aefdfccf6045d9654248",
+      "question": "Why does Checkov's database check validation system use direct dictionary traversal with hardcoded key paths instead of a schema-based validation approach for parsing complex nested Terraform configurations?",
+      "question_sha256": "834a5f24655c1deac891ff77d8465be37d37e22f9b54edef9cb45d67cce1a1f5",
+      "reference_answer": "Checks access provider-specific nested dictionaries directly; backup validation traverses settings[0] and backup_configuration[0], returning CheckResult.PASSED or FAILED (checkov/terraform/checks/resource/gcp/GoogleCloudSqlBackupConfiguration.py:5-17). The registry selects checks by supported entity type (checkov/common/checks/base_check_registry.py:17-34), and the parser uses hcl2.load (checkov/terraform/parser.py:20-31). These explain the implementation structure, but do not establish why schema validation was rejected or prove a performance advantage.",
+      "reference_sha256": "2102cc1cf5ea4133b49199bab9ab57ef5678bcc24f296926737058452827d593",
+      "repository": {
+        "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+        "family_id": "bridgecrewio/checkov",
+        "url": "https://github.com/bridgecrewio/checkov"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/bridgecrewio--checkov-c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-70f574ef3d0364c9966d1535"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/bridgecrewio--checkov-c2091482f54d",
+      "original_reference_sha256": "3efd61bf4bdb15e3a757aa202a2b0b69abdcab616be85fc67e8994b9a146c527",
+      "question": "What is the inheritance hierarchy and dependency relationships between Checkov's infrastructure-as-code parsing components across different file format handlers?",
+      "question_sha256": "8ffef4104409dd2643d7bdecd84423151d8205fb61dde67fc219c9a734ccabeb",
+      "reference_answer": "BaseRunner defines the abstract run interface (checkov/common/runners/base_runner.py:6-11). At this pin its concrete subclasses are Terraform, CloudFormation and Kubernetes Runner (their runner.py:24,16,16 respectively). Terraform uses Parser and hcl2.load (checkov/terraform/parser.py:8-31); CloudFormation uses cfn_yaml with a JSON fallback (checkov/cloudformation/parser/__init__.py:14-53); Kubernetes selects its YAML/JSON parsers (checkov/kubernetes/parser/parser.py:14-32). RunnerRegistry aggregates runner instances and their reports (checkov/common/runners/runner_registry.py:10-27).",
+      "reference_sha256": "d9e77c81a81c4367290dca982179eb050c6ed4405b1ba1758d94d7707617bbd3",
+      "repository": {
+        "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+        "family_id": "bridgecrewio/checkov",
+        "url": "https://github.com/bridgecrewio/checkov"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/bridgecrewio--checkov-c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-794a3c10f661abd4d90475e2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/bridgecrewio--checkov-c2091482f54d",
+      "original_reference_sha256": "07471b7fef8dc0d4c35e3acce37a1f95d84519d6a4e79a6e797c3b31979608f4",
+      "question": "Why does Checkov's security check execution scale linearly with repository size rather than implementing parallel processing for large-scale infrastructure scanning?",
+      "question_sha256": "3c8416a5adb6790476dfe01ea2912039c52348e1c2a5ce4f6451241c69de5360",
+      "reference_answer": "The registry calls framework runners sequentially (checkov/common/runners/runner_registry.py:22-27). Terraform iterates files and entities, and the check registry executes applicable checks in a loop (checkov/terraform/runner.py:83-110; checkov/common/checks/base_check_registry.py:44-66). These paths contain no parallel dispatch. They do not prove linear runtime in repository size or explain the authors decision: cost depends on parsing, entity count and check work; explicit files mode even calls check_tf_definition after adding each file (checkov/terraform/runner.py:50-56).",
+      "reference_sha256": "2b9eeee760f79021d64f2222a119b61bec9e68af90734349124c9c7044f2b7d8",
+      "repository": {
+        "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+        "family_id": "bridgecrewio/checkov",
+        "url": "https://github.com/bridgecrewio/checkov"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/bridgecrewio--checkov-c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-d3d2a6ff6adcfcfe6f211d46"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/bridgecrewio--checkov-c2091482f54d",
+      "original_reference_sha256": "97ea3043cf4c1d2a826e24aebd5044a60f355943ed766812f11931ebd8460b27",
+      "question": "Where is the database type filtering logic implemented for cloud SQL security checks that need to distinguish between MySQL, PostgreSQL, and SQL Server instances?",
+      "question_sha256": "3404f4d01bcfe48f2d26c741988e9bcd84a29ed8ccb8c1f26eb21f14e7cfabba",
+      "reference_answer": "No engine-specific filtering implementation matching the question is present at this pin. GoogleCloudSqlBackupConfiguration supports google_sql_database_instance and checks nested backup settings without a database-version branch; its policy name explicitly targets all Cloud SQL instances (checkov/terraform/checks/resource/gcp/GoogleCloudSqlBackupConfiguration.py:5-17). The cited GoogleCloudPostgreSqlLogConnection implementation is not in this snapshot, so it cannot substantiate MySQL/PostgreSQL/SQL Server filtering.",
+      "reference_sha256": "e7d2db743d03f78d4072a278cfff83f1f05f14fb92377745653bc89c48cf6d3d",
+      "repository": {
+        "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+        "family_id": "bridgecrewio/checkov",
+        "url": "https://github.com/bridgecrewio/checkov"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/bridgecrewio--checkov-c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e319435e4a94fbd52db01a02"
+    }
+  ]
+}

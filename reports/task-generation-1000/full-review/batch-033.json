@@ -1,0 +1,268 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-684874418f7cdcf4b33fee47",
+      "reference_sha256": "317b5a07a60819f1d1acd4ca0e0135cf323846f0e682f0412f0b2cb14fcd5bc5",
+      "question_sha256": "c29cec6ec326b62eca9ded48fe514bb08234e7b08a13b0f85dc36e5e903d44d2",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Recursive scan reaches TagBytes decoder through untag dispatch",
+          "verdict": "supported",
+          "reason": "loads scans nested values; one-key registered tags call to_python; TagBytes b64decodes.",
+          "evidence": {
+            "path": "src/flask/json/tag.py",
+            "start_line": 297,
+            "end_line": 327
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-6bf72bdb09136c49cf400fb0",
+      "reference_sha256": "e07f98945679b6c6ab0c629f157d4700e5b87ae6cf274f953843999172c4fb96",
+      "question_sha256": "2a893919e9f32c33b231d73d8689b25ad533a06a97f5783e2c3422d5ec8c87fe",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "FakePath.__fspath__ returns stored path",
+          "verdict": "supported",
+          "reason": "Direct return self.path is explicit.",
+          "evidence": {
+            "path": "tests/test_helpers.py",
+            "start_line": 11,
+            "end_line": 22
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-6d68ecd979748f1847974a59",
+      "reference_sha256": "e4b5fdb17c792902b80763fef524609ad42aacd68bd204ceb0539c3fc985cdd9",
+      "question_sha256": "f89bbdc882e1039de2434100e3cdf541fb55719e3c123315a169f55b494513e8",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Globals attributes raise AttributeError while pop uses sentinel/default",
+          "verdict": "supported",
+          "reason": "Exact exception translation and dictionary defaults match.",
+          "evidence": {
+            "path": "src/flask/ctx.py",
+            "start_line": 52,
+            "end_line": 90
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-6dc2da81340708145f2188d0",
+      "reference_sha256": "3a11a144354971b6ddecdd9f9a1bf8c41b8f07781ee54674baa9b4199cf78d9d",
+      "question_sha256": "8b54bc0e10d841d99d7d21f1f638cfe77270dab3adbff453127bebd7edc2ec42",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Setting accessed causes signed-cookie serialization",
+          "verdict": "contradicted",
+          "reason": "should_set_cookie checks modified or permanent-refresh, not accessed; accessed controls Vary header.",
+          "evidence": {
+            "path": "src/flask/sessions.py",
+            "start_line": 259,
+            "end_line": 261
+          }
+        }
+      ],
+      "material_errors": [
+        "should_set_cookie checks modified or permanent-refresh, not accessed; accessed controls Vary header."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "SecureCookieSession access methods mark accessed so save_session can add Vary: Cookie (src/flask/sessions.py:362-364). That flag does not determine serialization: should_set_cookie checks modified or permanent with SESSION_REFRESH_EACH_REQUEST (259-261); only then does save_session dump/sign the session (383-387). Read-only permanent sessions may be refreshed by policy, but that cost is not caused by unconditionally setting accessed."
+    },
+    {
+      "task_id": "import-7179f24c607ffda8c3848ea6",
+      "reference_sha256": "3853419c922331ae09b7f83352673b034c2c1790af13294dcbc536e0d29e8224",
+      "question_sha256": "4bd6d53487d5f5a19b06fe5fe1c9c9956d678aaafdfd24ef6315956c45b193a2",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "make_config substitutes instance_path when instance-relative",
+          "verdict": "supported",
+          "reason": "Local root_path selection precedes config_class construction.",
+          "evidence": {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 482,
+            "end_line": 496
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-71d4d03cae99337aaa2ec333",
+      "reference_sha256": "fb1e90317b66590625d91b2f5d1c83abb4d3745da6515f25e0df7d6924e02580",
+      "question_sha256": "aa7e15c3d0429c3217816e91aebe0f4fac4a3aa674ccd51b70e97b8a46b9c052",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "CLI tries registered/plugin commands before app command group",
+          "verdict": "supported",
+          "reason": "Immediate return on found command, app load error return, then app.cli lookup are present.",
+          "evidence": {
+            "path": "src/flask/cli.py",
+            "start_line": 609,
+            "end_line": 634
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-72bb083ccf26445bda20e838",
+      "reference_sha256": "9e9f5ab9faf4af93053f1c1b40ff21e0cba50a9f18230e470fb9662f4860a37b",
+      "question_sha256": "27fde113f1471e3f2c3610bea6ab502b10422131b9919fb7dd01131cad7663ca",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "MethodView supports async handlers via ensure_sync",
+          "verdict": "supported",
+          "reason": "Inherited dispatch selects method, HEAD fallback, and ensure_sync call.",
+          "evidence": {
+            "path": "src/flask/views.py",
+            "start_line": 182,
+            "end_line": 191
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-75067f6e8485dbf168747a9e",
+      "reference_sha256": "484a7b929befe389be723a8e74d84762080b13df2b408c6cb2838c23ccfa0942",
+      "question_sha256": "04194a94959c980cc514df9de2c8adbbb5cb7b8979cfef07c8c20a527576f955",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Copied request context guarantees isolated concurrent data",
+          "verdict": "partially_supported",
+          "reason": "Request and session objects are shared; documentation requires locking when moving request between threads.",
+          "evidence": {
+            "path": "src/flask/ctx.py",
+            "start_line": 337,
+            "end_line": 355
+          }
+        }
+      ],
+      "material_errors": [
+        "Request and session objects are shared; documentation requires locking when moving request between threads."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "copy_current_request_context captures ctx.copy once and runs the wrapped function under that context (src/flask/ctx.py:179-193). RequestContext.copy creates a new context object but shares the request, environ and current session (337-355). Context-local bindings are distinct, but mutable request/session data are not isolated; the docstring specifically warns that thread access to the shared request must be locked."
+    },
+    {
+      "task_id": "import-783e928a3c75c32dfd207f30",
+      "reference_sha256": "5fe7e4d985fb5948c7a1a88aa6f4e701192387d9aae91ef553d3d883c992750a",
+      "question_sha256": "d5395d73f9f9abc94f66a00784b63d4953eca345a32cb25b16abf6af730b44b8",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "PassList delegates each mixed item through serializer.tag",
+          "verdict": "supported",
+          "reason": "List comprehension reenters ordered type dispatcher recursively.",
+          "evidence": {
+            "path": "src/flask/json/tag.py",
+            "start_line": 150,
+            "end_line": 156
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-7ad8ddd5d0a532fc3a120a6c",
+      "reference_sha256": "4891df47908de464714f17f95a4f12fcfbcd761c89f994e63e4f04a28de5dc91",
+      "question_sha256": "d4eadaac0b5152a6add8ddc052da0fc32609b68c9154befbc795a4e378987604",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "List route return is covered by ResponseValue and both checker test paths",
+          "verdict": "supported",
+          "reason": "List appears in union; actual route returns list dictionaries; mypy/pyright include type_check directory.",
+          "evidence": {
+            "path": "tests/type_check/typing_route.py",
+            "start_line": 36,
+            "end_line": 38
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-84b03ba4886f9348f881c038",
+      "reference_sha256": "a8f390403864710c62a9ceb4a27fbabb2ab768c52880f615042340dd91d076d3",
+      "question_sha256": "a116f75e9d5fa40282a5d26248f98e80c3fdb6c20a8aa2c30a769fec59d4dceb",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Config.from_object reads inherited uppercase attributes through dir/getattr",
+          "verdict": "supported",
+          "reason": "No explicit hierarchy walker needed; Python attribute resolution supplies inherited values.",
+          "evidence": {
+            "path": "src/flask/config.py",
+            "start_line": 250,
+            "end_line": 254
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-84c901ed4005931ea617ed3c",
+      "reference_sha256": "65e89dc2523b0a9422093acaf25daa1cb3529840d9f2f2c5c5724741eb7e990c",
+      "question_sha256": "91d26a56d31b1758ee4636522488a5602c4301d5847fb08bfb10ccffb8c36e2f",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "MRO traversal proves bottleneck and reversing order is an optimization",
+          "verdict": "partially_supported",
+          "reason": "It already checks specific classes first, skips empty maps and exits at match; reversing changes precedence.",
+          "evidence": {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 831,
+            "end_line": 846
+          }
+        }
+      ],
+      "material_errors": [
+        "It already checks specific classes first, skips empty maps and exits at match; reversing changes precedence."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "_find_error_handler loops over at most two code categories, blueprint/app scopes, then exception MRO for nonempty maps, returning the first match (src/flask/sansio/app.py:831-846). A no-match worst case is O(B*M) dictionary lookups for B scopes and M MRO entries under usual dictionary assumptions. Handler count does not multiply this directly. Deep hierarchies can add work, but a measured bottleneck is not established, and reversing MRO would change specificity semantics. Caching would need keys and invalidation that preserve scope/code precedence."
+    }
+  ]
+}

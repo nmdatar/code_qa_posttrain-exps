@@ -1,0 +1,621 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 199,
+            "file_sha256": "5f8a2d1425e8420204208d9b4e7a6bac4bb87070be6e943db75f0fb61f29f4c3",
+            "path": "django/forms/formsets.py",
+            "start_line": 192
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the `initial_form_count` method in `BaseFormSet` reconcile the dual data sources of management form state and initial data to determine the authoritative form count, and what are the implications of this branching logic for form validation consistency?",
+      "question_sha256": "cdeda6c64b0c434df0fca73352241b7289629229fa853ba27d14c1cec6c75644",
+      "reference_answer": "The method that determines the count of pre-filled forms in the formset collection class (`initial_form_count()` in `BaseFormSet`) uses state-dependent logic to choose between two sources:\n\n1. When the formset is bound (has submitted data): it returns `self.management_form.cleaned_data[INITIAL_FORM_COUNT]`, which comes from the hidden `INITIAL_FORMS` field in the submitted POST data.\n\n2. When the formset is not bound: it returns `len(self.initial) if self.initial else 0`, using the length of the pre-populated data passed to the formset constructor.\n\nThis logic appears in `django/forms/formsets.py` at lines 192-199:\n\n```python\ndef initial_form_count(self):\n    \"\"\"Return the number of forms that are required in this FormSet.\"\"\"\n    if self.is_bound:\n        return self.management_form.cleaned_data[INITIAL_FORM_COUNT]\n    else:\n        # Use the length of the initial data if it's there, 0 otherwise.\n        initial_forms = len(self.initial) if self.initial else 0\n    return initial_forms\n```\n\nThe method is used throughout validation to distinguish initial forms from extra forms:\n- In `_construct_form()` (line 241): determines if forms can be empty (`empty_permitted`)\n- In `deleted_forms` (line 294): skips extra forms that haven't changed\n- In `ordered_forms` (line 318): skips extra forms that haven't changed\n- In `full_clean()` (line 425): counts empty forms for minimum validation\n- In `add_fields()` (line 479): determines which forms get ordering/deletion fields\n\nImplications for validation consistency:\n1. Trust in client-submitted data: when bound, the formset relies on the client-submitted `INITIAL_FORMS` value, which could be tampered with or inconsistent with actual initial data.\n2. Potential inconsistency: if the submitted `INITIAL_FORM_COUNT` differs from the actual number of forms with initial data, validation behavior may be inconsistent (e.g., forms that should be treated as initial may be treated as extra, affecting empty form handling and deletion rules).\n3. The `ManagementForm.clean()` method (lines 43-49) provides defaults (0) when the management form is invalid, which helps prevent errors but may mask inconsistencies.\n\nThe authoritative count is determined by the bound state: when bound, the submitted management form state is authoritative; when not bound, the initial data length is authoritative. This design assumes the client submits the correct `INITIAL_FORMS` value matching the original formset state.\n</start_of_answer>",
+      "reference_sha256": "4011d2e426f4c5da92ad603bcb702382327cd1a04de65ad7931cb47d3c0a1f6e",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-3950d154749fe63577cf0c0a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 116,
+            "file_sha256": "0cc788d164c339aeb1593e81fa87c5fe3b52825facb42aaf6625698ca66885ca",
+            "path": "django/db/backends/base/base.py",
+            "start_line": 116
+          },
+          {
+            "end_line": 1904,
+            "file_sha256": "bd62c426721e11c627c2c7eb885c0b0709909c2d98838e3dcd8e412894ca4007",
+            "path": "django/db/models/fields/__init__.py",
+            "start_line": 1893
+          },
+          {
+            "end_line": 641,
+            "file_sha256": "f5b06d5a3ed9807d62c77e6441bda62bc1b07ff62ed42f074aad7bf07a9fd0e8",
+            "path": "django/db/backends/base/operations.py",
+            "start_line": 639
+          },
+          {
+            "end_line": 105,
+            "file_sha256": "268a9db10b254455a4016a37bed381b9d02ef9a287614ffa3483e6527e9ad56e",
+            "path": "django/db/backends/postgresql/base.py",
+            "start_line": 105
+          },
+          {
+            "end_line": 128,
+            "file_sha256": "ac0f238d447347d4897c797c2f82dd2235b11220d5713abf02f3e65dda35adca",
+            "path": "django/db/backends/oracle/base.py",
+            "start_line": 128
+          },
+          {
+            "end_line": 117,
+            "file_sha256": "173cb011c7af4ae753998bbb155ab465365f669cb1b3a4c98178773efd3a7954",
+            "path": "django/db/backends/mysql/base.py",
+            "start_line": 117
+          },
+          {
+            "end_line": 75,
+            "file_sha256": "48dee44b196c7d0e3530c5aa95e83f826661ea661acac67a4ebed63b49d1439c",
+            "path": "django/db/backends/sqlite3/base.py",
+            "start_line": 75
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "aa82b3b8d68ff2b5009670e8b76844c2c78f56698a3edb62b98634941f1ce4b8",
+            "kind": "file_reference",
+            "line_count": 436,
+            "path": "django/db/backends/base/features.py"
+          },
+          {
+            "file_sha256": "f831e9c45ef019b8d72f588d3bd06d2c3559bab210303d841dbd2892125614b3",
+            "kind": "file_reference",
+            "line_count": 166,
+            "path": "django/db/backends/postgresql/features.py"
+          },
+          {
+            "file_sha256": "afc741f2d00670f1ef72d40079d656d49b27a6456137eadc9d31b9c4e58f4d46",
+            "kind": "file_reference",
+            "line_count": 219,
+            "path": "django/db/backends/oracle/features.py"
+          },
+          {
+            "file_sha256": "1cae44dfa17518674f7210aa1ec9a5a1886b1d7fc1cb2213bce1f2bb1b449521",
+            "kind": "file_reference",
+            "line_count": 46,
+            "path": "django/utils/duration.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where in the codebase are the connection features that determine whether native duration field support exists, and how does DurationField resolve database-specific duration storage implementations across different backends?",
+      "question_sha256": "9aef0c887e9b3361a9c9c349de91c76127f88fff68065b2df3cf162114533d66",
+      "reference_answer": "The timedelta storage field class resolves database-specific duration storage by checking connection capability flags defined in backend-specific feature classes.\n\nLocation of connection capability flags:\nThe capability flag indicating native interval type support is defined in `django/db/backends/base/features.py` within the `BaseDatabaseFeatures` class as a class attribute defaulting to `False`. Backend-specific feature classes override this:\n- PostgreSQL: `django/db/backends/postgresql/features.py` sets it to `True` (line 16)\n- Oracle: `django/db/backends/oracle/features.py` sets it to `True` (line 26)\n- MySQL and SQLite: inherit `False` from the base class\n\nThese feature classes are instantiated in the database connection wrapper's `__init__` method (`django/db/backends/base/base.py`, line 116) as `self.features = self.features_class(self)`, making them accessible via `connection.features`.\n\nResolution mechanism:\nThe timedelta storage field class (`django/db/models/fields/__init__.py`, lines 1893-1904) uses the capability flag in two methods:\n\n1. Database preparation (`get_db_prep_value`, lines 1893-1898):\n   - If native support exists: returns the timedelta value as-is\n   - If no native support: converts the timedelta to microseconds using `duration_microseconds()` from `django/utils/duration.py`\n\n2. Database value conversion (`get_db_converters`, lines 1900-1904):\n   - If no native support: adds a converter from the connection's operations module that converts microseconds back to timedelta objects\n   - The converter is defined in `django/db/backends/base/operations.py` (lines 639-641) and reconstructs timedelta from microseconds\n\nDatabase column type mapping:\nThe database column type is determined by the `data_types` dictionary in each backend's base class:\n- PostgreSQL (`django/db/backends/postgresql/base.py`, line 105): maps to `\"interval\"`\n- Oracle (`django/db/backends/oracle/base.py`, line 128): maps to `\"INTERVAL DAY(9) TO SECOND(6)\"`\n- MySQL (`django/db/backends/mysql/base.py`, line 117): maps to `\"bigint\"` (stores microseconds)\n- SQLite (`django/db/backends/sqlite3/base.py`, line 75): maps to `\"bigint\"` (stores microseconds)\n\nThis design allows the field to adapt its storage and conversion behavior based on each database backend's native capabilities, using native interval types where available and falling back to microsecond-based integer storage for databases without native support.",
+      "reference_sha256": "bab0527024e790a47fca844c7bef7b2f9a86d0269a127dcba62b07734725e72f",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-49809902aa400b161e7c1457"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "75496418b19d8ce9da711ffc3dac1e0395d2c200fcc288cc4c951538238a54b6",
+            "kind": "file_reference",
+            "line_count": 270,
+            "path": "django/db/backends/ddl_references.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the Reference base class design pattern that enables subclasses to implement different reference tracking strategies while maintaining a consistent interface for DDL operations?",
+      "question_sha256": "8a9e4e54f18abe1624b3509006586c7f0d56680ef93f5aba388c9b9506342dc5",
+      "reference_answer": "The base class design pattern in the database backend DDL references module is the `Reference` class located in `django/db/backends/ddl_references.py`. This class implements the Template Method design pattern, providing a consistent interface for tracking references to database objects (tables, columns, and indexes) in deferred DDL statements during migrations.\n\n**Core Interface Methods:**\n\nThe base class defines a consistent interface with the following key methods:\n\n1. **Reference checking methods**: `references_table()`, `references_column()`, and `references_index()` - These methods return boolean values indicating whether a reference tracks a specific database object. The base implementation returns `False` for all methods, requiring subclasses to override them.\n\n2. **Reference renaming methods**: `rename_table_references()` and `rename_column_references()` - These methods allow deferred DDL statements to be updated when database objects are renamed during migrations. The base implementation provides no-op methods that subclasses override.\n\n3. **String representation**: `__str__()` - This abstract method (raises `NotImplementedError` in the base class) allows references to be converted to their SQL string representation when the deferred statement is executed.\n\n**Subclass Implementations:**\n\nDifferent subclasses implement specific reference tracking strategies:\n\n- **`Table`**: Tracks references to a single table name, implementing `references_table()` and `rename_table_references()` to handle table renames.\n\n- **`TableColumns`**: Base class for references to multiple columns of a table, implementing `references_column()` and `rename_column_references()`.\n\n- **`Columns`**: Extends `TableColumns` to track one or many column references with support for column suffixes.\n\n- **`IndexName`**: Tracks index name references, generating index names based on table, columns, and suffix.\n\n- **`IndexColumns`**: Tracks index column references with support for operator classes and column suffixes.\n\n- **`ForeignKeyName`**: Tracks foreign key constraint names, handling references to both source and target tables/columns.\n\n- **`Statement`**: A container class that holds SQL statement templates with reference objects as parts, delegating reference operations to its contained parts.\n\n- **`Expressions`**: Tracks references in database expressions (like `F()` expressions), handling table and column renames in complex SQL expressions.\n\n**Usage in DDL Operations:**\n\nThis design pattern is used extensively in Django's schema editor (`BaseDatabaseSchemaEditor`) to manage deferred SQL statements. When schema operations occur (like table renames or column deletions), the schema editor:\n\n1. Checks deferred statements using `references_table()` or `references_column()` to identify statements that need adjustment\n2. Updates references using `rename_table_references()` or `rename_column_references()` when objects are renamed\n3. Removes statements that reference deleted objects\n\nFor example, in `delete_model()`, the schema editor iterates through `deferred_sql` and removes any `Statement` objects that reference the deleted table. Similarly, in `rename_db_table()`, it calls `rename_table_references()` on all deferred statements to update table name references.\n\nThis design pattern enables Django to maintain referential integrity in deferred DDL statements during complex migration operations, ensuring that constraints, indexes, and other database objects are correctly created even when schema changes occur.",
+      "reference_sha256": "30d06a7485c2a11c4e0993f2e4696206703333091c238abeee3001cabd927c95",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-4c744eb48b4b9c0d749a377a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 47,
+            "file_sha256": "2b25717fc317690836b981b7be621541785292aecf89333ab139099582b2d661",
+            "path": "django/views/generic/list.py",
+            "start_line": 22
+          },
+          {
+            "end_line": 1745,
+            "file_sha256": "8e53239f694290fcaf442787dd14809b0855378e2a0a864d7d8fa52276d67472",
+            "path": "django/db/models/query.py",
+            "start_line": 1745
+          },
+          {
+            "end_line": 77,
+            "file_sha256": "5d39062065a9686c5bb9d32f18eac5282ea9f2c97f10a867d77200e60ff5cfcc",
+            "path": "django/views/generic/detail.py",
+            "start_line": 77
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the conditional invocation of `queryset.all()` versus `self.model._default_manager.all()` in `get_queryset` occur and how does it affect the subsequent ordering logic, and what are the implications for QuerySet-specific behavior when neither path is taken?",
+      "question_sha256": "3b051e67faab9122ce08eeab16ce799cb4e928be93cd312eaabea8f056e31c7a",
+      "reference_answer": "The conditional invocation occurs in the `get_queryset()` method of the `MultipleObjectMixin` class located in `django/views/generic/list.py` (lines 22-47). This method is used by list-based generic views to retrieve the queryset or iterable of objects to display.\n\nThe conditional logic works as follows:\n\n1. **First path** (lines 29-32): If `self.queryset` is not None:\n   - If `self.queryset` is an instance of `QuerySet`, it calls `queryset.all()` which creates a copy of the queryset via the `_chain()` method. This preserves any prefetch_related lookups and returns a new QuerySet instance.\n   - If `self.queryset` is not a QuerySet instance (e.g., a list or other iterable), it uses the queryset as-is without modification.\n\n2. **Second path** (lines 33-34): If `self.queryset` is None but `self.model` is not None:\n   - It calls `self.model._default_manager.all()`, which returns a new QuerySet from the model's default manager.\n\n3. **Ordering application** (lines 41-45): After obtaining the queryset through either path, if ordering is specified via `self.get_ordering()`, the code attempts to call `queryset.order_by(*ordering)`. This method is only available on QuerySet instances.\n\n**Implications for ordering logic:**\n\n- When the first path is taken with a QuerySet instance: `queryset.all()` returns a new QuerySet copy, and subsequent `order_by()` calls work correctly since QuerySet has the `order_by()` method (defined in `django/db/models/query.py` at line 1745).\n\n- When the first path is taken with a non-QuerySet iterable: The queryset is used as-is, but when ordering is applied at line 45, it will raise an `AttributeError` because non-QuerySet iterables don't have an `order_by()` method. This is a potential bug scenario.\n\n- When the second path is taken: `self.model._default_manager.all()` always returns a QuerySet instance, so `order_by()` will work correctly.\n\n**Implications when neither path is taken:**\n\nIf `self.queryset` is None and `self.model` is None, the code raises an `ImproperlyConfigured` exception (lines 36-39), so this case is handled explicitly. However, the problematic case is when `self.queryset` is set to a non-QuerySet iterable: the code will fail when trying to apply ordering, as the docstring notes (lines 26-27) that \"The return value must be an iterable and may be an instance of `QuerySet` in which case `QuerySet` specific behavior will be enabled.\"\n\nThis design allows views to accept any iterable (for flexibility), but QuerySet-specific operations like `order_by()` will only work when a QuerySet instance is provided. The conditional check `isinstance(queryset, QuerySet)` at line 31 ensures that `.all()` is only called on QuerySet instances, preventing errors on other iterable types, but the subsequent `order_by()` call at line 45 doesn't have the same protection.\n\nIn contrast, the `SingleObjectMixin.get_queryset()` method in `django/views/generic/detail.py` (line 77) always calls `.all()` on `self.queryset` if it's not None, without checking if it's a QuerySet instance first, which could raise an error if a non-QuerySet is provided.",
+      "reference_sha256": "be249cb548215b074994a2943b66113c8af58bc2e4be11a70ee05919cccc653a",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-535d769c328871b186aff333"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 88,
+            "file_sha256": "d2970f25a41ae74023a50b55a0ae9d59366b73d532114c74de063f2c98744e7b",
+            "path": "tests/auth_tests/test_views.py",
+            "start_line": 79
+          },
+          {
+            "end_line": 153,
+            "file_sha256": "96c7a1fd5843d445dc776fa83e7ef0fb153672c50ab79a4d948acb28a71ada26",
+            "path": "django/contrib/auth/__init__.py",
+            "start_line": 153
+          },
+          {
+            "end_line": 814,
+            "file_sha256": "4888d8a06d94d680f855f79df455e8a5c209fc6838e3279232a4fc44a55a6441",
+            "path": "django/test/client.py",
+            "start_line": 805
+          },
+          {
+            "end_line": 66,
+            "file_sha256": "479b5d493836a87daa6b54781c2dd543b2b4c5b0975bbe7dad14e095c8c17b82",
+            "path": "django/contrib/auth/views.py",
+            "start_line": 66
+          },
+          {
+            "end_line": 1049,
+            "file_sha256": "4888d8a06d94d680f855f79df455e8a5c209fc6838e3279232a4fc44a55a6441",
+            "path": "django/test/client.py",
+            "start_line": 1049
+          },
+          {
+            "end_line": 196,
+            "file_sha256": "96c7a1fd5843d445dc776fa83e7ef0fb153672c50ab79a4d948acb28a71ada26",
+            "path": "django/contrib/auth/__init__.py",
+            "start_line": 196
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What implicit dependencies exist between the assertLoginRedirectURLEqual helper method and the self.login() method inherited from AuthViewsTestCase regarding session middleware and CSRF token handling?",
+      "question_sha256": "90038cae3d2bcf098cdc4029c94f95bf500e1cccc824e1c203f688d61c790672",
+      "reference_answer": "Based on my exploration of the Django repository, there are several implicit dependencies between these two methods regarding session middleware and CSRF token handling:\n\n**Session Middleware Dependencies:**\n\n1. **Session Initialization Requirement**: The `login()` method (defined at line 79-88 in `tests/auth_tests/test_views.py`) performs a POST request using `self.client.post()`, which requires the session middleware to be active in the middleware stack. The session middleware must process the request to initialize `request.session`, which is required by the `auth_login()` function (defined at line 153 in `django/contrib/auth/__init__.py`) that sets `request.session[SESSION_KEY]` (line 191).\n\n2. **Session Cookie Persistence**: The test client's `session` property (defined at lines 805-814 in `django/test/client.py`) automatically creates or retrieves sessions using the session engine. After the login POST request completes, the session middleware sets a session cookie in the response, which the test client stores in `self.cookies` (line 1107). The `login()` method then accesses `self.client.session` (line 87) to verify that `SESSION_KEY` is present, which depends on the session cookie being properly set by the middleware.\n\n3. **Session State Verification**: The `assertLoginRedirectURLEqual()` method (defined at lines 1027-1029) calls `self.login()` and then checks the redirect response. While it doesn't explicitly verify the session, it implicitly relies on `self.login()` having already verified that `SESSION_KEY` is in the session. This creates a dependency where `assertLoginRedirectURLEqual()` assumes the session middleware has successfully processed the login request and established an authenticated session.\n\n**CSRF Token Handling Dependencies:**\n\n1. **CSRF Protection Bypass**: The LoginView (defined at line 66 in `django/contrib/auth/views.py`) has `@method_decorator(csrf_protect)` (line 78), which enables CSRF protection. However, the test client by default has `enforce_csrf_checks=False` (line 1049 in `django/test/client.py`). The ClientHandler sets `request._dont_enforce_csrf_checks = not self.enforce_csrf_checks` (line 183), which bypasses CSRF checks. This means `self.login()` can make POST requests without providing CSRF tokens, and `assertLoginRedirectURLEqual()` relies on this default behavior.\n\n2. **CSRF Token Rotation**: The `auth_login()` function calls `rotate_token(request)` (line 196 in `django/contrib/auth/__init__.py`), which rotates the CSRF token after successful login. This rotation happens automatically during the login process, but neither `self.login()` nor `assertLoginRedirectURLEqual()` explicitly handle CSRF tokens - they both depend on the test client's default behavior of not enforcing CSRF checks.\n\n3. **Implicit CSRF Dependency**: If CSRF checks were enforced (by setting `enforce_csrf_checks=True` when creating the test client), the `login()` method would fail because it doesn't provide a CSRF token in the POST data. The `assertLoginRedirectURLEqual()` method would then also fail because it depends on `self.login()` succeeding. This creates an implicit dependency where both methods assume CSRF checks are disabled.\n\n**Summary**: The main implicit dependencies are: (1) both methods assume session middleware is active and properly processes requests to establish sessions, (2) both methods assume CSRF protection is bypassed by default in the test client, (3) `assertLoginRedirectURLEqual()` depends on `self.login()` having successfully established an authenticated session, and (4) neither method explicitly handles CSRF tokens, relying on the test client's default configuration.",
+      "reference_sha256": "3f4e43a20219b08ac21a51d39fcc873a38147a366244e6cbee857542278aeaff",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-61119dd3437675675599db61"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1037,
+            "file_sha256": "95b6e5bf285ef1e18445e8ed9e40b4454069c794569ec04fa737e23e17348031",
+            "path": "django/db/models/fields/related.py",
+            "start_line": 1037
+          },
+          {
+            "end_line": 1062,
+            "file_sha256": "95b6e5bf285ef1e18445e8ed9e40b4454069c794569ec04fa737e23e17348031",
+            "path": "django/db/models/fields/related.py",
+            "start_line": 1051
+          },
+          {
+            "end_line": 73,
+            "file_sha256": "45cb0be274507192d8220f0032337ab9716e45256db303042586b7c11918b983",
+            "path": "django/db/models/deletion.py",
+            "start_line": 69
+          },
+          {
+            "end_line": 517,
+            "file_sha256": "45cb0be274507192d8220f0032337ab9716e45256db303042586b7c11918b983",
+            "path": "django/db/models/deletion.py",
+            "start_line": 94
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "95b6e5bf285ef1e18445e8ed9e40b4454069c794569ec04fa737e23e17348031",
+            "kind": "file_reference",
+            "line_count": 2064,
+            "path": "django/db/models/fields/related.py"
+          },
+          {
+            "file_sha256": "07d625a8e0e8eb09f207b3f1ee30b46ecd11140a4d866db159b8ae6e829fdfa4",
+            "kind": "file_reference",
+            "line_count": 36,
+            "path": "tests/m2o_recursive/models.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the architectural pattern of the Person model's self-referential foreign key that enables recursive relationship traversal while maintaining data integrity constraints, and what architectural implications arise from using SET_NULL cascading behavior for both parental relationships?",
+      "question_sha256": "7f6f53485332a39ea7c35d2d898694a73149e75bd19477fa0be19cd896293624",
+      "reference_answer": "The architectural pattern is a self-referential many-to-one relationship using Django's `ForeignKey` with the recursive relationship constant.\n\n**Architectural Pattern:**\n\nThe model uses `ForeignKey(\"self\", ...)`, where `\"self\"` is Django's `RECURSIVE_RELATIONSHIP_CONSTANT` (defined in `django/db/models/fields/related.py`). This creates a many-to-one relationship where a model instance can reference another instance of the same model.\n\nIn the Person model (`tests/m2o_recursive/models.py`), this pattern is implemented as:\n\n```python\nclass Person(models.Model):\n    full_name = models.CharField(max_length=20)\n    mother = models.ForeignKey(\n        \"self\", models.SET_NULL, null=True, related_name=\"mothers_child_set\"\n    )\n    father = models.ForeignKey(\n        \"self\", models.SET_NULL, null=True, related_name=\"fathers_child_set\"\n    )\n```\n\n**Recursive Relationship Traversal:**\n\nThe pattern enables hierarchical traversal through reverse relationship accessors:\n- Forward: `person.mother` and `person.father` access parent instances\n- Reverse: `person.mothers_child_set.all()` and `person.fathers_child_set.all()` access child instances via the `related_name` parameters\n\n**Data Integrity Constraints:**\n\nThe `ForeignKey` field creates database-level foreign key constraints (`db_constraint=True` by default, as seen in `django/db/models/fields/related.py:1037`). These constraints:\n- Enforce referential integrity at the database level\n- Require `null=True` when using `SET_NULL` (validated in `django/db/models/fields/related.py:1051-1062`)\n- Ensure foreign key values reference valid primary keys or are NULL\n\n**SET_NULL Cascading Behavior Implications:**\n\nWhen both parent-reference fields use `SET_NULL` (implemented in `django/db/models/deletion.py:69-73`), the architectural implications include:\n\n1. **Orphaned Children**: Deleting a parent sets the child's parent references to NULL, creating \"orphaned\" records without parent links. Children are not deleted, preserving their data.\n\n2. **NULL Handling**: The model must handle NULL values in queries and traversal. Reverse relationships may return empty querysets when parents are deleted.\n\n3. **Constraint Behavior**: Database constraints allow NULL values (due to `null=True`), so referential integrity is maintained while permitting orphaned relationships.\n\n4. **Deletion Order Independence**: Unlike `CASCADE`, deletion order is less critical because children are not deleted when parents are removed.\n\n5. **Data Preservation**: Historical data is preserved even when parent records are deleted, which is useful for audit trails or maintaining child records independently.\n\n6. **Query Complexity**: Traversal queries must account for potential NULL values when following parent chains, requiring null-safe lookups in recursive queries.\n\nThe implementation uses Django's `Collector` class (`django/db/models/deletion.py:94-517`) to manage the deletion process, where `SET_NULL` schedules field updates to NULL rather than cascading deletions, as seen in the `add_field_update` method (lines 148-153) and the deletion execution (lines 472-491).",
+      "reference_sha256": "9a13f62651950772006d674e660fa047bf45189f9b7c2a5ab37c87ebb3cd9bb6",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-73b93f0a5cfce972e6e03cb4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 186,
+            "file_sha256": "89c14feb18bee50c6af7c819c49210f6ea113de562ee164d8145061fef9b556b",
+            "path": "django/forms/fields.py",
+            "start_line": 186
+          },
+          {
+            "end_line": 782,
+            "file_sha256": "bd62c426721e11c627c2c7eb885c0b0709909c2d98838e3dcd8e412894ca4007",
+            "path": "django/db/models/fields/__init__.py",
+            "start_line": 782
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "ef9055e49cdb7e83b50044656bf1965344f20940c2227e01b86080d41f336b59",
+            "kind": "file_reference",
+            "line_count": 259,
+            "path": "django/core/exceptions.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the run_validators() method's exception handling pattern with hasattr() checks and error list concatenation impact performance under high validation load, and what refactoring would improve throughput?",
+      "question_sha256": "201588d0f600c7c23febb23f732fbdd5e508f0d03f1d2cc98bf1c9621dbee661",
+      "reference_answer": "The method that executes field validators and aggregates validation errors (found in `django/forms/fields.py` at line 186 and `django/db/models/fields/__init__.py` at line 782) uses an exception handling pattern that impacts performance under high validation load:\n\n**Current Implementation Pattern:**\n\n```python\ndef run_validators(self, value):\n    if value in self.empty_values:\n        return\n    errors = []\n    for v in self.validators:\n        try:\n            v(value)\n        except ValidationError as e:\n            if hasattr(e, \"code\") and e.code in self.error_messages:\n                e.message = self.error_messages[e.code]\n            errors.extend(e.error_list)\n    if errors:\n        raise ValidationError(errors)\n```\n\n**Performance Issues:**\n\n1. **Attribute existence checks (`hasattr(e, \"code\")`)**: On every `ValidationError`, `hasattr()` performs attribute lookup via `__getattribute__()` or `__getattr__()`, adding overhead. Under high load with many validators, this accumulates.\n\n2. **List extension operations (`errors.extend(e.error_list)`)**: Each `extend()` call:\n   - Accesses `e.error_list` (which may trigger property access or list creation in `ValidationError.__init__()`)\n   - Extends the list, potentially causing reallocation\n   - Under high load with multiple validators raising errors, this creates repeated list operations\n\n**Refactoring to Improve Throughput:**\n\n1. **Replace `hasattr()` with try/except or direct attribute access**: Since `ValidationError` always has a `code` attribute when constructed with it (per `django/core/exceptions.py`), use:\n   ```python\n   try:\n       if e.code in self.error_messages:\n           e.message = self.error_messages[e.code]\n   except AttributeError:\n       pass\n   ```\n   Or use `getattr(e, \"code\", None)` which is faster than `hasattr()`.\n\n2. **Pre-allocate or use list comprehension**: Instead of repeated `extend()` calls, collect error lists first:\n   ```python\n   error_lists = []\n   for v in self.validators:\n       try:\n           v(value)\n       except ValidationError as e:\n           if getattr(e, \"code\", None) in self.error_messages:\n               e.message = self.error_messages[e.code]\n           error_lists.append(e.error_list)\n   if error_lists:\n       errors = [item for sublist in error_lists for item in sublist]\n       raise ValidationError(errors)\n   ```\n\n3. **Use `itertools.chain()` for flattening**: More efficient for combining multiple lists:\n   ```python\n   from itertools import chain\n   errors = list(chain.from_iterable(e.error_list for e in caught_errors))\n   ```\n\n4. **Cache attribute checks**: If the same `ValidationError` types are raised repeatedly, cache the `hasattr` result or use a set of known error types.\n\nThe most impactful optimization would be replacing `hasattr()` with `getattr(e, \"code\", None)` and using `itertools.chain()` for list concatenation, as these reduce per-iteration overhead in the hot path.",
+      "reference_sha256": "487d6139e332db00decc888c811348b6c486f48f41b3f7bb9b84d90bcd68a2f4",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-7a8e5fce8ed60429423f422d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 15,
+            "file_sha256": "d4b46e0587160aa20a6b6dc81cb11db486738141860c6c346126fa4535f549a1",
+            "path": "django/core/management/commands/flush.py",
+            "start_line": 15
+          },
+          {
+            "end_line": 91,
+            "file_sha256": "d4b46e0587160aa20a6b6dc81cb11db486738141860c6c346126fa4535f549a1",
+            "path": "django/core/management/commands/flush.py",
+            "start_line": 88
+          },
+          {
+            "end_line": 281,
+            "file_sha256": "07473585ec67a7a33e82c3c505af43db330be9aa49cfa87c4e103536135d9b52",
+            "path": "docs/topics/testing/overview.txt",
+            "start_line": 278
+          },
+          {
+            "end_line": 1263,
+            "file_sha256": "05e9f5bec18adc58dac079a51e645d5c9578a8e4e968a96d2d0c0f7769efbd56",
+            "path": "django/test/testcases.py",
+            "start_line": 1252
+          },
+          {
+            "end_line": 342,
+            "file_sha256": "9b38d684a9c2fb2afe2dcbe1079108af58a91a5a1181512a3eba27c02041c23b",
+            "path": "docs/topics/testing/advanced.txt",
+            "start_line": 313
+          },
+          {
+            "end_line": 88,
+            "file_sha256": "d4b46e0587160aa20a6b6dc81cb11db486738141860c6c346126fa4535f549a1",
+            "path": "django/core/management/commands/flush.py",
+            "start_line": 88
+          },
+          {
+            "end_line": 1271,
+            "file_sha256": "05e9f5bec18adc58dac079a51e645d5c9578a8e4e968a96d2d0c0f7769efbd56",
+            "path": "django/test/testcases.py",
+            "start_line": 1256
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "d4b46e0587160aa20a6b6dc81cb11db486738141860c6c346126fa4535f549a1",
+            "kind": "file_reference",
+            "line_count": 93,
+            "path": "django/core/management/commands/flush.py"
+          },
+          {
+            "file_sha256": "6551d5240622fe30885f1594652931ab42031027ba6ef6c5b166b2aea6eeb5f7",
+            "kind": "file_reference",
+            "line_count": 145,
+            "path": "django/contrib/contenttypes/management/__init__.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the inhibit_post_migrate stealth option and how does it prevent unintended side effects when flushing a database with populated migration history?",
+      "question_sha256": "a123cf4148da96f57c8acb08d03c48fe03de50dc7088ef07ecc9be7aa3a23abf",
+      "reference_answer": "The stealth option that suppresses the signal emitted after database schema changes when clearing all data from a database containing migration tracking information is `inhibit_post_migrate`. It is defined in the `flush` management command located at `django/core/management/commands/flush.py`.\n\n**What it is:**\n`inhibit_post_migrate` is a stealth option (line 15 in `flush.py`), meaning it's not exposed as a command-line argument but can be passed programmatically. It's used internally by Django's test framework and other components.\n\n**How it prevents unintended side effects:**\n\n1. **Normal behavior without the option:**\n   When the `flush` command clears all database tables, it normally emits the `post_migrate` signal (lines 88-91 in `flush.py`). This signal triggers handlers that recreate essential database records:\n   - **ContentTypes**: The `create_contenttypes` function (in `django/contrib/contenttypes/management/__init__.py`) creates ContentType records for each model\n   - **Permissions**: The `create_permissions` function creates permission records for each model\n   - **Default Site**: The `create_default_site` function creates a default Site record\n   - Other app-specific handlers that respond to the signal\n\n2. **The problem with populated migration history:**\n   When flushing a database that contains migration tracking information (the `django_migrations` table and related migration state), emitting `post_migrate` can cause unintended side effects:\n   - **With serialized rollback**: In test cases using `serialized_rollback=True`, the database state is serialized before tests and restored afterward. If `post_migrate` runs after flushing, it would recreate ContentTypes, permissions, and other data that would then conflict with or duplicate the serialized data being restored (as documented in `docs/topics/testing/overview.txt` lines 278-281).\n   - **With available_apps**: When test cases restrict the app registry using `available_apps`, only a subset of apps are available. Emitting `post_migrate` would try to create ContentTypes and permissions for all installed apps, not just the restricted set, causing incorrect state (as explained in `django/test/testcases.py` lines 1252-1263 and `docs/topics/testing/advanced.txt` lines 313-342).\n\n3. **How the option prevents side effects:**\n   When `inhibit_post_migrate=True` is passed to the flush command, the condition on line 88 of `flush.py` evaluates to false, preventing the call to `emit_post_migrate_signal()` on line 91. This means:\n   - No ContentTypes are recreated unnecessarily\n   - No permissions are recreated unnecessarily  \n   - No default Site is recreated unnecessarily\n   - Other signal handlers don't run, avoiding conflicts with serialized data or restricted app registries\n\n**Usage in test framework:**\nThe test framework uses this option in `TransactionTestCase._fixture_teardown()` (lines 1256-1271 in `django/test/testcases.py`) when:\n- `available_apps` is set (to avoid creating data for apps not in the test)\n- `serialized_rollback=True` and serialized contents exist (to avoid recreating data that will be restored from serialized state)\n\nThis ensures that after flushing, the database state matches what the test framework expects, without the side effects of signal handlers running inappropriately.",
+      "reference_sha256": "58c4d8eeb4dc2289d26542cbacecefa96d9fbd11e78369b3c4f4589ce8920364",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-80e0bd535d2dab28c20b2941"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1594,
+            "file_sha256": "38d900b034b86d9c4d2d3f4c7cb078d672d637f9badc0bfaa03732dbc6103bb4",
+            "path": "django/db/models/base.py",
+            "start_line": 1594
+          },
+          {
+            "end_line": 509,
+            "file_sha256": "c565a46c3af495ddc0ada728ada08f52249b67eb2e7a6d7d59ca1200b95a87bb",
+            "path": "django/forms/models.py",
+            "start_line": 500
+          },
+          {
+            "end_line": 259,
+            "file_sha256": "3ae3085ecc252e5be30ae1813e982485e6a9cf00daacb4960142c24df7f82017",
+            "path": "docs/ref/models/instances.txt",
+            "start_line": 259
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the unique constraint on the 'name' CharField in the Target model propagate through the ORM's data validation pipeline and affect the control flow when foreign key relationships from other models attempt to reference Target instances?",
+      "question_sha256": "cdc891ae8030e6a7d18a2291672f01f5c5c0a0a21e55be1db94597862bdc5c28",
+      "reference_answer": "The unique constraint on the `name` CharField in the Target model propagates through Django's ORM validation pipeline as follows:\n\n1. Validation entry points:\n   - `full_clean()` (in `django/db/models/base.py`, line 1594) calls `validate_unique()` when `validate_unique=True`.\n   - `ModelForm.is_valid()` (in `django/forms/models.py`, line 500-509) calls `full_clean()` with `validate_unique=False`, then calls `validate_unique()` separately (line 520).\n   - `save()` does not automatically call `full_clean()` (documented in `docs/ref/models/instances.txt`, line 259).\n\n2. Unique constraint collection:\n   - `validate_unique()` (line 1354) calls `_get_unique_checks()` (line 1370).\n   - `_get_unique_checks()` collects fields with `f.unique=True` (line 1428-1429), including Target's `name` field.\n   - It builds a list of `(model_class, (field_name,))` tuples for single-field unique constraints.\n\n3. Unique constraint validation:\n   - `_perform_unique_checks()` (line 1438) executes the checks:\n     - Gets the field value via `getattr(self, f.attname)` (line 1448).\n     - Builds `lookup_kwargs` with the field name and value (line 1459).\n     - Queries the database: `model_class._default_manager.filter(**lookup_kwargs)` (line 1465).\n     - Excludes the current instance if updating (line 1474-1475).\n     - Raises `ValidationError` if `qs.exists()` returns `True` (line 1476-1483).\n\n4. Control flow with foreign key relationships:\n   - When other models (e.g., Pointer, ToFieldPointer) reference Target instances:\n     - `save()` calls `_prepare_related_fields_for_save()` (line 827) to ensure related objects are saved first.\n     - If a foreign key uses `to_field=\"name\"` (as in ToFieldPointer, line 89), it references the unique `name` field.\n     - If `full_clean()` is called, `validate_unique()` runs before the database save.\n     - Fields that failed validation are excluded from unique checks (line 1620-1622).\n     - In `ModelForm`, fields not on the form are excluded via `_get_validation_exclusions()` (line 394-437), which affects which unique checks run.\n\n5. Exclusion mechanism:\n   - `validate_unique(exclude=None)` accepts an `exclude` set of field names to skip (line 1354).\n   - `full_clean()` automatically excludes fields that failed validation (line 1620-1622).\n   - `ModelForm._get_validation_exclusions()` excludes fields not on the form, fields in errors, and certain empty fields (line 394-437).\n\n6. Database-level enforcement:\n   - If ORM validation passes but a database unique constraint violation occurs, the database raises `IntegrityError` during `_save_table()` (line 1038+).\n\nThe unique constraint on Target's `name` field is enforced at the ORM validation layer through `validate_unique()`, which performs database queries to check for existing objects with the same value, and this validation can be influenced by the `exclude` parameter when foreign key relationships attempt to reference Target instances, particularly when those relationships use `to_field=\"name\"` to reference the unique field directly.",
+      "reference_sha256": "2e2b0df9a6781c287e0341e5dffc247a95f4eb9e0de861ca76b3d16815d46912",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-8256ac589aed18728dda2aef"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 495,
+            "file_sha256": "74299a4c38e8ff679f30d7ba6d25c150498d2c7b2d20cb912e762295234fa016",
+            "path": "django/template/defaulttags.py",
+            "start_line": 467
+          },
+          {
+            "end_line": 242,
+            "file_sha256": "5bb4eb402536033fa5f9ccd3fbc6811658bc967cc11ebe0d482e3a604282ae16",
+            "path": "tests/template_tests/syntax_tests/test_url.py",
+            "start_line": 239
+          },
+          {
+            "end_line": 1454,
+            "file_sha256": "dcf9efdde48fe7e2cc37cfa5d390455ecd49688f1977336d122cf5bdb988e9bc",
+            "path": "docs/ref/templates/builtins.txt",
+            "start_line": 1447
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why is the purpose of the test_url_asvar03 function in validating the URL template tag's behavior when using the 'as' variable assignment syntax?",
+      "question_sha256": "4370c86596f6fff2a6ca8fa9aa8384706a7b71522b163b9a525c35fadf69664a",
+      "reference_answer": "The test function exists to verify that when the URL-generating template tag uses the variable assignment syntax (the `as` keyword) instead of outputting the URL directly, it handles missing or invalid view names gracefully by assigning an empty string to the variable rather than raising a `NoReverseMatch` exception.\n\nThis behavior is implemented in the `URLNode.render()` method in `./django/template/defaulttags.py` (lines 467-495). The implementation shows:\n\n1. When the `asvar` parameter is set (indicating the `as` syntax is used), the code initializes `url = \"\"` (line 482).\n\n2. If `reverse()` raises `NoReverseMatch` (lines 483-487), the exception is only re-raised if `self.asvar is None` (meaning the `as` syntax was not used). If `asvar` is set, the exception is silently caught and the code continues with `url` remaining as an empty string.\n\n3. The empty string is then assigned to the context variable (line 490), and the tag returns an empty string instead of outputting anything (line 491).\n\nThe test itself (lines 239-242 in `./tests/template_tests/syntax_tests/test_url.py`) uses the template `'{% url \"no_such_view\" as url %}{{ url }}'` where `\"no_such_view\"` is a non-existent view name. It verifies that the output is an empty string (`\"\"`) rather than raising an exception.\n\nThis design allows templates to conditionally check if a URL exists before using it, as documented in `./docs/ref/templates/builtins.txt` (lines 1447-1454), where the documentation states: \"This `{% url ... as var %}` syntax will *not* cause an error if the view is missing. In practice you'll use this to link to views that are optional.\"\n\nThe test ensures this error-suppression behavior works correctly, preventing template rendering failures when optional URLs are referenced.",
+      "reference_sha256": "c222ce81c2d51dbd4ed0ab5ef7aef603fc26e858b5bd3079474edf817d881f2a",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-87284dbb640a5fec7e8cc9c7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 892,
+            "file_sha256": "7517569c2c7e2355a96d43eaada16f6788eabffb31721aea643951a1f986b26e",
+            "path": "django/db/models/sql/query.py",
+            "start_line": 872
+          },
+          {
+            "end_line": 1031,
+            "file_sha256": "7ac5853f85e8705642aeba19877b690f9965b3b9cdcb86a4add0598f6addce72",
+            "path": "django/db/models/sql/compiler.py",
+            "start_line": 982
+          },
+          {
+            "end_line": 1330,
+            "file_sha256": "7ac5853f85e8705642aeba19877b690f9965b3b9cdcb86a4add0598f6addce72",
+            "path": "django/db/models/sql/compiler.py",
+            "start_line": 1173
+          },
+          {
+            "end_line": 400,
+            "file_sha256": "4593434092cbbf69772ca779ef7cd6a12f12757fcd52b9bc9fb843eb9b92f814",
+            "path": "django/db/models/query_utils.py",
+            "start_line": 365
+          },
+          {
+            "end_line": 243,
+            "file_sha256": "4593434092cbbf69772ca779ef7cd6a12f12757fcd52b9bc9fb843eb9b92f814",
+            "path": "django/db/models/query_utils.py",
+            "start_line": 200
+          },
+          {
+            "end_line": 853,
+            "file_sha256": "7517569c2c7e2355a96d43eaada16f6788eabffb31721aea643951a1f986b26e",
+            "path": "django/db/models/sql/query.py",
+            "start_line": 811
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How should Django's ORM architecture be designed to ensure that when select_related and defer are combined on a related parent object, the deferred fields are properly excluded from the join query while maintaining lazy-loading semantics for non-deferred parent attributes?",
+      "question_sha256": "3de30c884a2793fa3b3709856ce880f660045d23c3b60dddfb979a3621ea92bd",
+      "reference_answer": "Based on my exploration of the Django codebase, the ORM architecture handles the combination of `select_related()` and `defer()` through a coordinated system involving select masks, column filtering, and validation logic.\n\n**Core Architecture Components:**\n\n1. **Select Mask Generation** (`django/db/models/sql/query.py:872-892`): The `get_select_mask()` method converts the `deferred_loading` data structure (a tuple of `(frozenset(), True/False)`) into a nested dictionary structure called `select_mask`. This mask tracks which fields should be included or excluded for each model in the query. When `defer()` is called, `_get_defer_select_mask()` recursively builds this mask to exclude deferred fields while including all non-deferred fields.\n\n2. **Column Selection Filtering** (`django/db/models/sql/compiler.py:982-1031`): The `get_default_columns()` method uses the `select_mask` to determine which columns to include in the SQL SELECT clause. At line 1026, it checks `if select_mask and field not in select_mask_fields: continue`, effectively excluding deferred fields from the column selection. This ensures that when `select_related()` creates JOINs, only non-deferred fields are included in the SELECT clause for the related model.\n\n3. **Related Selection Processing** (`django/db/models/sql/compiler.py:1173-1330`): The `get_related_selections()` method handles the `select_related()` traversal. At line 1243, it extracts the `related_select_mask` for each related field: `related_select_mask = select_mask.get(f) or {}`. This mask is then passed to `get_default_columns()` at line 1258-1259, ensuring that when columns are selected for the joined related model, deferred fields are excluded.\n\n4. **Validation Logic** (`django/db/models/query_utils.py:365-400`): The `select_related_descend()` function prevents invalid combinations. At lines 395-399, it raises a `FieldError` if a field is both deferred and being traversed via `select_related()` on the same model level. However, this validation allows deferring fields on related models that are selected via `select_related()` (e.g., `select_related().defer(\"related__field\")` is valid).\n\n5. **Lazy Loading Mechanism** (`django/db/models/query_utils.py:200-243`): The `DeferredAttribute` class implements lazy loading. When a deferred field is accessed, `__get__()` checks if the value exists in the instance's `__dict__`. If not, it calls `instance.refresh_from_db(fields=[field_name])` at line 228, triggering a separate query to load just that field.\n\n**How It Works Together:**\n\nWhen `select_related().defer(\"parent__field\")` is called:\n- The `select_mask` is built to exclude `parent__field` from the related model's field set\n- `get_related_selections()` processes the `select_related()` traversal and extracts the mask for the parent relationship\n- `get_default_columns()` filters out the deferred field when generating columns for the JOIN query\n- The SQL JOIN is created, but the deferred field column is excluded from the SELECT clause\n- When the deferred field is accessed later, `DeferredAttribute` triggers a lazy load query\n\n**Key Implementation Details:**\n\n- The select mask is a nested dictionary structure where keys are field objects and values are nested masks for related models (`django/db/models/sql/query.py:811-853`)\n- The mask is passed recursively through `get_related_selections()` to maintain field exclusion across relationship chains\n- Non-deferred parent attributes remain in the SELECT clause and are loaded immediately, maintaining lazy-loading semantics only for explicitly deferred fields\n- The architecture ensures that JOIN queries are optimized (excluding unnecessary columns) while preserving the lazy-loading contract for deferred fields\n\nThis design ensures that deferred fields on related parent objects are properly excluded from join query column selection while maintaining lazy-loading semantics for non-deferred parent attributes, exactly as the question asks.",
+      "reference_sha256": "3a56f1092589667eedc0c5b0e98611b7aab2d644d3ee19415e838271ff72972f",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-87c5ca19ae578a5cf219738a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 101,
+            "file_sha256": "5d39062065a9686c5bb9d32f18eac5282ea9f2c97f10a867d77200e60ff5cfcc",
+            "path": "django/views/generic/detail.py",
+            "start_line": 8
+          },
+          {
+            "end_line": 180,
+            "file_sha256": "5d39062065a9686c5bb9d32f18eac5282ea9f2c97f10a867d77200e60ff5cfcc",
+            "path": "django/views/generic/detail.py",
+            "start_line": 117
+          },
+          {
+            "end_line": 134,
+            "file_sha256": "bb2470d75b2246c3515f3d2277803672b25e0c6527710f027b87e259b0e0b438",
+            "path": "django/views/generic/edit.py",
+            "start_line": 76
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "afac2428a0d1f7e3ecfa64cb78a91873da47144cec8f59eb2e77bcdcbce70ed7",
+            "kind": "file_reference",
+            "line_count": 221,
+            "path": "tests/generic_views/test_detail.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the layered architecture design revealed by DetailViewTest's test structure in handling the composition of SingleObjectMixin, SingleObjectTemplateResponseMixin, and ModelFormMixin?",
+      "question_sha256": "df4573e1ab207fb531f47e443d518c905cfa487273431b7892345895cb2888df",
+      "reference_answer": "The layered architecture revealed by the test structure demonstrates a separation of concerns through mixin composition:\n\n**Foundation Layer: SingleObjectMixin**\n- Located in `django/views/generic/detail.py` (lines 8-101)\n- Provides core object retrieval: `get_object()`, `get_queryset()`, `get_context_data()`\n- Handles URL parameter extraction (pk/slug) and queryset filtering\n- Base for single-object operations\n\n**Template Response Layer: SingleObjectTemplateResponseMixin**\n- Located in `django/views/generic/detail.py` (lines 117-180)\n- Extends `TemplateResponseMixin` and depends on `SingleObjectMixin`\n- Resolves template names from object metadata (`template_name_field`, model app_label/model_name)\n- Requires `self.object` to be set (usually by SingleObjectMixin)\n\n**Form Handling Layer: ModelFormMixin**\n- Located in `django/views/generic/edit.py` (lines 76-134)\n- Combines `FormMixin` with `SingleObjectMixin` (inherits from both)\n- Provides model form creation, instance handling, and success URL resolution\n- Uses `SingleObjectMixin`'s object retrieval for form instance binding\n\n**Composition Pattern:**\nThe test structure in `tests/generic_views/test_detail.py` reveals this layering:\n- Lines 185-193: `test_deferred_queryset_template_name` tests `SingleObjectTemplateResponseMixin` working with deferred querysets, showing it depends on object metadata\n- Lines 195-204: `test_deferred_queryset_context_object_name` tests `ModelFormMixin`'s context generation, demonstrating its use of `SingleObjectMixin`'s context methods\n\n**Architectural Flow:**\n1. `BaseDetailView` = `SingleObjectMixin` + `View` (object retrieval + HTTP handling)\n2. `DetailView` = `SingleObjectTemplateResponseMixin` + `BaseDetailView` (template resolution + base detail)\n3. `ModelFormMixin` = `FormMixin` + `SingleObjectMixin` (form handling + object retrieval)\n\nThis design allows independent testing of each layer's responsibilities while enabling flexible composition for different view types.",
+      "reference_sha256": "82aef1d7388c068d32271185c9c95b40670b959b7c0c8fbe2cf1b918a81117f6",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-89f132eab20a4e4d332ec777"
+    }
+  ]
+}

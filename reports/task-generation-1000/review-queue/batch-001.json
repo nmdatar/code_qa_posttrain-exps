@@ -1,0 +1,427 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2672,
+            "file_sha256": "7774a333214107da1e5d016031b6be9be80b9bc9e33bb3773ca9dfd2e7a51d5e",
+            "path": "cextern/wcslib/C/prj.c",
+            "start_line": 2672
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "7774a333214107da1e5d016031b6be9be80b9bc9e33bb3773ca9dfd2e7a51d5e",
+            "kind": "file_reference",
+            "line_count": 8647,
+            "path": "cextern/wcslib/C/prj.c"
+          },
+          {
+            "file_sha256": "60faf4d63604bc0b9b3ed90634aeac5d3ab307177b00fa6f97163959df55f1ad",
+            "kind": "file_reference",
+            "line_count": 202,
+            "path": "cextern/wcslib/C/wcstrig.c"
+          },
+          {
+            "file_sha256": "8de6c80f3f0099a69ed36de07d71793442218c70c3ea8a420f5f2f8f36263313",
+            "kind": "file_reference",
+            "line_count": 998,
+            "path": "astropy/wcs/src/wcslib_prjprm_wrap.c"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where are the lower-level mathematical transformation functions that the sky-to-pixel zenithal equal area projection class delegates to for converting the zenithal angle theta into the radial distance R_theta during the sky-to-pixel projection?",
+      "question_sha256": "0e9533b4fc95b02f1c8381d55e12c9ef53a289fe16d4ff57781eecedcd694a4a",
+      "reference_answer": "The lower-level mathematical transformation functions that `Sky2Pix_ZenithalEqualArea` delegates to for converting the zenithal angle theta into the radial distance R_theta during sky-to-pixel projection are:\n\n1. **`zeas2x()` function** in `cextern/wcslib/C/prj.c` (starting at line 2780) - This is the main transformation function that performs the ZEA (zenithal equal area) sky-to-pixel conversion. The specific calculation of R_theta from theta occurs at line 2837: `double r = prj->w[0]*sind((90.0 - *thetap)/2.0);` where `prj->w[0]` is set to `2*r0` (or `360.0/PI` if r0 is 0) in the `zeaset()` function.\n\n2. **`sind()` function** in `cextern/wcslib/C/wcstrig.c` (starting at line 54) - This helper function computes the sine of an angle given in degrees, which is used in the R_theta calculation.\n\nThe delegation chain is: `Sky2Pix_ZenithalEqualArea.evaluate()` \u2192 `Sky2PixProjection.evaluate()` \u2192 `Prjprm.prjs2x()` (Python wrapper in `astropy/wcs/src/wcslib_prjprm_wrap.c`) \u2192 `zeas2x()` (C function in wcslib) \u2192 `sind()` (C helper function in wcslib). The function pointer `prj->prjs2x` is set to `zeas2x` during projection initialization in the `zeaset()` function at line 2672 of `cextern/wcslib/C/prj.c`.",
+      "reference_sha256": "de237e5c50ac0d92d88abd9fdd6195d589e766e0058ee452eb37bc98392c864a",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "task_id": "import-0c613a2a48e168f78506c7c9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "dc1c329e9899a295473df0d6d19af03b8b0d4bca73b3d9302eb10e28f4dc9aab",
+            "kind": "file_reference",
+            "line_count": 2299,
+            "path": "astropy/utils/data.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where in the data utilities module are the module-level functions responsible for raising the exception that indicates cache corruption during download cache consistency checks?",
+      "question_sha256": "4b7ca09e54507abab9f7caf411bb38c0b2878ace71e993482765a459a38f4ff3",
+      "reference_answer": "The module-level function `check_download_cache` in `astropy/utils/data.py` (starting at line 1956) raises the `CacheDamaged` exception during download cache consistency checks. The exception is raised at line 2044 when corruption is detected (e.g., missing files, malformed URLs, unexpected files, or directory structure issues). This is the only place in the module where `CacheDamaged` is raised.",
+      "reference_sha256": "02a84b49cb911744f68e06f272696196da39126f66cf1cf7de798c17d562fcec",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "task_id": "import-0cc45773ec185cf178d731d0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "0a4a73c7e60facb9e400a83c35f13b07931c5e8e2d29328fc10a305ac6655d26",
+            "kind": "file_reference",
+            "line_count": 665,
+            "path": "astropy/table/tests/test_init_table.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the test class that validates table initialization from heterogeneous column sources enforce separation between column name and type resolution logic and parent table reference assignment when creating tables from mixed column inputs?",
+      "question_sha256": "3406425c07abf95704a1215681dc8bd46f69e0a3daf605e1a338383a3ab6d6bd",
+      "reference_answer": "The `TestInitFromColsList` class in `test_init_table.py` validates table initialization from heterogeneous column sources (Column objects and numpy arrays). It enforces separation between column name/type resolution and parent table reference assignment through:\n\n1. **Architectural separation in implementation**: Name and type resolution occur in `_convert_data_to_col` (called from `_init_from_list`), which processes each column and returns Column objects with resolved names and types but without parent_table set. Parent table assignment happens later in `_set_col_parent_table_and_mask`, called from `_make_table_from_cols` after all columns are converted.\n\n2. **Test validation strategy**: The `test_default_names` and `test_partial_names_dtype` methods validate this separation by:\n   - Asserting column names are correctly resolved from heterogeneous sources (`assert t.colnames == [\"x\", \"col1\", \"col2\"]`), where a Column with name \"x\" keeps it and numpy arrays get default names\n   - Asserting column types are correctly resolved (`assert t[\"b\"].dtype.type == np.float32`), validating type resolution works independently\n   - Asserting `all(t[name].name == name for name in t.colnames)`, ensuring each column's name attribute matches the table's column name, which validates that name resolution completed before parent table assignment\n\nThe separation is enforced by the call sequence: `_init_from_list` \u2192 `_convert_data_to_col` (name/type resolution) \u2192 `_init_from_cols` \u2192 `_make_table_from_cols` \u2192 `_set_col_parent_table_and_mask` (parent table assignment), ensuring name and type resolution complete before parent table references are assigned.",
+      "reference_sha256": "f3f71a465081e416c5cd8fadc79a07b532c905053e8e848a3c03fe95e85001f0",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "task_id": "import-16b11e3f2e95b9676b10b313"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the dependency relationship between the class that manages macro definitions and performs token expansion in the ANSI-C style preprocessor and the data container class that stores macro information including name, token sequence, and variadic flag, in handling macros that accept a variable number of arguments during replacement of macro references with their expanded token sequences?",
+      "question_sha256": "d343bdcfc2d602c8b6d65fad3a7c453e3303fbf9b1a4528505ac249001b15dac",
+      "reference_answer": "The Preprocessor class depends on the Macro class. The Preprocessor instantiates Macro objects to store preprocessor macro definitions and stores them in its `self.macros` dictionary. When a macro is defined with variadic arguments (`variadic=True`), the Macro class stores the last argument in `arglist` as `self.vararg`. During macro expansion, the Preprocessor accesses the Macro instance's `variadic` attribute and `vararg` field to handle variable-length argument lists. Specifically, in `macro_prescan()`, it checks `macro.variadic` and `macro.vararg` to create comma patch points. In `expand_macros()`, it checks `m.variadic` and `m.arglist` to validate argument counts and collect remaining arguments into the variadic parameter. In `macro_expand_args()`, it checks `macro.variadic` and uses `macro.var_comma_patch` to remove commas when the variadic argument is empty, then substitutes the collected arguments into the macro's value template. This coupling means changes to Macro's variadic handling would require corresponding updates in Preprocessor's expansion mechanism.",
+      "reference_sha256": "ded10e9f9907322953b369c71a2bfe04c0110a38cdc1788a858bac3a711ab0e2",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "task_id": "import-1bb3321682f47d86c458c9e9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 97,
+            "file_sha256": "2b8891bdfe06b0a6ca82a72953c2ab8fae6c06eeed0f0d57b1dbeeaafa8f4245",
+            "path": "astropy/cosmology/_src/parameter/converter.py",
+            "start_line": 97
+          },
+          {
+            "end_line": 93,
+            "file_sha256": "2b8891bdfe06b0a6ca82a72953c2ab8fae6c06eeed0f0d57b1dbeeaafa8f4245",
+            "path": "astropy/cosmology/_src/parameter/converter.py",
+            "start_line": 93
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "astropy/convolution/core.py",
+              "astropy/coordinates/angles/core.py",
+              "astropy/cosmology/_src/core.py",
+              "astropy/cosmology/_src/parameter/core.py",
+              "astropy/cosmology/core.py",
+              "astropy/io/ascii/core.py",
+              "astropy/io/registry/core.py",
+              "astropy/modeling/core.py",
+              "astropy/time/core.py",
+              "astropy/timeseries/core.py",
+              "astropy/timeseries/periodograms/bls/core.py",
+              "astropy/timeseries/periodograms/lombscargle/core.py",
+              "astropy/timeseries/periodograms/lombscargle_multiband/core.py",
+              "astropy/uncertainty/core.py",
+              "astropy/units/core.py",
+              "astropy/units/function/core.py",
+              "astropy/utils/masked/core.py",
+              "astropy/utils/metadata/core.py",
+              "astropy/visualization/wcsaxes/core.py"
+            ],
+            "end_line": 237,
+            "path": "core.py",
+            "reason": "ambiguous_basename",
+            "reference": "core.py",
+            "start_line": 222
+          }
+        ]
+      },
+      "question": "Where in the control flow does the effective neutrino species parameter validation diverge when receiving a negative value versus a positive unitless quantity in the cosmology parameter test method?",
+      "question_sha256": "02f91a29d1bf966040f32b17b9ddeef8351dd1a72d715fc40ffd9fd6856e82b1",
+      "reference_answer": "The control flow diverges at line 97 in `./astropy/cosmology/_src/parameter/converter.py` within the `validate_non_negative` function, at the conditional check `if value < 0.0:`.\n\nWhen `test_Neff` calls `Neff.validate(cosmo, -1)` or `Neff.validate(cosmo, 10 * u.one)`, the validation proceeds through:\n\n1. `Parameter.validate()` (line 222-237 in `core.py`) calls `self._fvalidate(cosmology, self, value)`\n2. For Neff, `fvalidate` is `\"non-negative\"`, which resolves to `validate_non_negative` (registered at line 93 in `converter.py`)\n3. `validate_non_negative` (lines 94-99) first calls `validate_to_float()` (line 96), which:\n   - Calls `validate_with_unit()` to handle unit conversion\n   - Converts the result to a float (extracting the numeric value from unitless quantities like `10 * u.one`)\n4. The divergence occurs at line 97: `if value < 0.0:`\n   - For negative values (e.g., `-1`): the condition is `True`, so it raises `ValueError(f\"{param.name} cannot be negative.\")` at line 98\n   - For positive unitless quantities (e.g., `10 * u.one`): the condition is `False`, so execution continues and returns the float value at line 99\n\nThe conditional branch at line 97 is where the control flow splits: negative values raise an exception, while non-negative values (including positive unitless quantities) return successfully.",
+      "reference_sha256": "d64e4bd6eae300171058e60502dc5fb5e2721e47a97564cce9d4e3c2d2a4e4b6",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "task_id": "import-1c3b2703cfe74e88f14de19c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "bc6c5ab9e37cfaecf3955debcee17d50eedeee03abde5a8c8f55aad0dc879873",
+            "kind": "file_reference",
+            "line_count": 206,
+            "path": "astropy/utils/tests/test_console.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why is the test function in the console utilities test module that verifies terminal color output without assertions implemented as a smoke test rather than a comprehensive unit test?",
+      "question_sha256": "f64c5f354ed79416d6b8052f5f790fbda3772941f9323b0d0fd950ebd3a24538",
+      "reference_answer": "The `test_color_print()` function in `astropy/utils/tests/test_console.py` is implemented as a smoke test rather than a comprehensive unit test because terminal color output is difficult to test programmatically when writing directly to `sys.stdout`.\n\nThe test calls `console.color_print()` without assertions, writing to the actual standard output stream. The `color_print()` function's behavior depends on multiple runtime conditions that vary across environments:\n\n1. **TTY detection**: The function checks `isatty(file)` to determine if the output stream is a terminal, which affects whether ANSI color codes are included.\n\n2. **Configuration dependency**: Color output is controlled by `conf.use_color`, a runtime configuration setting that may differ across test environments.\n\n3. **Platform-specific behavior**: The implementation has different behavior on Windows versus Unix systems, and includes special handling for IPython environments.\n\n4. **Complex encoding fallback logic**: The function uses `_write_with_fallback()` which attempts multiple encoding strategies (locale encoding, UTF-8, Latin-1) when Unicode encoding fails, making the exact output difficult to predict.\n\n5. **Uncapturable output**: Writing to `sys.stdout` means the output goes to the actual terminal, making it difficult to capture and verify the exact ANSI escape sequences that would be emitted.\n\nThe comment in the test explicitly states \"This stuff is hard to test, at least smoke test it\", acknowledging that comprehensive testing would require capturing stdout, verifying platform-specific ANSI escape sequences, and accounting for all the conditional logic paths, which would create brittle tests that fail across different environments.\n\nIn contrast, the other test functions (`test_color_print2` and `test_color_print3`) are comprehensive unit tests because they use mock file objects (`io.StringIO` and `FakeTTY`) that can be captured and verified with assertions, testing specific scenarios in isolation.",
+      "reference_sha256": "4754ca5f0c7f580dc9d757b3ecbb13f96cd017941882701706b6f51fa216cc01",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "task_id": "import-214e735279e53690253950d8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 537,
+            "file_sha256": "afa2f41f617bd6c73d429f09efd843621965b3d64da6cf1608f983352a5fe906",
+            "path": "astropy/io/fits/header.py",
+            "start_line": 537
+          },
+          {
+            "end_line": 575,
+            "file_sha256": "8676456f3086c62311c5788409afa205f03c33d6765d8c16d72d242eb44ce446",
+            "path": "astropy/io/fits/card.py",
+            "start_line": 575
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where in the codebase is the classmethod that converts FITS keyword strings to uppercase before they are used as keys in the header's keyword-to-index mapping dictionary located?",
+      "question_sha256": "c2b72226a794a90ca446db99b5cf48821be6f4f029122ab60e4b510757f8c0ff",
+      "reference_answer": "The classmethod that converts FITS keyword strings to uppercase before they are used as keys in the header's keyword-to-index mapping dictionary is `Header._fromcards`, located at line 537 in `astropy/io/fits/header.py`. \n\nThis classmethod calls `Card.normalize_keyword` (a classmethod at line 575 in `astropy/io/fits/card.py`) on line 541 to convert the keyword to uppercase. The normalized keyword is then used as a key in the `_keyword_indices` dictionary on line 542.\n\nThe `Card.normalize_keyword` classmethod handles the actual uppercase conversion, handling standard FITS keywords, record-valued keywords, and HIERARCH keywords.",
+      "reference_sha256": "48b74c3a186d5559a126837275c85c75f6a209bf36714e86143aadb4e5dbcac2",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "task_id": "import-2bb68add52f3d0d976d2c402"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "eda0a52a913cef9eb1bf031c124784624c1f9a7f3e2cf511484ca002b7a29276",
+            "kind": "file_reference",
+            "line_count": 323,
+            "path": "astropy/modeling/separable.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the boolean flag indicating whether model outputs are independent in the base class for cylindrical sky projections enable performance optimization in astronomical coordinate transformation pipelines?",
+      "question_sha256": "58c28516fad46ec51f9b17f4f7c1b1575efd20aee9ea58ff121215dfeb4aff72",
+      "reference_answer": "The `_separable = True` flag in the `Cylindrical` base class indicates that the projection outputs are independent: longitude (phi) depends only on the x input, and latitude (theta) depends only on the y input. This enables several optimizations:\n\n1. **Diagonal separability matrix**: When `model.separable` is `True`, `_coord_matrix` in `separable.py` creates a diagonal matrix (lines 207-214) instead of a full matrix, reducing floating-point operations from O(n\u00b2) to O(n) per coordinate pair.\n\n2. **Independent vectorized operations**: Each coordinate can be processed independently without cross-dependencies, enabling efficient vectorization on each axis.\n\n3. **Parallel computation**: The x and y transformations can be computed in parallel since they don't depend on each other.\n\n4. **Reduced memory bandwidth**: Coordinates can be processed in separate passes, reducing memory access patterns.\n\n5. **Simplified Jacobian computation**: The transformation matrix is sparse (diagonal), simplifying derivative calculations needed for optimization and error propagation.\n\nThis is especially beneficial when transforming large arrays of sky coordinates in astronomical pipelines, where millions of coordinate pairs may need transformation. The separability property is used by tools like GWCS (Generalized World Coordinate System) to optimize coordinate transformation pipelines.",
+      "reference_sha256": "03cdbcb87a3aac9ff38c6badabab86bab50c81d23c47747e8c60b2541c4c7991",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "task_id": "import-35da7acfac96a72b76488f15"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What architectural design does the template-style string interpolation class employ to separate identifying template variables from retrieving values from configuration sections?",
+      "question_sha256": "5f421da9b427decc40ccfe431e14543f95f2e0b2c2baaa99480876a5687072f0",
+      "reference_answer": "The `TemplateInterpolation` class uses a two-stage design to separate identifying template variables from retrieving values from configuration sections.\n\n**Stage 1 - Pattern Matching (Lexical Analysis)**: The `_KEYCRE` compiled regex pattern (lines 424-430) handles syntactic recognition of interpolation tokens. It identifies three formats:\n- Escaped delimiters (`$$`)\n- Named variables (`$name`)\n- Braced variables (`${name}`)\n\n**Stage 2 - Value Retrieval (Semantic Resolution)**: The `_parse_match` method (lines 432-443) extracts the key from the regex match, then delegates value retrieval to the inherited `_fetch` method from `InterpolationEngine` (lines 354-385). The `_fetch` method performs the contextual lookup by searching through configuration sections, starting from the current section, then checking DEFAULT sections, and walking up the parent hierarchy.\n\n**Architectural Separation**: This design isolates lexical analysis (regex matching via `_KEYCRE`) from contextual value lookup (section-based fetching via `_fetch`). The `_parse_match` method acts as a bridge between these concerns, returning a three-tuple `(key, value, section)` that encapsulates both the matched token identity and its resolved context. This separation allows independent evolution of parsing rules and data resolution strategies, with the parent `InterpolationEngine.interpolate` method managing substitution logic without coupling to specific pattern syntax.",
+      "reference_sha256": "5f6218eb7d0424ef48472d4795aa3293ade560d51f5b0aee8709fda938ba67b0",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "task_id": "import-3e1b56e3c137076cff642f1b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What does verifying different values for the metadata field that records which source was selected from the priority list indicate about the source selection algorithm in the test class that validates automatic loading of leap second tables with different priority configurations?",
+      "question_sha256": "3f94c471057fb9533e534ded185de5aede36a2a300db7c13ed973095fa0e4ee9",
+      "reference_answer": "Verifying different values for the `data_url` metadata field in `TestDefaultAutoOpen` confirms that the source selection algorithm uses a priority-based fallback with early termination. The algorithm iterates through sources in priority order from `_auto_open_files` (erfa, built-in file, system file, IERS URL, IETF URL). It selects the first source whose expiration date exceeds the \"good enough\" threshold (calculated as current date + 180 days - `auto_max_age`). If a source is good enough, it stops and uses that source, recording it in `data_url`. If none are good enough, it continues through all sources and selects the one with the latest expiration date, still recording it in `data_url`. By asserting different `data_url` values across test methods\u2014such as \"erfa\" when ERFA is available and fresh, the built-in file path when ERFA is removed, system file paths when higher-priority sources are expired, and HTTP URLs when only remote sources remain\u2014the tests verify that the algorithm correctly implements this priority-based selection logic, respects the freshness threshold, and falls back appropriately when higher-priority sources are unavailable or expired. The `data_url` metadata field thus serves as a provenance indicator that makes the otherwise opaque selection process observable and testable, confirming that source selection behaves as intended under various configuration and availability scenarios.",
+      "reference_sha256": "c6a78bbc7d2635ed66a9765352b68276d6355a209732b6aa6164e2b0b0c2eb52",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "task_id": "import-45249a9d7cd81def7bb17466"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 48,
+            "file_sha256": "6b3f05e2e2e596aa896aa3e144e995196768cc1e0e0d4a04eb1e4c039b0de969",
+            "path": "astropy/io/fits/tests/test_header.py",
+            "start_line": 39
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "astropy/io/fits/hdu/compressed/header.py",
+              "astropy/io/fits/header.py"
+            ],
+            "end_line": 829,
+            "path": "header.py",
+            "reason": "ambiguous_basename",
+            "reference": "header.py",
+            "start_line": 806
+          },
+          {
+            "candidates": [],
+            "end_line": 89,
+            "path": "hdu/image.py",
+            "reason": "not_tracked",
+            "reference": "hdu/image.py",
+            "start_line": 89
+          },
+          {
+            "candidates": [],
+            "end_line": 340,
+            "path": "hdu/table.py",
+            "reason": "not_tracked",
+            "reference": "hdu/table.py",
+            "start_line": 340
+          },
+          {
+            "candidates": [],
+            "end_line": 950,
+            "path": "hdu/base.py",
+            "reason": "not_tracked",
+            "reference": "hdu/base.py",
+            "start_line": 950
+          }
+        ]
+      },
+      "question": "What architectural pattern does the header initialization process use to prevent modifications when creating new header data unit instances from existing headers in the FITS file I/O module?",
+      "question_sha256": "2250846a4f377540debeab79a4ea798da48975e41625cb66f9384af4481eacb8",
+      "reference_answer": "The header initialization process uses the **Defensive Copying** pattern (also called **Protective Copying** or **Copy-on-Construction**) to prevent modifications when creating new header data unit instances from existing headers.\n\nImplementation details:\n\n1. **Header.copy() method**: The `Header` class provides a `copy()` method (in `header.py` line 806-829) that creates a new `Header` instance by copying each `Card` object using `copy.copy(card)`, ensuring the new header has its own card objects.\n\n2. **Explicit copying in HDU constructors**: When creating new HDU instances from existing headers, the code explicitly calls `header.copy()`:\n   - In `_ImageBaseHDU.__init__` (line 89 of `hdu/image.py`): `new_header.extend(header.copy(), strip=True, update=True, end=True)`\n   - In `TableHDU.__init__` (line 340 of `hdu/table.py`): `hcopy = header.copy(strip=True)` with a comment noting \"Make a 'copy' (not just a view) of the input header, since it may get modified\"\n   - In `_BaseHDU.copy()` (line 950 of `hdu/base.py`): `return self.__class__(data=data, header=self._header.copy())`\n\n3. **Card-level copying**: The `Header.copy()` method creates shallow copies of individual `Card` objects using Python's `copy.copy()`, ensuring each card in the new header is independent.\n\n4. **Optional copy parameter**: The `Header.__init__` method accepts a `copy` parameter (default `False`) that, when `True`, creates a defensive copy when constructing from another Header instance.\n\nThis pattern ensures that modifications to a new HDU's header do not affect the original header, and vice versa, providing data isolation between HDU instances. The test in `test_header.py` (lines 39-48) demonstrates this behavior, showing that modifications to the original header do not affect a copied header when `copy=True` is used.",
+      "reference_sha256": "96527668945eb76f7d76dbf76adb4ac5eb21b212f1c54fbc15b1e53fa2340f69",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "task_id": "import-470be69fca66775f67deb6af"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 688,
+            "file_sha256": "ce698d2a0a7390f4e52f9b68528c40de5eb12852dd662d4d7168f4022773b4ec",
+            "path": "astropy/utils/masked/function_helpers.py",
+            "start_line": 662
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where in the astropy codebase is the mechanism that propagates boolean exclusion flags during array shape expansion implemented, coordinating between array wrapper objects that track excluded elements and the coordinate grid generation routine from the numerical computing library?",
+      "question_sha256": "a1ce472c9964ac112dd1d50a4c422f644e90bc07d2088542423ca49fd3190825",
+      "reference_answer": "The mechanism that propagates boolean exclusion flags during array shape expansion, coordinating between array wrapper objects that track excluded elements and the coordinate grid generation routine from the numerical computing library, is implemented in the `broadcast_arrays` function in `./astropy/utils/masked/function_helpers.py` at lines 662-688.\n\nThis function handles the coordination when `numpy.meshgrid` (the coordinate grid generation routine) is called with masked array wrapper objects (`Masked` instances from `astropy.utils.masked.core`). When meshgrid expands array shapes through broadcasting, the function:\n\n1. Extracts the unmasked data from each masked array wrapper object\n2. Calls `numpy.broadcast_arrays` on the unmasked data to generate the coordinate grids\n3. Propagates the boolean exclusion flags (masks) by broadcasting each mask to the expanded shape using `numpy.broadcast_to(arg.mask, shape, subok=subok)` at line 681\n4. Wraps the broadcast data and masks back into `Masked` instances\n\nThe boolean exclusion flags are thus propagated during shape expansion, ensuring that excluded elements tracked by the array wrapper objects remain properly marked in the expanded coordinate grids generated by numpy's meshgrid routine.",
+      "reference_sha256": "fc83f0f5302e579e46f60c589e471715e35dad7ef8b75295ff00ed959b53b8cd",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "task_id": "import-489e64e2d14c758a11a7b746"
+    }
+  ]
+}

@@ -30,7 +30,31 @@ def group_advantages(group):
     return [(r-center)/scale for r in rewards] if scale else [0.0] * len(group)
 
 
-def grpo_batch(groups):
+def stabilized(contributing, options):
+    """Mask loss only, keep the pre-mask denominator and group reward baselines."""
+    options = options or {}
+    kept = []
+    masked = 0
+    scaled = 0
+    for trajectory, advantage in contributing:
+        overlong = (any(g.stop_reason == 'length' for g in trajectory.generations)
+                    or any(e.get('kind') == 'termination_cause' and e.get('reason') in ('output_tokens','generations')
+                           for e in trajectory.events))
+        if options.get('mask_overlong') and overlong:
+            masked += 1
+            continue
+        if options.get('scale_tool_width'):
+            calls = trajectory.usage.get('tool_calls', 0)
+            turns = trajectory.usage.get('tool_turns', 0)
+            width = max(1.0, calls / turns) if turns else 1.0
+            advantage /= width
+            scaled += width > 1
+        kept.append((trajectory, advantage))
+    return kept, {'masked_overlong_trajectories':masked, 'width_scaled_trajectories':scaled,
+                  'pre_mask_contributing_trajectories':len(contributing)}
+
+
+def grpo_batch(groups, stability=None):
     contributing = []
     stats = {'excluded_groups': 0, 'zero_variance_groups': 0, 'rewards': [], 'advantages': []}
     policies = {t.policy_id for group in groups for t in group}
@@ -51,10 +75,13 @@ def grpo_batch(groups):
                 if not t.generations:
                     raise ValueError('Resolved trajectory has no actions')
                 contributing.append((t, a))
+    denominator = len(contributing)
+    contributing, stability_stats = stabilized(contributing, stability)
+    stats.update(stability_stats)
     rows = []
     for trajectory, advantage in contributing:
         tokens = sum(len(g.tokens) for g in trajectory.generations)
-        scale = advantage / (tokens * len(contributing))
+        scale = advantage / (tokens * denominator)
         for g in trajectory.generations:
             rows.append(shifted(g.prompt, g.tokens, [scale] * len(g.tokens), g.logprobs))
     # Report all resolved attempts, including those in otherwise excluded groups.
@@ -71,7 +98,7 @@ def grpo_batch(groups):
     return rows, stats
 
 
-def reinforce_batch(groups, baseline_state=None):
+def reinforce_batch(groups, baseline_state=None, stability=None):
     """Prior-batch running mean baseline; never center within the current group.
 
     Preserve GRPO's complete-group admission and per-trajectory token averaging.
@@ -89,12 +116,15 @@ def reinforce_batch(groups, baseline_state=None):
     eligible = [t for group in groups if group_advantages(group) is not None for t in group]
     advantages = [t.verification.reward - baseline for t in eligible]
     contributing = [(t, a) for t, a in zip(eligible, advantages) if a != 0]
+    denominator = len(contributing)
+    contributing, stability_stats = stabilized(contributing, stability)
+    stats.update(stability_stats)
     rows = []
     for t, advantage in contributing:
         if not t.generations:
             raise ValueError('Resolved trajectory has no actions')
         tokens = sum(len(g.tokens) for g in t.generations)
-        scale = advantage / (tokens * len(contributing))
+        scale = advantage / (tokens * denominator)
         for g in t.generations:
             rows.append(shifted(g.prompt, g.tokens, [scale] * len(g.tokens), g.logprobs))
     state['reward_sum'] += sum(t.verification.reward for t in eligible)

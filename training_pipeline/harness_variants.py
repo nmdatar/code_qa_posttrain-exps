@@ -8,8 +8,12 @@ from .storage import digest, atomic_json
 
 def validate(spec):
     required = {'symbols','retrieval','history','source_manifest','source_manifest_sha256'}
-    if not isinstance(spec,dict) or not required <= set(spec) or set(spec) - required - {'planning'}:
+    if not isinstance(spec,dict) or not required <= set(spec) or set(spec) - required - {'planning', 'interface'}:
         raise ConfigurationError('Invalid experimental harness specification')
+    if spec.get('interface', 'structured-v1') not in {'structured-v1', 'source-shell-v1'}:
+        raise ConfigurationError('Unsupported tool interface')
+    if spec.get('interface') == 'source-shell-v1' and (spec['symbols'] or spec['retrieval'] != 'none' or spec['history'] != 'raw'):
+        raise ConfigurationError('Shell-only interface cannot expose additional structured tools')
     if spec.get('planning', 'none') not in {'none', 'question-checklist-v1'}:
         raise ConfigurationError('Unsupported planning variant')
     if type(spec['symbols']) is not bool or spec['retrieval'] not in {'none','lexical-v1','hybrid-subword-v1'} or spec['history'] not in {'raw','evidence-ledger-v1'}:

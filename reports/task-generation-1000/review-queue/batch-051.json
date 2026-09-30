@@ -1,0 +1,534 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 517,
+            "file_sha256": "43e60de64e464b0908ab8993e93c4cb3da915a9a68422d196ba0a031559870fa",
+            "path": "src/_pytest/fixtures.py",
+            "start_line": 517
+          },
+          {
+            "end_line": 778,
+            "file_sha256": "43e60de64e464b0908ab8993e93c4cb3da915a9a68422d196ba0a031559870fa",
+            "path": "src/_pytest/fixtures.py",
+            "start_line": 763
+          },
+          {
+            "end_line": 149,
+            "file_sha256": "43e60de64e464b0908ab8993e93c4cb3da915a9a68422d196ba0a031559870fa",
+            "path": "src/_pytest/fixtures.py",
+            "start_line": 149
+          },
+          {
+            "end_line": 332,
+            "file_sha256": "693b0385b2c45646767200bc517416e776c10c3e58ee5ed937007491be4d868e",
+            "path": "src/_pytest/nodes.py",
+            "start_line": 332
+          },
+          {
+            "end_line": 1218,
+            "file_sha256": "e1ea3da297c5ffffd616270853a4f7636aea68cf46b2850e538b438f398a274f",
+            "path": "testing/python/fixtures.py",
+            "start_line": 1193
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 663,
+            "line_count": 662,
+            "path": "src/_pytest/mark/structures.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "src/_pytest/mark/structures.py",
+            "resolved_path": "src/_pytest/mark/structures.py",
+            "start_line": 610
+          }
+        ]
+      },
+      "question": "Where does the data flow of marker information propagate from the autouse fixture in test_accessmarker_dynamic through the request object to multiple test functions, and what control flow mechanism ensures that dynamically applied markers via applymarker are visible to all dependent tests in the same scope?",
+      "question_sha256": "ecfc5ef9faab0622abafa41bf5b89cda2ddcdb724c3ccd992f4fd518f9575fb8",
+      "reference_answer": "The mechanism is the `NodeKeywords` class's hierarchical lookup via parent traversal. When a marker is added to a class-scoped node via `applymarker`, it becomes accessible to child function nodes through this lookup.\n\nImplementation details:\n\n1. **Marker Addition**: When `request.applymarker()` is called in a class-scoped autouse fixture, it calls `self.node.add_marker(marker)` (line 517 in `src/_pytest/fixtures.py`). For class-scoped fixtures, `request.node` returns the Class node via `get_scope_node()` (lines 763-778 in `src/_pytest/fixtures.py`), which uses `node.getparent(_pytest.python.Class)` (line 149 in `src/_pytest/fixtures.py`).\n\n2. **Storage**: `add_marker()` stores the marker in two places:\n   - `self.keywords[marker_.name] = marker_` (line 332 in `src/_pytest/nodes.py`) - adds to the NodeKeywords dictionary\n   - `self.own_markers.append(marker_.mark)` (line 334) - adds to the node's own markers list\n\n3. **Hierarchical Lookup**: The `NodeKeywords` class (defined in `src/_pytest/mark/structures.py`, lines 610-663) implements parent traversal. Each `NodeKeywords` instance stores:\n   - `self.node` - the current node\n   - `self.parent` - the parent node (line 615: `self.parent = node.parent`)\n   - `self._markers` - local markers dictionary\n\n4. **Access Mechanism**: When a test function accesses `request.keywords[\"XYZ\"]`, the `NodeKeywords.__getitem__()` method (lines 618-624) performs:\n   - First checks `self._markers[key]` (local to the function node)\n   - If not found and parent exists, recursively calls `self.parent.keywords[key]` (line 624)\n   - This traverses up the node hierarchy until the marker is found or the root is reached\n\n5. **Visibility**: Since test function nodes are children of the class node in pytest's node hierarchy, markers added to the class node's keywords dictionary are accessible to all child function nodes through this parent traversal mechanism. The `__contains__` method (lines 632-635) also implements the same parent traversal for membership checks.\n\nThis design allows dynamically applied markers at class scope to be visible to all dependent test functions in the same class scope, as demonstrated in the test case at `testing/python/fixtures.py:1193-1218`.",
+      "reference_sha256": "9eafeb919104ef3ea6363ab4293cd8fe6245d96820bee9d36ac52bdb9a9d40bb",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-8ef0e1b957a22b443baf00d3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1148,
+            "file_sha256": "a846e231ae62b1d7278a9119bfd36b923057b5033b238765c9a7a64d41d798fe",
+            "path": "src/_pytest/pytester.py",
+            "start_line": 1075
+          },
+          {
+            "end_line": 221,
+            "file_sha256": "236918c090160c1f6b935e162ff44ab273a700221d5f40ac15892be75e4503ee",
+            "path": "src/_pytest/tmpdir.py",
+            "start_line": 211
+          },
+          {
+            "end_line": 277,
+            "file_sha256": "236918c090160c1f6b935e162ff44ab273a700221d5f40ac15892be75e4503ee",
+            "path": "src/_pytest/tmpdir.py",
+            "start_line": 255
+          },
+          {
+            "end_line": 139,
+            "file_sha256": "236918c090160c1f6b935e162ff44ab273a700221d5f40ac15892be75e4503ee",
+            "path": "src/_pytest/tmpdir.py",
+            "start_line": 139
+          },
+          {
+            "end_line": 208,
+            "file_sha256": "236918c090160c1f6b935e162ff44ab273a700221d5f40ac15892be75e4503ee",
+            "path": "src/_pytest/tmpdir.py",
+            "start_line": 199
+          },
+          {
+            "end_line": 278,
+            "file_sha256": "2f941a4e516816bced282a7b9e45c076729d5552a6443369184d5219ae8dcc8b",
+            "path": "src/_pytest/compat.py",
+            "start_line": 260
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "dc678e2bb07e1630f20595c71579d22f621a4bf4d4284fa9a659faaad44901bc",
+            "kind": "file_reference",
+            "line_count": 1104,
+            "path": "src/_pytest/main.py"
+          },
+          {
+            "file_sha256": "43e60de64e464b0908ab8993e93c4cb3da915a9a68422d196ba0a031559870fa",
+            "kind": "file_reference",
+            "line_count": 2018,
+            "path": "src/_pytest/fixtures.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the data flow from pytester.inline_run() through the test execution pipeline to ultimately validate that tmp_path remains functional when the current process's user id lacks a corresponding valid user entry?",
+      "question_sha256": "11971196abc30003181dd422d50315ac79c902672872c3d8ad43a496084d29c4",
+      "reference_answer": "The data flow proceeds as follows:\n\n1. **Entry Point**: The in-process test runner method (`Pytester.inline_run()` in `src/_pytest/pytester.py`, lines 1075-1148) calls `pytest.main()` with the provided arguments (line 1132), initiating the test execution pipeline.\n\n2. **Test Execution Pipeline**: `pytest.main()` (in `src/_pytest/main.py`) orchestrates the session lifecycle:\n   - Creates a `Config` instance\n   - Calls `pytest_configure` hooks, which creates a `TempPathFactory` instance (in `src/_pytest/tmpdir.py`, lines 211-221)\n   - Performs test collection\n   - Resolves fixtures through pytest's fixture system (`src/_pytest/fixtures.py`)\n\n3. **Fixture Resolution**: When a test requests the temporary directory fixture, pytest's fixture manager resolves it. The fixture function (`tmp_path` in `src/_pytest/tmpdir.py`, lines 255-277) calls `_mk_tmp()` (line 246), which invokes `tmp_path_factory.mktemp()` (line 251).\n\n4. **Base Directory Creation**: `mktemp()` calls `getbasetemp()` (line 139 in `src/_pytest/tmpdir.py`), which:\n   - Calls `get_user()` (line 157) to get the username. When the user id lacks a valid user entry, `get_user()` returns `None` (handled in `src/_pytest/tmpdir.py`, lines 199-208), and the code falls back to `\"unknown\"` (line 157)\n   - Constructs the root directory path as `pytest-of-{user}` or `pytest-of-unknown` (lines 160, 165)\n   - Creates the directory with mode 0o700 (lines 162, 166)\n\n5. **Validation Logic**: The validation occurs in `getbasetemp()` (lines 173-182):\n   - Calls `get_user_id()` (line 173, defined in `src/_pytest/compat.py`, lines 260-278), which returns `None` when `os.getuid()` returns -1 (indicating an invalid user id)\n   - When `get_user_id()` returns `None`, the ownership validation check is skipped (the `if uid is not None:` condition on line 174 prevents execution of the ownership check)\n   - This allows the temporary directory creation to proceed even when there's no valid user entry, as the code gracefully handles the `None` case\n\n6. **Final Directory Creation**: The method then calls `make_numbered_dir_with_cleanup()` (line 186) to create the actual numbered temporary directory, completing the validation that the temporary directory fixture remains functional.\n\nThe key validation point is in `TempPathFactory.getbasetemp()` where `get_user_id()` returning `None` (due to invalid user id) causes the ownership check to be skipped, allowing the fixture to work correctly even without a valid user entry in the system's user database.",
+      "reference_sha256": "4ffcbb246e58918a1ec890efcd27fbe6f22cf831c4eb725b8dc38bbdc26c1f6c",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-9465cff51c9989ebc615a4cd"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 114,
+            "file_sha256": "ebf31a8738065ad418c354ceeed99562926055587c664501e9f8d194e4078202",
+            "path": "src/_pytest/python.py",
+            "start_line": 112
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "ebf31a8738065ad418c354ceeed99562926055587c664501e9f8d194e4078202",
+            "kind": "file_reference",
+            "line_count": 1723,
+            "path": "src/_pytest/python.py"
+          },
+          {
+            "file_sha256": "e3d48717cd5125017f48833f33d277eed0d3a8d04042f7fba6cd7d45f5544632",
+            "kind": "file_reference",
+            "line_count": 662,
+            "path": "src/_pytest/mark/structures.py"
+          },
+          {
+            "file_sha256": "c0cd5ddbfcdcde768ab9a53061bc6aff984b7990bae0d241a62a74d0f7c33c27",
+            "kind": "file_reference",
+            "line_count": 294,
+            "path": "doc/en/how-to/parametrize.rst"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How would you refactor a minimal test function like test_1 to implement a parameterized testing strategy that maintains backward compatibility while enabling data-driven test execution across multiple input scenarios?",
+      "question_sha256": "6372a0198e002860f7180b7ba1350e12e58962bdc935230ef045a53c3537f642",
+      "reference_answer": "Based on my exploration of the pytest repository, here's how to refactor a minimal test function with no parameters to use the parametrize marker while maintaining backward compatibility:\n\n**1. Basic Refactoring Pattern:**\n\nStart with a minimal test function:\n```python\ndef test_1():\n    assert some_condition\n```\n\nRefactor it to use `@pytest.mark.parametrize`:\n```python\n@pytest.mark.parametrize(\"input_value,expected\", [(value1, result1), (value2, result2)])\ndef test_1(input_value, expected):\n    assert some_function(input_value) == expected\n```\n\n**2. Backward Compatibility Considerations:**\n\nThe pytest framework maintains backward compatibility through several mechanisms:\n\n- **Test Discovery**: Parameterized tests are still discovered by pytest's collection mechanism (defined in `src/_pytest/python.py`). The test function name remains the same, so existing test selectors (like `-k test_1`) still work.\n\n- **Test IDs**: pytest automatically generates test IDs for parameterized tests (e.g., `test_1[value1-result1]`, `test_1[value2-result2]`), allowing you to run specific parameter combinations while maintaining the original test name structure.\n\n- **Fixture Compatibility**: The refactored test can still use existing fixtures. Parameterized arguments are handled through the `pytest_generate_tests` hook (in `src/_pytest/python.py:112-114`), which processes `@pytest.mark.parametrize` markers and generates test instances.\n\n**3. Implementation Details:**\n\nThe parametrization is implemented through:\n- The `@pytest.mark.parametrize` decorator (defined in `src/_pytest/mark/structures.py`)\n- The `pytest_generate_tests` hook that processes parametrize markers during test collection\n- The `Metafunc.parametrize()` method that generates multiple test function instances\n\n**4. Data-Driven Execution:**\n\nThe parametrize marker enables data-driven execution by:\n- Accepting multiple parameter sets in the `argvalues` argument\n- Generating separate test instances for each parameter combination\n- Allowing stacking of multiple `@pytest.mark.parametrize` decorators for cartesian product combinations\n- Supporting indirect parametrization through fixtures for more complex setups\n\n**5. Example from Repository:**\n\nThe documentation (`doc/en/how-to/parametrize.rst`) shows this pattern:\n```python\n@pytest.mark.parametrize(\"test_input,expected\", [(\"3+5\", 8), (\"2+4\", 6), (\"6*9\", 42)])\ndef test_eval(test_input, expected):\n    assert eval(test_input) == expected\n```\n\nThis refactoring maintains backward compatibility because:\n- The test function name (`test_eval`) remains unchanged\n- Existing test runners and CI/CD pipelines can still find and execute the test\n- The test can be selected using `-k test_eval` to run all parameterized variants\n- Individual parameter combinations can be selected using their generated IDs\n\nThe key is that pytest treats each parameter combination as a separate test instance while preserving the original test function's identity and discoverability.",
+      "reference_sha256": "6d2d5844c7d390aa8ec4f650604836425c811a006d84b2593c53ecf8f0d5850c",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-97b3c55fbe0d770d9d0d6e34"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the architectural separation in the pytest fixture resolution system that decouples fixture discovery and validation to enable the error reporting mechanism that distinguishes between missing fixtures and internal failures?",
+      "question_sha256": "29003487fe6b30048917fc074a48b4cb5bb9c973d40ec36f8ddc2b09fac51be0",
+      "reference_answer": "The architectural separation is implemented through two distinct phases in the `FixtureManager` class:\n\n1. **Discovery Phase** (`getfixturedefs` method, lines 1853-1871): This method looks up fixtures by name from the `_arg2fixturedefs` dictionary. It returns `None` if no fixtures exist with that name (indicating a missing fixture), or it proceeds to the validation phase by calling `_matchfactories`.\n\n2. **Validation Phase** (`_matchfactories` method, lines 1873-1879): This method filters the discovered fixtures by checking if each fixture's `baseid` matches any parent node's `nodeid` in the collection tree. It returns an empty sequence if fixtures exist but none are applicable to the requesting node.\n\n3. **Error Reporting Distinction** (`FixtureLookupError.formatrepr` method, lines 827-879): The error reporting mechanism distinguishes between missing fixtures and internal failures through the `msg` parameter:\n   - When `msg is None` (lines 861-877): The fixture was not found during discovery (`getfixturedefs` returned `None`), so it generates a message like \"fixture 'X' not found\" and lists available fixtures.\n   - When `msg is not None` (lines 842-845): An internal failure occurred during fixture execution (e.g., an exception raised in `pytest_fixture_setup` at line 1197), so it uses the provided error message and adjusts the stack trace to show the error at the requesting side rather than inside the fixture.\n\nThis separation allows the system to:\n- First determine if a fixture exists (discovery)\n- Then determine if it's applicable to the current context (validation)\n- Finally report appropriate error messages based on whether the failure was due to absence (discovery failure) or execution problems (internal failure)\n\nThe decoupling is evident in `getfixturedefs` (line 1871), which calls `_matchfactories` only after successfully discovering fixtures in the registry, and in `_get_active_fixturedef` (lines 580-594), which handles `None` (missing) and empty sequence (validation failure) as distinct cases before raising `FixtureLookupError`.\n</start_of_answer>",
+      "reference_sha256": "cef14e0fa4d9408ce6558cc5ecabfc86aff38a4dfe5c4c4971a5c02aef3a4d99",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-9b15cd0e2e062e402dd64314"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 770,
+            "file_sha256": "693b0385b2c45646767200bc517416e776c10c3e58ee5ed937007491be4d868e",
+            "path": "src/_pytest/nodes.py",
+            "start_line": 770
+          },
+          {
+            "end_line": 492,
+            "file_sha256": "dc678e2bb07e1630f20595c71579d22f621a4bf4d4284fa9a659faaad44901bc",
+            "path": "src/_pytest/main.py",
+            "start_line": 483
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the _bestrelpath_cache class leverage Python's dictionary protocol to implement lazy computation and caching of relative path transformations?",
+      "question_sha256": "da8a80dd80a752b20f466da8c1ce49d86a14ff4ad55d2c34ff69af65ee20eea3",
+      "reference_answer": "The cache class leverages Python's dictionary protocol (specifically the `__missing__` method) to implement lazy computation and caching because:\n\n1. **Lazy computation**: By inheriting from `dict[Path, str]` and implementing `__missing__`, the cache computes relative paths only when first accessed via dictionary lookup (`cache[path]`). If a path hasn't been requested, no computation occurs, avoiding unnecessary work.\n\n2. **Automatic caching**: When `__missing__` is triggered (a key doesn't exist), it computes the relative path using `bestrelpath(self.path, path)`, stores it in the dictionary via `self[path] = r`, and returns it. Subsequent lookups for the same path are O(1) dictionary retrievals without recomputation.\n\n3. **Transparent API**: The dictionary protocol allows the cache to be used like a regular dictionary (`self._bestrelpathcache[node_path]` at line 647) without explicit \"get or compute\" logic, making the code cleaner and more Pythonic.\n\n4. **Performance optimization**: The comment at line 646 states \"bestrelpath is a quite slow function,\" and `_node_location_to_relpath()` is called frequently during test collection (e.g., in `nodes.py` line 770 for generating test locations). The lazy caching ensures each path transformation is computed only once, significantly improving performance during test runs.\n\nThe implementation (lines 483-492 in `src/_pytest/main.py`) shows a dataclass inheriting from `dict` with a `path` attribute (the root directory) and `__missing__` that computes and caches relative paths on-demand, providing an efficient solution for a performance-critical operation.\n</start_of_answer>",
+      "reference_sha256": "ce1ee507d80651485a7aa73b6e36e23219402e91e02f02494b0c2023d7b77301",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-9ce914df6059b4a8894dc349"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "51ea93fb20122b8aa5f2c412b9cf946b6daf719cde470f6ca2c50430bed4135d",
+            "kind": "file_reference",
+            "line_count": 692,
+            "path": "src/_pytest/junitxml.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the conditional logic in write_captured_output that determines which captured output streams are written to the XML report, and what is the semantic difference between the 'all' logging mode and the combination of 'system-out' and 'system-err' modes in terms of content aggregation?",
+      "question_sha256": "4cadb0c3adc70c4e6106a38f5d1e07d420ad43c99dab501d6e48d027fb50b628",
+      "reference_answer": "The conditional logic in the method that writes captured test output to JUnit XML report elements (located in `src/_pytest/junitxml.py` in the `_NodeReporter` class) determines which captured output streams are written through a series of conditional checks based on the `self.xml.logging` configuration value:\n\n1. **Early exit conditions:**\n   - If `self.xml.log_passing_tests` is `False` and the test report passed, the method returns early without writing any output.\n   - If `self.xml.logging == \"no\"`, the method returns early.\n\n2. **Content aggregation and writing logic:**\n   The method uses a `content_all` variable that accumulates content before writing:\n   \n   - **If `logging in [\"log\", \"all\"]`**: The method prepares log content (`report.caplog`) with a \"Captured Log\" header and assigns it to `content_all`.\n   \n   - **If `logging in [\"system-out\", \"out-err\", \"all\"]`**: The method appends stdout content (`report.capstdout`) with a \"Captured Out\" header to `content_all`, writes the entire `content_all` (which may include previously accumulated log content) to the `<system-out>` XML element, then resets `content_all` to an empty string.\n   \n   - **If `logging in [\"system-err\", \"out-err\", \"all\"]`**: The method appends stderr content (`report.capstderr`) with a \"Captured Err\" header to `content_all`, writes `content_all` to the `<system-err>` XML element, then resets `content_all` to an empty string.\n   \n   - **Final fallback**: If `content_all` still contains content after all checks (which occurs when `logging == \"log\"` but not \"system-out\", \"out-err\", or \"all\"), it writes that remaining content to `<system-out>`.\n\nThe key behavior is that when `logging == \"all\"`, log content is aggregated with stdout in the `<system-out>` element, while stderr is written separately to `<system-err>`. This differs from using \"system-out\" and \"system-err\" modes separately, which write stdout and stderr independently without any log content aggregation.\n\nThe method accesses captured content through `report.capstdout`, `report.caplog`, and `report.capstderr` attributes, and writes to XML elements using the `_write_content` helper method, which creates XML elements with the specified tag name and escaped content.",
+      "reference_sha256": "4085ac4dae34c4d9feb7b77bd0c8313f73614d16125adf6d332d1a9bb9e86919",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-9ef6839209e177ee0b789c96"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 45,
+            "file_sha256": "2f941a4e516816bced282a7b9e45c076729d5552a6443369184d5219ae8dcc8b",
+            "path": "src/_pytest/compat.py",
+            "start_line": 43
+          },
+          {
+            "end_line": 1790,
+            "file_sha256": "43e60de64e464b0908ab8993e93c4cb3da915a9a68422d196ba0a031559870fa",
+            "path": "src/_pytest/fixtures.py",
+            "start_line": 1790
+          },
+          {
+            "end_line": 1340,
+            "file_sha256": "a846e231ae62b1d7278a9119bfd36b923057b5033b238765c9a7a64d41d798fe",
+            "path": "src/_pytest/pytester.py",
+            "start_line": 1340
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the sentinel value abstraction pattern that NotSetType implements within the pytest compatibility layer to decouple internal state representation from external API contracts?",
+      "question_sha256": "5886dfdb8c232cd3396cb7ea289e025a0b178f158bad42344d8bd0614831c7ff",
+      "reference_answer": "The sentinel value abstraction pattern uses an enum-based singleton type (`NotSetType`) in `_pytest.compat` to represent \"not set\" values, distinct from `None` and actual values.\n\nImplementation:\n- `NotSetType` is an enum with a single token value (lines 43-45 in `src/_pytest/compat.py`):\n  ```python\n  class NotSetType(enum.Enum):\n      token = 0\n  NOTSET: Final = NotSetType.token\n  ```\n- The comment references PEP 484\u2019s singleton types in unions.\n\nPurpose and decoupling:\n- Enables three-state distinction in type annotations:\n  - Value is set (e.g., `str`)\n  - Value is explicitly not set (`NotSetType`)\n  - Value is explicitly `None` (`None`)\n- Example usage in `src/_pytest/fixtures.py` (line 1790):\n  ```python\n  nodeid: str | NotSetType | None = NOTSET,\n  ```\n- This allows distinguishing \"parameter not provided\" (NOTSET) from \"parameter explicitly set to None\" (None).\n\nUsage examples:\n1. In `parsefactories` (line 1806): `if nodeid is not NOTSET:` checks whether the parameter was provided.\n2. In fixture parameter handling (line 751): `if param is not NOTSET:` determines if a parametrized value was provided.\n3. In `pytester.py` (line 1340): `stdin: NotSetType | bytes | IO[Any] | int = CLOSE_STDIN` uses NOTSET as a default sentinel.\n\nBenefits:\n- Type safety: type checkers can distinguish the three states.\n- API clarity: external code can pass `None` or omit parameters, while internally NOTSET represents \"not provided\".\n- Internal consistency: a single sentinel value across the codebase for unset states.\n\nThis pattern decouples internal representation (NOTSET for unset) from external API contracts (where `None` or omission are valid), allowing the internal implementation to evolve independently while maintaining a stable public interface.",
+      "reference_sha256": "771e1197758aa7b64b313d8890236ba9b2565f2cbfbebb0596533b091d2346f8",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-a666fd6c53a422b90e1b55ea"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 289,
+            "file_sha256": "abdf73bd6dc01710f53857e4d10bcbec07a11d655b3cc59fee4e4413bdd69b19",
+            "path": "src/_pytest/terminal.py",
+            "start_line": 287
+          },
+          {
+            "end_line": 1468,
+            "file_sha256": "4eacf16ae9d7cafe7b767e023a427b716abcb63a3b8e87e656d6d17b37c74e8d",
+            "path": "testing/test_terminal.py",
+            "start_line": 1465
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "a7ddb326d48dcfdfb10c4173a90df37a662081745a0e7c43e97e08ca2b5ebdb0",
+            "kind": "file_reference",
+            "line_count": 117,
+            "path": "src/_pytest/pastebin.py"
+          },
+          {
+            "file_sha256": "26457b39bef0439dd3146910d136bdea300c606b9b81d5e212cdfd4fb14fcc74",
+            "kind": "file_reference",
+            "line_count": 407,
+            "path": "src/_pytest/debugging.py"
+          },
+          {
+            "file_sha256": "92e96e989751747bbbce8a2c3abe257c747471ee8bb0eb616aef41cabc3cc55e",
+            "kind": "file_reference",
+            "line_count": 1144,
+            "path": "src/_pytest/capture.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the test design rely on injecting the TerminalReporter through a fixture request rather than directly instantiating it, and what architectural principle does this reflect about pytest's plugin system?",
+      "question_sha256": "3aa9337ca0848f0cc04f83a8d6955b1d8538734dbc945354f7a4076914a7211f",
+      "reference_answer": "The test design uses dependency injection through the plugin system instead of direct instantiation to ensure tests use the same configured instance that pytest uses during execution.\n\nIn `src/_pytest/terminal.py` (lines 287-289), TerminalReporter is registered as a plugin during `pytest_configure`:\n\n```python\ndef pytest_configure(config: Config) -> None:\n    reporter = TerminalReporter(config, sys.stdout)\n    config.pluginmanager.register(reporter, \"terminalreporter\")\n```\n\nTests access it via the plugin manager, as shown in `testing/test_terminal.py` (lines 1465-1468):\n\n```python\n@pytest.fixture\ndef tr(request):\n    tr = request.config.pluginmanager.getplugin(\"terminalreporter\")\n    return tr\n```\n\nThis pattern ensures:\n1. Single source of truth: tests use the same instance configured by pytest, with the correct Config, TerminalWriter, and settings.\n2. Consistency: the instance matches what plugins and hooks see during actual test runs.\n3. Plugin system integration: accessing through the plugin manager aligns with pytest's plugin architecture, where components are registered and retrieved via the plugin manager.\n\nThis pattern appears throughout pytest's codebase (e.g., `src/_pytest/pastebin.py`, `src/_pytest/debugging.py`, `src/_pytest/capture.py`), where components are retrieved via `config.pluginmanager.getplugin()` rather than instantiated directly.\n\nDirect instantiation would create a separate instance with potentially different configuration, breaking the assumption that tests interact with the same component instance used by pytest.",
+      "reference_sha256": "b7cab20c44cbbd806dc5ccc1fcc80a79f9a1e16045f30a4ee7dd9a282704791b",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-a8f747280d42026c88700cfb"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 997,
+            "file_sha256": "0e93e9d085b76e1a1c79605b3528736151bf0d5de8193d37342f33d57b5c0238",
+            "path": "testing/python/collect.py",
+            "start_line": 997
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "fa9eca0e9b07f9288a2fd79fb2d20e9626394cf5c20cf027ff0f81efb2d067de",
+            "kind": "file_reference",
+            "line_count": 2184,
+            "path": "testing/test_assertion.py"
+          },
+          {
+            "file_sha256": "3a39c99b88fa5478306232af5bc77e28579f8c474e48e345178cf5d28f6bede8",
+            "kind": "file_reference",
+            "line_count": 208,
+            "path": "src/_pytest/assertion/__init__.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the TestImportHookInstallation class employ subprocess-based testing through pytester.runpytest_subprocess() rather than inline test execution, and what design constraints does this impose on the assertion rewrite hook installation verification?",
+      "question_sha256": "8fc32ed9aa5d626ff2d96a147b5aa83707955a6bf3bb13f4e5054d53be50319f",
+      "reference_answer": "The test class that verifies import hook installation for assertion rewriting uses subprocess execution instead of inline execution because assertion rewrite hooks are installed in Python's `sys.meta_path` (the import hook system), and import hooks only intercept module imports that occur after the hook is installed.\n\nWhen using inline execution (via `pytester.inline_run()` or `pytester.runpytest()`), the test runs in the same Python process where modules may already be imported and cached in `sys.modules`. Once a module is in `sys.modules`, Python will not trigger import hooks for that module again, even if the hook is installed later. This means the test cannot verify that the import hook correctly intercepts and rewrites assertions during module import.\n\nBy using subprocess execution (via `pytester.runpytest_subprocess()`), the test runs pytest in a fresh Python interpreter process where no modules have been imported yet. This ensures that when the test modules are imported, the assertion rewrite hook in `sys.meta_path` will be triggered, allowing the test to verify that:\n1. The hook is properly installed before modules are imported\n2. The hook correctly intercepts imports of conftest files, plugin modules, and test modules\n3. Assertions in those modules are properly rewritten to provide detailed failure messages\n\nThis pattern is evident in the codebase: in `testing/python/collect.py` line 997, there's a comment stating \"Use runpytest_subprocess, since we're futzing with sys.meta_path.\" The `TestImportHookInstallation` class in `testing/test_assertion.py` consistently uses `runpytest_subprocess()` for all its tests (lines 104, 127, 166, 197, 217, 363), while other test classes in the same file use inline execution methods.\n\nThe assertion rewrite hook installation code in `src/_pytest/assertion/__init__.py` shows that the hook is inserted into `sys.meta_path` at position 0 (line 120: `sys.meta_path.insert(0, hook)`), which ensures it has priority during import resolution. However, this only works if modules are imported after the hook is installed, which requires a fresh interpreter process.",
+      "reference_sha256": "43d1e3eed2aebaf3b1402c7db21633958bfeeaa11f0580838f72fe78bfd70b1a",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-aef32c6831d57567c69c3f1c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2016,
+            "file_sha256": "43e60de64e464b0908ab8993e93c4cb3da915a9a68422d196ba0a031559870fa",
+            "path": "src/_pytest/fixtures.py",
+            "start_line": 2016
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "e1ea3da297c5ffffd616270853a4f7636aea68cf46b2850e538b438f398a274f",
+            "kind": "file_reference",
+            "line_count": 5070,
+            "path": "testing/python/fixtures.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "test_show_fixtures_trimmed_doc.py",
+            "reason": "not_tracked",
+            "reference": "test_show_fixtures_trimmed_doc.py",
+            "start_line": null
+          },
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "test_show_fixtures_indented_doc.py",
+            "reason": "not_tracked",
+            "reference": "test_show_fixtures_indented_doc.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "Why does the TestShowFixtures class employ separate test methods for validating fixture documentation formatting across different contexts (trimmed docs, indented docs, first-line unindented, class-level fixtures) rather than consolidating these variations into parameterized tests?",
+      "question_sha256": "8c0b0944fe334976cb0b1c194681a649360e07026e98106e642905edddf2019e",
+      "reference_answer": "Based on my exploration of the pytest repository, the test class `TestShowFixtures` (located in `testing/python/fixtures.py` starting at line 3571) uses separate test methods for different docstring formatting scenarios rather than parameterized tests for several practical reasons:\n\n**1. Unique Expected Output Patterns**\nEach test method validates distinct expected output that includes:\n- Different test file names in the output (e.g., `test_show_fixtures_trimmed_doc.py`, `test_show_fixtures_indented_doc.py`)\n- Different line numbers in the fixture location output\n- Different formatting patterns in the docstring display\n\nFor example:\n- `test_show_fixtures_trimmed_doc` (lines 3652-3687) expects output showing two fixtures (`arg1` and `arg2`) with trimmed trailing whitespace\n- `test_show_fixtures_indented_doc` (lines 3689-3713) expects a single fixture with preserved indentation\n- `test_show_fixtures_indented_doc_first_line_unindented` (lines 3715-3742) tests the edge case where the first docstring line is on the same line as the opening quotes\n- `test_show_fixtures_indented_in_class` (lines 3744-3770) tests fixtures defined within a class context, which has different indentation handling\n\n**2. Different File Structures**\nEach test creates a different Python file structure:\n- Some tests create module-level fixtures\n- `test_show_fixtures_indented_in_class` creates a class with a fixture method\n- The file structure differences affect how `inspect.getdoc()` processes the docstrings\n\n**3. Test Name Clarity for Debugging**\nSeparate test methods provide descriptive names that immediately identify which specific edge case failed:\n- `test_show_fixtures_trimmed_doc` \u2192 clearly indicates trailing whitespace trimming\n- `test_show_fixtures_indented_doc_first_line_unindented` \u2192 clearly indicates the first-line positioning edge case\n\nThis is more informative than parameterized test names like `test_show_fixtures[trimmed]` or `test_show_fixtures[indented]`.\n\n**4. Implementation Context**\nThe tests validate how the `write_docstring()` function (in `src/_pytest/fixtures.py` at line 2016) handles docstrings processed by `inspect.getdoc()`. The function simply splits docstrings by newlines and writes them with indentation, but `inspect.getdoc()` handles normalization differently based on:\n- Whether the first line is on the same line as the opening quotes\n- The indentation context (module-level vs class-level)\n- How trailing whitespace/newlines are handled\n\nEach test validates a specific edge case of this normalization behavior.\n\n**5. Parameterization is Used Elsewhere**\nThe class does use parameterization in other contexts (e.g., `test_show_fixtures_conftest` at line 3626 uses `@pytest.mark.parametrize(\"testmod\", [True, False])`), indicating that parameterization is used when appropriate. The separate methods for docstring formatting suggest that the complexity and uniqueness of each case make separate methods more maintainable.\n\n**Conclusion**\nThe separate test methods provide better clarity, easier debugging, and more maintainable code for these specific edge cases, where each test has unique setup, expected output, and validation requirements that would be difficult to parameterize cleanly.\n</start_of_answer>",
+      "reference_sha256": "e5a41c0c735fea2ec0c11fea651afb88b1efc37f7089d691c05fb21b42c5535c",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-b4bd4d91f4d0e12cd83fdee1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 210,
+            "file_sha256": "4faed984761221a38fdd1b5073110b927c8c6d59750ce67f6ee0cf1868802446",
+            "path": "src/_pytest/_io/terminalwriter.py",
+            "start_line": 204
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "ddf80fa6b54357bb82682e7ec89ea3bf1ce9d90a97c5eed3c5e925770b8997ed",
+            "kind": "file_reference",
+            "line_count": 621,
+            "path": "src/_pytest/assertion/util.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where are the functions or methods in the assertion module that indirectly invoke the _HighlightFunc protocol through conditional lexer type selection between diff and python highlighting implementations?",
+      "question_sha256": "026e3a11c0cf17831906516b0ad7ac9be4874a22195396cc7d267cfea7e5caca",
+      "reference_answer": "The functions are located in `./src/_pytest/assertion/util.py`. They are:\n\n1. **`_diff_text`** (lines 285-337): Compares two text strings and calls the highlighter with `lexer=\"diff\"` at line 334 to highlight the unified diff output from `difflib.ndiff`.\n\n2. **`_compare_eq_iterable`** (lines 340-366): Compares iterables and calls the highlighter with `lexer=\"diff\"` at line 363 to highlight the full diff between formatted representations.\n\n3. **`_compare_eq_sequence`** (lines 369-426): Compares sequences and calls the highlighter without an explicit lexer parameter (defaults to `\"python\"`) at lines 398, 420, and 424 to highlight Python code representations.\n\n4. **`_set_one_sided_diff`** (lines 483-495): Computes one-sided set differences and calls the highlighter without an explicit lexer parameter (defaults to `\"python\"`) at line 494 to highlight Python representations of set items.\n\n5. **`_compare_eq_dict`** (lines 498-541): Compares dictionaries and calls the highlighter without an explicit lexer parameter (defaults to `\"python\"`) at lines 513, 519, 521, 530, and 539 to highlight Python-formatted dictionary representations.\n\n6. **`_compare_eq_cls`** (lines 544-596): Compares dataclasses, attrs classes, or namedtuples and calls the highlighter without an explicit lexer parameter (defaults to `\"python\"`) at lines 578, 581, and 588 to highlight Python-formatted attribute representations.\n\nAll these functions accept a `highlighter` parameter of type `_HighlightFunc` (defined at line 41-43). When they call the highlighter, the lexer parameter (either explicitly `\"diff\"` or defaulting to `\"python\"`) is passed through to the terminal writer's `_highlight` method, which then calls `_get_pygments_lexer` in `./src/_pytest/_io/terminalwriter.py` (lines 204-210). That method conditionally selects between `DiffLexer()` and `PythonLexer()` based on the lexer parameter using an if-elif statement, thus implementing the conditional lexer type selection mechanism.",
+      "reference_sha256": "2fb6070f3cb34d6134d21643ddaee81c11782664ab27c0a012a5bb9e149d5611",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-b981f9bac23687dd32ae162a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 91,
+            "file_sha256": "d3c7253f93c900be15cf34ea970f3f7f847d98bfcc9f336acfb262e7a2083ef0",
+            "path": "src/_pytest/timing.py",
+            "start_line": 86
+          },
+          {
+            "end_line": 251,
+            "file_sha256": "9df03b926213009d706e3cbe451d22079d97c623da42982caa720419abadd5c5",
+            "path": "src/_pytest/monkeypatch.py",
+            "start_line": 181
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the MockTiming.patch method's delegation to monkeypatch.setattr establish the interception points for timing module functions, and what is the relationship between the three separate setattr calls in terms of their execution order and potential side effects on the timing module's state?",
+      "question_sha256": "8dfd796150ef07aad165cabb694f1ed96dfd4e6bb62e338c7cfaf4b866f271cb",
+      "reference_answer": "The method that establishes interception points for time-related functions in the timing indirection module delegates to the attribute replacement mechanism within the `patch` method of the `MockTiming` class, located in `src/_pytest/timing.py` at lines 86-91.\n\nSpecifically, the delegation occurs at these three sequential calls within the `patch` method:\n\n```86:91:src/_pytest/timing.py\n    def patch(self, monkeypatch: MonkeyPatch) -> None:\n        from _pytest import timing  # noqa: PLW0406\n\n        monkeypatch.setattr(timing, \"sleep\", self.sleep)\n        monkeypatch.setattr(timing, \"time\", self.time)\n        monkeypatch.setattr(timing, \"perf_counter\", self.time)\n```\n\nThe interception points are established by:\n1. **Importing the timing module**: Line 87 imports `_pytest.timing` module, which exports `sleep`, `time`, and `perf_counter` functions (imported from the standard library `time` module, as shown in lines 14-16).\n\n2. **Three sequential setattr calls**: Lines 89-91 make three separate calls to `monkeypatch.setattr`, each targeting a different function in the `_pytest.timing` module namespace:\n   - `monkeypatch.setattr(timing, \"sleep\", self.sleep)` - replaces the `sleep` function\n   - `monkeypatch.setattr(timing, \"time\", self.time)` - replaces the `time` function  \n   - `monkeypatch.setattr(timing, \"perf_counter\", self.time)` - replaces the `perf_counter` function with the same `self.time` method\n\n**Execution order and side effects**: The three `setattr` calls execute sequentially in the order they appear. Each call immediately modifies the `_pytest.timing` module's namespace by replacing the corresponding function attribute. According to the `monkeypatch.setattr` implementation (lines 181-251 in `src/_pytest/monkeypatch.py`), each call:\n- Retrieves the old value from the target module\n- Stores it in the monkeypatch's undo stack (`self._setattr` list)\n- Immediately executes Python's built-in `setattr(target, name, value)` to replace the attribute\n\nSince the three calls target different attributes (\"sleep\", \"time\", \"perf_counter\") on the same module object, they are independent operations with no dependencies between them. However, they collectively establish interception points for all time-related functions that pytest and test code access through the `_pytest.timing` module, ensuring that any code importing and using `timing.sleep`, `timing.time`, or `timing.perf_counter` will use the mocked implementations instead of the real time functions.\n\nThis design allows pytest's own tests to control timing deterministically, as documented in the `MockTiming` class docstring (lines 67-76), which explains that time becomes static and only advances through `sleep` calls, making tests reliable and instant.",
+      "reference_sha256": "0c376cade8c77039aa2e410089aabe3f8eb38d79a1f4684d88b76f20025a92c5",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-be34a26cecb95595b7a51d1f"
+    }
+  ]
+}

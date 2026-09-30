@@ -1,0 +1,92 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-023.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "original_reference_sha256": "9ebc00a153d882bef1a78b1c54fb7fbd6a6133b740a9e8414c1dfa04991ef826",
+      "question": "How does the TextArea.get_text() method's delegation pattern to self._text.get_text() enable framework-agnostic text retrieval while maintaining compatibility with matplotlib's text rendering API?",
+      "question_sha256": "744918da446b6e1735480e8ec07ff0e28a1330024d6e82933187dcda06a6fea0",
+      "reference_answer": "TextArea owns a matplotlib.text.Text child and uses Matplotlib transforms for layout (lib/matplotlib/offsetbox.py:735-744). get_text simply forwards to that child, keeping text storage and retrieval consistent with Text rather than duplicating it (lib/matplotlib/offsetbox.py:746-753). This abstracts the contained Text from callers; it does not make TextArea independent of Matplotlib or universally interchangeable with other frameworks.",
+      "reference_sha256": "2de31b7721eeeffb0791509dc8a2041a6612267ba229fc2b3b3af117527e062b",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-14bd09e3c8e5c73cc8594bf7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "original_reference_sha256": "09bed52c7467af2b3e8717bf1c4bb68ad2f32ddedb4d570aef90fd6e57b0c94b",
+      "question": "Why does the RendererSVG class employ a deferred rendering strategy where clip paths and hatches are written only during finalization rather than immediately when encountered?",
+      "question_sha256": "eed7233358cb4df5b8682aebb46ace92fc04eb7908c3731212890c7616c226b5",
+      "reference_answer": "RendererSVG caches clip and hatch definitions by property keys, returning existing identifiers for repeat encounters (lib/matplotlib/backends/backend_svg.py:494-511,605-626). finalize emits both dictionaries before closing the SVG (lib/matplotlib/backends/backend_svg.py:344-348). _write_clips and _write_hatches each create their own defs section (lib/matplotlib/backends/backend_svg.py:513-519,628-649). This batches cached definitions and avoids duplicates; a single shared defs section is not the implementation.",
+      "reference_sha256": "14ade2bd5273c9a7c188c33132f30bb4cce92fbe09afb03172aaa81b98df69a8",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-27c88e9800690e60af874728"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "original_reference_sha256": "566a891d655519384451a73c40dd8afeffc9e22440ec542ce23c026b30586d2e",
+      "question": "Why does the FigureCanvasPS class reconcile the dual rendering pathways between _print_figure and _print_figure_tex to maintain consistent PostScript output quality while accommodating both standard and TeX-based text rendering modes?",
+      "question_sha256": "ee71fde6eff3b21ded60690942d9885966385c61b0f04871613ab711dfb0c8a6",
+      "reference_answer": "FigureCanvasPS._print_ps chooses _print_figure_tex when text.usetex is enabled, otherwise _print_figure, passing shared output options (lib/matplotlib/backends/backend_ps.py:995-1000). Both use MixedModeRenderer; the TeX route converts PSFrag placeholders through its external TeX pipeline (lib/matplotlib/backends/backend_ps.py:1044-1047,1157-1160,1202-1214). The common interface supports different text-rendering mechanisms; it does not itself guarantee identical typography, quality, or timing.",
+      "reference_sha256": "111f84b481f413dd1a1f3a6f7beed8ab903e546a204aafe7a6dd6a2ebd82856f",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-2b97bc542993df90e0c5135b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "original_reference_sha256": "6602c42dd4b8960456c90b5eed3694fb37aa2a30773a4ccc0f832abb213d01af",
+      "question": "Why does the repeated instantiation of figure and axes objects with different DPI values in test_legend_proper_window_extent impact renderer caching and what performance degradation occurs when get_window_extent is called sequentially on legends without renderer state reuse?",
+      "question_sha256": "e7b08c2b0ab639e442f3354baf17c6381f488680e96941ec2b35171a3f784c11",
+      "reference_answer": "Each Agg canvas caches RendererAgg by width, height and dpi, creating it when the key changes (lib/matplotlib/backends/backend_agg.py:388-395). Figure._get_renderer directly calls canvas.get_renderer when available (lib/matplotlib/figure.py:2849-2852), so repeated legend extent queries do not require prior canvas.draw or trigger full drawing on Agg. The fallback captures a renderer by immediately aborting a patched draw (lib/matplotlib/backend_bases.py:1589-1618). Separate figures have separate caches, but this test does not quantify a performance degradation.",
+      "reference_sha256": "5b84f5298e07d0a9a627002db9b90bb992ad0635ec4ecf3d3476b3483994b308",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-33cd52ca6417c1dcc7cacd7c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "original_reference_sha256": "3b9c80125330bd3f724a175ddf95807980450646bfeba8c56b368f42c3706cc0",
+      "question": "How does TransformWrapper's set() method maintain invalidation state consistency when replacing a child transform, and what is the significance of the double invalidation pattern with _invalid flag reset?",
+      "question_sha256": "b548d58d92e0c44d11323b2b4df09d088f39464697e803c72f99d66e4413d0e9",
+      "reference_answer": "TransformWrapper.set invalidates using the old child state, checks dimensional compatibility, removes the old parent link, attaches the new child and rebinds delegated methods (lib/matplotlib/transforms.py:1743-1771). It then resets _invalid, invalidates with the new child in place, and resets again (lib/matplotlib/transforms.py:1776-1778). invalidate chooses affine-only versus full invalidation from is_affine, rather than copying a child invalid flag (lib/matplotlib/transforms.py:154-176). Thus ancestors are notified around a possible change in transform type while the delegating wrapper ends with _invalid=0.",
+      "reference_sha256": "8944c95e95d297f43f65cdf91f9c47eedbd4707f4a969e22dc362a73587ad50a",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-35e0cd7ab847a000532888e8"
+    }
+  ]
+}

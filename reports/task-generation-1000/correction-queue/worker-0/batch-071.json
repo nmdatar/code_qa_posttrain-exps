@@ -1,0 +1,92 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-071.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "original_reference_sha256": "36a2ead63957933743d6349a8fc5387171c7ad069330d8a5f714d81c58e8af78",
+      "question": "Where in the Hive dialect function parsing class do grammar rules prevent ambiguity between the row keyword used as a function name versus type constructor?",
+      "question_sha256": "1d17d28f544a4c223d728b2c6249415a8d67ef99bda8cf40a347852168d2c53c",
+      "reference_answer": "FunctionSegment has a special ROW function-name parser followed by RowFunctionContentsSegment, AS ROW, and bracketed comma-separated identifiers with optional datatype (src/sqlfluff/dialects/dialect_hive.py:906-920). The AS ROW shape distinguishes this branch from generic function parsing at922-934. Datatypes are not mandatory. Alternative selection uses longest-match priorities, with earlier alternatives resolving ties and first total matches (src/sqlfluff/core/parser/match_algorithms.py:146-156), not an unconditional first-success rule.",
+      "reference_sha256": "90bde725c56ef6c792dd62e16fbad6933bd3fc0a401b67a821a3188695541d33",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-887e0169f5cf34c4373be9f5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "original_reference_sha256": "a84a872cbe955d6e5956301108f2dc662788fdbd1f1639ac8d2d287ca8a27e13",
+      "question": " What is the architectural design of the NamedTuple storing parsing results with an optional parse tree field enabling graceful degradation when parsing fails at different pipeline stages?",
+      "question_sha256": "a8ab19444bd79918292c5271afe5c15ca7a2a4e491797b665a147ac623fcdb5b",
+      "reference_answer": "ParsedVariant stores a nonoptional TemplatedFile, optional tree, and separate lexing/parsing violation lists, with violations combining the latter (src/sqlfluff/core/linter/common.py:57-64). parse_rendered constructs it for each existing templated variant; if there are no tokens it uses parsed=None while retaining lex errors (src/sqlfluff/core/linter/linter.py:333-361). The optional tree allows reporting without a usable parse tree. The docstring's suggestion that templated_file can be None should not be confused with the actual typed construction path; templating failure can instead yield no variants.",
+      "reference_sha256": "a5b749b04a663e2e5b0ca4a0b006c0a7ab85d170c206b883b60a1adbfe1eda24",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-9b7f614e174db3236d68bd50"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "original_reference_sha256": "0be9f691fef1468c91aeb3ca59f3d95f019a811696fd0074762977ac7ad49378",
+      "question": "How should the function that dynamically imports user-provided Python modules from configuration in the Jinja templater be redesigned to enforce security boundaries and prevent arbitrary code execution?",
+      "question_sha256": "4ba8dd51116c6da4ee5a8daa0beac5cebd283930e33d8a0ef92e14310bb0f6f7",
+      "reference_answer": "The loader executes discovered modules with exec_module (src/sqlfluff/core/templaters/jinja.py:274-289), so library_path is a trusted-code extension boundary, not protected by Jinja's template sandbox. The repository recommends invocation-level configuration overrides or --library-path none for secure deployments (docs/source/production/security.rst:31-48). A redesign should disable untrusted library loading by default and permit administrator-controlled trusted libraries explicitly. If arbitrary untrusted Python must run, use an external process/container boundary with OS-enforced filesystem, network and resource restrictions; path/name allowlists, export checks and AST scans are defense-in-depth rather than sufficient execution isolation.",
+      "reference_sha256": "5fe2182fdbee9cbf4114381678a83b227d3cba7c7ae5ec11bad32465247326c8",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-a024a3c06872fce52cb804ad"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "original_reference_sha256": "ee45595426868a5229cc35c8d0576a204909ae89d82e7deff2d94f08c2d921f0",
+      "question": "Why would repeatedly instantiating the NamedTuple that stores select clause target information in the layout rule during SQL linting cause performance degradation?",
+      "question_sha256": "c3cabfeefd5947eba9de1b408f7e362b0c9e8e851d3383baa0d95099f52d2ca2",
+      "reference_answer": "_get_indexes computes target positions from child/sibling selections and returns SelectTargetsInfo, including a new list of pre-FROM whitespace (src/sqlfluff/rules/layout/LT09.py:109-157). Repeated SELECT clauses repeat this work, but that does not prove tuple allocation causes significant slowdown, GC pressure or fragmentation. The tuple mainly holds existing references and indices. Profile traversal, allocation and total lint time before caching; different clauses and modified trees may require different results.",
+      "reference_sha256": "808e1dd5c777b7fcaa0289db96ae41b3f0cfdc52a8dc763848e387e98e0956d3",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-a9fc9efa3e7bbf21ae1eb14d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "original_reference_sha256": "6700ad33df66378686133ba9c5f7415d0b89da8674deb135b7c06f2d19241ba2",
+      "question": "Why does the early exit check using the cached subtree type set intersection prevent performance degradation in the recursive segment search method when traversing deeply nested trees with irrelevant branches?",
+      "question_sha256": "f07c0f2cb4768a608aebce2be8f0cd92a25ed13d8ff61afc023167f51061857e",
+      "reference_answer": "recursive_crawl checks self, then returns early if descendant_type_set has no requested types, otherwise recursing into allowed children (src/sqlfluff/core/parser/segments/base.py:1029-1054). Once cached, the summary avoids revisiting irrelevant subtrees. This saves traversal work but does not establish prevention of exponential complexity: a simple traversal of a tree is linear in visited nodes, and populating the cached descendant summaries also costs work.",
+      "reference_sha256": "3ade6fcf34654ace03b11e27d32348bfaf4a1606f95f18e5f611d8d27ce53a45",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-b47190d3a7f08a607a84569b"
+    }
+  ]
+}

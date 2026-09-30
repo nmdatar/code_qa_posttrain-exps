@@ -1,0 +1,357 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-3a81650143eee2434dd3a1c1",
+      "reference_sha256": "9d2aaa356dfc1866803da978dcd3fcf773487021743c84f30d35ac23d8c3283c",
+      "question_sha256": "ee6443e51ecbd5f8e842702d63cbb01d2e2c519848782a38d0c72cfa26438930",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Spectral fit chooses graph/precomputed/kernel affinity then embeds and labels",
+          "verdict": "supported",
+          "reason": "All four affinity branches and three labeling methods match; standard kernel args overwrite params for noncallable affinity.",
+          "evidence": {
+            "path": "sklearn/cluster/_spectral.py",
+            "start_line": 713,
+            "end_line": 770
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-4c8ebe954a3040bb5d4a29b5",
+      "reference_sha256": "191c7cb560a05da12c7d8051b8fe0a65ccd4b47650c039a68804d7d6e05c3fd3",
+      "question_sha256": "aad8170db20e025515034230cd1b19d170f91bee516862bec57d18774995bb4a",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Response helper validates explicit multiclass label but only infers binary default",
+          "verdict": "supported",
+          "reason": "Multiclass explicit valid labels allowed, None not replaced by class1.",
+          "evidence": {
+            "path": "sklearn/utils/_response.py",
+            "start_line": 200,
+            "end_line": 228
+          }
+        },
+        {
+          "claim": "Average precision separately fixes multiclass positive binarized value",
+          "verdict": "supported",
+          "reason": "Metric-specific convention cannot generalize to all multiclass response APIs.",
+          "evidence": {
+            "path": "sklearn/metrics/_ranking.py",
+            "start_line": 259,
+            "end_line": 268
+          }
+        }
+      ],
+      "material_errors": [
+        "Conflates average_precision_score multiclass convention with _get_response_values general label resolution."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "In _get_response_values, an explicit pos_label is checked against estimator.classes_ for binary or multiclass classifiers. An invalid label raises ValueError; a missing label defaults to classes[-1] only for binary targets, while multiclass None remains unset (sklearn/utils/_response.py:200-228). Separately, average_precision_score requires pos_label=1 for multiclass y_true because it binarizes the labels (sklearn/metrics/_ranking.py:259-268). That metric-specific rule is not a universal multiclass response-resolution policy."
+    },
+    {
+      "task_id": "import-667d41494071f29d516a169b",
+      "reference_sha256": "2e34b561a08b16aabd68d9658ab95199d861896168337a88cf0d4c21c7527901",
+      "question_sha256": "448e7a1df10fc6672a51da0a6b97587cf9cedc2d67fcaf529bf858076a17d0a7",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Warm initialization reuses latest compatible cached latent vector",
+          "verdict": "supported",
+          "reason": "Cache written after iteration loop; Newton matrix work repeated at each step.",
+          "evidence": {
+            "path": "sklearn/gaussian_process/_gpc.py",
+            "start_line": 452,
+            "end_line": 495
+          }
+        }
+      ],
+      "material_errors": [
+        "Omits requested trade-offs and overstates faster convergence as guaranteed."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "_posterior_mode uses f_cached only when warm_start is enabled, the cache exists and its shape matches y_train_; otherwise it starts from zeros. It caches the final vector after the Newton loop (sklearn/gaussian_process/_gpc.py:452-495). For nearby hyperparameters that vector may reduce iterations, but speedup is not guaranteed for dissimilar problems. The trade-off is retained O(n_samples) vector state and dependence of initialization on previous evaluations; each evaluation still performs its Newton updates and Cholesky work, rather than reusing a complete likelihood/factorization (lines463-493)."
+    },
+    {
+      "task_id": "import-72b8d8c83c8e3f87c2c31c35",
+      "reference_sha256": "d0c94b822268e9b73890af697c1c77d440165bfd5f06d25c67496868ea5456b7",
+      "question_sha256": "59ee67e8458c99b0b6911a315702f5579ad045388c4c03f6858824a8091d465b",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Sparse nearest-neighbor embedding warns and switches to RBF",
+          "verdict": "supported",
+          "reason": "Mutation persists; fallback not exception-based; warning means not silent despite one prose phrase.",
+          "evidence": {
+            "path": "sklearn/manifold/_spectral_embedding.py",
+            "start_line": 683,
+            "end_line": 708
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-7660d4151be40b9f8de022ac",
+      "reference_sha256": "0f8dd3db0ad59f4ce16ce963a8e8792541546c4be68ac2f5a5269b36fe6e5161",
+      "question_sha256": "5aa98a28efe527a2dfa261d049e3573f0859b960a0d266fc372fd75d72fd8dd4",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Composition handles list replacement and named replacement before nested params",
+          "verdict": "supported",
+          "reason": "Drop is replacement value, no special drop branch here.",
+          "evidence": {
+            "path": "sklearn/utils/metaestimators.py",
+            "start_line": 52,
+            "end_line": 80
+          }
+        },
+        {
+          "claim": "Nested parameter delegation calls estimator set_params",
+          "verdict": "supported",
+          "reason": "Named__param differs from replacing named estimator.",
+          "evidence": {
+            "path": "sklearn/base.py",
+            "start_line": 340,
+            "end_line": 359
+          }
+        },
+        {
+          "claim": "Ensemble validation ignores dropped entries and rejects all-drop",
+          "verdict": "supported",
+          "reason": "Drop semantics handled downstream.",
+          "evidence": {
+            "path": "sklearn/ensemble/_base.py",
+            "start_line": 228,
+            "end_line": 249
+          }
+        }
+      ],
+      "material_errors": [
+        "Does not answer modification/replacement/drop control flow and implies special drop handling inside composition setter."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "_BaseHeterogeneousEnsemble.set_params calls super()._set_params(\"estimators\", **params) (sklearn/ensemble/_base.py:251-274). Composition first replaces the whole list if supplied, then replaces a named entry for a plain estimator name, and finally forwards remaining parameters to BaseEstimator (sklearn/utils/metaestimators.py:52-80). A name__parameter key invokes that estimator\u2019s set_params; a name=\"drop\" key simply replaces the tuple value with the sentinel (sklearn/base.py:340-359). There is no special drop branch in _set_params. Ensemble validation subsequently skips drop entries and rejects an all-dropped ensemble (sklearn/ensemble/_base.py:228-249)."
+    },
+    {
+      "task_id": "import-774e6143baa89afd72d7ffdc",
+      "reference_sha256": "0ec89f1cb4a8839523f49ca5da7cbdc79736919f3d7313e6cbbcd91d84ed72ca",
+      "question_sha256": "c7456e045b548c1416d380ed2e32d9ee173421c95b4306d03bd67490c6f86242",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Test fits separate selectors to compare outputs",
+          "verdict": "supported",
+          "reason": "Separate implementations intentionally exercised; no benchmark.",
+          "evidence": {
+            "path": "sklearn/feature_selection/tests/test_feature_select.py",
+            "start_line": 926,
+            "end_line": 935
+          }
+        },
+        {
+          "claim": "Transform obtains support each time",
+          "verdict": "supported",
+          "reason": "Reusing estimator does not cache support mask.",
+          "evidence": {
+            "path": "sklearn/feature_selection/_base.py",
+            "start_line": 118,
+            "end_line": 132
+          }
+        },
+        {
+          "claim": "KBest mask stable-sorts scores each invocation",
+          "verdict": "supported",
+          "reason": "For ordinary k, sorting still repeats across transforms.",
+          "evidence": {
+            "path": "sklearn/feature_selection/_univariate_selection.py",
+            "start_line": 787,
+            "end_line": 801
+          }
+        }
+      ],
+      "material_errors": [
+        "False cached-sort claim, unsupported linear mutual-information complexity and significant cost assertions."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "The test fits SelectKBest and GenericUnivariateSelect independently to compare their selected data (sklearn/feature_selection/tests/test_feature_select.py:926-935). Reusing a fitted selector for repeated transforms avoids refitting and recomputing its scores, but transform still requests a support mask (sklearn/feature_selection/_base.py:118-132), and SelectKBest sorts scores each time for ordinary k values (sklearn/feature_selection/_univariate_selection.py:787-801). The source does not establish a measured slowdown or the claimed simple linear complexity; replacing these independent test fits with one object would weaken comparison coverage."
+    },
+    {
+      "task_id": "import-7b5af2c59e7c62c1afe6e116",
+      "reference_sha256": "06e6edd94b439b869c7591c95930d67d86413bbc4a9718f49c2de873870c5af6",
+      "question_sha256": "c5a2e2d7b1338d7aa87941ef1fe556b672003029e3d2be963920a001db8a633f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Custom tokenizer bypasses regex compilation and group validation",
+          "verdict": "supported",
+          "reason": "When absent compiles pattern and requires at most1 capture, returns findall.",
+          "evidence": {
+            "path": "sklearn/feature_extraction/text.py",
+            "start_line": 355,
+            "end_line": 373
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-8880fe60d348fb42ba9caf18",
+      "reference_sha256": "e6761e13ddd0664e1741d3507d3bcca8d2ec99b720f3fa79f1166c0eb51f7017",
+      "question_sha256": "dc17fed69c6bf3ccdb763dd79074316fae343015f567cb93ee8ea7177799cfa4",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Fit counter detects repeated fitting of fitted transformer",
+          "verdict": "supported",
+          "reason": "Test directly fits TransformedTargetRegressor and checks transformer_, not nested pipeline.",
+          "evidence": {
+            "path": "sklearn/compose/tests/test_target.py",
+            "start_line": 318,
+            "end_line": 344
+          }
+        },
+        {
+          "claim": "Pipeline clones only when cache configuration requires it",
+          "verdict": "supported",
+          "reason": "Explicit no-clone branch contradicts blanket cloning.",
+          "evidence": {
+            "path": "sklearn/pipeline.py",
+            "start_line": 573,
+            "end_line": 578
+          }
+        }
+      ],
+      "material_errors": [
+        "Overstates unconditional Pipeline cloning and what direct regressor test proves about nested workflows."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "DummyTransformer increments fit_counter in fit and otherwise passes data through. The regression test fits TransformedTargetRegressor for both check_inverse values and asserts transformer_.fit_counter==1, detecting repeated fit calls on that fitted transformer (sklearn/compose/tests/test_target.py:318-344). It does not itself exercise a Pipeline or prove all composition workflows fit exactly once. Pipeline\u2019s own code explicitly avoids cloning when caching is disabled (sklearn/pipeline.py:573-578)."
+    },
+    {
+      "task_id": "import-8f22baed8bc14544d72b7e73",
+      "reference_sha256": "0ada394617e96ef432a3ae0daf87b9a1e38883dd6af5bcb0ec4123305c349f46",
+      "question_sha256": "ed8c2a1ddb9bea4343194288d32755b30ded51e62d2ae7ddb4eb7970c1d06de1",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Central validator creates constraints and raises when none pass",
+          "verdict": "supported",
+          "reason": "Constraint boolean checks are aggregated; hidden constraints removed only from error display.",
+          "evidence": {
+            "path": "sklearn/utils/_param_validation.py",
+            "start_line": 63,
+            "end_line": 101
+          }
+        },
+        {
+          "claim": "Exception dual ancestry is deliberate compatibility",
+          "verdict": "supported",
+          "reason": "ValueError and TypeError bases documented.",
+          "evidence": {
+            "path": "sklearn/utils/_param_validation.py",
+            "start_line": 20,
+            "end_line": 25
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-9090a5ee6e510bdbc8a36db1",
+      "reference_sha256": "9982763e9fac2a0988c4b1a8c13cd0c89576485c5e930b65fb3dfa922c42f84d",
+      "question_sha256": "da4fad4620828fb054123b8c977358165fa150fbf7205750420402b4c1f6a85b",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Parsed version stores full components and precomputes sorting key",
+          "verdict": "supported",
+          "reason": "Full tuples passed to comparison key.",
+          "evidence": {
+            "path": "sklearn/externals/_packaging/version.py",
+            "start_line": 292,
+            "end_line": 319
+          }
+        },
+        {
+          "claim": "Post/dev properties extract number while pre returns tuple",
+          "verdict": "supported",
+          "reason": "No duplicated numeric field necessary; storage rationale inferred from structure.",
+          "evidence": {
+            "path": "sklearn/externals/_packaging/version.py",
+            "start_line": 362,
+            "end_line": 373
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-922d4c14d36f069b3d9ec937",
+      "reference_sha256": "2ab7c15c74f235309ebd9a72a8fd97072fdb731cc6dc83c5d45018561e0fc470",
+      "question_sha256": "f9c538d2ec492811826312033cceb11fa7085fbeb17f95afe20685ca69d314cf",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Docstring check layers module/class/method discovery and aggregates errors",
+          "verdict": "supported",
+          "reason": "Public class/function filters and None-y exceptions supported; external classes excluded but other sklearn imported classes remain eligible.",
+          "evidence": {
+            "path": "sklearn/tests/test_docstring_parameters.py",
+            "start_line": 73,
+            "end_line": 149
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-a03334ace499931cc91cbe7b",
+      "reference_sha256": "e5acede158a557f966d429e4b9ccac6bfaf48f9f1e16fea0648535daefd738d1",
+      "question_sha256": "55c5d6a7d37632c03005b6ad4855db9a39dd673804b9a451d0f51ca226be0629",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Infinity comparison methods are hardcoded and negation returns singleton",
+          "verdict": "supported",
+          "reason": "__neg__ returns existing NegativeInfinity; even Infinity<=Infinity false.",
+          "evidence": {
+            "path": "sklearn/externals/_packaging/_structures.py",
+            "start_line": 29,
+            "end_line": 58
+          }
+        }
+      ],
+      "material_errors": [
+        "Fails to answer negation and overstates universal consistent ordering across all comparison chains."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "InfinityType defines __lt__/__le__ as False and __gt__/__ge__ as True; equality tests isinstance(other,self.__class__) and inequality negates that test (sklearn/externals/_packaging/_structures.py:29-52). These are specialized ordering sentinels, not a fully conventional total-order guarantee for arbitrary comparison chains (even same-type <= is False). __neg__ performs no numerical transformation or fresh allocation: it returns the module\u2019s existing NegativeInfinity singleton (lines54-55)."
+    }
+  ]
+}
