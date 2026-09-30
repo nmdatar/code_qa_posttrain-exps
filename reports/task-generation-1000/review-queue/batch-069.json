@@ -1,0 +1,479 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 28,
+            "file_sha256": "ffdb4f0b746331f17b3f42a1b76d73d5505cc8078ec16dc410c3ea46c6bdee16",
+            "path": "src/sqlfluff/core/plugin/lib.py",
+            "start_line": 25
+          },
+          {
+            "end_line": 20,
+            "file_sha256": "489f220331e484834a255588375c061b923d04c1bf81557f613c9aeef62e400e",
+            "path": "src/sqlfluff/core/templaters/__init__.py",
+            "start_line": 13
+          },
+          {
+            "end_line": 447,
+            "file_sha256": "da2c1ebb2e533f34ae42c95a85aac753278782a0e0cb46c47c6f27efd1cf45d6",
+            "path": "src/sqlfluff/core/config/fluffconfig.py",
+            "start_line": 442
+          },
+          {
+            "end_line": 131,
+            "file_sha256": "c51d3c985192afda9732d1bc04f110f3ae358d0964dff421a14dbd01cee92f28",
+            "path": "src/sqlfluff/rules/jinja/JJ01.py",
+            "start_line": 131
+          },
+          {
+            "end_line": 211,
+            "file_sha256": "5dd422cc9760dae8025db3a61ea0b2b5ad9d2cfe91a597fd044295f7aee4c663",
+            "path": "src/sqlfluff/cli/commands.py",
+            "start_line": 205
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the list comprehension in the plugin hook that converts the generator-based templater discovery into a list impact memory allocation efficiency compared to directly returning the generator?",
+      "question_sha256": "d765124ac1be5e92d922298f9de596f90587b122facd09c2779f0aad3190a3c8",
+      "reference_answer": "The list comprehension in `get_templaters()` (located in `src/sqlfluff/core/plugin/lib.py`, lines 25-28) eagerly converts the generator returned by `core_templaters()` into a list, which impacts memory allocation efficiency in the following ways:\n\n**Memory allocation difference:**\n\n1. **Generator approach (`core_templaters()`):** The function in `src/sqlfluff/core/templaters/__init__.py` (lines 13-20) returns an `Iterator[type[RawTemplater]]` using `yield from`. This is a lazy generator that only creates items in memory when they are actually iterated over. It yields four templater classes: `RawTemplater`, `JinjaTemplater`, `PythonTemplater`, and `PlaceholderTemplater`.\n\n2. **List comprehension approach (`get_templaters()`):** The implementation uses `list(t for t in core_templaters())` (line 27), which immediately consumes the entire generator and stores all templater classes in a list in memory. This requires allocating memory for all items upfront, even if only a subset might be needed.\n\n**Why this matters:**\n\nThe `get_templaters()` function is called via the plugin hook system in `get_templater_class()` method (see `src/sqlfluff/core/config/fluffconfig.py`, lines 442-447). This method is invoked from various places, including:\n- Rules like `JJ01.py` (line 131) which check templater types\n- The configuration system when determining available templaters\n- CLI commands when listing templater options (see `src/sqlfluff/cli/commands.py`, lines 205-211)\n\nWhen `get_templater_class()` is called repeatedly (e.g., for each file being processed in a batch), the list comprehension forces the creation of a new list each time, consuming memory for all templater classes even though the function typically only needs to look up one templater by name. A generator would allow lazy evaluation, only creating items as needed during iteration, which would be more memory-efficient, especially in scenarios where the full list is never fully consumed or when this function is called many times in parallel processing scenarios.\n\nThe plugin hook system's design requires `get_templaters()` to return a list (as seen in the hook specification), but the conversion from generator to list happens eagerly, causing unnecessary memory allocation compared to what would be possible if the generator could be passed through directly.",
+      "reference_sha256": "4058b45099919968299450974a987c8d96dee4f77fd50dd934a4f60d7785beb1",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-05efdeacba8b181cce5faa64"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 66,
+            "file_sha256": "6adaacfca9d12c9d63ba0d73c111a445014a812438413fcd0eba254bf306bb86",
+            "path": "src/sqlfluff/cli/formatters.py",
+            "start_line": 62
+          },
+          {
+            "end_line": 639,
+            "file_sha256": "5dd422cc9760dae8025db3a61ea0b2b5ad9d2cfe91a597fd044295f7aee4c663",
+            "path": "src/sqlfluff/cli/commands.py",
+            "start_line": 639
+          },
+          {
+            "end_line": 714,
+            "file_sha256": "6adaacfca9d12c9d63ba0d73c111a445014a812438413fcd0eba254bf306bb86",
+            "path": "src/sqlfluff/cli/formatters.py",
+            "start_line": 69
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the relationship between the standalone header formatting function's use of StringIO text buffers and the output stream formatter class's responsibility for managing formatted output streams?",
+      "question_sha256": "51a4254b946f4e80fe0d2531a68a64a7c59dec5052125e037683983cdc0291e4",
+      "reference_answer": "The relationship between the standalone header formatting function's use of StringIO text buffers and the output stream formatter class's responsibility for managing formatted output streams reveals an architectural inconsistency in how output is handled.\n\nThe `format_linting_result_header()` function (defined at lines 62-66 in `src/sqlfluff/cli/formatters.py`) is a module-level function that uses StringIO as a temporary text buffer to build a header string (\"==== readout ====\\n\") and returns it directly. This function is called via `click.echo()` in the CLI commands (line 639 in `commands.py`), completely bypassing the `OutputStreamFormatter` class's dispatch mechanism.\n\nIn contrast, the `OutputStreamFormatter` class (lines 69-714 in `formatters.py`) implements the `FormatterInterface` and manages formatted output streams through its `_output_stream` instance (an `OutputStream` object). While this class also uses StringIO internally in many of its formatting methods (such as `_format_config()`, `_format_file_violations()`, `cli_table_row()`, `format_linting_stats()`, `format_config_vals()`, `format_rules()`, and `format_dialects()`), it routes all output through its `_dispatch()` method (lines 111-118), which writes to the managed output stream and applies filtering logic (`_filter_empty`).\n\nThe architectural implication is that the standalone function creates an inconsistency: it uses the same StringIO pattern for building formatted strings but bypasses the formatter's stream management, filtering, and coordination features. This means the header output doesn't benefit from the formatter's output stream abstraction (which can be `TqdmOutput`, `FileOutput`, or other implementations), doesn't respect the `_filter_empty` setting, and isn't coordinated with other formatter output. For concurrent linting operations or when output needs to be redirected to files or coordinated with progress bars, this bypass creates a potential architectural gap where some output is managed by the formatter class while the header output is handled separately.",
+      "reference_sha256": "a5c54be905ea32850939f5c36dc888522a8b97589fb6c3dd01d7ec7fb5e0530a",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-0bf96393934c3bf7b8f86373"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "5d478307425cd8f46a2dc69ca5a318940d83c6277063efd36a9b7dccb7928de9",
+            "kind": "file_reference",
+            "line_count": 1161,
+            "path": "src/sqlfluff/core/linter/linter.py"
+          },
+          {
+            "file_sha256": "a68f9cebd5cfc2a1a7844b28a78c115ab5873a12d6a3209118b65cc7309afcf0",
+            "kind": "file_reference",
+            "line_count": 79,
+            "path": "src/sqlfluff/core/parser/parser.py"
+          },
+          {
+            "file_sha256": "1a51a05695a11b88dab1a790f10324e96bc0f358b4a63c3c425ba0d27548956b",
+            "kind": "file_reference",
+            "line_count": 529,
+            "path": "src/sqlfluff/dialects/dialect_flink.py"
+          },
+          {
+            "file_sha256": "e5e3670aa9f89dc50012344b815c2ed9a1b394ca75bbf6ce4919bdfe66ae9a88",
+            "kind": "file_reference",
+            "line_count": 1213,
+            "path": "src/sqlfluff/core/rules/base.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What architectural mechanism in the main linting class decouples SQL dialect-specific grammar definitions from the rule-based validation process?",
+      "question_sha256": "6e47602939232ba7c87ae8398a31c70307c2e2bbf3bffc41b4a73af9c8e64a89",
+      "reference_answer": "The architectural mechanism that decouples SQL dialect-specific grammar definitions from the rule-based validation process in the main linting class is the **Parser abstraction layer** that produces a dialect-agnostic parse tree structure.\n\nHere's how it works:\n\n1. **Dialect-Specific Parsing Phase**: The `Linter` class (in `src/sqlfluff/core/linter/linter.py`) uses a `Parser` instance that is configured with a `Dialect` object retrieved from the configuration via `config.get(\"dialect_obj\")` (line 237). The `Parser` class (in `src/sqlfluff/core/parser/parser.py`) obtains the dialect-specific grammar by calling `dialect_obj.get_root_segment()` (line 26-28), which returns the root segment class containing all dialect-specific grammar rules (e.g., `flink_dialect` in `src/sqlfluff/dialects/dialect_flink.py` defines FlinkSQL-specific segments like `CreateTableStatementSegment`, `RowDataTypeSegment`, etc.).\n\n2. **Dialect-Agnostic Tree Production**: The `Parser.parse()` method (lines 30-79) uses the dialect-specific grammar to parse SQL tokens into a `BaseSegment` tree structure. This tree is dialect-agnostic - it's a hierarchical structure of segments that represents the parsed SQL, but the tree structure itself doesn't contain dialect-specific parsing logic.\n\n3. **Rule-Based Validation on Tree Structure**: The `Linter.lint_fix_parsed()` method (lines 380-628) then applies linting rules to this dialect-agnostic tree. Rules (defined in `src/sqlfluff/core/rules/base.py`) operate on the `BaseSegment` tree structure by crawling through segments and evaluating conditions. The rules receive the dialect object as context (line 489: `dialect=config.get(\"dialect_obj\")`), but they primarily work with the tree structure rather than dialect-specific parsing details.\n\n4. **Decoupling Benefits**: This architecture enables support for multiple SQL dialects (like Flink) without tight coupling because:\n   - Dialect-specific grammar is encapsulated in `Dialect` objects (each dialect extends a base dialect and adds/overrides segments)\n   - The parsing phase produces a standardized `BaseSegment` tree interface\n   - The validation phase operates on this standardized interface, not on dialect-specific parsing logic\n   - New dialects can be added by creating new `Dialect` objects without modifying the core linting framework\n\nThe key insight is that the `Parser` acts as an abstraction layer: it consumes dialect-specific grammar (from `Dialect` objects) and produces dialect-agnostic tree structures (`BaseSegment` hierarchies) that the rule evaluation system can operate on uniformly, regardless of which SQL dialect was used for parsing.",
+      "reference_sha256": "6d1ef62f86b8a93f1d5765df333f5b9225b54ed6682080f4a672a068e7c3a8b3",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-0fefd75f2ce0dc24c243e662"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 268,
+            "file_sha256": "cf7142fd7a7cdda1b6dc61610ecd6a6d3cc244988e11c3ee814a7ee6aabd0b3b",
+            "path": "src/sqlfluff/dialects/dialect_ansi.py",
+            "start_line": 268
+          },
+          {
+            "end_line": 449,
+            "file_sha256": "eabb6cb7a7a0a478aa950064a5b950ecc8fad832e01296d645bbc7a58d891899",
+            "path": "src/sqlfluff/dialects/dialect_bigquery.py",
+            "start_line": 449
+          },
+          {
+            "end_line": 345,
+            "file_sha256": "475b2ea54dc7e4606887a2075fc8770cbe11ba506e4ec0f08605a0e9e7fc319a",
+            "path": "src/sqlfluff/dialects/dialect_postgres.py",
+            "start_line": 345
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "b73aab61779ef67989c6d221469a37fa0c288a7c69da937fc85c2c473fa1b495",
+            "kind": "file_reference",
+            "line_count": 255,
+            "path": "src/sqlfluff/utils/analysis/select.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What method in the filtering logic that extracts aliases from SELECT FROM clauses differentiates between regular table reference aliases and column-returning function aliases?",
+      "question_sha256": "380b6666455d7b86ecc0efc35992e2244099427911a17392cd3a890cc25d1347",
+      "reference_answer": "The distinction is implemented by the helper `_has_value_table_function()` in `./src/sqlfluff/utils/analysis/select.py`.\n\nIn `get_aliases_from_select()` (lines 131-161), the filtering logic:\n1. Iterates through all aliases from the FROM clause (line 154)\n2. For each table expression and alias pair, calls `_has_value_table_function(table_expr, dialect)` (line 155)\n3. If true, adds the alias to `standalone_aliases` (value table function aliases) (lines 156-157)\n4. Otherwise, adds it to `table_aliases` (regular table aliases) (lines 158-159)\n\nThe `_has_value_table_function()` function (lines 164-179) determines this by:\n- Recursively crawling the table expression for `function_name` segments (line 173)\n- Checking if any function name (normalized to uppercase and stripped of whitespace) exists in the dialect's `value_table_functions` set (line 177)\n- Returning `True` if found, `False` otherwise\n\nValue table functions are dialect-specific functions that return columns rather than tables when used in FROM clauses. Examples include:\n- `UNNEST` in BigQuery and Postgres\n- `GENERATE_SERIES` in Postgres\n\nThese are defined per dialect in the `value_table_functions` set (see `dialect_ansi.py` line 268, `dialect_bigquery.py` line 449, `dialect_postgres.py` line 345).\n\nThe semantic significance of excluding value table functions from the primary return value (`table_aliases`) is that they behave differently in SQL semantics and require special handling in linting rules:\n- They don't require qualification in column references (RF02, RF03)\n- They don't count as \"tables\" for duplicate alias checks (AL04)\n- They are tracked separately for reference validation (RF01)\n\nThis separation allows the linter to apply different rules to these column-returning functions versus regular table references.",
+      "reference_sha256": "f77052f5b8d4a0a48fe3625e21ade79e54393dc73da12e8544f77e1698af3b6f",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-1f304e15b38676509094206d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "eabb6cb7a7a0a478aa950064a5b950ecc8fad832e01296d645bbc7a58d891899",
+            "kind": "file_reference",
+            "line_count": 3561,
+            "path": "src/sqlfluff/dialects/dialect_bigquery.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where is the grammar definition for parsing WHEN NOT MATCHED BY SOURCE clauses in the BigQuery MERGE statement segment class?",
+      "question_sha256": "b54fc57bab6d4ddac145aa153d9baa901a435a9178e1bb6757c144fcaed69d21",
+      "reference_answer": "The grammar definition for parsing the WHEN NOT MATCHED BY SOURCE clause is located in the `match_grammar` class attribute of the `MergeNotMatchedBySourceClauseSegment` class.\n\n**Exact Location:**\n- **File**: `./src/sqlfluff/dialects/dialect_bigquery.py`\n- **Lines**: 2663-2677\n- **Class**: `MergeNotMatchedBySourceClauseSegment` (defined at line 2654)\n\n**Grammar Definition:**\nThe `match_grammar` attribute is defined as a `Matchable` type using a `Sequence` that specifies the syntactic structure:\n\n```python\nmatch_grammar: Matchable = Sequence(\n    \"WHEN\",\n    \"NOT\",\n    \"MATCHED\",\n    \"BY\",\n    \"SOURCE\",\n    Sequence(\"AND\", Ref(\"ExpressionSegment\"), optional=True),\n    \"THEN\",\n    Indent,\n    OneOf(\n        Ref(\"MergeUpdateClauseSegment\"),\n        Ref(\"MergeDeleteClauseSegment\"),\n    ),\n    Dedent,\n)\n```\n\n**Context:**\n- The class inherits from `ansi.MergeMatchedClauseSegment` (line 2654)\n- It's part of the BigQuery dialect's extension of ANSI SQL to support `NOT MATCHED BY SOURCE` statements in MERGE operations\n- The class is referenced in `MergeMatchSegment.match_grammar` (line 2629) as one of the allowed clauses in a MERGE statement's match section\n- The grammar allows an optional condition (`AND` followed by an expression) and requires either an UPDATE or DELETE action after `THEN`\n\nThe `match_grammar` attribute is a standard pattern in SQLFluff's parser architecture, where segment classes define their parsing rules using this attribute.",
+      "reference_sha256": "3d03d9958e8184f8edbd7dfd9501624d37cbb0f213863bf530de0f993463c77e",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-20c7e039705d85ba8ca6746e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "a76a5a7ee87b0688915e40c33c47992e24548711a25e28beb4cf3588629ae66c",
+            "kind": "file_reference",
+            "line_count": 442,
+            "path": "src/sqlfluff/rules/convention/CV11.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where does conditional branching on the optional parameter for additional type segments in the function that generates CONVERT conversion fixes affect the structural composition of the segment replacement list through nested wrapping?",
+      "question_sha256": "979330b374b8016543d1cb4b2c82294f3a966418452a89b10a7b3b0b9a91eea1",
+      "reference_answer": "The conditional branching on the optional parameter for additional type segments affects the structural composition of the segment replacement list at lines 149-162 in the `_convert_fix_list` function within the `Rule_CV11` class (located in `src/sqlfluff/rules/convention/CV11.py`).\n\nWhen the optional parameter (which defaults to `None`) is provided, the conditional branch at line 149 (`if later_types:`) creates three segment list templates:\n- `pre_edits`: Contains the \"convert\" function name identifier and opening parenthesis\n- `in_edits`: Contains a comma and whitespace separator\n- `post_edits`: Contains the closing parenthesis\n\nThe nested loop (lines 161-162) then reconstructs the segment replacement list by iterating through each additional type segment and wrapping the existing edits list with a new CONVERT function call structure. Specifically, at line 162, the reconstruction occurs as:\n```python\nedits = pre_edits + [_type] + in_edits + edits + post_edits\n```\n\nThis nested wrapping transforms the flat structure of a simple CONVERT call (e.g., `convert(int, 100)`) into a nested structure (e.g., `convert(text, convert(int, 100))`) when handling multiple type casts like `100::int::text`. The significance of this nested reconstruction is that it creates the correct nested CONVERT syntax where each additional type becomes an outer wrapper around the previous conversion, ensuring that expressions with multiple sequential type casts are properly converted from shorthand notation (e.g., `::`) to CONVERT function calls while maintaining the correct nesting order and syntax structure.\n\nThe function is called from the `_eval` method at lines 305-309 and 402-406 when converting shorthand cast expressions that have more than two type segments, passing `expression_datatype_segment[2:]` as the optional parameter to handle the additional types beyond the first two arguments.",
+      "reference_sha256": "b2e7109e5f2736ce9a00816929f6f414af900f6fa43bc6ffa74c992d85e1451b",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-43c7ff8e4743c2fe25176be1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 485,
+            "file_sha256": "946598b33c7cf9068c29f6b26ff3bd9475816c538d691d3716b688b13d61a419",
+            "path": "src/sqlfluff/core/parser/grammar/base.py",
+            "start_line": 453
+          },
+          {
+            "end_line": 653,
+            "file_sha256": "110ca5dc78a72a395def4203ccd4223ecf8a8b05b4aeb2144ac60dd2b91e0e22",
+            "path": "src/sqlfluff/core/parser/match_algorithms.py",
+            "start_line": 552
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the logic that determines which segments halt greedy matching implemented within the grammar class that matches any content?",
+      "question_sha256": "d65c4813792025282676c31ea43249e656354c7bfb734916bd5fecc0e4577df1",
+      "reference_answer": "The logic that determines which segments halt greedy matching is implemented in two locations within the grammar class that matches any content:\n\n1. In the `match` method of the Anything class (located at `src/sqlfluff/core/parser/grammar/base.py`, lines 453-485). This method:\n   - Collects terminators from both the instance's `terminators` attribute and the parse context's terminators (lines 467-470)\n   - If no terminators exist, it matches all remaining segments (line 472)\n   - If terminators exist, it calls the `greedy_match` function with those terminators (lines 474-485)\n\n2. In the `greedy_match` function (located at `src/sqlfluff/core/parser/match_algorithms.py`, lines 552-653), which contains the core logic:\n   - Uses `next_ex_bracket_match` to search for terminator matches starting from the current index (line 571)\n   - If no terminator match is found, it claims all remaining segments (lines 582-584)\n   - If a terminator match is found, it determines whether that match should halt the process by checking whitespace requirements (lines 602-626):\n     - For keyword terminators (entirely alphabetical strings), it requires preceding whitespace or newline segments\n     - For symbol terminators (non-alphabetical or typed matchers), no preceding whitespace is required\n     - If a keyword terminator doesn't have required whitespace, the matching continues past it (lines 623-626)\n   - Once an allowable terminator match is found, the loop breaks and returns the match result (line 629)\n\nThe terminator resolution logic specifically checks whether matched terminators meet context requirements (like whitespace for keywords) to determine if they should halt the greedy matching process, ensuring that only valid terminator matches stop the matching rather than false positives.\n</start_of_answer>",
+      "reference_sha256": "384079432a4f4fd0a35d4b8cb83e2856b7e77ae3a52621389aee48d378e115bd",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-4472dde973e9af984b747b45"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 6346,
+            "file_sha256": "d4675622fe21b397970052857270214a559473893c685552e8d58db7f87e7990",
+            "path": "src/sqlfluff/dialects/dialect_tsql.py",
+            "start_line": 6334
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the match_grammar definition for the JSON format clause class located within the CREATE EXTERNAL FILE FORMAT statement parsing structure?",
+      "question_sha256": "e7d2149934530dc7149a8ab33785b6cc5089b602870d016ba2f911e913688d32",
+      "reference_answer": "The `match_grammar` definition for the JSON format clause class is located in the file `./src/sqlfluff/dialects/dialect_tsql.py` at lines 6334-6346, within the `ExternalFileFormatJsonClause` class definition that starts at line 6326.\n\nThe `match_grammar` is defined as a `Delimited` construct containing two `Sequence` elements:\n1. A required sequence matching `FORMAT_TYPE = JSON`\n2. An optional sequence matching `DATA_COMPRESSION = <compression_value>`\n\nThis class integrates with the parent CREATE EXTERNAL FILE FORMAT parsing hierarchy through the `CreateExternalFileFormat` class (defined at line 6364). The integration occurs at line 6385, where `ExternalFileFormatJsonClause` is referenced via `Ref(\"ExternalFileFormatJsonClause\")` within a `OneOf` construct. This `OneOf` (at lines 6380-6387) contains references to all six format clause types (DelimitedText, RcFile, ORC, Parquet, JSON, and Delta), allowing the parser to match any one of these format options.\n\nThe `OneOf` is nested inside a `Bracketed` section (line 6379) within the parent class's `match_grammar`, which follows the pattern:\n```\nCREATE EXTERNAL FILE FORMAT <object_name> WITH (<format_clause>)\n```\n\nThe parent `CreateExternalFileFormat` class is registered in the TSQL dialect's statement list at line 718, making it available for parsing CREATE EXTERNAL FILE FORMAT statements in T-SQL code.",
+      "reference_sha256": "63eaeecd852a431a52271dbc0aaeca09b1c0d8fe150182398de4c1a713336ba5",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-48c9abe300bb647d3146eed0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 952,
+            "file_sha256": "1a621c19602563902518eb5ac10ba6bd3871238f6e1a9c893ac2d4a0ce1e0a94",
+            "path": "src/sqlfluff/core/parser/segments/base.py",
+            "start_line": 947
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": " How does the test helper function that validates dialect-specific SQL statements ensure the parsed tree matches the expected segment type hierarchy and statement count through recursive validation?",
+      "question_sha256": "288baf9a5480f026b882c9c72fa102bd4d297297b048960b15344c1dc6fa3c11",
+      "reference_answer": "The test helper function ensures the parsed tree matches the expected segment type hierarchy and statement count through a multi-step recursive validation process:\n\n1. **Initial parsing and violation check**: The function uses `Linter(dialect=dialect).parse_string(raw)` to parse the SQL string into a `ParsedString` object. It first asserts that `len(parsed.violations) == 0`, ensuring no parsing errors occurred.\n\n2. **Recursive type hierarchy validation using `type_set()`**: The function calls `parsed.tree.type_set()` which recursively traverses the entire segment tree. The `type_set()` method (defined in `BaseSegment` at `src/sqlfluff/core/parser/segments/base.py:947-952`) recursively collects all segment types by:\n   - Starting with `{self.type}` (the current segment's type)\n   - Recursively calling `s.type_set()` on each child segment in `self.segments`\n   - Unioning all type sets together\n   \n   The function then asserts `\"unparsable\" not in typs`, ensuring no unparsable segments exist in the hierarchy, which validates the structural integrity of the parsed tree.\n\n3. **Recursive statement count validation using `recursive_crawl()`**: The function calls `parsed.tree.recursive_crawl(segment_cls.type)` to find all segments matching the expected type. The `recursive_crawl()` method (defined in `BaseSegment` at lines 1005-1054) recursively traverses the tree by:\n   - First checking if the current segment matches the target type (if `allow_self` is True)\n   - Using `descendant_type_set.intersection(seg_type)` to check if target types exist in descendants (early exit optimization)\n   - Recursively calling `recursive_crawl()` on each child segment in `self.segments`\n   - Yielding matching segments as it finds them\n   \n   The function collects all matching segments into a list and asserts `len(child_segments) == stmt_count`, validating that the count matches expectations.\n\n4. **Type instance validation**: Finally, the function iterates through all found segments and asserts `isinstance(c, segment_cls)` for each, ensuring that not only do segments have the correct type string, but they are actual instances of the expected segment class.\n\nThe recursive nature of both `type_set()` and `recursive_crawl()` allows the function to validate the entire tree structure regardless of nesting depth, ensuring that the parsed SQL structure matches both the expected type hierarchy (no unparsable segments) and the expected statement count (correct number of segments of the target type).",
+      "reference_sha256": "48cfa3392f92baa8ef7488e63010590a9988a897db9b25847aaf79f02fabd6db",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-4aede424b126a86b3331f326"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the sequence of state mutations in the private method that computes additional allowed characters with dialect-specific adjustments for the identifier special characters validation rule?",
+      "question_sha256": "fb5d4ecbbd4bfae5898e7bced6facaef61196d669ebef03692aae2d3e694ea29",
+      "reference_answer": "The sequence of state mutations in the private method that computes additional allowed characters with dialect-specific adjustments proceeds as follows:\n\n1. **Initial state**: An empty set `result` is initialized (line 60: `result: set[str] = set()`).\n\n2. **First conditional mutation**: If the rule's `additional_allowed_characters` configuration attribute is truthy, the set is updated with those characters (lines 61-62: `if self.additional_allowed_characters: result.update(self.additional_allowed_characters)`). This adds user-configured characters to the allowed set.\n\n3. **Second conditional mutation**: If the `dialect_name` parameter equals `\"bigquery\"`, the hyphen character `\"-\"` is added to the set (lines 63-65: `if dialect_name == \"bigquery\": result.update(\"-\")`). This is because BigQuery allows hyphens in identifiers.\n\n4. **Third conditional mutation**: If the `dialect_name` parameter equals `\"snowflake\"`, the dollar sign character `\"$\"` is added to the set (lines 66-68: `if dialect_name == \"snowflake\": result.update(\"$\")`). This is because Snowflake uses `$` in external stage metadata identifiers.\n\n5. **Final transformation**: The set is converted to a string by joining all characters together (line 69: `return \"\".join(result)`), which becomes the return value.\n\nThe mutations are independent and cumulative\u2014each conditional branch can add characters to the set, and all mutations are applied sequentially. The final output is a string containing all characters that were added through any of the conditional branches, with no duplicates (since sets automatically handle uniqueness). The method is called from the `_eval` method at line 211-213, where the returned string is used to strip additional allowed characters from identifiers before validation.",
+      "reference_sha256": "0caf475d598e606cc78764af9bd2a6c6844ad250f6698bc32e4cc1e9d235c394",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-4ea75585a10684810083d7e8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 277,
+            "file_sha256": "110ca5dc78a72a395def4203ccd4223ecf8a8b05b4aeb2144ac60dd2b91e0e22",
+            "path": "src/sqlfluff/core/parser/match_algorithms.py",
+            "start_line": 140
+          },
+          {
+            "end_line": 4166,
+            "file_sha256": "cf7142fd7a7cdda1b6dc61610ecd6a6d3cc244988e11c3ee814a7ee6aabd0b3b",
+            "path": "src/sqlfluff/dialects/dialect_ansi.py",
+            "start_line": 4125
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the longest-match priority algorithm in the grammar matching attribute of the top-level statement parsing segment that resolves ambiguity when multiple statement type patterns match the same input token sequence?",
+      "question_sha256": "e03009e2f537af1c2bb186b61666fa33937ca7770cc1ced2221805969169412c",
+      "reference_answer": "The longest-match priority algorithm in the grammar matching attribute of the top-level statement parsing segment (`StatementSegment.match_grammar`) resolves ambiguity through a priority-based selection system implemented in the `longest_match` function (`src/sqlfluff/core/parser/match_algorithms.py`, lines 140-277).\n\nThe `match_grammar` attribute is a `OneOf` grammar containing multiple statement type references (e.g., `Ref(\"SelectableGrammar\")`, `Ref(\"MergeStatementSegment\")`, `Ref(\"InsertStatementSegment\")`, etc.) as defined in `dialect_ansi.py` (lines 4125-4166). When multiple statement patterns could match the same input token sequence, the `OneOf` class delegates to `longest_match` to resolve the ambiguity.\n\nThe `longest_match` algorithm uses the following priority system:\n\n1. **First total match**: If a match consumes all available segments or hits a valid terminator, it is returned immediately without evaluating remaining options.\n\n2. **Longest clean match**: Among matches that don't consume all segments, the algorithm selects the match with the greatest length (determined by `MatchResult.is_better_than()`, which compares match lengths).\n\n3. **Longest unclean match**: If no clean matches exist, the longest unclean match is selected.\n\n4. **Empty match**: If no matches are found, an empty match is returned.\n\nFor ties in length, priority is given to the first option in the iterable order.\n\nThe algorithm also uses `prune_options()` (lines 81-137) to filter candidate options based on simple matchers (raw string or type matching) before full evaluation, improving performance by eliminating incompatible options early.\n\nAdditionally, the `terminators` parameter (specified as `terminators=[Ref(\"DelimiterGrammar\")]` in `StatementSegment`) plays a crucial role: when a match is followed by a valid terminator, the algorithm treats it as \"effectively complete\" and can stop early, returning that match without evaluating all remaining options. This significantly improves parsing performance and helps disambiguate statement boundaries by signaling where one statement ends and another begins.",
+      "reference_sha256": "c0ef745ab101a290c110135d3a7a6fba3fb19ba87ea4009ff9ede820f7ce97f6",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-52d3d31460a797c62480ea42"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 191,
+            "file_sha256": "45dd2dc6a5bd2e6d5470decf4f0feee2a97dd5deae76c1e0c1817291a7c759fa",
+            "path": "src/sqlfluff/core/parser/grammar/delimited.py",
+            "start_line": 88
+          },
+          {
+            "end_line": 1343,
+            "file_sha256": "eabb6cb7a7a0a478aa950064a5b950ecc8fad832e01296d645bbc7a58d891899",
+            "path": "src/sqlfluff/dialects/dialect_bigquery.py",
+            "start_line": 1339
+          },
+          {
+            "end_line": 170,
+            "file_sha256": "8879c7714be9baa98b4fce5643116d3fa1bccfe47207a96dce514b92a3517bb2",
+            "path": "src/sqlfluff/core/parser/match_result.py",
+            "start_line": 168
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "src/sqlfluff/core/parser/grammar/sequence.py",
+              "src/sqlfluff/utils/reflow/sequence.py"
+            ],
+            "end_line": 400,
+            "path": "sequence.py",
+            "reason": "ambiguous_basename",
+            "reference": "sequence.py",
+            "start_line": 400
+          },
+          {
+            "candidates": [
+              "src/sqlfluff/core/parser/grammar/sequence.py",
+              "src/sqlfluff/utils/reflow/sequence.py"
+            ],
+            "end_line": 251,
+            "path": "sequence.py",
+            "reason": "ambiguous_basename",
+            "reference": "sequence.py",
+            "start_line": 251
+          },
+          {
+            "candidates": [
+              "src/sqlfluff/core/dialects/base.py",
+              "src/sqlfluff/core/parser/grammar/base.py",
+              "src/sqlfluff/core/parser/segments/base.py",
+              "src/sqlfluff/core/rules/base.py",
+              "src/sqlfluff/core/templaters/base.py"
+            ],
+            "end_line": 645,
+            "path": "base.py",
+            "reason": "ambiguous_basename",
+            "reference": "base.py",
+            "start_line": 639
+          }
+        ]
+      },
+      "question": "How does the SELECT REPLACE clause segment's parsing grammar handle failures when the delimiter-based parser encounters malformed expression-alias pairs that violate expression or identifier grammar constraints?",
+      "question_sha256": "071344d77fe7b59d23ca7a10579396e223f917b0008c855493c0aeb00b4ff1eb",
+      "reference_answer": "When the delimiter-based parser (Delimited) within the SELECT REPLACE clause segment's parsing grammar encounters malformed expression-alias pairs that violate expression or identifier grammar constraints, the failure handling follows this flow:\n\n**1. Delimited's Failure Handling:**\nWhen Delimited's `match()` method (delimited.py:88-191) attempts to match an element and fails (line 157), it checks if it's seeking a delimiter with `optional_delimiter` enabled. If not, it breaks out of the matching loop (line 164) and returns the `working_match` accumulated so far. If the number of matched delimiters is less than `min_delimiters`, it returns `MatchResult.empty_at(idx)` (lines 188-189).\n\n**2. Sequence's Failure Handling:**\nThe inner Sequence (dialect_bigquery.py:1339-1343) containing BaseExpressionElementGrammar, \"AS\", and SingleIdentifierGrammar uses the default `ParseMode.STRICT` (sequence.py:400). When an element fails to match in STRICT mode, Sequence returns `MatchResult.empty_at(idx)` (sequence.py:251), indicating a complete parsing failure for that sequence element.\n\n**3. MatchResult.wrap() Behavior:**\nWhen BaseSegment's `match()` method (base.py:639-645) wraps the result using `match.wrap(cls)`, if the match is empty (failed), the `wrap()` method in MatchResult (match_result.py:168-170) detects this and passes the empty match through unchanged without wrapping it in the segment class. This means failed matches propagate upward as empty MatchResult objects.\n\n**4. Overall Behavior:**\nIn STRICT mode (the default), when Delimited encounters a malformed expression-alias pair:\n- The inner Sequence fails to match, returning an empty MatchResult\n- Delimited breaks its loop and returns whatever was successfully matched before the failure (or an empty match if nothing matched)\n- The Bracketed wrapper and outer Sequence also fail in STRICT mode\n- The entire ReplaceClauseSegment match fails, returning an empty MatchResult\n- No UnparsableSegment is created; the parser simply rejects the malformed input\n\nThis strict failure behavior ensures that only well-formed REPLACE clauses with valid expression-alias pairs are successfully parsed.",
+      "reference_sha256": "66995df8da8856e853a49f2026585439411bde5a32cee9972c717f6053803969",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-54b08cf47a74aa61472a3894"
+    }
+  ]
+}

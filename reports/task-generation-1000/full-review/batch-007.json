@@ -1,0 +1,315 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-1964f79f6d9b20cc5932178e",
+      "reference_sha256": "4365aea116594e38e00530ec006f9d78c2fa4d1201b4c2caa6c764964154454a",
+      "question_sha256": "9a353c9491e242a6588ae5f72566d9192e1fee407cd7d26a7b58a9fefad569de",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Migration implementation is compatibility.py",
+          "verdict": "supported",
+          "reason": "Generated-file guard, default save and deprecated removal match.",
+          "evidence": {
+            "path": "conan/internal/graph/compatibility.py",
+            "start_line": 87,
+            "end_line": 107
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-1fafbf819f860cc855ae0bc9",
+      "reference_sha256": "c22bfeafd80106eeef0084330f7dc7272bd33dff58d531e466d5ff56b225e28c",
+      "question_sha256": "7f8d021d5417233f579a282a0d83ad498ae85f7690182af5c94eb24807aa75ea",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "transitive_libs=False suppresses indirect libs but retains direct libs",
+          "verdict": "supported",
+          "reason": "Asserts liba libs=False from app and True from libb.",
+          "evidence": {
+            "path": "test/integration/graph/core/graph_manager_test.py",
+            "start_line": 81,
+            "end_line": 103
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-2531c212f45dced30ce4c5b4",
+      "reference_sha256": "310da55f3921d6149af8bdb1127cd358fd1ea1ee4f8107f78d88f9cee22b53cd",
+      "question_sha256": "6de3bb75192d7117329a0275e4a562929cb44d22a4a8bda21bbcebe47d53c0f1",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Meson Android resolver constructs NDK tool paths",
+          "verdict": "supported",
+          "reason": "Uses NDK config, architecture triple, API and Windows suffix.",
+          "evidence": {
+            "path": "conan/tools/meson/toolchain.py",
+            "start_line": 431,
+            "end_line": 454
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-27cd34037590c0b98d4d1199",
+      "reference_sha256": "ae21da8c50427f9175fb13fcaed436c564d4e955fa90cce77c3b0903b0522721",
+      "question_sha256": "48e5906db0b59cfd7f268f55c7a3285facec76370a4bce3df88d6705a1b542a7",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Workspace collapses editable nodes and merges external requirements",
+          "verdict": "supported",
+          "reason": "Reuses non-editable nodes, rejects editable dependencies of cache nodes and aggregates requirements.",
+          "evidence": {
+            "path": "conan/api/subapi/workspace.py",
+            "start_line": 302,
+            "end_line": 330
+          }
+        },
+        {
+          "claim": "No information loss and quoted package lookup match pinned source",
+          "verdict": "contradicted",
+          "reason": "Source uses self.packages() and a mapping; quoted self._ws.packages() list lookup differs. Source TODO also declines total-information guarantee.",
+          "evidence": {
+            "path": "conan/api/subapi/workspace.py",
+            "start_line": 264,
+            "end_line": 270
+          }
+        }
+      ],
+      "material_errors": [
+        "Quoted package lookup differs from pinned implementation; absolute no-information-loss guarantee overstates graph collapse."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "WorkspaceAPI.super_build_graph builds a new root, reuses non-editable nodes, and rejects cached nodes depending on editable nodes (conan/api/subapi/workspace.py:302-315). It records editable package options, skips editable-to-editable dependencies, and combines duplicate external requirements using aggregate before creating root edges (316-330). Requirement.aggregate merges flags and required_nodes (conan/internal/model/requires.py:235-265). This preserves the external dependency needs of collapsed packages, not every original edge or all graph metadata."
+    },
+    {
+      "task_id": "import-28b83a93e91b3fdfaf9fe4c3",
+      "reference_sha256": "75c9ad3a6d266f0f1a03bdd20df065a34d8e636b0c9dc3d0a01c253874213796",
+      "question_sha256": "7be869b8a8b71ef089df044094890cb9b08b390fc35952239b37a6346aec2a58",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Bearer identity is injected into callbacks",
+          "verdict": "supported",
+          "reason": "Validates through credentials manager, converts failure to 401, permits None identity without header.",
+          "evidence": {
+            "path": "conans/server/rest/bottle_plugins/jwt_authentication.py",
+            "start_line": 18,
+            "end_line": 36
+          }
+        },
+        {
+          "claim": "Only callbacks accepting auth_user get wrapper",
+          "verdict": "supported",
+          "reason": "Parses header and updates kwargs before callback; authorization remains service responsibility.",
+          "evidence": {
+            "path": "conans/server/rest/bottle_plugins/authorization_header.py",
+            "start_line": 28,
+            "end_line": 46
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-2b14b76c284694108fb01017",
+      "reference_sha256": "fd6f97c412396216cfe1ee292887933c4a8748943b636f7743e02a4bc62356a3",
+      "question_sha256": "eac6eb72bcfbeacfd546e2e72ab70dff4420f0796b1b7920d939218396746fd9",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Subsystem determines path separator",
+          "verdict": "supported",
+          "reason": "Initializes deduced subsystem; semicolon for Windows, colon otherwise.",
+          "evidence": {
+            "path": "conan/tools/env/environment.py",
+            "start_line": 343,
+            "end_line": 354
+          }
+        },
+        {
+          "claim": "Detection respects scope and bash config",
+          "verdict": "supported",
+          "reason": "Build vs host OS, active flag and win_bash/run control result.",
+          "evidence": {
+            "path": "conan/internal/subsystems.py",
+            "start_line": 130,
+            "end_line": 161
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-2c352d705596bb466a06fa25",
+      "reference_sha256": "b8b9d6f094d18837b90987988b56683f5bae0f8afb3ecf8d52a156eea794f30e",
+      "question_sha256": "621fb3ccc0b18b71ce5410e9264fb3d6d5d85b93c9d23570279126b6c00d6a47",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Read-modify-write spans separate locks",
+          "verdict": "supported",
+          "reason": "Read and write are separate adapter calls; disk adapter locks separately at 37-45.",
+          "evidence": {
+            "path": "conans/server/store/server_store.py",
+            "start_line": 161,
+            "end_line": 171
+          }
+        },
+        {
+          "claim": "Proposed versioning and expiring Redis locks guarantee distributed atomicity",
+          "verdict": "unsupported",
+          "reason": "Source does not implement proposed scheme; proposed version counter lacks compare-and-swap and expiring lock lacks fencing, so claimed guarantee does not follow.",
+          "evidence": {
+            "path": "conans/server/store/disk_adapter.py",
+            "start_line": 37,
+            "end_line": 45
+          }
+        }
+      ],
+      "material_errors": [
+        "Proposed optimistic locking never compares persisted version; expiring lease has no fencing; local fallback can split coordination; production-ready guarantee unsupported."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "RevisionList is an in-memory list with JSON serialization (conans/server/revision_list.py:9-34), while ServerStore performs separate read and write operations (conans/server/store/server_store.py:161-171), each independently locked by the disk adapter (conans/server/store/disk_adapter.py:37-45). A redesign should make the entire read-modify-write a storage transaction keyed by recipe/package identity. For multiple servers, use a shared transactional store or an atomic compare-and-swap on a persisted version, retrying actual conflicts; local object locks alone are insufficient. Preserve duplicate-latest no-op behavior and chronological listing, and test concurrent additions/removals plus failure recovery. This is a proposed design, not an existing source guarantee."
+    },
+    {
+      "task_id": "import-2f420d1217224f62447475e2",
+      "reference_sha256": "f1ebac2541b1cb8b83ec0392f7628018215175cf39e0073a8473021a940529a3",
+      "question_sha256": "491b3144987172b0c9e3cb226e3787bd1f24364b257a94f82631d8ec4bfbfcfe",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "VSRuntime context derives CMake runtime string",
+          "verdict": "supported",
+          "reason": "Guards settings, recovers previous configs, computes Debug/static/DLL combination and clang Debug fallback.",
+          "evidence": {
+            "path": "conan/tools/cmake/toolchain/blocks.py",
+            "start_line": 78,
+            "end_line": 120
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-2f8154dba2e2d8a86dd5724d",
+      "reference_sha256": "d2a96f7e25c718e00eb44a6065329e45937887622b633a8e568c36cb46861f28",
+      "question_sha256": "6deb2cf2b8070ca09e13fa097e08e0f9dcd665d53509523db21eee00af5b692b",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Delete authorization precedes store mutation",
+          "verdict": "supported",
+          "reason": "Check occurs before revision traversal/deletion.",
+          "evidence": {
+            "path": "conans/server/service/v2/service_v2.py",
+            "start_line": 130,
+            "end_line": 139
+          }
+        },
+        {
+          "claim": "BasicAuthorizer delegates deletion to recipe write rules",
+          "verdict": "supported",
+          "reason": "Checks package write then recipe write, raises when no rule allows.",
+          "evidence": {
+            "path": "conans/server/service/authorize.py",
+            "start_line": 130,
+            "end_line": 174
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-457f179a5395923cee9d4c2e",
+      "reference_sha256": "ecd1cbee50b68cd948ba43b709cd46cfb29606817e95727776ee34f45019c3f2",
+      "question_sha256": "309de16ed144f7f45dda6febccfb5fea4697e857bbb48192c372d202636c0156",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Upload eligibility and metadata patterns control inclusion",
+          "verdict": "supported",
+          "reason": "Truthiness/upload gates collection; fnmatch filters; nonempty results merge and enable upload.",
+          "evidence": {
+            "path": "conan/internal/api/uploader.py",
+            "start_line": 311,
+            "end_line": 344
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-474e033f01808ec6b16c2cfe",
+      "reference_sha256": "cb310a279058cb832993bcff24031555c9a2fea8e27853f2245bf078550ddf61",
+      "question_sha256": "13610ff5c5a6b98cd83e474a8f50a1d34475aefe7f0654988c46f57d280b5919",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "skip_rpath defaults False without options lookup",
+          "verdict": "supported",
+          "reason": "Context just returns attribute; rpath registration found at toolchain.py:118.",
+          "evidence": {
+            "path": "conan/tools/cmake/toolchain/blocks.py",
+            "start_line": 220,
+            "end_line": 235
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-4b4c5329a2c22fc24cdf8405",
+      "reference_sha256": "fa7aabc1bc7cf7260d637462f6fc7bff1b4cd49d769b4ff5ed7b95493d08ccf8",
+      "question_sha256": "a5d4ce4e39466ff46441bf7679f839217ee7a90a9ae7a362b3c818ecd602b0ee",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Preset wrapper passes nine parameters and routes user path separately",
+          "verdict": "supported",
+          "reason": "Arguments and two-result forwarding exactly match.",
+          "evidence": {
+            "path": "conan/tools/cmake/presets.py",
+            "start_line": 17,
+            "end_line": 24
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

@@ -1,0 +1,794 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 984,
+            "file_sha256": "d5f623d650ebf0bca07a54c90cd1a15de63bea1e346bb68e7ba9709a3ce9ed73",
+            "path": "django/db/models/expressions.py",
+            "start_line": 981
+          },
+          {
+            "end_line": 2141,
+            "file_sha256": "7517569c2c7e2355a96d43eaada16f6788eabffb31721aea643951a1f986b26e",
+            "path": "django/db/models/sql/query.py",
+            "start_line": 2141
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the ResolvedOuterRef class instantiated within the OuterRef class hierarchy and what is the control flow that determines when this instantiation occurs versus returning the original reference?",
+      "question_sha256": "947a9311103125330784823ec3e631ad88ef2dac56c3aea2a28f6048f7941205",
+      "reference_answer": "The class that represents a resolved reference to an outer query field in subqueries is instantiated in the `resolve_expression` method of the class that represents an unresolved reference to an outer query field, located at lines 981-984 in `./django/db/models/expressions.py`.\n\nThe control flow is as follows:\n\n1. **Instantiation location**: The instantiation occurs in the `resolve_expression` method of the unresolved reference class (lines 981-984):\n   ```python\n   def resolve_expression(self, *args, **kwargs):\n       if isinstance(self.name, self.__class__):\n           return self.name\n       return ResolvedOuterRef(self.name)\n   ```\n\n2. **Control flow logic**:\n   - **Condition check**: The method first checks if `self.name` is an instance of the unresolved reference class itself (`isinstance(self.name, self.__class__)`).\n   - **Return original**: If the condition is true, it returns `self.name` (the original unresolved reference instance) without creating a new resolved instance.\n   - **Create resolved instance**: If the condition is false (meaning `self.name` is a string field name, not another unresolved reference), it instantiates and returns a new resolved reference instance: `ResolvedOuterRef(self.name)`.\n\n3. **Purpose**: This design allows nested unresolved references (where an unresolved reference contains another unresolved reference as its name) to be preserved as-is, while string field names get converted to resolved references when the expression is resolved during query processing.\n\n4. **Additional instantiation**: The resolved reference class is also directly instantiated in `./django/db/models/sql/query.py` at line 2141 when building filters for subqueries that need to reference outer query fields.\n\nBoth classes inherit from the `F` class (which inherits from `Combinable`), which provides the base functionality for field references in Django's ORM expression system.",
+      "reference_sha256": "ac5c45f2535288a7cdc837072db6b7e0b5fbdc724fd454a43ec8c7166cdc1eaf",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-b8a5cb138ed333fb99423b5b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 594,
+            "file_sha256": "268a9db10b254455a4016a37bed381b9d02ef9a287614ffa3483e6527e9ad56e",
+            "path": "django/db/backends/postgresql/base.py",
+            "start_line": 579
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "django/contrib/admin/templatetags/base.py",
+              "django/contrib/gis/db/backends/mysql/base.py",
+              "django/contrib/gis/db/backends/oracle/base.py",
+              "django/contrib/gis/db/backends/postgis/base.py",
+              "django/contrib/gis/db/backends/spatialite/base.py",
+              "django/contrib/gis/gdal/base.py",
+              "django/contrib/gis/gdal/raster/base.py",
+              "django/contrib/gis/geos/base.py",
+              "django/contrib/messages/storage/base.py",
+              "django/contrib/sessions/backends/base.py",
+              "django/core/cache/backends/base.py",
+              "django/core/checks/security/base.py",
+              "django/core/files/base.py",
+              "django/core/files/storage/base.py",
+              "django/core/handlers/base.py",
+              "django/core/mail/backends/base.py",
+              "django/core/management/base.py",
+              "django/core/serializers/base.py",
+              "django/db/backends/base/base.py",
+              "django/db/backends/dummy/base.py",
+              "django/db/backends/mysql/base.py",
+              "django/db/backends/oracle/base.py",
+              "django/db/backends/postgresql/base.py",
+              "django/db/backends/sqlite3/base.py",
+              "django/db/migrations/operations/base.py",
+              "django/db/models/base.py",
+              "django/template/backends/base.py",
+              "django/template/base.py",
+              "django/template/loaders/base.py",
+              "django/urls/base.py",
+              "django/views/generic/base.py",
+              "tests/forms_tests/widget_tests/base.py",
+              "tests/messages_tests/base.py",
+              "tests/serializers/models/base.py",
+              "tests/sitemaps_tests/base.py",
+              "tests/template_tests/syntax_tests/i18n/base.py"
+            ],
+            "end_line": 439,
+            "path": "base.py",
+            "reason": "ambiguous_basename",
+            "reference": "base.py",
+            "start_line": 407
+          }
+        ]
+      },
+      "question": "Why does the ServerSideCursorsPostgres test class ensure that database cursor lifecycle management is properly validated across different ORM query patterns while accounting for psycopg version-specific binding behaviors?",
+      "question_sha256": "45478adfaec532e0a40d827f54f856b434f7eff9a12d6e5155a0c97d2cd8e580",
+      "reference_answer": "The PostgreSQL backend test suite class that validates server-side cursor functionality ensures proper database connection cursor resource management across different queryset iteration methods while accounting for psycopg version-specific binding differences for the following reasons:\n\n**1. Server-side cursor lifecycle validation:**\nThe test class validates that server-side cursors are properly created, used, and cleaned up. It checks:\n- Cursor creation when querysets are iterated (via `assertUsesCursor()` which queries `pg_cursors` system view)\n- Proper cursor closure when querysets are garbage collected (`test_closed_server_side_cursor`)\n- Multiple concurrent cursors can exist simultaneously (`test_server_side_cursor_many_cursors`)\n- Cursor properties are correctly set (non-scrollable, non-holdable, non-binary, with `_django_curs_` prefix)\n\n**2. ORM query pattern compatibility:**\nThe test validates that different queryset iteration methods work correctly with server-side cursors:\n- Basic iteration: `Person.objects.iterator()`\n- Values iteration: `Person.objects.values(\"first_name\").iterator()`\n- Values list iteration: `Person.objects.values_list(\"first_name\").iterator()`\n- Flat values list: `Person.objects.values_list(\"first_name\", flat=True).iterator()`\n- Annotated querysets: `Person.objects.annotate(id__count=expr).values_list(expr, \"id__count\").iterator()`\n\nThis ensures that the server-side cursor implementation works across all queryset transformation methods that support iteration.\n\n**3. Psycopg version-specific binding behavior:**\nThe critical reason for version-specific testing is that **psycopg3 forces server-side bindings for named cursors by default**, while psycopg2 uses client-side bindings. This creates a compatibility issue because:\n\n- Django's ORM generates SQL that is **not suitable for prepared statements** (as noted in the test docstring and Django issue #20516)\n- When `server_side_binding` is disabled (the default), Django must use a specialized `ServerSideCursor` class (defined in `django/db/backends/postgresql/base.py:579-594`) that mixes `ClientCursorMixin` with `ServerCursor` to force client-side bindings while still using server-side cursors\n- The `test_server_side_binding` test validates this by using a query with `Coalesce` in `ORDER BY` that generates problematic SQL from a server-side binding perspective (parametrized ORDER BY doesn't use the same binding parameter as SELECT)\n- The test confirms that with `server_side_binding=False` (default), the query succeeds, but with `server_side_binding=True`, it raises a `ProgrammingError` because the ORM-generated SQL isn't compatible with prepared statements\n\n**4. Configuration validation:**\nThe test also validates the `DISABLE_SERVER_SIDE_CURSORS` setting works correctly, ensuring that when disabled, querysets fall back to regular iteration without server-side cursors.\n\n**Implementation details:**\nThe specialized cursor handling is implemented in `DatabaseWrapper.create_cursor()` (lines 407-439 in `base.py`), which checks if `is_psycopg3` and `server_side_binding` is not True, then uses the custom `ServerSideCursor` class instead of the standard named cursor. This ensures backward compatibility and proper behavior across different psycopg versions while maintaining the performance benefits of server-side cursors.\n\n**Why this matters:**\nWithout these tests, Django could have cursor leaks (cursors not properly closed), incompatibility issues with certain queryset patterns, or failures when using psycopg3 with the default settings. The test suite ensures that server-side cursors work reliably across all supported query patterns and psycopg versions.",
+      "reference_sha256": "f6161b79e6393813d039221b6a65f5f23d681795475c15089323c36eadf87f09",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-bbc35ab4545cc68ce86781fd"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 818,
+            "file_sha256": "78f1b8ca48523d31d341f0a6b3e59ea446c94f56d635797ca041ab1c6381b6f0",
+            "path": "django/contrib/admin/checks.py",
+            "start_line": 792
+          },
+          {
+            "end_line": 77,
+            "file_sha256": "7648bb18b14a38f4fe981e6bc6c617d76ae8c75f01cb0ae8c66af38c6fd52573",
+            "path": "django/contrib/admin/decorators.py",
+            "start_line": 34
+          },
+          {
+            "end_line": 275,
+            "file_sha256": "a4e4ecd44b65d6b8a92253397fee5f94e096df01fe019a78ebc3abefefd79ea8",
+            "path": "django/contrib/admin/helpers.py",
+            "start_line": 275
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "324a054f8b48e4074c4d2c90a36eebf658f8c3265bd0c3669d3634281edd169b",
+            "kind": "file_reference",
+            "line_count": 620,
+            "path": "django/contrib/admin/utils.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does Django's admin framework validation system determine whether a method decorated with @admin.display can be safely included in readonly_fields without triggering check errors, and what internal mechanisms prevent false positives when the decorated method signature matches the expected callable interface?",
+      "question_sha256": "b4280f9376ad61042f012bbbae96f24750694b28f7c82e32433cc0e8134186ad",
+      "reference_answer": "The validation system in Django's admin framework uses a callability check as the primary mechanism to determine if a decorated method can be safely included in readonly_fields. Here's how it works:\n\n**Primary Validation Mechanism:**\n\nThe validation occurs in the `_check_readonly_fields_item` method located in `django/contrib/admin/checks.py` (lines 792-818). The validation logic follows this order:\n\n1. **Callability Check (Line 793-794)**: The system first checks if `field_name` is callable using Python's built-in `callable()` function. If it is callable, the method immediately returns an empty list `[]`, indicating no validation errors. This is the key mechanism that allows decorated methods to pass validation.\n\n2. **Attribute Existence Checks**: If not callable, the system checks if the field name exists as an attribute on the ModelAdmin instance (`hasattr(obj, field_name)`) or on the model (`hasattr(obj.model, field_name)`).\n\n3. **Model Field Check**: As a last resort, it attempts to retrieve the field from the model's metadata using `obj.model._meta.get_field(field_name)`. If this fails, it returns a validation error.\n\n**How the Decorator Works:**\n\nThe `@admin.display` decorator (defined in `django/contrib/admin/decorators.py`, lines 34-77) does not alter the callability of the decorated function. It simply adds attributes to the function object:\n- `boolean` attribute (if specified)\n- `admin_order_field` attribute (if ordering is specified)\n- `short_description` attribute (if description is specified)\n- `empty_value_display` attribute (if empty_value is specified)\n\nSince the decorator returns the same function object (with added attributes), the decorated method remains callable, and thus passes the `callable(field_name)` check in validation.\n\n**Prevention of False Positives:**\n\nThe mechanism that prevents false positives operates on two levels:\n\n1. **Static Validation Level**: The validation system trusts that if something is callable, it can be safely included in readonly_fields. The early return when `callable(field_name)` is True means the validation doesn't attempt to verify the method signature at this stage. This design choice prevents false positives because:\n   - The decorator preserves callability\n   - Methods decorated with `@admin.display` are guaranteed to be callable\n   - The signature verification is deferred to runtime\n\n2. **Runtime Validation Level**: When the callable is actually used (in `django/contrib/admin/utils.py`, the `lookup_field` function at lines 296-298), it's invoked as `attr(obj)`, where `obj` is the model instance. If the signature doesn't match (e.g., wrong number of parameters, incompatible types), a runtime exception will be raised at that point, not during static validation.\n\n**Expected Callable Interface:**\n\nThe expected callable interface for readonly_fields is that the callable should accept the model instance as its parameter. This is evident from:\n- `lookup_field` function (line 298): `value = attr(obj)` where `attr` is the callable and `obj` is the model instance\n- `AdminReadonlyField.contents` method (helpers.py, line 275): calls `lookup_field(field, obj, model_admin)` where `obj` is `self.form.instance`\n\n**Why This Design Prevents False Positives:**\n\nThe design prevents false positives because:\n1. The `callable()` check is a reliable indicator that the object can be invoked as a function\n2. The `@admin.display` decorator doesn't change the function's callability or core signature\n3. Signature mismatches are caught at runtime when the callable is actually invoked, not during static validation\n4. The validation system correctly identifies decorated methods as callables, allowing them to pass validation without needing to inspect their signatures\n\nThis two-tier approach (static callability check + runtime signature validation) ensures that decorated methods are correctly identified as valid readonly_fields entries while deferring signature verification to when it can be properly tested with actual model instances.",
+      "reference_sha256": "4c53b7a1ead27ae23506893924826ad782618e0b40fefa238857f3a165ad6c59",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-c26272d937aa5a311f14a871"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "afac2428a0d1f7e3ecfa64cb78a91873da47144cec8f59eb2e77bcdcbce70ed7",
+            "kind": "file_reference",
+            "line_count": 221,
+            "path": "tests/generic_views/test_detail.py"
+          },
+          {
+            "file_sha256": "5d39062065a9686c5bb9d32f18eac5282ea9f2c97f10a867d77200e60ff5cfcc",
+            "kind": "file_reference",
+            "line_count": 189,
+            "path": "django/views/generic/detail.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "generic_views/author_detail.html",
+            "reason": "not_tracked",
+            "reference": "generic_views/author_detail.html",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "What architectural pattern does DetailViewTest employ to verify that context object naming and template resolution mechanisms maintain independence from the underlying object lookup strategy?",
+      "question_sha256": "12a94ee8433f47f92d2168e15aa542510cbe8618629d883e88ceb5c65bd5f2b1",
+      "reference_answer": "The test class employs a **variation testing pattern** (also known as **parameterized testing** or **cross-product testing**) to verify that context object naming and template resolution mechanisms maintain independence from the underlying object lookup strategy.\n\nThis pattern works by testing the same view class (`AuthorDetail`, which extends `DetailView`) with multiple URL configurations that use different object lookup strategies. The test suite includes methods such as:\n- `test_detail_by_pk` - tests lookup by primary key\n- `test_detail_by_slug` - tests lookup by slug field\n- `test_detail_by_custom_pk` - tests lookup with custom primary key parameter\n- `test_detail_by_custom_slug` - tests lookup with custom slug parameter\n- `test_detail_by_pk_ignore_slug` - tests lookup by pk when slug is present but ignored\n- `test_detail_by_pk_and_slug` - tests lookup requiring both pk and slug to match\n\nDespite these different lookup strategies, each test verifies that:\n1. **Context object naming remains consistent**: All tests check that `res.context[\"object\"]` and `res.context[\"author\"]` contain the same object, regardless of how it was looked up (lines 49-50, 64-65, 74-75, etc. in `test_detail.py`).\n\n2. **Template resolution remains consistent**: All tests verify that the same template (`\"generic_views/author_detail.html\"`) is used, regardless of the lookup method (lines 51, 66, 77, etc.).\n\nThis pattern demonstrates **separation of concerns** implemented through **mixin composition**:\n- `SingleObjectMixin` (in `django/views/generic/detail.py`) handles object lookup via `get_object()` method (lines 21-59)\n- `SingleObjectMixin` also handles context object naming via `get_context_object_name()` method (lines 83-90)\n- `SingleObjectTemplateResponseMixin` handles template resolution via `get_template_names()` method (lines 121-180)\n\nThe variation testing pattern systematically exercises different lookup strategies while asserting that the other mechanisms (context naming and template resolution) produce identical results, thereby proving their independence from the lookup strategy. This architectural approach ensures that changes to how objects are retrieved (e.g., switching from pk-based to slug-based lookup) do not affect how they are named in the context or which templates are selected for rendering.",
+      "reference_sha256": "47694ca8ea54aa212b391054edaa84489813a486a65f4b95a1ff104187a675ef",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-c92230120383eae96a30dd23"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 116,
+            "file_sha256": "2cddc22831b3d01d6b088cacc25674850a8bff7814cf5378175b9b70030b70fb",
+            "path": "tests/template_tests/utils.py",
+            "start_line": 115
+          },
+          {
+            "end_line": 88,
+            "file_sha256": "2cddc22831b3d01d6b088cacc25674850a8bff7814cf5378175b9b70030b70fb",
+            "path": "tests/template_tests/utils.py",
+            "start_line": 88
+          },
+          {
+            "end_line": 343,
+            "file_sha256": "7c6a20768e123a287fbf76377ef8b339967d18f9e48985979a61195e82b9510e",
+            "path": "docs/ref/templates/api.txt",
+            "start_line": 313
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "82121f40b181158dd7061b39f2dd25cc7bed602f9ae46a1a50d74922b2c3ad8e",
+            "kind": "file_reference",
+            "line_count": 1146,
+            "path": "django/template/base.py"
+          },
+          {
+            "file_sha256": "112e51588cc22e321d20ce08ea82c13108cb0ea9677b320c31ec1b9d243e7742",
+            "kind": "file_reference",
+            "line_count": 431,
+            "path": "tests/template_tests/syntax_tests/test_basic.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the exception-raising behavior of method5 in SomeClass interact with Django's template rendering framework to affect error handling and propagation through the template engine's execution stack?",
+      "question_sha256": "687559955b56eed791193859501160c264cf115d8abe9eaf04a627f3847d3d8a",
+      "reference_answer": "The TypeError-raising method in the template test utility class (`method5` in `SomeClass`, defined in `tests/template_tests/utils.py` at lines 115-116) interacts with Django's template rendering framework so that the exception propagates through the template engine's execution stack rather than being silenced.\n\n**Exception handling mechanism:**\n\nWhen the method is called during template variable resolution, the exception handling occurs in `django/template/base.py` in the `Variable._resolve_lookup()` method (lines 888-967):\n\n1. **Method invocation** (lines 932-952): When a callable is encountered during variable resolution:\n   - The template engine checks if it's callable (line 932)\n   - If the callable doesn't have `do_not_call_in_templates` or `alters_data` flags, it attempts to call it without arguments (line 939)\n   - If a `TypeError` is raised, there's special handling to distinguish between:\n     - `TypeError` due to required arguments (which gets silenced and returns `string_if_invalid`)\n     - `TypeError` raised from within the method body itself (which gets re-raised at line 952)\n\n2. **Outer exception handler** (lines 953-965): All exceptions raised during variable resolution are caught by the outer exception handler:\n   ```python\n   except Exception as e:\n       if getattr(e, \"silent_variable_failure\", False):\n           current = context.template.engine.string_if_invalid\n       else:\n           raise\n   ```\n   - Since `TypeError` does not have the `silent_variable_failure = True` attribute (unlike `SomeException` which does, as seen in `tests/template_tests/utils.py` line 88), the exception is re-raised (line 965)\n\n3. **Exception propagation path**: The exception propagates through the template rendering stack:\n   - `Template.render()` (line 165) \u2192 `Template._render()` (line 162) \u2192 `NodeList.render()` \u2192 `VariableNode.render()` \u2192 `Variable.resolve()` (line 864) \u2192 `Variable._resolve_lookup()` (line 888)\n\n**Test evidence:**\n\nThe behavior is explicitly tested in `tests/template_tests/syntax_tests/test_basic.py` in the `test_basic_syntax20b` test (lines 180-188):\n```python\n@setup({\"basic-syntax20b\": \"{{ var.method5 }}\"})\ndef test_basic_syntax20b(self):\n    \"\"\"\n    Don't silence a TypeError if it was raised inside a callable.\n    \"\"\"\n    template = self.engine.get_template(\"basic-syntax20b\")\n    with self.assertRaises(TypeError):\n        template.render(Context({\"var\": SomeClass()}))\n```\n\nThis test confirms that `TypeError` exceptions raised from within callable methods during template rendering are not silenced and propagate to the caller, unlike exceptions with `silent_variable_failure = True` which are caught and replaced with the engine's `string_if_invalid` value.\n\n**Documentation reference:**\n\nThis behavior is documented in `docs/ref/templates/api.txt` (lines 313-343), which explains that exceptions raised during variable calls are propagated unless they have a `silent_variable_failure` attribute set to `True`.",
+      "reference_sha256": "f660196fb4b65444fae6aaffa9e45742cd41f2628061f950ae0226956fc7bd45",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-ca41edc641b1afc8b30dc72c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 11,
+            "file_sha256": "2be57c6af7116db2351416c453289fa37a4d79b3a6993cb0849d2a18a3b78b4d",
+            "path": "tests/force_insert_update/models.py",
+            "start_line": 9
+          },
+          {
+            "end_line": 1089,
+            "file_sha256": "38d900b034b86d9c4d2d3f4c7cb078d672d637f9badc0bfaa03732dbc6103bb4",
+            "path": "django/db/models/base.py",
+            "start_line": 1089
+          },
+          {
+            "end_line": 533,
+            "file_sha256": "3ae3085ecc252e5be30ae1813e982485e6a9cf00daacb4960142c24df7f82017",
+            "path": "docs/ref/models/instances.txt",
+            "start_line": 522
+          },
+          {
+            "end_line": 310,
+            "file_sha256": "3ae3085ecc252e5be30ae1813e982485e6a9cf00daacb4960142c24df7f82017",
+            "path": "docs/ref/models/instances.txt",
+            "start_line": 310
+          },
+          {
+            "end_line": 48,
+            "file_sha256": "72e4cc69196dcb51f27c41ae4c40cd26cfa42eb68d473a951763b0294beb4c23",
+            "path": "tests/force_insert_update/tests.py",
+            "start_line": 45
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "2be57c6af7116db2351416c453289fa37a4d79b3a6993cb0849d2a18a3b78b4d",
+            "kind": "file_reference",
+            "line_count": 43,
+            "path": "tests/force_insert_update/models.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "django/contrib/admin/templatetags/base.py",
+              "django/contrib/gis/db/backends/mysql/base.py",
+              "django/contrib/gis/db/backends/oracle/base.py",
+              "django/contrib/gis/db/backends/postgis/base.py",
+              "django/contrib/gis/db/backends/spatialite/base.py",
+              "django/contrib/gis/gdal/base.py",
+              "django/contrib/gis/gdal/raster/base.py",
+              "django/contrib/gis/geos/base.py",
+              "django/contrib/messages/storage/base.py",
+              "django/contrib/sessions/backends/base.py",
+              "django/core/cache/backends/base.py",
+              "django/core/checks/security/base.py",
+              "django/core/files/base.py",
+              "django/core/files/storage/base.py",
+              "django/core/handlers/base.py",
+              "django/core/mail/backends/base.py",
+              "django/core/management/base.py",
+              "django/core/serializers/base.py",
+              "django/db/backends/base/base.py",
+              "django/db/backends/dummy/base.py",
+              "django/db/backends/mysql/base.py",
+              "django/db/backends/oracle/base.py",
+              "django/db/backends/postgresql/base.py",
+              "django/db/backends/sqlite3/base.py",
+              "django/db/migrations/operations/base.py",
+              "django/db/models/base.py",
+              "django/template/backends/base.py",
+              "django/template/base.py",
+              "django/template/loaders/base.py",
+              "django/urls/base.py",
+              "django/views/generic/base.py",
+              "tests/forms_tests/widget_tests/base.py",
+              "tests/messages_tests/base.py",
+              "tests/serializers/models/base.py",
+              "tests/sitemaps_tests/base.py",
+              "tests/template_tests/syntax_tests/i18n/base.py"
+            ],
+            "end_line": 1103,
+            "path": "base.py",
+            "reason": "ambiguous_basename",
+            "reference": "base.py",
+            "start_line": 1082
+          },
+          {
+            "candidates": [
+              "django/contrib/admin/templatetags/base.py",
+              "django/contrib/gis/db/backends/mysql/base.py",
+              "django/contrib/gis/db/backends/oracle/base.py",
+              "django/contrib/gis/db/backends/postgis/base.py",
+              "django/contrib/gis/db/backends/spatialite/base.py",
+              "django/contrib/gis/gdal/base.py",
+              "django/contrib/gis/gdal/raster/base.py",
+              "django/contrib/gis/geos/base.py",
+              "django/contrib/messages/storage/base.py",
+              "django/contrib/sessions/backends/base.py",
+              "django/core/cache/backends/base.py",
+              "django/core/checks/security/base.py",
+              "django/core/files/base.py",
+              "django/core/files/storage/base.py",
+              "django/core/handlers/base.py",
+              "django/core/mail/backends/base.py",
+              "django/core/management/base.py",
+              "django/core/serializers/base.py",
+              "django/db/backends/base/base.py",
+              "django/db/backends/dummy/base.py",
+              "django/db/backends/mysql/base.py",
+              "django/db/backends/oracle/base.py",
+              "django/db/backends/postgresql/base.py",
+              "django/db/backends/sqlite3/base.py",
+              "django/db/migrations/operations/base.py",
+              "django/db/models/base.py",
+              "django/template/backends/base.py",
+              "django/template/base.py",
+              "django/template/loaders/base.py",
+              "django/urls/base.py",
+              "django/views/generic/base.py",
+              "tests/forms_tests/widget_tests/base.py",
+              "tests/messages_tests/base.py",
+              "tests/serializers/models/base.py",
+              "tests/sitemaps_tests/base.py",
+              "tests/template_tests/syntax_tests/i18n/base.py"
+            ],
+            "end_line": 830,
+            "path": "base.py",
+            "reason": "ambiguous_basename",
+            "reference": "base.py",
+            "start_line": 830
+          },
+          {
+            "candidates": [
+              "django/contrib/admin/templatetags/base.py",
+              "django/contrib/gis/db/backends/mysql/base.py",
+              "django/contrib/gis/db/backends/oracle/base.py",
+              "django/contrib/gis/db/backends/postgis/base.py",
+              "django/contrib/gis/db/backends/spatialite/base.py",
+              "django/contrib/gis/gdal/base.py",
+              "django/contrib/gis/gdal/raster/base.py",
+              "django/contrib/gis/geos/base.py",
+              "django/contrib/messages/storage/base.py",
+              "django/contrib/sessions/backends/base.py",
+              "django/core/cache/backends/base.py",
+              "django/core/checks/security/base.py",
+              "django/core/files/base.py",
+              "django/core/files/storage/base.py",
+              "django/core/handlers/base.py",
+              "django/core/mail/backends/base.py",
+              "django/core/management/base.py",
+              "django/core/serializers/base.py",
+              "django/db/backends/base/base.py",
+              "django/db/backends/dummy/base.py",
+              "django/db/backends/mysql/base.py",
+              "django/db/backends/oracle/base.py",
+              "django/db/backends/postgresql/base.py",
+              "django/db/backends/sqlite3/base.py",
+              "django/db/migrations/operations/base.py",
+              "django/db/models/base.py",
+              "django/template/backends/base.py",
+              "django/template/base.py",
+              "django/template/loaders/base.py",
+              "django/urls/base.py",
+              "django/views/generic/base.py",
+              "tests/forms_tests/widget_tests/base.py",
+              "tests/messages_tests/base.py",
+              "tests/serializers/models/base.py",
+              "tests/sitemaps_tests/base.py",
+              "tests/template_tests/syntax_tests/i18n/base.py"
+            ],
+            "end_line": 1070,
+            "path": "base.py",
+            "reason": "ambiguous_basename",
+            "reference": "base.py",
+            "start_line": 1070
+          },
+          {
+            "candidates": [
+              "django/contrib/admin/templatetags/base.py",
+              "django/contrib/gis/db/backends/mysql/base.py",
+              "django/contrib/gis/db/backends/oracle/base.py",
+              "django/contrib/gis/db/backends/postgis/base.py",
+              "django/contrib/gis/db/backends/spatialite/base.py",
+              "django/contrib/gis/gdal/base.py",
+              "django/contrib/gis/gdal/raster/base.py",
+              "django/contrib/gis/geos/base.py",
+              "django/contrib/messages/storage/base.py",
+              "django/contrib/sessions/backends/base.py",
+              "django/core/cache/backends/base.py",
+              "django/core/checks/security/base.py",
+              "django/core/files/base.py",
+              "django/core/files/storage/base.py",
+              "django/core/handlers/base.py",
+              "django/core/mail/backends/base.py",
+              "django/core/management/base.py",
+              "django/core/serializers/base.py",
+              "django/db/backends/base/base.py",
+              "django/db/backends/dummy/base.py",
+              "django/db/backends/mysql/base.py",
+              "django/db/backends/oracle/base.py",
+              "django/db/backends/postgresql/base.py",
+              "django/db/backends/sqlite3/base.py",
+              "django/db/migrations/operations/base.py",
+              "django/db/models/base.py",
+              "django/template/backends/base.py",
+              "django/template/base.py",
+              "django/template/loaders/base.py",
+              "django/urls/base.py",
+              "django/views/generic/base.py",
+              "tests/forms_tests/widget_tests/base.py",
+              "tests/messages_tests/base.py",
+              "tests/serializers/models/base.py",
+              "tests/sitemaps_tests/base.py",
+              "tests/template_tests/syntax_tests/i18n/base.py"
+            ],
+            "end_line": null,
+            "path": "base.py",
+            "reason": "ambiguous_basename",
+            "reference": "base.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "Why does the Counter model's design rely on Django's ORM abstraction rather than implementing custom field validation logic, and what architectural constraints does this choice impose on force_insert and force_update operations?",
+      "question_sha256": "582d878b100dd303ad6a2a8f81b295cb3c1b3ae46215a49a370c38e4306c6952",
+      "reference_answer": "The test model class (Counter) in `tests/force_insert_update/models.py` relies on Django's ORM abstraction rather than custom validation because it uses standard field types (`CharField` and `IntegerField`) that handle data preparation through the ORM's field-level methods (`pre_save()` and `get_db_prep_save()`), and Django's `save()` method does not automatically invoke validation methods like `full_clean()`, `clean()`, or `clean_fields()`.\n\n**Design Rationale:**\n\nThe Counter model is intentionally minimal for testing force_insert/force_update behavior:\n\n```9:11:tests/force_insert_update/models.py\nclass Counter(models.Model):\n    name = models.CharField(max_length=10)\n    value = models.IntegerField()\n```\n\nIt has no custom `clean()`, `clean_fields()`, or `validate_unique()` methods. Field preparation occurs through the ORM abstraction layer:\n\n1. **Field-level preparation**: During `save()`, each field's `pre_save()` method is called (line 1089 in `django/db/models/base.py`) to perform automated data modification (e.g., `auto_now` for date fields).\n\n2. **Database preparation**: Each field's `get_db_prep_save()` method converts Python values to database-compatible formats (documented in `docs/ref/models/instances.txt` lines 522-533).\n\n3. **No automatic validation**: As documented (line 310 in `docs/ref/models/instances.txt`): \"a model's `clean()` method is not invoked when you call your model's `save()` method.\" Validation is separate from ORM operations.\n\n**Architectural Constraints on force_insert and force_update:**\n\nThis design choice constrains how `force_insert` and `force_update` operate:\n\n1. **Operation-level control, not validation-level**: These parameters work at the ORM/database operation level (controlling INSERT vs UPDATE SQL), not at validation. They bypass Django's automatic INSERT/UPDATE detection (lines 1082-1103 in `base.py`) but do not trigger validation.\n\n2. **Mutual exclusivity constraint**: The parameters cannot be used simultaneously. Line 830 in `base.py` raises `ValueError(\"Cannot force both insert and updating in model saving.\")` if both are True.\n\n3. **Primary key requirement for force_update**: Line 1070 in `base.py` raises `ValueError(\"Cannot force an update in save() with no primary key.\")` when `force_update=True` is used without a primary key value.\n\n4. **Integrity constraint conflicts**: `force_insert=True` can cause `IntegrityError` if the primary key already exists (tested in `tests/force_insert_update/tests.py` lines 45-48), because it bypasses the ORM's existence check that would normally trigger an UPDATE.\n\n5. **Inheritance hierarchy constraints**: For multi-table inheritance, `force_insert` accepts a tuple of parent classes (lines 900-917, 1019 in `base.py`) to control which parent tables receive INSERT operations, but this operates at the ORM level without validation.\n\n6. **No validation integration**: Since validation methods are not called during `save()`, `force_insert` and `force_update` cannot leverage custom validation logic to prevent invalid operations. The Counter model's reliance on ORM abstraction means these operations proceed directly to database queries without model-level validation checks.\n\nThe architectural constraint is that `force_insert` and `force_update` are ORM operation controls that work with field preparation methods (`pre_save()`, `get_db_prep_save()`) but operate independently of Django's validation framework, making them suitable for testing database-level behavior but requiring separate validation if data integrity beyond database constraints is needed.\n</start_of_answer>",
+      "reference_sha256": "cd10e799bc4d25558b3326f9dadbc57e372aa35ec660d11dfe45e9d72bb32758",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-da8100e8fae1a82c11c8b794"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 305,
+            "file_sha256": "aa2c2d2c6715234cd71b7caf0e552a4c4b676434e6c5b41ad32421f3c0e4312e",
+            "path": "django/db/backends/base/schema.py",
+            "start_line": 300
+          },
+          {
+            "end_line": 1531,
+            "file_sha256": "aa2c2d2c6715234cd71b7caf0e552a4c4b676434e6c5b41ad32421f3c0e4312e",
+            "path": "django/db/backends/base/schema.py",
+            "start_line": 1521
+          },
+          {
+            "end_line": 930,
+            "file_sha256": "bd62c426721e11c627c2c7eb885c0b0709909c2d98838e3dcd8e412894ca4007",
+            "path": "django/db/models/fields/__init__.py",
+            "start_line": 929
+          },
+          {
+            "end_line": 246,
+            "file_sha256": "1edd9958f0fba7e729d9da38b68f979ef5782ccfbd4b24ee6cccfa0eac14e132",
+            "path": "django/db/backends/postgresql/operations.py",
+            "start_line": 242
+          },
+          {
+            "end_line": 579,
+            "file_sha256": "2294570e79f9655b61a2399877e7a483cc891862acc7449a970f70c6b04f4de0",
+            "path": "django/db/backends/oracle/operations.py",
+            "start_line": 575
+          },
+          {
+            "end_line": 26,
+            "file_sha256": "f831e9c45ef019b8d72f588d3bd06d2c3559bab210303d841dbd2892125614b3",
+            "path": "django/db/backends/postgresql/features.py",
+            "start_line": 26
+          },
+          {
+            "end_line": 32,
+            "file_sha256": "afc741f2d00670f1ef72d40079d656d49b27a6456137eadc9d31b9c4e58f4d46",
+            "path": "django/db/backends/oracle/features.py",
+            "start_line": 32
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "bd2ba9d502cea8300d17497b3ced72e195035fe0f704aaa0cf7ccd1bd983c139",
+            "kind": "file_reference",
+            "line_count": 53,
+            "path": "tests/model_options/models/tablespaces.py"
+          },
+          {
+            "file_sha256": "29f706006ac9210c6bb6681cdc9dc6710a942d2bf4e0547a8919a0f83c59e777",
+            "kind": "file_reference",
+            "line_count": 1043,
+            "path": "django/db/models/options.py"
+          },
+          {
+            "file_sha256": "abfa523998a4bf50a88f93c72579ac24266208726f98b6e93bbc0e4a94fd8494",
+            "kind": "file_reference",
+            "line_count": 1288,
+            "path": "django/db/migrations/operations/models.py"
+          },
+          {
+            "file_sha256": "95b6e5bf285ef1e18445e8ed9e40b4454069c794569ec04fa737e23e17348031",
+            "kind": "file_reference",
+            "line_count": 2064,
+            "path": "django/db/models/fields/related.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What are the tablespace configuration dependencies of the Article class that interact with Django's database routing and the underlying database system's tablespace management capabilities?",
+      "question_sha256": "3e173d7ecf4030a5e4fb4065e88b7b2f92879abb60a853cc5b685cfcdb86e062",
+      "reference_answer": "The Article class in `tests/model_options/models/tablespaces.py` has several tablespace configuration dependencies that interact with Django's database routing and underlying database system capabilities:\n\n**1. Model-Level Tablespace Configuration:**\nThe Article class defines `db_tablespace = \"tbl_tbsp\"` in its Meta class (line 43). This configuration is processed by Django's `Options` class in `django/db/models/options.py`, which initializes `db_tablespace` from `settings.DEFAULT_TABLESPACE` if not explicitly set (line 133).\n\n**2. Field-Level Tablespace Configuration:**\n- The `code` field specifies `db_tablespace=\"idx_tbsp\"` (line 35), which applies to indexes created for this field.\n- The `reviewers` ManyToManyField also specifies `db_tablespace=\"idx_tbsp\"` (line 38), affecting the indexes on the intermediate table.\n\n**3. Interaction with Database Routing:**\nWhen migrations execute, the `CreateModel` operation in `django/db/migrations/operations/models.py` calls `allow_migrate_model()` to check if the router permits creating the model on a specific database (line 99). If routing allows, `schema_editor.create_model()` is invoked, which generates tablespace SQL through `table_sql()` in `django/db/backends/base/schema.py` (lines 300-305). The tablespace SQL is generated by calling `connection.ops.tablespace_sql()`, which is database-backend specific.\n\n**4. ManyToMany Intermediate Table Dependencies:**\nWhen creating ManyToMany intermediate tables, Django's `create_many_to_many_intermediary_model()` in `django/db/models/fields/related.py` inherits tablespace configurations: the intermediate table inherits `klass._meta.db_tablespace` (line 1329), and the ForeignKey fields inherit `field.db_tablespace` (lines 1348, 1355). This ensures consistent tablespace usage across related tables.\n\n**5. Index Tablespace Resolution:**\nThe `_get_index_tablespace_sql()` method in `django/db/backends/base/schema.py` (lines 1521-1531) resolves tablespace for indexes using a priority order: field-level `db_tablespace`, `settings.DEFAULT_INDEX_TABLESPACE`, or model-level `db_tablespace`. Field-level `db_tablespace` property in `django/db/models/fields/__init__.py` (lines 929-930) falls back to `settings.DEFAULT_INDEX_TABLESPACE` if not specified.\n\n**6. Database System Dependencies:**\nThe actual tablespace SQL generation depends on the database backend's capabilities:\n- PostgreSQL and Oracle backends implement `tablespace_sql()` in their operations modules (`django/db/backends/postgresql/operations.py` lines 242-246, `django/db/backends/oracle/operations.py` lines 575-579), generating `TABLESPACE <name>` or `USING INDEX TABLESPACE <name>` SQL.\n- The backend's `supports_tablespaces` feature flag (defined in `django/db/backends/postgresql/features.py` line 26 and `django/db/backends/oracle/features.py` line 32) determines whether tablespace options are honored.\n- For backends without tablespace support (SQLite, MySQL, MariaDB), Django ignores all tablespace-related options.\n\n**7. Migration and Routing Coordination:**\nDuring migrations, the router's `allow_migrate()` method determines which databases receive the model. The schema editor then uses the connection's operations module to generate tablespace-specific SQL, ensuring that tablespace configurations are applied only on databases that support them and where routing permits the migration.",
+      "reference_sha256": "5981899b396d1e0e64556c7fecb7e095ebb15888bcc22836ee86450c0a8eb128",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-e365c91c4187b2b238f16eb7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 4,
+            "file_sha256": "9dc21e954a1abb3527c205c2ed16dc27517ec848cd263e78062c239f0dd478ff",
+            "path": "django/contrib/admin/templates/admin/change_form_object_tools.html",
+            "start_line": 4
+          },
+          {
+            "end_line": 18,
+            "file_sha256": "1cda287b6eb0cad30b8790dd80eab37321ed35fe06faf59f72c2fbc5095656e1",
+            "path": "django/contrib/admin/templatetags/admin_urls.py",
+            "start_line": 17
+          },
+          {
+            "end_line": 96,
+            "file_sha256": "324a054f8b48e4074c4d2c90a36eebf658f8c3265bd0c3669d3634281edd169b",
+            "path": "django/contrib/admin/utils.py",
+            "start_line": 89
+          },
+          {
+            "end_line": 70,
+            "file_sha256": "1cda287b6eb0cad30b8790dd80eab37321ed35fe06faf59f72c2fbc5095656e1",
+            "path": "django/contrib/admin/templatetags/admin_urls.py",
+            "start_line": 21
+          },
+          {
+            "end_line": 1075,
+            "file_sha256": "82121f40b181158dd7061b39f2dd25cc7bed602f9ae46a1a50d74922b2c3ad8e",
+            "path": "django/template/base.py",
+            "start_line": 1064
+          },
+          {
+            "end_line": 4065,
+            "file_sha256": "4793d2242a3d414a2d1575acf5ad9c9586db68bc9daf4f3cda2956019ba0e4b1",
+            "path": "tests/admin_views/tests.py",
+            "start_line": 4048
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "74299a4c38e8ff679f30d7ba6d25c150498d2c7b2d20cb912e762295234fa016",
+            "kind": "file_reference",
+            "line_count": 1566,
+            "path": "django/template/defaulttags.py"
+          },
+          {
+            "file_sha256": "4721c57d87acaae539976fd073cd3a12e81cfdcc45cc4d133de4a07f0bee8d40",
+            "kind": "file_reference",
+            "line_count": 488,
+            "path": "django/template/library.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the quoted primary key value flow through the reverse URL resolution and HTML escaping pipeline to ensure the history link in the response matches the expected escaped URL?",
+      "question_sha256": "a9058e134c4147329ce33efa522628ec3dda5eaaa142ff90224a3eb4476f477a",
+      "reference_answer": "The primary key value processed by the character translation function in the admin utilities module flows through the URL pattern name resolution mechanism and the automatic HTML entity encoding system as follows:\n\n1. Primary key quoting: In `django/contrib/admin/templates/admin/change_form_object_tools.html` (line 4), the template uses `original.pk|admin_urlquote`. The `admin_urlquote` filter (defined in `django/contrib/admin/templatetags/admin_urls.py` at line 17-18) calls `quote()` from `django/contrib/admin/utils.py` (lines 89-96). This function translates special characters like '/', '_', ':', etc. using a translation map to prevent URL confusion.\n\n2. URL pattern name resolution: The quoted primary key is then passed to the `{% url %}` template tag (line 4 of the template), which internally uses Django's `reverse()` function. The URL tag implementation is in `django/template/defaulttags.py` in the `URLNode.render()` method (lines 467-495). At line 484, it calls `reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)` with the quoted primary key as an argument.\n\n3. First HTML escaping stage: After `reverse()` returns the URL string, if autoescape is enabled in the template context (which is the default), the `URLNode.render()` method applies `conditional_escape()` to the URL at line 494: `url = conditional_escape(url)`. This escapes HTML special characters in the URL. The URL is then stored in the `history_url` template variable (due to the `as history_url` clause).\n\n4. Preserved filters processing: The `history_url` variable is then passed to the `{% add_preserved_filters %}` template tag (line 5 of the template). This tag is implemented as a `simple_tag` in `django/contrib/admin/templatetags/admin_urls.py` (lines 21-70). It processes the URL to add query string parameters for preserved filters.\n\n5. Second HTML escaping stage: Since `add_preserved_filters` is registered as a `simple_tag` (not marked as `is_safe`), when it returns the processed URL string, Django's template system automatically applies `conditional_escape()` again. This happens in `django/template/library.py` in the `SimpleNode.render()` method at lines 325-326, where it checks `if context.autoescape:` and then calls `output = conditional_escape(output)`.\n\n6. Final HTML escaping in href attribute: The output from `add_preserved_filters` is then used directly in the `href` attribute of the anchor tag (line 5). When template variables are rendered in HTML contexts, they go through `render_value_in_context()` function (defined in `django/template/base.py` at lines 1064-1075). At lines 1070-1073, if `context.autoescape` is True, it applies `conditional_escape()` once more: `return conditional_escape(value)`.\n\nThe test case in `tests/admin_views/tests.py` (lines 4048-4065), specifically `test_change_view_history_link()`, verifies this behavior by checking that the history link contains the properly quoted and escaped primary key value, using `escape(expected_link)` to match the expected HTML-escaped URL format.\n\nThis multi-stage escaping ensures that special characters in primary key values are properly URL-encoded for the reverse URL resolution, and then HTML-escaped multiple times to safely embed the URL in HTML attributes, preventing both URL parsing issues and XSS vulnerabilities.",
+      "reference_sha256": "534c6ed89d714dd24f3ccfdc0ba64583a267cfc0a34c0ff3623e761ad8c9bd4a",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-f428a78e12d9f2a124055c61"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1573,
+            "file_sha256": "ac70ec930438c073f8780d0eb67dc8ec1be8cc28f350c175bf5e7f3279b1a529",
+            "path": "django/contrib/admin/options.py",
+            "start_line": 1561
+          },
+          {
+            "end_line": 70,
+            "file_sha256": "1cda287b6eb0cad30b8790dd80eab37321ed35fe06faf59f72c2fbc5095656e1",
+            "path": "django/contrib/admin/templatetags/admin_urls.py",
+            "start_line": 22
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the _response_post_save method's permission-based branching logic interact with Django's URL reversal and filter preservation mechanisms to ensure that users are redirected to contextually appropriate locations while maintaining their search and filter state?",
+      "question_sha256": "dca2f61dbe1db05e5ea48134e98c4f74987381979f15497c41b50fd26f9dba8d",
+      "reference_answer": "The private method `_response_post_save` in Django's `ModelAdmin` class (located in `django/contrib/admin/options.py` at lines 1561-1573) uses permission-based branching to ensure users are redirected appropriately based on their access level, while preserving their filter state when they have sufficient permissions.\n\nThe method implements this through the following logic:\n\n1. Permission check: It first calls `has_view_or_change_permission(request)` (line 1562), which checks if the user has either view or change permissions for the model. This method (defined at lines 616-619) returns `True` if the user has either the `view` or `change` permission for the model's app.\n\n2. Branching behavior:\n   - If the user has permissions (lines 1563-1570): The method uses `reverse()` from `django.urls` to generate the changelist URL using the pattern `\"admin:%s_%s_changelist\"` with the model's app label and model name. It then retrieves preserved filters via `get_preserved_filters(request)` (line 1567), which extracts filter query parameters from the request (either from `request.GET.urlencode()` if currently on the changelist, or from `request.GET.get(\"_changelist_filters\")` if coming from another view, as seen in lines 1207-1225). These filters are then merged into the URL using `add_preserved_filters()` (lines 1568-1570), which parses the preserved filters and merges them into the URL's query string, ensuring users return to the changelist with their previous search and filter state intact.\n   \n   - If the user lacks permissions (lines 1571-1572): The method redirects to `admin:index` (the admin homepage) instead, bypassing filter preservation since the user cannot access the changelist.\n\n3. Filter preservation mechanism: The `get_preserved_filters` method (lines 1207-1225) works by checking if `preserve_filters` is enabled (which defaults to `True` in `ModelAdmin` at line 652) and extracting filter state from either the current URL's query string (if on the changelist) or from the `_changelist_filters` parameter (if navigating from add/change views). The `add_preserved_filters` function (in `django/contrib/admin/templatetags/admin_urls.py`, lines 22-70) then merges these filters into the target URL's query string, ensuring the user's filter context is maintained.\n\nThis design ensures that:\n- Users with appropriate permissions maintain their workflow context (filters, searches) when redirected after saving\n- Users without permissions are safely redirected to a page they can access (the admin index) rather than being sent to a changelist they cannot view\n- The permission check happens before URL generation and filter preservation, avoiding unnecessary work for unauthorized users\n\nThe method is called by both `response_post_save_add` (line 1580) and `response_post_save_change` (line 1587), providing consistent redirect behavior for both adding new objects and editing existing ones.",
+      "reference_sha256": "2d4719ab6f7d5f1c2690f5141afb9e964b41e802fe54965e36ab10b1df96ae4c",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-f53cee9eafc6c47d9bfbfc65"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 198,
+            "file_sha256": "89c14feb18bee50c6af7c819c49210f6ea113de562ee164d8145061fef9b556b",
+            "path": "django/forms/fields.py",
+            "start_line": 186
+          },
+          {
+            "end_line": 1642,
+            "file_sha256": "c565a46c3af495ddc0ada728ada08f52249b67eb2e7a6d7d59ca1200b95a87bb",
+            "path": "django/forms/models.py",
+            "start_line": 1642
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "django/contrib/contenttypes/fields.py",
+              "django/contrib/gis/db/models/fields.py",
+              "django/contrib/gis/forms/fields.py",
+              "django/db/migrations/operations/fields.py",
+              "django/forms/fields.py",
+              "tests/custom_pk/fields.py",
+              "tests/field_subclassing/fields.py",
+              "tests/postgres_tests/fields.py",
+              "tests/schema/fields.py"
+            ],
+            "end_line": 171,
+            "path": "fields.py",
+            "reason": "ambiguous_basename",
+            "reference": "fields.py",
+            "start_line": 171
+          }
+        ]
+      },
+      "question": "Where in the codebase is the validator execution logic implemented that allows ModelMultipleChoiceField to invoke custom validators during the clean() method call?",
+      "question_sha256": "38b9a622b40fb54b2bb76ce3536508232fd70bb7a903c6983a763bad9c7b957c",
+      "reference_answer": "The mechanism that invokes custom validation functions for the form field class handling multiple model instance selections is implemented in two locations:\n\n1. **Primary implementation**: The `run_validators()` method in the `Field` class at `django/forms/fields.py`, lines 186-198. This method:\n   - Checks if the value is in empty values and returns early if so\n   - Iterates through `self.validators` (initialized in `Field.__init__()` at line 171 by combining `default_validators` and the `validators` parameter)\n   - Calls each validator function with the value\n   - Collects any `ValidationError` exceptions raised by validators\n   - Raises a combined `ValidationError` if any errors occurred\n\n2. **Invocation point**: The `clean()` method of the form field class handling multiple model instance selections at `django/forms/models.py`, line 1642, explicitly calls `self.run_validators(value)`. This is necessary because this class overrides the parent's `clean()` method (as noted in the comment at line 1640-1641: \"Since this overrides the inherited ModelChoiceField.clean we run custom validators here\").\n\nThe validator execution flow works as follows:\n- During field initialization (`Field.__init__()`), validators are stored in `self.validators` (line 171 in `fields.py`)\n- When `clean()` is called on the field, it processes the value and then calls `run_validators()`\n- `run_validators()` executes each validator in `self.validators`, passing the value to each validator function\n- If any validator raises a `ValidationError`, it's collected and all errors are raised together at the end\n\nThis design allows custom validators passed to the field constructor to be automatically executed during validation, ensuring that both built-in field validation and custom validator logic are applied to the input value.",
+      "reference_sha256": "6a6ba6fff611f02b30acc7f54bef97e7fc425c7465873f2da42c84a61619c218",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-fc0130ae6027c6688a59ddfe"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 431,
+            "file_sha256": "c726b3843d7b95f0915db5879cd59b23558c1efc325cb52ea51cc6ebbd32f205",
+            "path": "django/utils/cache.py",
+            "start_line": 416
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "28e960f8a9e3c7fd7b2ad5ebfafc760c4a56be9ce88e4df21544ac307508628e",
+            "kind": "file_reference",
+            "line_count": 223,
+            "path": "django/middleware/cache.py"
+          },
+          {
+            "file_sha256": "c726b3843d7b95f0915db5879cd59b23558c1efc325cb52ea51cc6ebbd32f205",
+            "kind": "file_reference",
+            "line_count": 444,
+            "path": "django/utils/cache.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the semantic contract established by the initialization of UpdateCacheMiddleware between its configuration parameters and the caching behavior that downstream middleware operations depend upon?",
+      "question_sha256": "5e599558ea8a6cabea0eedd47d53a850183883184f445d28e9c0b2f49090c7a3",
+      "reference_answer": "The semantic contract established by the initialization of `UpdateCacheMiddleware` (located in `django/middleware/cache.py`) creates a binding agreement between configuration parameters read from Django settings and the caching behavior that downstream middleware operations must rely upon.\n\n**Initialization Parameters:**\n\nThe `__init__` method (lines 71-76) establishes four key configuration parameters:\n\n1. **`cache_timeout`** - Read from `settings.CACHE_MIDDLEWARE_SECONDS` (default: 600 seconds), determines the default cache duration\n2. **`key_prefix`** - Read from `settings.CACHE_MIDDLEWARE_KEY_PREFIX` (default: empty string), ensures cache key uniqueness across Django instances\n3. **`cache_alias`** - Read from `settings.CACHE_MIDDLEWARE_ALIAS` (default: \"default\"), specifies which cache backend to use\n4. **`page_timeout`** - Initialized to `None`, allows per-page cache timeout overrides\n\n**The Semantic Contract:**\n\nThe contract guarantees that:\n\n1. **Cache Key Consistency**: The `key_prefix` and `cache_alias` parameters must be identical between `UpdateCacheMiddleware` and `FetchFromCacheMiddleware` for cache keys to match. `UpdateCacheMiddleware` uses these in `learn_cache_key()` (line 121-122) to generate cache keys, while `FetchFromCacheMiddleware` uses the same parameters in `get_cache_key()` (line 161) to retrieve them. Both functions (`learn_cache_key` and `get_cache_key` in `django/utils/cache.py`) default to the same settings if parameters are not provided, ensuring consistency.\n\n2. **Cache Backend Selection**: The `cache_alias` determines which cache backend instance is used (via the `cache` property, lines 78-80), and this must match across both middleware classes to ensure they read from and write to the same cache storage.\n\n3. **Timeout Hierarchy**: The `cache_timeout` establishes a default, but the contract allows for precedence: `page_timeout` (if set) > `max-age` from Cache-Control header > `cache_timeout` (lines 107-115). This hierarchy is respected in `process_response()`.\n\n4. **Header Registry Storage**: The `learn_cache_key()` function stores header lists (from the Vary header) in the cache using the same `key_prefix` and `cache_alias` (lines 416-431 in `django/utils/cache.py`). `FetchFromCacheMiddleware` retrieves these header lists using `get_cache_key()` with matching parameters, creating a dependency on the initialization contract.\n\n**Downstream Dependencies:**\n\n- **`FetchFromCacheMiddleware`**: Must use identical `key_prefix` and `cache_alias` values (initialized in lines 144-145) to generate matching cache keys. It sets the `_cache_update_cache` flag on the request object (lines 157, 163, 174, 187) to signal whether `UpdateCacheMiddleware` should update the cache.\n\n- **Other Middleware**: Middleware like `LocaleMiddleware` can affect cache keys by modifying the Vary header, but they depend on the contract that `UpdateCacheMiddleware` will use the established `key_prefix` and `cache_alias` when learning and storing cache keys.\n\nThe contract ensures that cache keys generated during the response phase (by `UpdateCacheMiddleware`) can be reliably retrieved during the request phase (by `FetchFromCacheMiddleware`), maintaining cache coherence across the middleware stack.",
+      "reference_sha256": "36cbe0fb31faa13e92836f6a71c23240b458a681afb9d946470bcd493bb8fee9",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "task_id": "import-ff17202cb3b894fcc69ab84b"
+    }
+  ]
+}

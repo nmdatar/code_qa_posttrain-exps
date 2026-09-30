@@ -1,0 +1,75 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-062.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "2aa204516af2ae71afeef2285a742258abcb1519f39a319f8052fdc686780571",
+      "question": "What are the consequences of dtype incompatibility at each transformation stage in the dataflow dependency chain from fetch_20newsgroups through TfidfVectorizer to train_test_split, and how does this chain constrain dtype parameter propagation?",
+      "question_sha256": "c989507e892acddc9f3316349b05080abde5b2931d27b254838c008caa3c1861",
+      "reference_answer": "Raw text input has no NumPy matrix dtype to propagate. TfidfVectorizer's dtype controls count construction, while _check_params warns for values outside FLOAT_DTYPES without assigning a replacement dtype (sklearn/feature_extraction/text.py:2051-2057). TfidfTransformer selects float32/64 dtype for IDF computations, otherwise float64 (sklearn/feature_extraction/text.py:1664-1674), and its transformation uses floating-point validation. Numeric matrix dtype is then preserved by row splitting, rather than controlled by a train_test_split dtype argument. Do not interpret the warning as a guarantee that every arbitrary dtype succeeds or as a mutation of the estimator parameter.",
+      "reference_sha256": "cb5437e2fb15f513dd754d7a3a05817ed89ace580035133f75dac601050f7222",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-a547458bbe75b9aa72f098bd"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "85af07e21de091e1d3e26e3713fee9b805cfe4df9b3092a2c3ee554e4b943120",
+      "question": "How does _get_visual_block implement the extraction and validation of parallel estimator metadata from a FeatureUnion's transformer_list structure?",
+      "question_sha256": "cd502eb2c0033ac8cf908f76a1c44d23080f0a9e4ece400e34b2b0d90df08da4",
+      "reference_answer": "_get_visual_block delegates to an estimator's _sk_visual_block_ and falls back to a single block if it raises (sklearn/utils/_repr_html/estimator.py:225-234). FeatureUnion unpacks transformer_list into names/transformers and constructs a parallel block (sklearn/pipeline.py:2082-2084). _VisualBlock supplies tuples of None when names or details are omitted; it does not validate supplied sequence lengths (sklearn/utils/_repr_html/estimator.py:89-102). Unpacking errors are not comprehensive structural validation, and malformed metadata can fall back rather than be validated as claimed.",
+      "reference_sha256": "1ae9c8590e4da33b84328944cc45fdf672c41b0d71d98c7b34238c083ad25ad1",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-ccae99e0aa76d46d37542b3b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "e9ea847ad51c5df3333283a4cc69f8a1a83e58924f701a6336ae1dfb941f90f3",
+      "question": "What is the semantic significance of SelectFromModel's partial_fit method enforcing max_features validation constraints differently compared to its fit method, and why does it raise validation errors during partial_fit rather than deferring validation to subsequent fit calls?",
+      "question_sha256": "394c07b7a2982566e94f615b2267a0b71af20af355f49d412742d305eb319cfd",
+      "reference_answer": "partial_fit calls _check_max_features only before estimator_ exists (sklearn/feature_selection/_from_model.py:437-440). That helper evaluates a callable if supplied, checks an integral value between zero and current feature count, and stores max_features_ (sklearn/feature_selection/_from_model.py:309-325). Invalid initial settings therefore fail during incremental initialization, which may never be followed by fit. Later calls reuse that initialized constraint; omitting a later check does not itself enforce unchanged feature count, which must be handled elsewhere, such as the underlying estimator.",
+      "reference_sha256": "4d326642454f95fd13ee7b9d172f5d59ad9c04c81c57cc1979f426889b144e19",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-d3235e795cfc423d31b310d4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "f5c8886e707104bbe9649dbb2a4745e0bae6e578c451ad80f23c674005d1e948",
+      "question": "How does the convergence detection mechanism in the `fit` method handle the trade-off between numerical precision and computational efficiency when comparing label distribution changes across iterations?",
+      "question_sha256": "e9eb2d7ed9564a08971b543d10bfffcbcf35466584717df64875be66848f825f",
+      "reference_answer": "The fit loop stops when the sum of absolute changes across all samples/classes is below tol (sklearn/semi_supervised/_label_propagation.py:302-304). This is an unnormalized aggregate L1 criterion: many small changes accumulate, and a large local change cannot be diluted by adding near-zero changes. Computing it takes work proportional to the distribution array size; the source does not establish that max-norm alternatives are slower. Larger tolerance can stop earlier with more residual change; smaller tolerance may require more iterations, capped by max_iter and a convergence warning (sklearn/semi_supervised/_label_propagation.py:323-328).",
+      "reference_sha256": "c4656f015f8a7230d39a6694e805a103a70fbe36272d936daf58143b068e6a61",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-d7b7d55534fc6cd8353bdb09"
+    }
+  ]
+}

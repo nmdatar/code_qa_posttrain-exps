@@ -1,0 +1,426 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 3253,
+            "file_sha256": "5f93c327d5c10386c07718e83b7ed09908299a3b63f58a5cba32f86c946bf571",
+            "path": "sphinx/domains/cpp/_ast.py",
+            "start_line": 3246
+          },
+          {
+            "end_line": 1437,
+            "file_sha256": "811fb133c0413925aa68a6d6287683f50a97367abda7a5afc8702795acf39e5a",
+            "path": "sphinx/domains/c/_ast.py",
+            "start_line": 1430
+          },
+          {
+            "end_line": 2586,
+            "file_sha256": "5f93c327d5c10386c07718e83b7ed09908299a3b63f58a5cba32f86c946bf571",
+            "path": "sphinx/domains/cpp/_ast.py",
+            "start_line": 2586
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How do the signature description methods on the inner and next declarator attributes handle recursive traversal of nested parenthesized declarators?",
+      "question_sha256": "3dd7bb6f1bde18465947b89690f4b29a4877e653687cbccb34cbaf2c894a0f2f",
+      "reference_answer": "The signature description methods on the `inner` and `next` declarator attributes handle recursive traversal through polymorphic method dispatch on the `ASTDeclarator` base class.\n\nIn `ASTDeclaratorParen.describe_signature` (located in `sphinx/domains/cpp/_ast.py` lines 3246-3253 and `sphinx/domains/c/_ast.py` lines 1430-1437), the method delegates to:\n1. `self.inner.describe_signature(signode, mode, env, symbol)` - processes the inner declarator wrapped in parentheses\n2. `self.next.describe_signature(signode, 'noneIsName', env, symbol)` - processes the subsequent declarator chain\n\nBoth `inner` and `next` are instances of `ASTDeclarator`, which is an abstract base class (`sphinx/domains/cpp/_ast.py` line 2586) with multiple concrete subclasses including:\n- `ASTDeclaratorParen` (parenthesized declarators)\n- `ASTDeclaratorPtr` (pointer declarators)\n- `ASTDeclaratorRef` (reference declarators)\n- `ASTDeclaratorMemPtr` (member pointer declarators)\n- `ASTDeclaratorNameParamQual` (named declarators with parameters)\n\nThe recursive traversal works as follows:\n- When `ASTDeclaratorParen` calls `inner.describe_signature()`, it invokes the polymorphic `describe_signature` method on that declarator object\n- If `inner` is another `ASTDeclaratorParen`, its `describe_signature` will recursively call its own `inner` and `next` methods\n- Similarly, when `next.describe_signature()` is called, if `next` is an `ASTDeclaratorParen` or another composite declarator type (like `ASTDeclaratorPtr`), it will process its own nested structure\n- Each declarator subclass implements its own `describe_signature` that handles its specific syntax (e.g., `ASTDeclaratorPtr` adds `*` and qualifiers, then calls `next.describe_signature()`)\n\nThis creates a recursive descent through the declarator tree structure, where each node processes its own syntax elements and delegates to its nested declarators, naturally handling arbitrarily nested parenthesized declarators like `(*(*inner))next` or `((inner)next)next2`.",
+      "reference_sha256": "7cbc61cafc77a61077ec39ef2acf655a53c754472fdfa851401a940ebec9b72e",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-0b4746621b69807b12713d63"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "52baaef127186aa64554cb19a14270bc7fa6e6192c4c8da462438c3dd228a3c2",
+            "kind": "file_reference",
+            "line_count": 135,
+            "path": "sphinx/builders/latex/theming.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the theme retrieval method in the LaTeX theme factory resolve precedence when a name exists in both predefined themes and user theme directories?",
+      "question_sha256": "179888ada8e91ce96388114a52bae7f987202994e001d411e36eac18e94d4ed7",
+      "reference_answer": "The theme retrieval method in the LaTeX theme factory (`ThemeFactory.get()` in `sphinx/builders/latex/theming.py`) resolves precedence by checking the predefined themes dictionary first, before searching user theme directories.\n\nThe resolution order is implemented in the `get` method (lines 115-123):\n\n```python\ndef get(self, name: str) -> Theme:\n    \"\"\"Get a theme for given *name*.\"\"\"\n    if name in self.themes:\n        theme = self.themes[name]\n    else:\n        theme = self.find_user_theme(name) or Theme(name)\n\n    theme.update(self.config)\n    return theme\n```\n\n**Resolution mechanism:**\n\n1. **First check**: The method checks `if name in self.themes:` (line 117), where `self.themes` is a dictionary containing predefined system themes loaded during initialization via `load_builtin_themes()` (lines 110-113). This dictionary initially contains 'manual' and 'howto' themes as `BuiltInTheme` instances.\n\n2. **Early return**: If the theme name exists in `self.themes`, the method returns that theme immediately (line 118) without checking user theme paths.\n\n3. **Fallback to user themes**: Only if the name is not found in `self.themes` does the method call `find_user_theme(name)` (line 120), which searches through `self.theme_paths` (user-specified directories from `config.latex_theme_path`) for a matching theme configuration file.\n\n4. **Default fallback**: If no user theme is found, it creates a default `Theme(name)` instance.\n\n**When both exist**: When a theme name exists in both locations, the predefined theme takes precedence because the check `if name in self.themes` occurs first and returns early, preventing `find_user_theme()` from being called.\n\n**Rationale**: This precedence ensures that built-in system themes (which are guaranteed to work and are part of the core LaTeX builder functionality) cannot be accidentally overridden by user-provided themes with the same name, maintaining system stability and predictable behavior.",
+      "reference_sha256": "86e34d361b2452cf95ca2fd56364ee1b74dbfabe8896b0b8fff62b29a92a0ee4",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-1283a292fcfa83e492caf412"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 138,
+            "file_sha256": "e27ab2f20ea69df40a50da5629b1d82788eab9eb885e0387e3f030ac0bc733ae",
+            "path": "sphinx/writers/texinfo.py",
+            "start_line": 134
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the method that closes bullet list itemize blocks integrate within the document tree traversal and output assembly pipeline that generates Texinfo files?",
+      "question_sha256": "6bbcf196b0674c89a8ee640b606481ca9b42cfe6fe30a76d654b8c93208fc5aa",
+      "reference_answer": "The method that closes bullet list itemize blocks (`depart_bullet_list`) integrates into the document tree traversal and output assembly pipeline at the following points:\n\n1. **During Document Tree Traversal**: The method is invoked as part of the visitor pattern traversal initiated in `TexinfoWriter.translate()` (line 134-138 in `sphinx/writers/texinfo.py`). When `document.walkabout(visitor)` is called, it recursively traverses the document tree, calling `visit_bullet_list()` when entering a bullet list node and `depart_bullet_list()` when leaving it.\n\n2. **Output Accumulation Phase**: During traversal, `depart_bullet_list` (lines 917-919) appends the closing `@end itemize\\n` command to `self.body`, which is a list of strings that accumulates all Texinfo output commands. The method first calls `ensure_eol()` to ensure proper line termination, then appends the closing tag.\n\n3. **Nested List Handling**: For nested list hierarchies, the visitor pattern naturally handles the nesting through recursive traversal. When a bullet list contains another bullet list, the sequence is: `visit_bullet_list` (outer) \u2192 `visit_bullet_list` (inner) \u2192 `depart_bullet_list` (inner) \u2192 `depart_bullet_list` (outer). Each call appends to `self.body` in order, creating properly nested `@itemize`/`@end itemize` blocks.\n\n4. **Final Assembly**: After traversal completes, `visitor.finish()` (lines 198-215) is called, which:\n   - Processes any remaining indices and referenced IDs\n   - Joins all strings in `self.body` into `self.fragment` (line 213)\n   - Assigns the fragment to `self.elements['body']` (line 214)\n   - Inserts it into the TEMPLATE at the `%(body)s` placeholder (line 79, 215) to generate the final Texinfo file\n\nThe method's integration is thus part of the standard docutils visitor pattern, where each node type has corresponding visit/depart methods that transform the document tree into output format-specific commands stored in `self.body`.",
+      "reference_sha256": "25205c1cfa56181be1a05b6ead5246e8a06579bc2de74cd6a088e9a475178dde",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-128cd07fca3059497de066d2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1329,
+            "file_sha256": "5f93c327d5c10386c07718e83b7ed09908299a3b63f58a5cba32f86c946bf571",
+            "path": "sphinx/domains/cpp/_ast.py",
+            "start_line": 1320
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "7733662ca9b9b5b93cbb4b50ce49c50de7a9802eaeae4bdb543c30bdd658fadf",
+            "kind": "file_reference",
+            "line_count": 2269,
+            "path": "sphinx/domains/cpp/_parser.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the transformation mechanism in the method that converts the binary operator expression class in the C++ domain AST that processes expressions and operators into a formatted string?",
+      "question_sha256": "1e37934a6cdc77dace0b7d24586721005ae285f88260e34654b2703cde9d2856",
+      "reference_answer": "The transformation mechanism in the `_stringify` method of `ASTBinOpExpr` (located in `sphinx/domains/cpp/_ast.py` at lines 1320-1329) converts a sequence of expressions and operators into a formatted string as follows:\n\n**Implementation Details:**\n\nThe method takes a `StringifyTransform` function (a callable that converts AST nodes to strings) and processes the binary operator expression:\n\n```python\ndef _stringify(self, transform: StringifyTransform) -> str:\n    res = [transform(self.exprs[0])]\n    for i in range(1, len(self.exprs)):\n        res.extend((\n            ' ',\n            self.ops[i - 1],\n            ' ',\n            transform(self.exprs[i]),\n        ))\n    return ''.join(res)\n```\n\n**Transformation Process:**\n\n1. **Initialization**: Starts with the first expression transformed via the `transform` function: `res = [transform(self.exprs[0])]`\n\n2. **Iterative Processing**: For each subsequent expression (index 1 to len-1):\n   - Adds a space character `' '`\n   - Adds the corresponding operator from `self.ops[i - 1]` (operators are stored at index i-1 for expression at index i)\n   - Adds another space character `' '`\n   - Adds the transformed expression `transform(self.exprs[i])`\n\n3. **String Assembly**: Joins all collected parts into a single string using `''.join(res)`\n\n**Semantic Significance of Spacing and Operator Ordering:**\n\n- **Spacing**: The method inserts a single space before and after each operator, producing output like `\"expr1 op1 expr2 op2 expr3\"`. This matches standard C++ formatting and ensures operators are clearly separated from operands.\n\n- **Operator Ordering**: The operators are stored in `self.ops` in the order they appear in the parsed expression, which respects C++ operator precedence rules. The parser (`_parse_bin_op_expr` in `sphinx/domains/cpp/_parser.py`) processes operators according to precedence levels defined in `_expression_bin_ops` (from highest to lowest: `.*`/`->*`, `*`/`/`/`%`, `+`/`-`, `<<`/`>>`, comparison operators, `&`/`bitand`, `^`/`xor`, `|`/`bitor`, `&&`/`and`, `||`/`or`). This ordering preserves the semantic meaning of the expression as parsed.\n\n- **Format Consistency**: The consistent spacing pattern ensures that the string representation is readable and matches the expected format for C++ code documentation, which is important for generating proper documentation output in Sphinx.\n\nThe method is used throughout the C++ domain for converting AST nodes to their string representations, supporting features like `get_display_string()` and `__str__()` methods defined in the base `ASTBaseBase` class.",
+      "reference_sha256": "57b5eb08951009adb31644864c0599735d1afe38e69791e1dd8f0f5d83028c48",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-171b512bacb934fc9a161a42"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "98d1d93ad2560aed528904e5bd01dfcbe92ef7ee9abee30f407cdb8ef26d297a",
+            "kind": "file_reference",
+            "line_count": 1141,
+            "path": "sphinx/domains/python/__init__.py"
+          },
+          {
+            "file_sha256": "f443b11c786fc7877da07517b764def967fb495489260c4c2daf4d4b1ee74935",
+            "kind": "file_reference",
+            "line_count": 1060,
+            "path": "sphinx/util/inspect.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How should the process that records objects for cross-referencing and generates index entries be designed so that flags indicating method decorator types are consistently reflected in both the storage mapping object names to documentation locations and the hierarchical structure of documentation nodes without duplicating the code that checks decorator properties across the components that process these flags?",
+      "question_sha256": "5ba8f86f85f8eaaa335130a9d8a3bf4322f5cdb058e4236ced4ba415c97ef893",
+      "reference_answer": "Based on the codebase exploration, the current architecture has decorator information flowing through two separate paths that need better coordination:\n\n**Current Architecture:**\n\n1. **Domain Directive Path** (`sphinx/domains/python/__init__.py`):\n   - `PyClassMethod` and `PyStaticMethod` are subclasses of `PyMethod` that override `run()` to set `self.name = 'py:method'` and set option flags (`'classmethod'` or `'staticmethod'` in `self.options`)\n   - `PyMethod.get_signature_prefix()` (lines 243-270) reads these flags to display decorators in the signature\n   - `PyMethod.get_index_text()` (lines 272-289) reads the same flags to generate different index entries based on decorator type\n   - `PyObject.add_target_and_index()` (lines 415-441) calls `domain.note_object()` to register objects, passing `self.objtype` but not decorator flags\n   - `PythonDomain.note_object()` (lines 790-823) stores objects in `self.objects` dict with `ObjectEntry(docname, node_id, objtype, aliased)` - decorator information is NOT stored in the registry\n\n2. **Autodoc Path** (`sphinx/ext/autodoc/`):\n   - Uses `inspect.isclassmethod()`, `inspect.isstaticmethod()`, `inspect.iscoroutinefunction()` (from `sphinx/util/inspect.py`) to detect decorators\n   - Adds `:classmethod:`, `:staticmethod:`, `:async:` options to generated directives\n   - This detection logic is separate from domain directive handling\n\n**The Problem:**\n- Decorator flags are used in `get_signature_prefix()` and `get_index_text()` but are NOT stored in the object registry (`ObjectEntry` only has `docname, node_id, objtype, aliased`)\n- Validation/detection logic is duplicated: autodoc uses inspection utilities, while domain directives accept flags without validation\n- When objects are registered via `note_object()`, decorator information is lost, making it unavailable for cross-referencing resolution\n\n**Recommended Architecture:**\n\n1. **Extend ObjectEntry** to include decorator information:\n   ```python\n   class ObjectEntry(NamedTuple):\n       docname: str\n       node_id: str\n       objtype: str\n       aliased: bool\n       decorators: frozenset[str]  # {'classmethod', 'staticmethod', 'async', ...}\n   ```\n\n2. **Centralize decorator validation** in a shared utility that both autodoc and domain directives can use, ensuring consistent detection logic\n\n3. **Update note_object()** to accept and store decorator information:\n   ```python\n   def note_object(self, name: str, objtype: str, node_id: str, \n                   decorators: frozenset[str] = frozenset(), ...):\n       self.objects[name] = ObjectEntry(..., decorators=decorators)\n   ```\n\n4. **Update add_target_and_index()** to extract decorator flags from `self.options` and pass them to `note_object()`\n\n5. **Use stored decorator info** in cross-reference resolution and index generation, ensuring consistency between what's registered and what's displayed\n\nThis architecture ensures decorator information flows consistently from directive options \u2192 object registration \u2192 index generation \u2192 cross-reference resolution, eliminating duplication of validation logic.",
+      "reference_sha256": "eb5ebdc763927f381dc6f26262acf3fc79ed36d905699195d50b484caad3873d",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-2128ca52106ba83f6903775c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1149,
+            "file_sha256": "5f93c327d5c10386c07718e83b7ed09908299a3b63f58a5cba32f86c946bf571",
+            "path": "sphinx/domains/cpp/_ast.py",
+            "start_line": 1125
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How should the noexcept expression class in the C++ domain's abstract syntax tree be refactored to separate expression wrapping, identifier generation, and documentation rendering while maintaining backward compatibility?",
+      "question_sha256": "91325143a9e969e8663303017251460794e4fe5f28475331cbee0cc850f07f1a",
+      "reference_answer": "Based on my exploration of the Sphinx codebase, the `ASTNoexceptExpr` class (located in `sphinx/domains/cpp/_ast.py` at lines 1125-1149) currently combines three responsibilities:\n\n1. **Expression wrapping**: It stores a wrapped expression via `self.expr` (line 1127)\n2. **Identifier generation**: The `get_id()` method (lines 1140-1141) generates unique identifiers by prefixing 'nx' to the wrapped expression's identifier\n3. **Documentation rendering**: The `describe_signature()` method (lines 1143-1149) renders the noexcept expression for documentation output\n\nThe class inherits from `ASTExpression` (line 1125), which is the base class for all expression types in the C++ domain AST hierarchy. This base class defines abstract methods `get_id()` and `describe_signature()` that all expression classes must implement.\n\nTo refactor while maintaining backward compatibility:\n\n1. **Separate expression wrapping**: Create a composition-based wrapper class that holds the expression without inheriting from `ASTExpression`. This wrapper would only handle storage and delegation.\n\n2. **Separate identifier generation**: Extract identifier generation logic into a separate strategy or mixin class. The `get_id()` method could delegate to an identifier generator that follows the 'nx' prefix pattern.\n\n3. **Separate documentation rendering**: Move rendering logic into a separate renderer class or visitor pattern. The `describe_signature()` method could delegate to a renderer that handles the noexcept-specific formatting.\n\n4. **Maintain backward compatibility**: Keep `ASTNoexceptExpr` as a facade that delegates to these separated components. The public API (inheritance from `ASTExpression`, method signatures) remains unchanged, ensuring existing code that uses this class continues to work.\n\nThe refactoring would follow the Single Responsibility Principle while preserving the existing AST hierarchy structure and API contracts that other parts of the codebase depend on.",
+      "reference_sha256": "19fb2243c4ab4e41358448398d3e46328e295d038a42101b63aa036a9c89bc6d",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-38315f8e603005bb669ba252"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 231,
+            "file_sha256": "5da92ffd4c6629ac3d7983c5b244b9e0a388721e60cfc6814c264c7bc4e837fe",
+            "path": "sphinx/util/docfields.py",
+            "start_line": 231
+          },
+          {
+            "end_line": 110,
+            "file_sha256": "22b9a3056e87209730b55755104d72e9982030812dcd0e283aa279c12da6d18b",
+            "path": "sphinx/domains/python/_object.py",
+            "start_line": 110
+          },
+          {
+            "end_line": 103,
+            "file_sha256": "324813861035dc7195d4f7f773f2f9424a2bb374ba82ee8f1ee861618a5a44ff",
+            "path": "tests/test_domains/test_domain_py_fields.py",
+            "start_line": 103
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the Python domain grouped field class resolve method conflicts between its cross-reference mixin and grouping base class?",
+      "question_sha256": "794714d72f337d2a3f4c0610f297971bb8752af7ee40a4901bf1e6cef4daff6f",
+      "reference_answer": "The Python domain grouped field class resolves method conflicts through Python's Method Resolution Order (MRO), which ensures the mixin's cross-reference methods take precedence while the base class's grouping functionality remains intact.\n\n**Inheritance Structure:**\nThe class inherits from `PyXrefMixin` first, then `GroupedField`, creating the MRO: `PyGroupedField \u2192 PyXrefMixin \u2192 GroupedField \u2192 Field`.\n\n**Conflict Resolution Mechanism:**\n\n1. **Cross-reference method resolution**: Both `PyXrefMixin` and `Field` (which `GroupedField` inherits from) define `make_xref()` and `make_xrefs()`. Since `PyXrefMixin` appears first in the MRO, its implementations override those from `Field`. When `GroupedField.make_field()` calls `self.make_xrefs()` (line 231 in `docfields.py`), it resolves to `PyXrefMixin.make_xrefs()` (line 110 in `_object.py`), ensuring Python-specific cross-reference handling is used.\n\n2. **Super() delegation**: `PyXrefMixin.make_xref()` calls `super().make_xref()` (line 69), which delegates to `Field.make_xref()` since `GroupedField` doesn't override this method. This allows the mixin to enhance the base behavior rather than replace it entirely.\n\n3. **No actual conflicts**: `GroupedField` doesn't define `make_xref()` or `make_xrefs()`, so there are no conflicting implementations. The mixin's methods seamlessly integrate with the grouping functionality.\n\n**How it works in practice:**\nWhen processing exception fields (the primary use case for `PyGroupedField` in `PyObject.doc_field_types` at line 212), `GroupedField.make_field()` creates grouped bullet lists while using `PyXrefMixin.make_xrefs()` to generate Python-specific cross-references that include module/class context (`py:module`, `py:class` attributes) and handle unqualified type names, as seen in the test cases where exception references include these attributes (e.g., line 103 in `test_domain_py_fields.py`).\n\nThe design leverages Python's MRO to combine behaviors without explicit conflict resolution code, making the inheritance pattern clean and maintainable.",
+      "reference_sha256": "2a65d2dc187e233a7b9417b4c877955031db19eadbf6c4d93de4ecd8092d3958",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-39ebd622269bdc6c8bf9255b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 73,
+            "file_sha256": "43c2072aa70b2c45660abad91c9982e8d9100ca821d74f9865a86a4c2947e2ac",
+            "path": "sphinx/writers/manpage.py",
+            "start_line": 73
+          },
+          {
+            "end_line": 103,
+            "file_sha256": "0df48ce3ac6f786c61f679a7c086062edf19f6b315a59fdb0bd6d89210d7d876",
+            "path": "sphinx/builders/manpage.py",
+            "start_line": 103
+          },
+          {
+            "end_line": 38,
+            "file_sha256": "43c2072aa70b2c45660abad91c9982e8d9100ca821d74f9865a86a4c2947e2ac",
+            "path": "sphinx/writers/manpage.py",
+            "start_line": 38
+          },
+          {
+            "end_line": 802,
+            "file_sha256": "8d35613a91d8f19a84c8a41806dc6f992e4878448325405f613d31954c73902e",
+            "path": "sphinx/util/docutils.py",
+            "start_line": 788
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "43c2072aa70b2c45660abad91c9982e8d9100ca821d74f9865a86a4c2947e2ac",
+            "kind": "file_reference",
+            "line_count": 470,
+            "path": "sphinx/writers/manpage.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the method that handles the departure of parameter list nodes in domain-specific object descriptions implemented within the manual page translator class that extends both the Sphinx base translator and the docutils manpage translator?",
+      "question_sha256": "792ec1c6505aec9225b8bf1719532f6c8eb3b6f33f288bcefc0cc380fddde39d",
+      "reference_answer": "The method that handles the departure of parameter list nodes in domain-specific object descriptions is implemented in the `ManualPageTranslator` class, located at lines 194-195 in the file `sphinx/writers/manpage.py`.\n\n**Class Hierarchy:**\nThe `ManualPageTranslator` class (defined at line 73 of `sphinx/writers/manpage.py`) inherits from two parent classes:\n1. `SphinxTranslator` (from `sphinx.util.docutils.SphinxTranslator`) - provides Sphinx-specific visitor pattern enhancements\n2. `manpage.Translator` (from `docutils.writers.manpage.Translator`) - provides the base docutils manpage translation functionality\n\n**Method Implementation:**\nThe method implementation is straightforward:\n```python\ndef depart_desc_parameterlist(self, node: Element) -> None:\n    self.body.append(')')\n```\n\nThis method appends a closing parenthesis `)` to the output body when departing (leaving) a parameter list node. It works in conjunction with the corresponding `visit_desc_parameterlist` method (at line 190-192) which appends an opening parenthesis `(` and initializes `self.first_param = 1`.\n\n**Relationship to Visitor Pattern:**\nThe method is automatically invoked through the docutils visitor pattern mechanism. When `document.walkabout(visitor)` is called (as seen in `sphinx/builders/manpage.py` line 103 and `sphinx/writers/manpage.py` line 38), the visitor traverses the document tree. For each `desc_parameterlist` node encountered:\n1. `visit_desc_parameterlist()` is called when entering the node\n2. Child nodes are processed\n3. `depart_desc_parameterlist()` is called when leaving the node\n\nThe dispatch mechanism is implemented in `SphinxTranslator.dispatch_departure()` (in `sphinx/util/docutils.py` lines 788-802), which uses Python's Method Resolution Order (MRO) to find the appropriate departure method by searching through the class hierarchy for a method named `depart_{node_class_name}`.\n\nThis method is part of Sphinx's domain-specific node handling system, where `desc_parameterlist` nodes are created by domain modules (Python, C, C++, JavaScript, etc.) to represent function/method parameter lists in object descriptions.",
+      "reference_sha256": "0192f4db981047e031491f776dc8f9313ac6456d270bef9ff568c51591b4a55d",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-3aa338a411f3814f9fb31630"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 3241,
+            "file_sha256": "5f93c327d5c10386c07718e83b7ed09908299a3b63f58a5cba32f86c946bf571",
+            "path": "sphinx/domains/cpp/_ast.py",
+            "start_line": 3237
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the semantic significance of the processing order where the declarator following parentheses is processed before the declarator inside parentheses in the type identifier generation method for parenthesized C++ declarators?",
+      "question_sha256": "39addafbbfad9445fa768be05dfa488efa74e801df7bf466d27e924320f06cba",
+      "reference_answer": "The semantic significance of processing the declarator following parentheses (`next`) before the declarator inside parentheses (`inner`) in the type identifier generation method for parenthesized C++ declarators lies in correctly modeling C++ declarator syntax precedence and type construction.\n\nIn the implementation at `sphinx/domains/cpp/_ast.py` lines 3237-3241, the `get_type_id` method of `ASTDeclaratorParen` executes:\n\n```python\ndef get_type_id(self, version: int, returnTypeId: str) -> str:\n    assert version >= 2\n    # ReturnType (inner)next, so 'inner' returns everything outside\n    next_id = self.next.get_type_id(version, returnTypeId)\n    return self.inner.get_type_id(version, returnTypeId=next_id)\n```\n\nThe order matters because:\n\n1. **C++ Syntax Precedence**: In C++ declarator syntax like `ReturnType (inner)next`, parentheses change operator precedence. The `next` part (what follows the parentheses, such as pointer operators `*` or array suffixes) must be evaluated first to understand the complete type structure.\n\n2. **Type ID Construction Flow**: The method first processes `next` with the original `returnTypeId`, producing `next_id`. This result represents the type information for everything that follows the parentheses. Then `inner` (which typically contains function parameters) processes this `next_id` as its `returnTypeId` parameter, allowing it to construct the complete type identifier with knowledge of what comes after the parentheses.\n\n3. **Contrast with Other Declarators**: Unlike other declarator types (e.g., `ASTDeclaratorPtr`, `ASTDeclaratorRef`) which process themselves and then delegate to `next`, `ASTDeclaratorParen` reverses this pattern. The comment \"ReturnType (inner)next, so 'inner' returns everything outside\" indicates that `inner` needs to know about `next` to properly represent the return type structure.\n\n4. **Function Pointer Semantics**: For function pointers like `int (*func)(int, int)`, the `next` part (`*func`) is processed first to establish the pointer type, then `inner` (the function parameters `(int, int)`) receives this pointer type information to construct the complete function pointer type identifier.\n\nThis processing order ensures that the generated type identifiers correctly reflect C++ declarator syntax where parentheses alter the binding and precedence of type modifiers.",
+      "reference_sha256": "2d8e41cfca138f1f0ff10fa185bf02fb015b32baea7ee531f127d55d7efe69c4",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-3c01803404a049946f0bc6d9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2607,
+            "file_sha256": "5f93c327d5c10386c07718e83b7ed09908299a3b63f58a5cba32f86c946bf571",
+            "path": "sphinx/domains/cpp/_ast.py",
+            "start_line": 2607
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the propagation mechanism of the return value of the boolean method that determines spacing requirements after type specification sequences through the abstract syntax tree node hierarchy of declarator wrappers that influences whitespace insertion decisions in type declaration formatting?",
+      "question_sha256": "2faf4062db9b794c6c103a9ac42e9535de5247df72d43ccbafba165414beaf28",
+      "reference_answer": "The propagation mechanism works through a recursive delegation pattern in the abstract syntax tree (AST) declarator class hierarchy. The method `require_space_after_declSpecs()` is defined as an abstract method on the base `ASTDeclarator` class (line 2607 in `sphinx/domains/cpp/_ast.py`) and implemented by various declarator subclasses.\n\n**Propagation Pattern:**\n1. **Wrapper Declarators**: Declarator wrapper classes (like `ASTDeclaratorPtr`, `ASTDeclaratorRef`, `ASTDeclaratorParen`) propagate the value by recursively calling `self.next.require_space_after_declSpecs()`:\n   - `ASTDeclaratorPtr.require_space_after_declSpecs()` (line 2832) returns `self.next.require_space_after_declSpecs()`\n   - `ASTDeclaratorRef.require_space_after_declSpecs()` (line 2945) returns `self.next.require_space_after_declSpecs()`\n\n2. **Terminal Implementations**: Different declarator types provide terminal implementations:\n   - `ASTDeclaratorNameParamQual` (line 2708) returns `self.declId is not None` - checks if there's an identifier\n   - `ASTDeclaratorNameBitField` (line 2764) returns `self.declId is not None`\n   - `ASTDeclaratorMemPtr` (line 3102) returns `True` directly\n   - `ASTDeclaratorParen` (line 3209) returns `True` directly\n   - `ASTDeclaratorParamPack` (line 3019) returns `False`\n\n**Usage in Formatting:**\nThe return value influences whitespace formatting in two key locations:\n\n1. **In `ASTType._stringify()`** (line 3453): When stringifying a type, if the method returns `True` and there are declaration specifiers, a space character is appended:\n   ```python\n   if self.decl.require_space_after_declSpecs() and len(decl_specs) > 0:\n       res.append(' ')\n   ```\n\n2. **In `ASTType.describe_signature()`** (line 3469): When rendering the signature for documentation, if the method returns `True` and there are declaration specifiers, a space node is added:\n   ```python\n   if self.decl.require_space_after_declSpecs() and len(str(self.declSpecs)) > 0:\n       signode += addnodes.desc_sig_space()\n   ```\n\n3. **Within Declarator Stringification**: The method is also called within declarator `_stringify()` and `describe_signature()` methods (e.g., lines 2846, 2906, 2950, 2981, 3114, 3168) to determine spacing after modifiers, attributes, or pointer/reference operators.\n\nThe propagation follows the declarator chain structure: wrapper declarators delegate to their nested `next` declarator until reaching a terminal declarator that provides the actual boolean value based on its specific structure (presence of identifier, type of declarator, etc.).",
+      "reference_sha256": "c3674e75f6b6a3aec4028d0962881f9c3c7759fde55ce21e19645f8f42d8290f",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-40ff1123ddebb741b0e2281b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 190,
+            "file_sha256": "dc0dcb2b0e4f200a883898cfd3f1bae721914639accab4772903e30496cf6873",
+            "path": "sphinx/builders/_epub_base.py",
+            "start_line": 183
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the EPUB test function validate that manifest item identifiers match spine itemref references?",
+      "question_sha256": "bd382051725f96eb690b696d7cdc94577570ddf69382077a7127c858b4719a92",
+      "reference_answer": "The EPUB test function validates structural consistency between manifest item identifiers and spine itemref references through two complementary assertion checks in the test suite.\n\n**Validation mechanism:**\n\n1. **Manifest item ID pattern validation (lines 156-158):**\n   The test iterates through manifest items starting from index 2 (after the 'ncx' and 'nav' items) and asserts each item's `id` attribute follows the sequential pattern `epub-%d` where `%d` is the index:\n   ```python\n   for i, item in enumerate(items[2:]):\n       # items are named as epub-NN\n       assert item.get('id') == 'epub-%d' % i\n   ```\n\n2. **Spine itemref reference validation (lines 165-166):**\n   The test asserts that spine `<itemref>` elements have `idref` attributes that match specific manifest item IDs:\n   ```python\n   assert itemrefs[0].get('idref') == 'epub-1'\n   assert itemrefs[1].get('idref') == 'epub-0'\n   ```\n\n**How consistency is maintained in the implementation:**\n\nBoth manifest items and spine itemrefs use the same `make_id()` method (defined in `sphinx/builders/_epub_base.py`, lines 183-190) which ensures consistency:\n\n- When building manifest items (line 603): `self.make_id(filename)` generates the ID\n- When building spine itemrefs (line 616): `self.make_id(refnode['refuri'])` generates the idref\n- The `make_id()` method uses an `id_cache` dictionary to ensure the same filename/refuri always gets the same ID\n- IDs are generated as `'epub-%d' % self.env.new_serialno('epub')`, creating sequential identifiers like 'epub-0', 'epub-1', etc.\n\nThis design ensures that spine itemrefs always reference valid manifest item IDs because both use the same identifier generation mechanism with the same cache, maintaining structural consistency in the EPUB package document.",
+      "reference_sha256": "f30514fb042eba67402fedbc2c9411209f21e26259c6f9b8236b281409fb62ec",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-4b548abb7dbcea0f01dbea7b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 666,
+            "file_sha256": "5f93c327d5c10386c07718e83b7ed09908299a3b63f58a5cba32f86c946bf571",
+            "path": "sphinx/domains/cpp/_ast.py",
+            "start_line": 663
+          },
+          {
+            "end_line": 366,
+            "file_sha256": "811fb133c0413925aa68a6d6287683f50a97367abda7a5afc8702795acf39e5a",
+            "path": "sphinx/domains/c/_ast.py",
+            "start_line": 363
+          },
+          {
+            "end_line": 109,
+            "file_sha256": "84e67b529f86d7c25c3ca1fd1c56dd2374306d0aa179f29ef6829e349a1c31a0",
+            "path": "sphinx/util/cfamily.py",
+            "start_line": 103
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the equality comparison method in the parenthesized expression node class return the special sentinel value instead of the boolean false value when comparing with incompatible types?",
+      "question_sha256": "5a9b60ce6e880c94d4038a273a4f1a05672e4a3dc9fc860c026621326a3a5aa2",
+      "reference_answer": "The equality comparison method in `ASTParenExpr` returns `NotImplemented` instead of `False` when comparing with incompatible types to enable symmetric comparison behavior and maintain substitutability across the AST class hierarchy.\n\n**Technical Implementation:**\nIn `sphinx/domains/cpp/_ast.py` (lines 663-666) and `sphinx/domains/c/_ast.py` (lines 363-366), the `__eq__` method is implemented as:\n\n```python\ndef __eq__(self, other: object) -> bool:\n    if not isinstance(other, ASTParenExpr):\n        return NotImplemented\n    return self.expr == other.expr\n```\n\n**Why `NotImplemented` instead of `False`:**\n\n1. **Symmetric Comparison Protocol**: When Python's `==` operator is used, if the left operand's `__eq__` returns `NotImplemented`, Python automatically tries the right operand's `__eq__` method (or falls back to `__ne__`). This enables symmetric comparison behavior where `a == b` and `b == a` can both be properly handled, even when the types differ.\n\n2. **Base Class Consistency**: The base class `ASTBaseBase` in `sphinx/util/cfamily.py` (lines 103-109) also returns `NotImplemented` when types don't match:\n   ```python\n   def __eq__(self, other: object) -> bool:\n       if type(self) is not type(other):\n           return NotImplemented\n   ```\n   This establishes a consistent pattern across the entire AST hierarchy.\n\n3. **Liskov Substitution Principle Support**: By returning `NotImplemented`, subclasses of `ASTExpression` (like `ASTParenExpr`) can be used interchangeably where `ASTExpression` is expected. If a comparison fails in one direction, the other object gets a chance to handle it, maintaining proper substitutability. This is especially important since `ASTParenExpr` inherits from `ASTExpression`, which inherits from `ASTBase`, which inherits from `ASTBaseBase`.\n\n4. **Consistent Pattern**: The vast majority of AST classes in the codebase follow this pattern (e.g., `ASTIdentifier`, `ASTBooleanLiteral`, `ASTIdExpression`, `ASTPostfixArray`, `ASTPostfixMember` all return `NotImplemented` for incompatible types), ensuring consistent behavior across the hierarchy.\n\n**Exception Cases**: A few classes like `ASTPointerLiteral`, `ASTThisLiteral`, `ASTPostfixInc`, and `ASTPostfixDec` directly return `isinstance(other, ClassName)`, which returns `False` for incompatible types. However, these are exceptions, and `ASTParenExpr` follows the standard pattern used throughout most of the AST hierarchy.\n\nThis design choice ensures that the AST class hierarchy maintains proper polymorphic behavior and substitutability, allowing any `ASTExpression` subclass to be used where an `ASTExpression` is expected without breaking comparison semantics.",
+      "reference_sha256": "418cb6003acc1c34ef414c833f5fd26daa25c276ec9b448687dfd33de45fd5e2",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-4e5ce44fdeba528fc5d147df"
+    }
+  ]
+}

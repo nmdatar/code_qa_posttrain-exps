@@ -1,0 +1,92 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 1,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-036.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "948934905d56ba4cbc8f6741577bede1961f3f4d6e9b0c3e13eef97080a72af7",
+      "question": "Why would the repeated urlparse calls in MockRequest's __init__, get_host, and get_full_url methods impact performance when processing high-volume cookie jar operations, and what optimization strategy would minimize redundant URL parsing while preserving the read-only semantics of the wrapped request?",
+      "question_sha256": "0184fadb582dd1b9b3506334533f06c56e593031a39af4822b13e783b889765f",
+      "reference_answer": "MockRequest parses the URL for scheme at construction and netloc in get_host; get_full_url parses only when a Host header overrides the URL authority (src/requests/cookies.py:35-66). Caching a parsed result per wrapper could reduce repeated calls if profiling shows material cost. To preserve behavior when the wrapped request is externally mutable, cache by current URL or document snapshot semantics; do not infer immutability from the wrapper's read-only contract.",
+      "reference_sha256": "e473ac2c7f81eba0db034edfdadc109cbf183a5ed153b601a9fa54299fcb96e5",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-0fce241788d5057d546c7640"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "9217ca62823831ca07e772cf773f6ed34a8a3777090b192d0392b75de4984732",
+      "question": "How does the SessionRedirectMixin coordinate the interaction between get_redirect_target, resolve_redirects, and rebuild_auth to maintain security boundaries while following HTTP redirects across different hosts?",
+      "question_sha256": "98095a2135ac2becd45f7a81c3b0b5499ff5e5c1c515a35ff3810b74a094c940",
+      "reference_answer": "resolve_redirects calls rebuild_auth before sending the next request (src/requests/sessions.py:244-246). should_strip_auth strips on hostname changes and generally on scheme/port changes, except same-host standard-port HTTP-to-HTTPS and equivalent default ports (127-157). rebuild_auth removes Authorization when required, then may load destination credentials from netrc if trust_env is enabled (282-300). Same host alone does not guarantee retention.",
+      "reference_sha256": "ae4f8d4f5461d4aa02f4e3ac0a0458bb2f31413ccf4115bf3900e92f0f556257",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-2f3c8028c5a3f4f11f316e5c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "b701d0d52dbbafd5a71c433e915f589be5f6498c4b4428f0129c56293c64137c",
+      "question": "Why does the repeated key-lookup pattern in CaseInsensitiveDict impact performance when scaling to thousands of case-insensitive dictionary operations in a high-throughput HTTP request processing pipeline?",
+      "question_sha256": "df88005deea9311051a87eef2b20b399de60699a660f60d31edbb55d9214e578",
+      "reference_answer": "CaseInsensitiveDict stores entries under lowercase keys and calls key.lower() on each get/delete (src/requests/structures.py:46-55). This adds work proportional to lookup-key length before usual dictionary lookup. Repeated lookups therefore have normalization overhead, but this source does not establish that it is significant or a bottleneck compared with HTTP I/O. Any cache optimization should be benchmarked and account for its memory/lookup overhead.",
+      "reference_sha256": "1ef3bf564ceab0f96773da7d23b1b07763501fefcbd466d5aa3dd9fcc7b81e08",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-3c9a62a4f97b39abf81119fc"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "f5509e9c2bed37382e9bd5a7b0f9bf325af36283ca20ad5857f70df3ca7a7a3b",
+      "question": "What assumptions about encoding representation does the test_pragmas method enforce when validating that get_encodings_from_content correctly extracts and normalizes character encoding declarations from HTTP content headers?",
+      "question_sha256": "bf2ec236e7f01f6fb527c336a1faaea35369cb7715642e15157cbb903216d1c3",
+      "reference_answer": "test_pragmas supplies HTML meta and XML content declarations containing UTF-8 and asserts the extracted string remains UTF-8 (tests/test_utils.py:368-384). get_encodings_from_content returns regex capture groups without lowercasing (src/requests/utils.py:493-501). HTML patterns are case-insensitive; the XML pattern is not. This tests document content, not response header decoding.",
+      "reference_sha256": "62d23b65b6945def0016d517c37459e681ec1ef9e4ee2516c13652a614b7f836",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-42cec52322387ba7c0875586"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "0fcc69dab5e2a85dc82da01f9e33c0a947c1bc37510ab34aa28e182737247169",
+      "question": "How does the Response class coordinate the lifecycle management of the underlying urllib3 raw connection through its context manager protocol and close() method to ensure resource cleanup while preventing double-close scenarios?",
+      "question_sha256": "5b80ae5f74bad28e96cf9e42d3837db6626966a72992266ee68e1dac466ad454",
+      "reference_answer": "Response context exit calls close. close invokes raw.close when _content_consumed is false and invokes release_conn when available (src/requests/models.py:1028-1039). Consumed content skips raw.close, but close itself does not change _content_consumed or set a closed flag. Repeated close on an unread response can therefore call raw.close repeatedly; safe repeated cleanup depends on the underlying object, not an explicit double-close guard here.",
+      "reference_sha256": "57993cfa8f13706a532f95694ee29cb6853d6568ef4a317ae344271d4a7ac3aa",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-43544c025fdaa9cc2029afcd"
+    }
+  ]
+}

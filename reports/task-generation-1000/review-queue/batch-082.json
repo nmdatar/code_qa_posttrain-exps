@@ -1,0 +1,641 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/yt-dlp--yt-dlp-f2a4983df7a6",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 314,
+            "file_sha256": "2be2bb6368c18e18c616eed7bb3fccd03f7ba2f7ce408f902652098f5ee5e502",
+            "path": "yt_dlp/networking/common.py",
+            "start_line": 278
+          },
+          {
+            "end_line": 291,
+            "file_sha256": "2be2bb6368c18e18c616eed7bb3fccd03f7ba2f7ce408f902652098f5ee5e502",
+            "path": "yt_dlp/networking/common.py",
+            "start_line": 283
+          },
+          {
+            "end_line": 309,
+            "file_sha256": "2be2bb6368c18e18c616eed7bb3fccd03f7ba2f7ce408f902652098f5ee5e502",
+            "path": "yt_dlp/networking/common.py",
+            "start_line": 304
+          },
+          {
+            "end_line": 424,
+            "file_sha256": "ce38db361486446dc2ee953cfabbf4663f21dee8444056b9c7e0cc32ef85b4c3",
+            "path": "yt_dlp/networking/_urllib.py",
+            "start_line": 334
+          },
+          {
+            "end_line": 367,
+            "file_sha256": "ac846d7cec2d36ade095da247af53d3f278c60dec88e2515d3645e98facd4625",
+            "path": "yt_dlp/networking/_requests.py",
+            "start_line": 255
+          },
+          {
+            "end_line": 254,
+            "file_sha256": "7a1742b118c685f0ab19c600f359f9bc6c68c2bf4f2e024ba61495a8e486deca",
+            "path": "yt_dlp/networking/_curlcffi.py",
+            "start_line": 109
+          },
+          {
+            "end_line": 517,
+            "file_sha256": "4380da1b4bdc81a7abdf1dc3b43d25162923d9eb9dc59b5d737759c958b88a9c",
+            "path": "yt_dlp/options.py",
+            "start_line": 512
+          },
+          {
+            "end_line": 4102,
+            "file_sha256": "ca61aac6b66ed081b4104916f7fd27d5ff80eb0512819eb978bc60c821c6de6d",
+            "path": "yt_dlp/YoutubeDL.py",
+            "start_line": 4089
+          },
+          {
+            "end_line": 27,
+            "file_sha256": "bda42fb16364b32836920b26963adb2ecf4548ead0a61c416046505121339409",
+            "path": "yt_dlp/networking/exceptions.py",
+            "start_line": 25
+          },
+          {
+            "end_line": 11,
+            "file_sha256": "5f83eb1a6f0f9b72615a499b993bc8c0883f45dfd9911b9b391213f430a65498",
+            "path": "yt_dlp/networking/__init__.py",
+            "start_line": 4
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the proxy configuration validation and error handling logic implemented in yt-dlp's networking architecture?",
+      "question_sha256": "abed281f711ce212ed75b80f8dec5d109892583a8fb5c1887aeafa65bee41050",
+      "reference_answer": "Proxy configuration validation and error handling in yt-dlp is implemented through a layered design centered on the `_check_proxies` method of the `RequestHandler` base class in yt_dlp/networking/common.py : lines 278\u2013314. This method performs proxy validation prior to request execution and is invoked by the networking subsystem for each request handler. Within `_check_proxies`, proxy URLs are validated against the handler-specific `_SUPPORTED_PROXY_SCHEMES` definition to ensure compatibility with the active backend at yt_dlp/networking/common.py : lines 283\u2013291. The method also checks handler capabilities related to `ALL_PROXY` and `NO_PROXY` support before applying proxy settings. Malformed proxy URLs are detected using `urllib.request._parse_proxy`, which raises parsing errors for invalid proxy specifications at yt_dlp/networking/common.py : lines 304\u2013309. Each concrete networking backend declares its supported proxy schemes explicitly. The `urllib` handler defines its supported schemes in yt_dlp/networking/_urllib.py : lines 334\u2013424, the `requests` handler extends supported schemes in yt_dlp/networking/_requests.py : lines 255\u2013367, and the `curlcffi` handler mirrors the `requests` proxy capabilities in yt_dlp/networking/_curlcffi.py : lines 109\u2013254. These definitions are consulted during proxy validation to ensure backend compatibility. Proxy configuration originates from the command-line interface via the `--proxy` option defined in yt_dlp/options.py : lines 512\u2013517. Parsed proxy values are exposed through the `YoutubeDL.proxies` property in yt_dlp/YoutubeDL.py : lines 4089\u20134102, which normalizes proxy parameters into the format consumed by the networking layer. Validation failures are reported using the `UnsupportedRequest` exception defined in yt_dlp/networking/exceptions.py : lines 25\u201327. The `RequestDirector`, defined in yt_dlp/networking/__init__.py : lines 4\u201311, coordinates request handler selection and propagates these exceptions when proxy validation fails, ensuring that invalid or unsupported proxy configurations are rejected before any network requests are issued.",
+      "reference_sha256": "2d047fce9be572b7d1901b50efec0313833fde672f960ae6201725095f72ae9b",
+      "repository": {
+        "commit": "f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+        "family_id": "yt-dlp/yt-dlp",
+        "url": "https://github.com/yt-dlp/yt-dlp"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/yt-dlp--yt-dlp-f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+      "task_id": "import-254d34fb2e1012daa0eb3f95"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/yt-dlp--yt-dlp-f2a4983df7a6",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 131,
+            "file_sha256": "4380da1b4bdc81a7abdf1dc3b43d25162923d9eb9dc59b5d737759c958b88a9c",
+            "path": "yt_dlp/options.py",
+            "start_line": 43
+          },
+          {
+            "end_line": 5012,
+            "file_sha256": "6d860e9c04b8bf1b546f55687b6f95804f8b0760f565caf4f658cc89671b300c",
+            "path": "yt_dlp/utils/_utils.py",
+            "start_line": 4906
+          },
+          {
+            "end_line": 84,
+            "file_sha256": "4380da1b4bdc81a7abdf1dc3b43d25162923d9eb9dc59b5d737759c958b88a9c",
+            "path": "yt_dlp/options.py",
+            "start_line": 84
+          },
+          {
+            "end_line": 441,
+            "file_sha256": "4380da1b4bdc81a7abdf1dc3b43d25162923d9eb9dc59b5d737759c958b88a9c",
+            "path": "yt_dlp/options.py",
+            "start_line": 436
+          },
+          {
+            "end_line": 429,
+            "file_sha256": "4380da1b4bdc81a7abdf1dc3b43d25162923d9eb9dc59b5d737759c958b88a9c",
+            "path": "yt_dlp/options.py",
+            "start_line": 423
+          },
+          {
+            "end_line": 594,
+            "file_sha256": "4380da1b4bdc81a7abdf1dc3b43d25162923d9eb9dc59b5d737759c958b88a9c",
+            "path": "yt_dlp/options.py",
+            "start_line": 583
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "config.txt",
+            "reason": "not_tracked",
+            "reference": "config.txt",
+            "start_line": null
+          },
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "yt-dlp.conf.txt",
+            "reason": "not_tracked",
+            "reference": "yt-dlp.conf.txt",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "How does yt-dlp's configuration system coordinate hierarchical option loading across multiple file locations with runtime CLI override capabilities?",
+      "question_sha256": "0d07ed09af95303f14336d7b157bad51f2d9d38ea048b7209c80d6c22b9223ce",
+      "reference_answer": "yt-dlp implements a four-tier hierarchical configuration system orchestrated by the `parseOpts` function in yt_dlp/options.py : lines 43\u2013131, together with the `Config` class in yt_dlp/utils/_utils.py : lines 4906\u20135012. `parseOpts` acts as the entry point that initializes option parsing and delegates configuration file discovery and loading to `Config`(line 46), which manages file resolution, parsing, and precedence handling. Configuration files are loaded according to a fixed precedence order: (1) portable configuration files located alongside the executable (yt_dlp/options.py : lines 84), (2) home configuration files based on a user-specified home path, (3) user configuration files resolved from XDG directories such as ~/.config/yt-dlp, Windows %APPDATA%/yt-dlp, or the legacy ~/.yt-dlp fallback, and (4) system-wide configuration files located under /etc/yt-dlp. At each tier, multiple filename patterns are supported, including config, config.txt, yt-dlp.conf, and yt-dlp.conf.txt. Configuration contents are parsed using `shlex.split` with comment handling, and character encoding is resolved via `determine_file_encoding`, which supports BOM detection and explicit encoding declarations such as `# coding: shift-jis`. Runtime override capabilities are provided by command-line options, which are processed after all configuration files have been loaded, ensuring that CLI arguments take precedence over file-based settings. The `--config-locations` option allows additional configuration files to be specified at runtime, including reading from stdin using `-`, with recursive inclusion handled by the `Config.load_configs` mechanism (yt_dlp/options.py : lines 436-441). The `--ignore-config` flag provides an explicit escape hatch to bypass configuration loading, including backward-compatible behavior where system-level `--ignore-config` suppresses user configuration files (yt_dlp/options.py : lines 423-429). In addition, the `--alias` option enables user-defined command shortcuts via Python string formatting, with recursive expansion guarded by a fixed invocation limit implemented in `_alias_callback` to prevent infinite alias loops (yt_dlp/options.py : lines 583-594).",
+      "reference_sha256": "0e8421e7bd5b37363c7e798c59732bba783b5c99d0045e684165e450fb8e50b5",
+      "repository": {
+        "commit": "f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+        "family_id": "yt-dlp/yt-dlp",
+        "url": "https://github.com/yt-dlp/yt-dlp"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/yt-dlp--yt-dlp-f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+      "task_id": "import-2603ce382682af3c93448e41"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/yt-dlp--yt-dlp-f2a4983df7a6",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 26,
+            "file_sha256": "769581dfaf04eb6179ba8cb6c7765f8ffeed63087bc0930baaa9bc9ceec60b6a",
+            "path": "yt_dlp/extractor/extractors.py",
+            "start_line": 9
+          },
+          {
+            "end_line": 13,
+            "file_sha256": "7820aa30e2bb7fd91ca931832d70a79a1709fb53027cec9a562f63ab1b2e4dbf",
+            "path": "yt_dlp/extractor/__init__.py",
+            "start_line": 7
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "752a1d4d90798442bb828b9be20976128b7f5617ee92f115f9ce40169da5be69",
+            "kind": "file_reference",
+            "line_count": 2614,
+            "path": "yt_dlp/extractor/_extractors.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "yt_dlp/extractor/lazy_extractors.py",
+            "reason": "not_tracked",
+            "reference": "yt_dlp/extractor/lazy_extractors.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "How does yt-dlp implement the extractor registry pattern to automatically discover and register site-specific extractors for different media platforms?",
+      "question_sha256": "f2fa6f34434929295c9360f0030c119a651e13cfc1f04af8c55f1d64d8ab03ad",
+      "reference_answer": "yt-dlp implements an extractor registry pattern through a multi-stage discovery and registration process that enables automatic integration of site-specific extractors. The core registry logic is defined in yt_dlp/extractor/extractors.py : lines 9\u201326, where the system first attempts to load pre-generated extractor definitions from yt_dlp/extractor/lazy_extractors.py to reduce import overhead. When lazy extractors are unavailable, the registry falls back to inspecting the extractor module namespace to dynamically discover extractor classes. During registry construction, the system scans imported extractor classes from yt_dlp/extractor/_extractors.py, selecting classes whose names end with `IE` while excluding `GenericIE`, and aggregates them into the `_ALL_CLASSES` registry. Extractor ordering is explicitly controlled by the declaration order within _extractors.py, with specialized extractors appearing earlier and `GenericIE` appended last to serve as a fallback when no site-specific extractor matches. The registry also supports extensibility through plugins, which contribute additional extractor classes collected into `_PLUGIN_CLASSES`. Plugin-provided extractors are inserted ahead of built-in extractors, allowing them to override default behavior when necessary. The `gen_extractor_classes` factory function in yt_dlp/extractor/__init__.py : lines 7\u201313 acts as the primary access point for the registry, returning the final ordered list of extractor classes `_ALL_CLASSES` to the rest of the application.",
+      "reference_sha256": "b36ba042452b627acac307c1215c0740530f7820541ac3d3ed455c22051121a7",
+      "repository": {
+        "commit": "f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+        "family_id": "yt-dlp/yt-dlp",
+        "url": "https://github.com/yt-dlp/yt-dlp"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/yt-dlp--yt-dlp-f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+      "task_id": "import-50dde77a6e1d529114e9133f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/yt-dlp--yt-dlp-f2a4983df7a6",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 174,
+            "file_sha256": "94d204d27d9f1d07696ca656eb1cb80c09a89446959cd69cc5b4b3cfec64380f",
+            "path": "yt_dlp/extractor/teachable.py",
+            "start_line": 174
+          },
+          {
+            "end_line": 164,
+            "file_sha256": "94d204d27d9f1d07696ca656eb1cb80c09a89446959cd69cc5b4b3cfec64380f",
+            "path": "yt_dlp/extractor/teachable.py",
+            "start_line": 164
+          },
+          {
+            "end_line": 173,
+            "file_sha256": "94d204d27d9f1d07696ca656eb1cb80c09a89446959cd69cc5b4b3cfec64380f",
+            "path": "yt_dlp/extractor/teachable.py",
+            "start_line": 166
+          },
+          {
+            "end_line": 6,
+            "file_sha256": "94d204d27d9f1d07696ca656eb1cb80c09a89446959cd69cc5b4b3cfec64380f",
+            "path": "yt_dlp/extractor/teachable.py",
+            "start_line": 6
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the 'Unable to find video URL' error message defined that gets raised when Teachable extractor cannot locate video content?",
+      "question_sha256": "0c94614433b649591e9cff42e85f593c88cbd073002a913ba3901f3f31251987",
+      "reference_answer": "The 'Unable to find video URL' error message is raised via an `ExtractorError` in the `TeachableIE` class within the `_real_extract` method at yt_dlp/extractor/teachable.py : line 174. This exception is triggered when the extractor fails to locate any embedded video URLs using `WistiaIE._extract_embed_urls` at yt_dlp/extractor/teachable.py : line 164 and subsequently determines that the content is not restricted by authentication or login requirements at yt_dlp/extractor/teachable.py : lines 166\u2013173. The error therefore corresponds to a terminal extraction failure where no extractable video URLs are found on the page after successful access. The `ExtractorError` class used to raise this exception is imported from the shared utilities module at yt_dlp/extractor/teachable.py : line 6, indicating that the error follows yt-dlp\u2019s standard extractor error handling mechanism rather than a Teachable-specific exception type.",
+      "reference_sha256": "b24cacd68788f72fcd16dda89763a7d62e0dbc6d94f00f7c8de7c2f6bff143e3",
+      "repository": {
+        "commit": "f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+        "family_id": "yt-dlp/yt-dlp",
+        "url": "https://github.com/yt-dlp/yt-dlp"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/yt-dlp--yt-dlp-f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+      "task_id": "import-5f620f2dec3858c4036260ee"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/yt-dlp--yt-dlp-f2a4983df7a6",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1913,
+            "file_sha256": "4380da1b4bdc81a7abdf1dc3b43d25162923d9eb9dc59b5d737759c958b88a9c",
+            "path": "yt_dlp/options.py",
+            "start_line": 1901
+          },
+          {
+            "end_line": 519,
+            "file_sha256": "ca61aac6b66ed081b4104916f7fd27d5ff80eb0512819eb978bc60c821c6de6d",
+            "path": "yt_dlp/YoutubeDL.py",
+            "start_line": 517
+          },
+          {
+            "end_line": 3876,
+            "file_sha256": "a08b528736c422ae10950b8978ec7f0eecc443d44111da98e4e136e3eafa7a71",
+            "path": "yt_dlp/extractor/common.py",
+            "start_line": 3865
+          },
+          {
+            "end_line": 4066,
+            "file_sha256": "56c1e966dea2a2cf9a1d235d6dc982769da47b9b814c9cbe9c77c558b141af47",
+            "path": "yt_dlp/extractor/youtube.py",
+            "start_line": 4034
+          },
+          {
+            "end_line": 4390,
+            "file_sha256": "56c1e966dea2a2cf9a1d235d6dc982769da47b9b814c9cbe9c77c558b141af47",
+            "path": "yt_dlp/extractor/youtube.py",
+            "start_line": 4390
+          },
+          {
+            "end_line": 355,
+            "file_sha256": "092ae634e694a3d6fbdc2b35cb5512c8ca1dd6e3211e8ac03ca1806cb2155c7a",
+            "path": "yt_dlp/extractor/rokfin.py",
+            "start_line": 352
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What mechanisms does yt-dlp provide for runtime extractor argument customization to control site-specific download behavior?",
+      "question_sha256": "b4e85a57e27e3435edbfbd15d4fcdeb115301380339927aeab36221165d344c0",
+      "reference_answer": "yt-dlp supports runtime extractor argument customization through the `--extractor-args` command-line option, spanning option parsing, parameter storage, and per-extractor access APIs. At the option parsing stage, the `--extractor-args` flag is processed in yt_dlp/options.py : lines 1901\u20131913. The option handler uses `_dict_from_options_callback` together with a custom `_extractor_arg_parser` lambda to parse arguments in the `IE_KEY:ARGS` format, where extractor-specific arguments are expressed as semicolon-separated `key=value` pairs. Parsed extractor arguments are stored in the main downloader configuration under the `extractor_args` entry of the params dictionary at yt_dlp/YoutubeDL.py : lines 517\u2013519. This produces a nested mapping keyed by extractor identifier, for example, e.g. `{'youtube': {'skip': ['dash', 'hls']}}`, enabling multiple extractors to receive independent argument sets at runtime. Extractor-side access to these arguments is provided by the `_configuration_arg` method defined on the base `InfoExtractor` class in yt_dlp/extractor/common.py : lines 3865\u20133876. This method retrieves extractor-specific arguments using the extractor\u2019s `IE_KEY`, applies default values when arguments are absent, normalizes case when requested, and automatically converts scalar values into lists to simplify downstream handling. Concrete extractors consume these configuration arguments to alter site-specific behavior. For example, the YouTube extractor reads configuration arguments to influence client selection logic at yt_dlp/extractor/youtube.py : lines 4034\u20134066 and to control format skipping behavior via the `skip` argument at yt_dlp/extractor/youtube.py : lines 4390. Some extractors additionally validate their supported arguments explicitly, such as the `_validate_extractor_args` method in the Rokfin extractor at yt_dlp/extractor/rokfin.py : lines 352\u2013355.",
+      "reference_sha256": "08d8b433c799475cd814672c18b094c55e73fedf721141e17189579000fdd3d2",
+      "repository": {
+        "commit": "f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+        "family_id": "yt-dlp/yt-dlp",
+        "url": "https://github.com/yt-dlp/yt-dlp"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/yt-dlp--yt-dlp-f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+      "task_id": "import-7f49aee22c25bd9c0f8b207f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/yt-dlp--yt-dlp-f2a4983df7a6",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 5338,
+            "file_sha256": "6d860e9c04b8bf1b546f55687b6f95804f8b0760f565caf4f658cc89671b300c",
+            "path": "yt_dlp/utils/_utils.py",
+            "start_line": 5338
+          },
+          {
+            "end_line": 5343,
+            "file_sha256": "6d860e9c04b8bf1b546f55687b6f95804f8b0760f565caf4f658cc89671b300c",
+            "path": "yt_dlp/utils/_utils.py",
+            "start_line": 5341
+          },
+          {
+            "end_line": 5353,
+            "file_sha256": "6d860e9c04b8bf1b546f55687b6f95804f8b0760f565caf4f658cc89671b300c",
+            "path": "yt_dlp/utils/_utils.py",
+            "start_line": 5352
+          },
+          {
+            "end_line": 5544,
+            "file_sha256": "6d860e9c04b8bf1b546f55687b6f95804f8b0760f565caf4f658cc89671b300c",
+            "path": "yt_dlp/utils/_utils.py",
+            "start_line": 5489
+          },
+          {
+            "end_line": 5634,
+            "file_sha256": "6d860e9c04b8bf1b546f55687b6f95804f8b0760f565caf4f658cc89671b300c",
+            "path": "yt_dlp/utils/_utils.py",
+            "start_line": 5600
+          },
+          {
+            "end_line": 5585,
+            "file_sha256": "6d860e9c04b8bf1b546f55687b6f95804f8b0760f565caf4f658cc89671b300c",
+            "path": "yt_dlp/utils/_utils.py",
+            "start_line": 5558
+          },
+          {
+            "end_line": 5637,
+            "file_sha256": "6d860e9c04b8bf1b546f55687b6f95804f8b0760f565caf4f658cc89671b300c",
+            "path": "yt_dlp/utils/_utils.py",
+            "start_line": 5635
+          },
+          {
+            "end_line": 2717,
+            "file_sha256": "ca61aac6b66ed081b4104916f7fd27d5ff80eb0512819eb978bc60c821c6de6d",
+            "path": "yt_dlp/YoutubeDL.py",
+            "start_line": 2716
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "ca61aac6b66ed081b4104916f7fd27d5ff80eb0512819eb978bc60c821c6de6d",
+            "kind": "file_reference",
+            "line_count": 4412,
+            "path": "yt_dlp/YoutubeDL.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does yt-dlp implement its multi-criteria format selection algorithm to automatically rank and prioritize media formats based on quality, codec preference, and user requirements?",
+      "question_sha256": "2c82dc3dc65dfe78c3f509a764445b0d8ffd06b42b5b78398fd7db0ee2e499ea",
+      "reference_answer": "yt-dlp implements its multi-criteria format selection logic in the FormatSorter class, located at yt_dlp/utils/_utils.py: line 5338. The algorithm is built around a layered ranking system that evaluates available formats using 20 default criteria applied in a fixed priority order (yt_dlp/utils/_utils.py: lines 5341-5343). Codec preferences are defined hierarchically using regular expressions. For video, the priority order is AV1, VP9.2, VP9, H.265/HEVC, and H.264/AVC. For audio, the preferred codecs are FLAC, WAV, Opus, Vorbis, and AAC (yt_dlp/utils/_utils.py: lines 5352-5353). User-defined constraints are incorporated through the evaluate_params method (yt_dlp/utils/_utils.py: lines 5489-5544), which parses the format_sort command-line options. This allows users to override the default ordering or add additional sorting criteria. The sorting process itself consists of three main stages. First, format metadata is prepared using the static method _fill_sorting_fields (yt_dlp/utils/_utils.py: lines 5600-5634). Next, individual preference values are computed for each field via _calculate_field_preference_from_value (yt_dlp/utils/_utils.py: lines 5558-5585). These values are then combined into a single preference score by the calculate_preference method (yt_dlp/utils/_utils.py: lines 5635-5637). The final format choice is made in YoutubeDL.py, where formats.sort() is called with FormatSorter.calculate_preference as the sorting key (yt_dlp/YoutubeDL.py: lines 2716-2717). This ensures that the format with the highest overall preference, based on all combined criteria, is selected automatically.",
+      "reference_sha256": "a0c2aefdd5c24d80b41a2bded826462429cb1514fffe06b82f0bf816b6b400b9",
+      "repository": {
+        "commit": "f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+        "family_id": "yt-dlp/yt-dlp",
+        "url": "https://github.com/yt-dlp/yt-dlp"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/yt-dlp--yt-dlp-f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+      "task_id": "import-ad62e8857aa4109c3291b81e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/yt-dlp--yt-dlp-f2a4983df7a6",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 74,
+            "file_sha256": "bda42fb16364b32836920b26963adb2ecf4548ead0a61c416046505121339409",
+            "path": "yt_dlp/networking/exceptions.py",
+            "start_line": 57
+          },
+          {
+            "end_line": 63,
+            "file_sha256": "bda42fb16364b32836920b26963adb2ecf4548ead0a61c416046505121339409",
+            "path": "yt_dlp/networking/exceptions.py",
+            "start_line": 62
+          },
+          {
+            "end_line": 61,
+            "file_sha256": "bda42fb16364b32836920b26963adb2ecf4548ead0a61c416046505121339409",
+            "path": "yt_dlp/networking/exceptions.py",
+            "start_line": 60
+          },
+          {
+            "end_line": 22,
+            "file_sha256": "bda42fb16364b32836920b26963adb2ecf4548ead0a61c416046505121339409",
+            "path": "yt_dlp/networking/exceptions.py",
+            "start_line": 11
+          },
+          {
+            "end_line": 964,
+            "file_sha256": "6d860e9c04b8bf1b546f55687b6f95804f8b0760f565caf4f658cc89671b300c",
+            "path": "yt_dlp/utils/_utils.py",
+            "start_line": 955
+          },
+          {
+            "end_line": 526,
+            "file_sha256": "2be2bb6368c18e18c616eed7bb3fccd03f7ba2f7ce408f902652098f5ee5e502",
+            "path": "yt_dlp/networking/common.py",
+            "start_line": 515
+          },
+          {
+            "end_line": 185,
+            "file_sha256": "158bf95cba79aefc132c55171dd3d31f4c7a37159324b191fb914fc6d0e24a6a",
+            "path": "test/test_networking_utils.py",
+            "start_line": 180
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where are the HTTPError class and HTTP status code error messages like 'HTTP Error 403: Forbidden' defined in the yt-dlp error handling system?",
+      "question_sha256": "7821857081d4c250fbcab850e0393dc305a0c1b8e2ac69bdc67abd2f05785f18",
+      "reference_answer": "The `HTTPError` class is defined in yt_dlp/networking/exceptions.py : lines 57\u201374 as a subclass of `RequestError`. The HTTP status code error message is constructed within this class using the format string `HTTP Error {response.status}: {response.reason}` at yt_dlp/networking/exceptions.py : lines 62\u201363, which produces messages such as `HTTP Error 403: Forbidden`. The `HTTPError` constructor accepts a `Response` object and extracts the numeric status code and textual reason phrase from `response.status` and `response.reason` at yt_dlp/networking/exceptions.py : lines 60\u201361. Within the exception hierarchy, `HTTPError` inherits from `RequestError`, which is defined in yt_dlp/networking/exceptions.py : lines 11\u201322. `RequestError` in turn derives from the base exception `YoutubeDLError`, defined in yt_dlp/utils/_utils.py : lines 955\u2013964. The `Response` object that supplies the `status` and `reason` attributes is defined in yt_dlp/networking/common.py : lines 515\u2013526, where the status code is explicitly set and the reason defaults to the standard HTTP reason phrase when not provided. The correctness of the formatted error message, including the exact string `HTTP Error 403: Forbidden`, is validated by tests in test/test_networking_utils.py : lines 180\u2013185.",
+      "reference_sha256": "1804a9a01086db9b664afdabfcc3f85b6bc7ee5708acefcb3bb22a043aad670d",
+      "repository": {
+        "commit": "f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+        "family_id": "yt-dlp/yt-dlp",
+        "url": "https://github.com/yt-dlp/yt-dlp"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/yt-dlp--yt-dlp-f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+      "task_id": "import-bb187ae6eb9cc7390796bd19"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/yt-dlp--yt-dlp-f2a4983df7a6",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 418,
+            "file_sha256": "4380da1b4bdc81a7abdf1dc3b43d25162923d9eb9dc59b5d737759c958b88a9c",
+            "path": "yt_dlp/options.py",
+            "start_line": 412
+          },
+          {
+            "end_line": 4912,
+            "file_sha256": "6d860e9c04b8bf1b546f55687b6f95804f8b0760f565caf4f658cc89671b300c",
+            "path": "yt_dlp/utils/_utils.py",
+            "start_line": 4912
+          },
+          {
+            "end_line": 977,
+            "file_sha256": "e5910715914c359b245526e4c6b28f60471d3cd380e99c01e07388b82ed9d036",
+            "path": "yt_dlp/__init__.py",
+            "start_line": 976
+          },
+          {
+            "end_line": 123,
+            "file_sha256": "f2859543108a9d1f9e61b38458d4600d4af041aea56e41045a1235654a16935f",
+            "path": "yt_dlp/plugins.py",
+            "start_line": 50
+          },
+          {
+            "end_line": 26,
+            "file_sha256": "f2859543108a9d1f9e61b38458d4600d4af041aea56e41045a1235654a16935f",
+            "path": "yt_dlp/plugins.py",
+            "start_line": 26
+          },
+          {
+            "end_line": 27,
+            "file_sha256": "f2859543108a9d1f9e61b38458d4600d4af041aea56e41045a1235654a16935f",
+            "path": "yt_dlp/plugins.py",
+            "start_line": 27
+          },
+          {
+            "end_line": 7,
+            "file_sha256": "769581dfaf04eb6179ba8cb6c7765f8ffeed63087bc0930baaa9bc9ceec60b6a",
+            "path": "yt_dlp/extractor/extractors.py",
+            "start_line": 7
+          },
+          {
+            "end_line": 106,
+            "file_sha256": "a08b528736c422ae10950b8978ec7f0eecc443d44111da98e4e136e3eafa7a71",
+            "path": "yt_dlp/extractor/common.py",
+            "start_line": 106
+          },
+          {
+            "end_line": 26,
+            "file_sha256": "769581dfaf04eb6179ba8cb6c7765f8ffeed63087bc0930baaa9bc9ceec60b6a",
+            "path": "yt_dlp/extractor/extractors.py",
+            "start_line": 25
+          },
+          {
+            "end_line": 378,
+            "file_sha256": "4380da1b4bdc81a7abdf1dc3b43d25162923d9eb9dc59b5d737759c958b88a9c",
+            "path": "yt_dlp/options.py",
+            "start_line": 370
+          },
+          {
+            "end_line": 38,
+            "file_sha256": "62c86e1ccb0146c211b8942c1402537f2b0f147eb24889469fd639755f259e2f",
+            "path": "yt_dlp/postprocessor/__init__.py",
+            "start_line": 38
+          },
+          {
+            "end_line": 36,
+            "file_sha256": "c1cf25b37dad6b80cba1a9095048abeb834f95a9fbade6ea600d2e88b8da20b1",
+            "path": "yt_dlp/postprocessor/common.py",
+            "start_line": 36
+          },
+          {
+            "end_line": 45,
+            "file_sha256": "62c86e1ccb0146c211b8942c1402537f2b0f147eb24889469fd639755f259e2f",
+            "path": "yt_dlp/postprocessor/__init__.py",
+            "start_line": 45
+          },
+          {
+            "end_line": 167,
+            "file_sha256": "f2859543108a9d1f9e61b38458d4600d4af041aea56e41045a1235654a16935f",
+            "path": "yt_dlp/plugins.py",
+            "start_line": 165
+          },
+          {
+            "end_line": 149,
+            "file_sha256": "f2859543108a9d1f9e61b38458d4600d4af041aea56e41045a1235654a16935f",
+            "path": "yt_dlp/plugins.py",
+            "start_line": 148
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does yt-dlp implement plugin directory customization and dynamic extractor loading for user-installed extensions?",
+      "question_sha256": "58f1200b4a7952e0a3908bb51972fa87e228e674849abe859aedb1e3eab5ecc3",
+      "reference_answer": "yt-dlp implements plugin extensibility through a sophisticated discovery and loading system coordinated by multiple components. Plugin directory customization is handled through the --plugin-dirs option (defined in yt_dlp/options.py: line 412-418) which accepts multiple directory paths to search for yt_dlp_plugins namespace packages. These paths are stored in Config._plugin_dirs (yt_dlp/utils/_utils.py: line 4912) and processed during initialization (yt_dlp/__init__.py: line 976-977). The core plugin discovery mechanism is implemented in the PluginFinder class (yt_dlp/plugins.py: line 50-123), a custom MetaPathFinder that searches across multiple locations including user/system config directories, the executable directory, PYTHONPATH, and custom plugin directories specified via --plugin-dirs. This finder supports both the primary yt_dlp_plugins namespace (yt_dlp/plugins.py: line 26) and the legacy ytdlp_plugins namespace for backward compatibility (yt_dlp/plugins.py: line 27). Dynamic extractor loading occurs through load_plugins('extractor', 'IE') in yt_dlp/extractor/extractors.py: line 7, which discovers and loads extractor classes ending with 'IE' from plugin modules. These plugin extractors inherit from the InfoExtractor base class (yt_dlp/extractor/common.py: line 106) and are seamlessly integrated into the global extractor registry (_ALL_CLASSES) alongside built-in extractors (yt_dlp/extractor/extractors.py: line 25-26). The system supports extractor filtering via --use-extractors/--ies options (yt_dlp/options.py: line 370-378) which accept regex patterns for including or excluding specific extractors, including plugin-provided ones. PostProcessor plugin integration follows the same pattern through load_plugins('postprocessor', 'PP') (yt_dlp/postprocessor/__init__.py: line 38), where plugins inherit from the PostProcessor base class (yt_dlp/postprocessor/common.py: line 36) and are injected into the global namespace (yt_dlp/postprocessor/__init__.py: line 45). The plugin system maintains isolation through comprehensive error handling (yt_dlp/plugins.py: line 165-167) that logs import failures without terminating execution, and provides a YTDLP_NO_PLUGINS environment variable to disable all plugins when needed (yt_dlp/plugins.py:  line 148-149). This architecture enables developers to create plugins by adding directories to PYTHONPATH or using --plugin-dirs, while maintaining full compatibility with yt-dlp's existing extractor and postprocessor interfaces.",
+      "reference_sha256": "1a6a0f2c77367f1da95c55270fe9056eb018ee4a1b88ce6587e419df2ea313f0",
+      "repository": {
+        "commit": "f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+        "family_id": "yt-dlp/yt-dlp",
+        "url": "https://github.com/yt-dlp/yt-dlp"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/yt-dlp--yt-dlp-f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+      "task_id": "import-d51965bf74058a0e4430bd52"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/yt-dlp--yt-dlp-f2a4983df7a6",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2080,
+            "file_sha256": "a08b528736c422ae10950b8978ec7f0eecc443d44111da98e4e136e3eafa7a71",
+            "path": "yt_dlp/extractor/common.py",
+            "start_line": 2046
+          },
+          {
+            "end_line": 2659,
+            "file_sha256": "a08b528736c422ae10950b8978ec7f0eecc443d44111da98e4e136e3eafa7a71",
+            "path": "yt_dlp/extractor/common.py",
+            "start_line": 2633
+          },
+          {
+            "end_line": 1918,
+            "file_sha256": "a08b528736c422ae10950b8978ec7f0eecc443d44111da98e4e136e3eafa7a71",
+            "path": "yt_dlp/extractor/common.py",
+            "start_line": 1897
+          },
+          {
+            "end_line": 229,
+            "file_sha256": "a08b528736c422ae10950b8978ec7f0eecc443d44111da98e4e136e3eafa7a71",
+            "path": "yt_dlp/extractor/common.py",
+            "start_line": 130
+          },
+          {
+            "end_line": 3423,
+            "file_sha256": "a08b528736c422ae10950b8978ec7f0eecc443d44111da98e4e136e3eafa7a71",
+            "path": "yt_dlp/extractor/common.py",
+            "start_line": 3371
+          },
+          {
+            "end_line": 3370,
+            "file_sha256": "a08b528736c422ae10950b8978ec7f0eecc443d44111da98e4e136e3eafa7a71",
+            "path": "yt_dlp/extractor/common.py",
+            "start_line": 3313
+          },
+          {
+            "end_line": 5638,
+            "file_sha256": "6d860e9c04b8bf1b546f55687b6f95804f8b0760f565caf4f658cc89671b300c",
+            "path": "yt_dlp/utils/_utils.py",
+            "start_line": 5338
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does yt-dlp implement its multi-format adaptive streaming extraction algorithm to coordinate between HLS (M3U8), DASH (MPD), and F4M manifest parsing for optimal format selection?",
+      "question_sha256": "72ece1734fb1fab8257c16b79143659fb301104faf42da3f41aa39ede797a1d6",
+      "reference_answer": "yt-dlp handles multi-format adaptive streaming extraction using a clear three-layer architecture that brings together  HLS (M3U8), DASH (MPD), and F4M manifest parsing. At the lowest level are three protocol-specific parsers: _extract_m3u8_formats_and_subtitles for HLS M3U8 manifests (yt_dlp/extractor/common.py: line 2046\u20132080), _extract_mpd_formats_and_subtitles together with _extract_mpd_periods for DASH MPD manifests (yt_dlp/extractor/common.py: line 2633\u20132659), and _extract_f4m_formats for F4M manifests (yt_dlp/extractor/common.py: line 1897\u20131918). Each parser is responsible for downloading its corresponding manifest, parsing it, and extracting all available formats along with detailed metadata such as video and audio codecs, bitrates, resolutions, and quality indicators. Above these parsers sits the unified InfoExtractor base class, which acts as the coordination layer. It normalizes the outputs from different protocols into a common format dictionary, using more than 40 metadata fields that cover quality metrics, codec information, bitrate data, resolution details, language preferences, and protocol-specific attributes (yt_dlp/extractor/common.py: line 130\u2013229). This standardization allows formats from  HLS (M3U8), DASH (MPD), and F4M to be compared and processed consistently. Cross-protocol coordination is implemented through helper methods such as _extract_wowza_formats (yt_dlp/extractor/common.py: line 3371\u20133423) and _extract_akamai_formats_and_subtitles (yt_dlp/extractor/common.py: line 3313\u20133370). These methods automatically infer the manifest type from URL patterns, extract streams from multiple protocols when available, and convert between format URLs when necessary so that all relevant streams are discovered. Finally, format selection is performed by the FormatSorter class (yt_dlp/utils/_utils.py: line 5338\u20135638). This component ranks candidate formats using configurable criteria, including codec preferences that prioritize AV1, VP9, and H.265, protocol rankings that favor HTTPS over HLS (M3U8), DASH (MPD), and F4M, as well as quality metrics, bitrates, and compatibility considerations. ",
+      "reference_sha256": "468cb9a82c9c9d03d1c002894f2ed61e9fe693f4d5d31a2a722a3b84c83f7625",
+      "repository": {
+        "commit": "f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+        "family_id": "yt-dlp/yt-dlp",
+        "url": "https://github.com/yt-dlp/yt-dlp"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/yt-dlp--yt-dlp-f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+      "task_id": "import-f350448a035938a26ee17cad"
+    }
+  ]
+}

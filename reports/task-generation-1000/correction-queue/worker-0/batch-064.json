@@ -1,0 +1,24 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-064.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-47757c4062a6",
+      "original_reference_sha256": "096d1bd09b709dcd3834ac936611379b150f2c509cb3aafeff88528a9c737bba",
+      "question": "How does Sphinx's parallel build system handle exception propagation from worker processes back to the main process while preserving meaningful traceback information?",
+      "question_sha256": "b307b02feb9beea1edadcfba3df1c826e0d902fb9fbd7fff669e2cbbe765e620",
+      "reference_answer": "ParallelTasks._process catches BaseException, formats its message and full traceback, and sends those strings plus collected logs through a pipe (sphinx/util/parallel.py:69-83). _join_one raises SphinxParallelError from the received pair when failed; only successful results reach the subsequent log-replay loop (lines121-130). The wrapper stores message/traceback (sphinx/errors.py:104-114), and CLI reporting or saved tracebacks use that worker traceback rather than only the parent stack (sphinx/cmd/build.py:52-58; sphinx/util/exceptions.py:25-28). Thus traceback preservation is supported, but replay of logs from a failing worker is not guaranteed by this path.",
+      "reference_sha256": "eaae5b559ed0ef3dad2b85deb53a83a5b853c8164577928ee7372be056cef597",
+      "repository": {
+        "commit": "47757c4062a6421feeaf0ae2ded89896d6cb3526",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-47757c4062a6421feeaf0ae2ded89896d6cb3526",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-b901a330fedf8ee104c2dfc0"
+    }
+  ]
+}

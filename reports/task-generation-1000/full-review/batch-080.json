@@ -1,0 +1,247 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-dd8293e32bae2047df308e4d",
+      "reference_sha256": "818ba25b62bc2b81e40b2f241a10d9ff8963049549acf5ee98522dd80f151b8c",
+      "question_sha256": "ef3d65caf1ba3d0a223b3acd3286d053466268d62694afcdcb27db56b3ab8520",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "minorEntry forwards to minor and submatrix determinant",
+          "verdict": "supported",
+          "reason": "The deprecated wrapper and matrix method forward the method argument; the helper normalizes and checks indices, extracts complement rows/columns and computes det.",
+          "evidence": {
+            "path": "sympy/matrices/determinant.py",
+            "start_line": 1001,
+            "end_line": 1046
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-e310871482d281d17b111f45",
+      "reference_sha256": "ae58327e9eb219104c309da8fcf68fe6a03efcbf280cc0e724a4a8846ae28858",
+      "question_sha256": "23961965abf149c9ecf18f3c0ecc076de3d8fd7bfd6d8b3481844213c3d426cc",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Sparse applyfunc skips implicit zeros only when zero maps to zero",
+          "verdict": "supported",
+          "reason": "The branch iterates stored entries and filters zero outputs; otherwise Flatten visits all positions.",
+          "evidence": {
+            "path": "sympy/tensor/array/ndim_array.py",
+            "start_line": 347,
+            "end_line": 353
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-e3cdaf1c6a18fd5d4904816f",
+      "reference_sha256": "3b77635eb7a710ad68199133d5be1b0093ae12ab282227dacc7caeb685474069",
+      "question_sha256": "7b7ff6c664f97482fe1243db24a5a374ca26be2bbd0d70e84560d82694f727fd",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "OuterProduct strips scalars then checks one ket/bra and exact dual class",
+          "verdict": "supported",
+          "reason": "The validation is directly present. This is class compatibility, with Hilbert-space compatibility explicitly still a TODO, not a universal physical-validity guarantee.",
+          "evidence": {
+            "path": "sympy/physics/quantum/operator.py",
+            "start_line": 400,
+            "end_line": 432
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-e491b6aeb15b6aafba8faef9",
+      "reference_sha256": "c871550bd9247888c4a9cbbdc272c873a8a786f759359fc0a123ca134f156a73",
+      "question_sha256": "a4c0dcde110931ebb5dcaca1a0ee64c7897d544770a154390567e44c5874cd35",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "test_instance repeatedly creates default Floats and uncached nodes causing significant slowdown",
+          "verdict": "unsupported",
+          "reason": "test_instance uses symbolic constants and never calls with_defaults. Performance scale is unevidenced and Function construction has caching, contrary to guaranteed fresh nodes.",
+          "evidence": {
+            "path": "sympy/physics/biomechanics/tests/test_curve.py",
+            "start_line": 283,
+            "end_line": 320
+          }
+        }
+      ],
+      "material_errors": [
+        "test_instance uses symbolic constants and never calls with_defaults. Performance scale is unevidenced and Function construction has caching, contrary to guaranteed fresh nodes."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The premise is not established by this test. Its fixture creates symbolic parameters, and test_instance constructs one inverse-curve expression and checks its type/string; the default Float constants belong to the separate test_with_defaults (sympy/physics/biomechanics/tests/test_curve.py:283-320). Function construction is cache-decorated (sympy/core/function.py:444-450), so identical calls need not allocate new expression objects. Repeated tests entail work, but significant suite-wide memory or runtime impact requires profiling; these sources do not show hundreds of repetitions or the claimed Float-allocation bottleneck."
+    },
+    {
+      "task_id": "import-e500b7a23bdb2ebaa272893b",
+      "reference_sha256": "def6bd6d7fde0fd1fafb7eb1b26695d1611c81db34433b405eceb6f6c77ad735",
+      "question_sha256": "36037f2ac29a04f3f7d5933e56c2b13da85229019090b0363f4930966d3ec0a3",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Infinite child bounds skip both bound update and tick recalculation",
+          "verdict": "supported",
+          "reason": "The continue occurs before both mutations for each axis and finite-bound updates immediately recalculate ticks.",
+          "evidence": {
+            "path": "sympy/plotting/pygletplot/plot_axes.py",
+            "start_line": 98,
+            "end_line": 115
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-e92542bf5a046255f098d304",
+      "reference_sha256": "c9f6f46b4c198fe53828f6975509fa48f4103367a1e06259198131e9609931a3",
+      "question_sha256": "9844cee04c7d77225b7d8fbecf9ee6360390562e8e10c7e2e5b1cc0b3a300f84",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Dirichlet eta delegates to local zeta and gamma-module digamma/polygamma",
+          "verdict": "supported",
+          "reason": "The eval call sites and local digamma import match; gamma_functions eval forwards digamma to polygamma(0,z).",
+          "evidence": {
+            "path": "sympy/functions/special/zeta_functions.py",
+            "start_line": 631,
+            "end_line": 648
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-e9745c18665251bebf23f6b4",
+      "reference_sha256": "902c8f58243cef481ccd82a0a7623b0e7e8b57098dd85b02529eb1f16b90ce5f",
+      "question_sha256": "46215f010759a34a5d2918c51ceb0afe8943b15c6285adbd792f00941fdd1549",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "ShiftA composes through a polynomial interpreted by Operator.apply",
+          "verdict": "supported",
+          "reason": "The polynomial is 1+x/ai with zero ai rejected; apply builds generator powers and combines coefficients. apply_operators applies the list in reverse.",
+          "evidence": {
+            "path": "sympy/simplify/hyperexpand.py",
+            "start_line": 976,
+            "end_line": 1019
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-ea8c8f68cf16be4a60c5c370",
+      "reference_sha256": "af441e449e44f411101dd2fb4cf5acacf3a3f454e02ffdff84b1d1158da89f59",
+      "question_sha256": "cec0bc273e392855cec3b22ae7d00f3c7d74aac9eb2ab75099bf7d9757365d55",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Conditional discrete domains resolve inequalities then intersect full support",
+          "verdict": "supported",
+          "reason": "The return expression explicitly separates reduction from intersection; crv wrapper handles relational, Or and And inputs.",
+          "evidence": {
+            "path": "sympy/stats/drv.py",
+            "start_line": 198,
+            "end_line": 206
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-f5d21d1c64c9b16fc40851e3",
+      "reference_sha256": "3cbb1698d0427ce52307778d4183c72ce05f8b6baab2dfbdf8f01ebc4bacfdfa",
+      "question_sha256": "8a8f99f2c17fe4ff63c61fe846c4e369871df779931b5955b99f7acd75057a50",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "srepr preserves integer assumptions on matrix dimension symbols",
+          "verdict": "supported",
+          "reason": "Original assumptions become keyword arguments, and test_matrix_expressions expects integer=True in both dimensions.",
+          "evidence": {
+            "path": "sympy/printing/repr.py",
+            "start_line": 222,
+            "end_line": 234
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-fd5459f1e5864a161492e539",
+      "reference_sha256": "79f0324589757fa402eb7a485f6c6458cc7e72d71744979183117ccda57c9b0c",
+      "question_sha256": "095abe627bb3f9a810c1cea332c1a3ba8f0adba00f6b335546c42a78a53030f5",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "as_base_exp validates a universal structural reconstruction invariant",
+          "verdict": "partially_supported",
+          "reason": "The method normalizes rather than validates. Its own unevaluated Pow example means reconstruction can evaluate, so structural equality is not a universal invariant; the uncited 156-use count is immaterial and unverified.",
+          "evidence": {
+            "path": "sympy/core/power.py",
+            "start_line": 797,
+            "end_line": 823
+          }
+        }
+      ],
+      "material_errors": [
+        "The method normalizes rather than validates. Its own unevaluated Pow example means reconstruction can evaluate, so structural equality is not a universal invariant; the uncited 156-use count is immaterial and unverified."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "Pow.as_base_exp recognizes a Rational with numerator 1 and denominator other than 1, then returns Integer(denominator), -exponent; otherwise it returns the original base and exponent (sympy/core/power.py:797-823). The identity (1/q)^e=q^(-e) motivates this normal form and consistent downstream decomposition. This is a transformation, not a runtime validation pass. Mathematical equivalence should not be confused with guaranteed structural equality when reconstructing an originally unevaluated power."
+    },
+    {
+      "task_id": "import-ff59c1a2df87e2cbe908fab6",
+      "reference_sha256": "afe025fd16aa07d90f172852262eae5133e1eeac9665042aca4d1a9362872fa7",
+      "question_sha256": "d23e889a8436a97a3c2b8bedb2ad040bad4598ffb0f7b7ab61beb1c462678922",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Implicit kinematics preserves matrices without performing the explicit solve",
+          "verdict": "partially_supported",
+          "reason": "Matrices are preserved separately, but initialization unconditionally computes the explicit solve and qdot map even for implicit output. The reference's contrast can falsely imply implicit mode avoids the solve.",
+          "evidence": {
+            "path": "sympy/physics/mechanics/kane.py",
+            "start_line": 379,
+            "end_line": 397
+          }
+        }
+      ],
+      "material_errors": [
+        "Matrices are preserved separately, but initialization unconditionally computes the explicit solve and qdot map even for implicit output. The reference's contrast can falsely imply implicit mode avoids the solve."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "After common Jacobian extraction, _initialize_kindiffeq_matrices stores original coefficients as _f_k_implicit, _k_ku_implicit and _k_kqdot_implicit. It then solves against k_kqdot, builds _qdot_u_map and stores explicit coefficients with an identity qdot matrix (sympy/physics/mechanics/kane.py:364-397). Both sets are initialized: implicit mode does not skip this solve. The explicit_kinematics flag subsequently selects which matrix form the kinematic properties expose."
+    }
+  ]
+}

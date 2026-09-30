@@ -1,0 +1,383 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/cekit--cekit-6b82c4adc0e2",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 163,
+            "file_sha256": "89c619e858170186db016c0649fced51bfab9a98201e9ab5dafdaf299adee99c",
+            "path": "cekit/descriptor/base.py",
+            "start_line": 140
+          },
+          {
+            "end_line": 49,
+            "file_sha256": "3bee4bdba26130376403d950ede5be39e96ac6d866ffc1143fc264e3b2abf336",
+            "path": "cekit/descriptor/image.py",
+            "start_line": 46
+          },
+          {
+            "end_line": 28,
+            "file_sha256": "559cad54a453f53ba3d054be85ed9b9bb79e6bbb179ed465501cf133caba4be2",
+            "path": "cekit/descriptor/module.py",
+            "start_line": 24
+          },
+          {
+            "end_line": 68,
+            "file_sha256": "3bee4bdba26130376403d950ede5be39e96ac6d866ffc1143fc264e3b2abf336",
+            "path": "cekit/descriptor/image.py",
+            "start_line": 67
+          },
+          {
+            "end_line": 70,
+            "file_sha256": "10247aaaf00714c0c96fc5efa8bbc4d1d9518dfdbe62fb47a17331fe1970fb31",
+            "path": "cekit/generator/base.py",
+            "start_line": 64
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the expected behavior and state management approach of the descriptor merging system when handling conflicting properties between image descriptors and module descriptors in cekit's hierarchical composition model?",
+      "question_sha256": "f98a3ff6af63f1e737bc5bae0028169c98720b0867704cc4fa7d1579edf582d9",
+      "reference_answer": "The descriptor merging system implements a hierarchical property inheritance model. At the core is the _merge_descriptors function (cekit/descriptor/base.py: line 140-163) which recursively merges nested descriptors while respecting skip_merging lists to prevent certain properties from being overridden. Image descriptors define skip_merging as ['description', 'version', 'name', 'release'] (cekit/descriptor/image.py: lines 46-49), ensuring these identity properties cannot be modified during module composition. Module descriptors inherit from Image but extend skip_merging to also include 'help' (cekit/descriptor/module.py: lines 24-28), preserving module identity while allowing composition. The system maintains an _image_overrides dictionary (cekit/descriptor/image.py: lines 67-68) containing artifacts and modules mappings that ensure image-level definitions take precedence over module definitions. During processing, the generator applies image overrides first via apply_image_overrides, then module overrides via apply_module_overrides (cekit/generator/base.py: line 64-70), creating a clear hierarchy where image-level specifications override module-level ones.",
+      "reference_sha256": "0e7c2f20a0201d00efaf9c2e987720b509b5f254ca4bfcaecc77890f72cf71a3",
+      "repository": {
+        "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+        "family_id": "cekit/cekit",
+        "url": "https://github.com/cekit/cekit"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/cekit--cekit-6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+      "task_id": "import-5031b2b7d6c927758f9a940d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/cekit--cekit-6b82c4adc0e2",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 136,
+            "file_sha256": "10247aaaf00714c0c96fc5efa8bbc4d1d9518dfdbe62fb47a17331fe1970fb31",
+            "path": "cekit/generator/base.py",
+            "start_line": 134
+          },
+          {
+            "end_line": 61,
+            "file_sha256": "1605d9b6885018c10c53af848d1188d05c685d4993fd40abe33193d61d75473f",
+            "path": "cekit/test/behave_tester.py",
+            "start_line": 57
+          },
+          {
+            "end_line": 58,
+            "file_sha256": "a0c0579661b199524abd881c11a4efe211155ecdd7704d58e77021fd73095330",
+            "path": "cekit/test/behave_runner.py",
+            "start_line": 49
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where are the test tag identifiers processed and transformed during behave test execution in CEKit's testing framework?",
+      "question_sha256": "55d7f46e969e300ec067036cf2afcb03ca3bf32681cca9f0bb91dc7e0b89e588",
+      "reference_answer": "Test tag identifiers in CEKit's testing framework are processed and transformed through three key stages during behave test execution. The Generator class creates source tags from image metadata using the get_tags method (cekit/generator/base.py: lines 134-136), which generates tags in the format 'name:version' and 'name:latest' based on the image name and version properties. The BehaveTester class then extracts the primary tag during test execution (cekit/test/behave_tester.py: lines 57-61), taking the first tag from the generator's tag list and providing an override mechanism that replaces all tags with '@wip' when the work-in-progress flag is specified. Finally, the BehaveTestRunner performs tag transformation (cekit/test/behave_runner.py: lines 49-58) by processing tags with delimiter-based splitting: it removes version suffixes by splitting on ':' characters, and for tags containing '/' characters, it creates composite Behave tag arguments in the format '@tag1,@tag2' where tag1 is the portion before the '/' and tag2 is the complete tag. This transformation pipeline enables flexible test filtering by converting image-based identifiers into Behave-compatible tag formats for selective test scenario execution.",
+      "reference_sha256": "3b10676a68585bc583d298428df57078bac718d6df559699fbaf35f12dc99ebc",
+      "repository": {
+        "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+        "family_id": "cekit/cekit",
+        "url": "https://github.com/cekit/cekit"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/cekit--cekit-6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+      "task_id": "import-50539ece6dccdfccc93ef5ff"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/cekit--cekit-6b82c4adc0e2",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 94,
+            "file_sha256": "3cfb0d91858de22cbe8640ddf75233b6c901e85dcf7688495d2dde726a88d1f8",
+            "path": "cekit/builders/docker_builder.py",
+            "start_line": 84
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does CEKit's DockerBuilder integrate with Docker's buildkit secrets API to support authenticated access during container builds?",
+      "question_sha256": "493f761c347e7ad51382470ef81479d021f8cbf22e6945cee2dd0803e38bcd78",
+      "reference_answer": "CEKit's DockerBuilder does not integrate with Docker's buildkit secrets API for authenticated access during container builds. The DockerBuilder implementation in cekit/builders/docker_builder.py: line 84-94 demonstrates this limitation through its _build_with_docker method, which constructs a minimal docker_args dictionary containing only basic build parameters: path (build context), pull (force pull base image), and rm (remove intermediate containers). The method calls docker_client.build(**docker_args) without any secrets, buildargs, or authentication parameters that would be necessary for Docker buildkit secrets integration.",
+      "reference_sha256": "85c4b77e2730b34250a6765dc2adf310f9b30c74ac0820d451d702a7b88be7fe",
+      "repository": {
+        "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+        "family_id": "cekit/cekit",
+        "url": "https://github.com/cekit/cekit"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/cekit--cekit-6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+      "task_id": "import-60456a08ebdf9cc210dd4eb3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/cekit--cekit-6b82c4adc0e2",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 82,
+            "file_sha256": "3bee4bdba26130376403d950ede5be39e96ac6d866ffc1143fc264e3b2abf336",
+            "path": "cekit/descriptor/image.py",
+            "start_line": 71
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does cekit's package management system handle package manager selection and validation across different container base images and build environments?",
+      "question_sha256": "af99fbeb0d233540900627fca4f3fcf74f8d9a4dd7572348e10075b8b7bb91e2",
+      "reference_answer": "CeKit implements strict schema validation using YAML schema constraints that restrict package manager selection to exactly three supported values: 'yum', 'dnf', and 'microdnf'. This validation occurs at descriptor parsing time and prevents invalid package manager specifications. Then, CeKit uses intelligent default assignment through the process_defaults method (cekit/descriptor/image.py lines 71-82) which automatically sets 'yum' as the fallback package manager when none is explicitly specified in the image descriptor. This choice leverages the fact that both Fedora and RHEL distributions maintain symbolic links from 'yum' to their actual package manager, ensuring compatibility across different base image distributions.",
+      "reference_sha256": "87f7deccc15d6b09bcf39d669b19b33a208c2225b89e950ce5358e8863de4bc1",
+      "repository": {
+        "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+        "family_id": "cekit/cekit",
+        "url": "https://github.com/cekit/cekit"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/cekit--cekit-6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+      "task_id": "import-6e943669aae98abc2b848e34"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/cekit--cekit-6b82c4adc0e2",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 349,
+            "file_sha256": "8673cff7ba2c6385d7ca6225a4be5b753d88831d9e1418590991c7cde3555723",
+            "path": "tests/test_dockerfile.py",
+            "start_line": 336
+          },
+          {
+            "end_line": 804,
+            "file_sha256": "8e156c0cc51dad4b1de67565826de6c12fd14aa526d6e8e4ba817103af000c41",
+            "path": "tests/test_validate.py",
+            "start_line": 727
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does CEKit's package management system conditionally clear package manager metadata only when packages are installed rather than implementing a universal cache invalidation strategy?",
+      "question_sha256": "d9b40c9df071e9d89c88774cc735c4c1fe6594d7d4bd9037b63c6ed93182e93f",
+      "reference_answer": "CEKit's package management system uses conditional cache clearing to balance performence and resource consumption. During installs is a convenient and appropriate opprintunity to manage the cache. This conditional approach prevents unnecessary execution of commands like 'yum clean all' or 'microdnf clean all' in build environments that lack package repositories or when no packages are specified for installation. Historical context from commit 3b9283c shows that CEKit previously had similar issues with makecache commands that would fail when no repositories were available, leading to the removal of universal cache operations. Test evidence (tests/test_dockerfile.py: line 336-349, tests/test_validate.py: line 727-804) demonstrates that when no packages are installed, clean commands are not generated, while when packages are present, cleanup is performed to reduce final image size. This approach ensures build reliability and performence across different container environments while maintaining optimal image hygiene when package operations actually occur.",
+      "reference_sha256": "36fcf85ac18af755fd1c5bbfe802d2ccdef598c5d0220fe82ebdee711dcdf702",
+      "repository": {
+        "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+        "family_id": "cekit/cekit",
+        "url": "https://github.com/cekit/cekit"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/cekit--cekit-6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+      "task_id": "import-88c850cee4fae8ee2688805c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/cekit--cekit-6b82c4adc0e2",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 148,
+            "file_sha256": "0547a7d2b592c1ae475616e9c4af7f70632dd5794ad3041094357f1ccd4be476",
+            "path": "cekit/tools.py",
+            "start_line": 130
+          },
+          {
+            "end_line": 148,
+            "file_sha256": "0547a7d2b592c1ae475616e9c4af7f70632dd5794ad3041094357f1ccd4be476",
+            "path": "cekit/tools.py",
+            "start_line": 143
+          },
+          {
+            "end_line": 302,
+            "file_sha256": "0547a7d2b592c1ae475616e9c4af7f70632dd5794ad3041094357f1ccd4be476",
+            "path": "cekit/tools.py",
+            "start_line": 300
+          },
+          {
+            "end_line": 33,
+            "file_sha256": "bb7c2c14748910ae0a7b011753f2757b5cf643181ca46523a1db36df54ab8299",
+            "path": "cekit/generator/docker.py",
+            "start_line": 19
+          },
+          {
+            "end_line": 82,
+            "file_sha256": "3cfb0d91858de22cbe8640ddf75233b6c901e85dcf7688495d2dde726a88d1f8",
+            "path": "cekit/builders/docker_builder.py",
+            "start_line": 65
+          },
+          {
+            "end_line": 26,
+            "file_sha256": "6245304484018b061416834b784cbeced3f7196c7038b74ece3e8d73cc39eac2",
+            "path": "cekit/builders/buildah.py",
+            "start_line": 18
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "9f964c6eda12456429fabd6a68bbd813c9947545f08b23779b39e76e80930cde",
+            "kind": "file_reference",
+            "line_count": 14,
+            "path": "requirements.txt"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where are the external dependency definitions and compatibility checks centralized in CEKit's dependency management system?",
+      "question_sha256": "be7b57c2989e04d957c425f797cb81e34c922b05a4462095894b5ecb8d966797",
+      "reference_answer": "CEKit's dependency management is centralized around the DependencyHandler class (cekit/tools.py: lines 130-148). The core external tool dependencies are defined in the EXTERNAL_CORE_DEPENDENCIES dictionary (cekit/tools.py: lines 143-148), which currently includes git as the primary external dependency. Compatibility checks for these core dependencies are performed through the handle_core_dependencies() method (cekit/tools.py: line 300-302). Beyond core dependencies, individual components define their own external dependencies through static dependencies() methods. For example, the DockerGenerator defines RedHat-specific tools like odcs-client and brew (cekit/generator/docker.py: line 19-33), DockerBuilder specifies Python Docker libraries (cekit/builders/docker_builder.py: line 65-82), and BuildahBuilder requires the buildah executable (cekit/builders/buildah.py: line 18-26). Core Python library dependencies are separately managed in a requirements.txt file.",
+      "reference_sha256": "ad471d6bbd526b00b88c77f3e82fda7b209a5a8f3e6e82cb84e6003e41047939",
+      "repository": {
+        "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+        "family_id": "cekit/cekit",
+        "url": "https://github.com/cekit/cekit"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/cekit--cekit-6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+      "task_id": "import-a272146f2dee703eb410045b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/cekit--cekit-6b82c4adc0e2",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 57,
+            "file_sha256": "1605d9b6885018c10c53af848d1188d05c685d4993fd40abe33193d61d75473f",
+            "path": "cekit/test/behave_tester.py",
+            "start_line": 57
+          },
+          {
+            "end_line": 110,
+            "file_sha256": "10247aaaf00714c0c96fc5efa8bbc4d1d9518dfdbe62fb47a17331fe1970fb31",
+            "path": "cekit/generator/base.py",
+            "start_line": 108
+          },
+          {
+            "end_line": 57,
+            "file_sha256": "a0c0579661b199524abd881c11a4efe211155ecdd7704d58e77021fd73095330",
+            "path": "cekit/test/behave_runner.py",
+            "start_line": 49
+          },
+          {
+            "end_line": 65,
+            "file_sha256": "a0c0579661b199524abd881c11a4efe211155ecdd7704d58e77021fd73095330",
+            "path": "cekit/test/behave_runner.py",
+            "start_line": 62
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 91,
+            "line_count": 90,
+            "path": "cekit/test/collector.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "cekit/test/collector.py",
+            "resolved_path": "cekit/test/collector.py",
+            "start_line": 53
+          }
+        ]
+      },
+      "question": "Why does CEKit's test collection system require explicit tagging for behave test execution instead of running all collected tests by default?",
+      "question_sha256": "21e4369eff5fa079a5d194fdd812265c270ec9c7228da507d687d8dcf088f4b7",
+      "reference_answer": "CEKit requires explicit tagging for behave test execution because its test collection system aggregates tests from multiple heterogeneous sources that would be inappropriate to run together without filtering. Tagging allows the runner to prioritize relevant tests corresponding to specific changes. The BehaveTestCollector (cekit/test/collector.py: line 53-91) gathers tests from three distinct sources: shared common steps fetched from a git repository, tests from collected modules, and tests from the image repository itself. Without tagging, all these collected tests would execute regardless of their relevance to the specific image being tested. The tagging system prevents this by using image-derived tags as the default filter. When tests run, the system uses the first tag from the image generator (cekit/test/behave_tester.py: line 57), which corresponds to the image name and version from generator.get_tags() (cekit/generator/base.py: lines 108-110). The behave runner then processes these tags intelligently (cekit/test/behave_runner.py: line 49-57), converting image tags like 'test/image:1.0' into behave tag arguments to match appropriately tagged test scenarios. This ensures that only tests relevant to the current image context execute. Additionally, the system provides built-in exclusions for development workflows, automatically skipping CI-specific tests when running locally (cekit/test/behave_runner.py: line 62-65) and always excluding tests marked with @ignore tags. In summary, this system ensures that the relevant tests, gathered from multiple sources, are run by the CI system.",
+      "reference_sha256": "c81dd93a5da5af14614bb2f7aec129fda26173bdda6f20ed9ab0d03c93fe69cb",
+      "repository": {
+        "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+        "family_id": "cekit/cekit",
+        "url": "https://github.com/cekit/cekit"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/cekit--cekit-6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+      "task_id": "import-b8bd4cfe9d85ec4625d95d88"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/cekit--cekit-6b82c4adc0e2",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 168,
+            "file_sha256": "3cfb0d91858de22cbe8640ddf75233b6c901e85dcf7688495d2dde726a88d1f8",
+            "path": "cekit/builders/docker_builder.py",
+            "start_line": 162
+          },
+          {
+            "end_line": 44,
+            "file_sha256": "2079574cbbe8e7e5ed1389d2e886de065940b3c92d5a0e0f697746660a5f0772",
+            "path": "cekit/builders/podman.py",
+            "start_line": 43
+          },
+          {
+            "end_line": 44,
+            "file_sha256": "6245304484018b061416834b784cbeced3f7196c7038b74ece3e8d73cc39eac2",
+            "path": "cekit/builders/buildah.py",
+            "start_line": 43
+          },
+          {
+            "end_line": 136,
+            "file_sha256": "10247aaaf00714c0c96fc5efa8bbc4d1d9518dfdbe62fb47a17331fe1970fb31",
+            "path": "cekit/generator/base.py",
+            "start_line": 134
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does CEKit's Docker builder implement the tag parsing algorithm to handle container registry URLs with port specifications in the build pipeline?",
+      "question_sha256": "4b8092796422fe434cf7e7b7832fa89448df806dcbcb96674972b7c4bc987cb8",
+      "reference_answer": "CEKit's Docker builder implements tag parsing through the _tag method (cekit/builders/docker_builder.py: lines 162-168) which uses a naive string splitting approach. For each tag containing a colon, the method calls tag.split(':') and attempts to unpack the result into exactly two variables (img_repo, img_tag), then calls docker_client.tag(image_id, img_repo, tag=img_tag). This algorithm works correctly for standard tags like 'myimage:v1.0'. However, this fails catastrophically when registry URLs contain port specifications such as 'registry.com:5000/repo:v1.0'. In this case, split(':') produces three components ['registry.com', '5000/repo', 'v1.0'], causing a 'too many values to unpack' error during variable assignment. This parsing limitation is specific to the Docker builder, as evidenced by the Podman builder (cekit/builders/podman.py: line 43-44) and Buildah builder (cekit/builders/buildah.py: line 43-44) which both pass tags directly to their respective command-line tools via the -t flag, delegating the complex tag parsing logic to the underlying container tools that properly handle registry port syntax. The base generator's get_tags method (cekit/generator/base.py: line 134-136) produces tags in the standard 'name:version' format, but users can provide custom tags including registry URLs with ports through the build parameters.",
+      "reference_sha256": "982a47e2885b08bfa8376b1f55348a8c97e95f8cf39a91f45a5d081d63edfaa8",
+      "repository": {
+        "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+        "family_id": "cekit/cekit",
+        "url": "https://github.com/cekit/cekit"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/cekit--cekit-6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+      "task_id": "import-d0da0df04b1ebb1d41f6464f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/cekit--cekit-6b82c4adc0e2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the architecture of timeout management across different builder implementations in cekit's container build system?",
+      "question_sha256": "d7ea5af886ffe188c4714e68c7f5c37f9796dee006c1e522b22746b94f6549f7",
+      "reference_answer": "The timeout management architecture in cekit's container build system is inconsistent across different builder implementations. Different implementations have differing max durations before a timeout occurs. The DockerBuilder implementation provides configurable timeout management through the DOCKER_TIMEOUT environment variable with a default value of 600 seconds (10 minutes) for Docker daemon API connections. The OSBSBuilder implements a different timeout strategy with the _wait_for_osbs_task method that has a hardcoded timeout of 7200 seconds (2 hours) for monitoring OSBS build task completion. The BuildahBuilder and PodmanBuilder implementations do not implement any explicit timeout management, instead relying on subprocess.check_call() which can potentially block indefinitely depending on the underlying command-line tools' behavior. This architecture results in inconsistent timeout behaviors across different build engines, with some providing configurable timeouts, others using hardcoded values, and some having no timeout protection at all.",
+      "reference_sha256": "0714cff8cb0439ff0a83f481b2593e28244873db6eb3f388bc2fe19232222778",
+      "repository": {
+        "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+        "family_id": "cekit/cekit",
+        "url": "https://github.com/cekit/cekit"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/cekit--cekit-6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+      "task_id": "import-dd6ba2db772f5d50e095202f"
+    }
+  ]
+}

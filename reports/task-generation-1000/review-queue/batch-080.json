@@ -1,0 +1,423 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 675,
+            "file_sha256": "8aa822ef1edc8e72d3e8eb91a7a4d88e839b26d52d6dc3e97864ce0be12787d4",
+            "path": "sympy/matrices/matrices.py",
+            "start_line": 675
+          },
+          {
+            "end_line": 88,
+            "file_sha256": "8aa822ef1edc8e72d3e8eb91a7a4d88e839b26d52d6dc3e97864ce0be12787d4",
+            "path": "sympy/matrices/matrices.py",
+            "start_line": 87
+          },
+          {
+            "end_line": 1004,
+            "file_sha256": "ea8efe98b8f4e6be2af9b21a3309b02647cef1ac99f7c514f6a4c473663bad8e",
+            "path": "sympy/matrices/determinant.py",
+            "start_line": 970
+          },
+          {
+            "end_line": 528,
+            "file_sha256": "d9f38e592076d86cf52d595dd873322e7c3ae4884ddacb96e23b3f4260df8b75",
+            "path": "sympy/matrices/matrixbase.py",
+            "start_line": 468
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "sympy/matrices/determinant.py",
+              "sympy/matrices/expressions/determinant.py"
+            ],
+            "end_line": 1046,
+            "path": "determinant.py",
+            "reason": "ambiguous_basename",
+            "reference": "determinant.py",
+            "start_line": 1007
+          }
+        ]
+      },
+      "question": "Where does the data flow from the deprecated matrix entry method through the matrix determinant class method to the determinant computation module?",
+      "question_sha256": "ef3d65caf1ba3d0a223b3acd3286d053466268d62694afcdcb27db56b3ab8520",
+      "reference_answer": "The data flows through the following path:\n\n1. **Starting point**: The deprecated `minorEntry` method (defined in `MatrixDeprecated` class in `sympy/matrices/matrices.py` at line 675) simply calls `self.minor(i, j, method=method)`, passing through to the `minor` method.\n\n2. **Matrix determinant class method**: The `minor` method (defined in `MatrixDeterminant` class in `sympy/matrices/matrices.py` at line 87-88) calls `_minor(self, i, j, method=method)`, which is imported from the determinant module.\n\n3. **Determinant computation module**: The `_minor` function (defined in `sympy/matrices/determinant.py` at lines 970-1004) performs the actual minor computation by:\n   - Calling `M.minor_submatrix(i, j)` to obtain the submatrix\n   - Then calling `.det(method=method)` on that submatrix\n\n4. **Index transformations in `minor_submatrix`**: The `_minor_submatrix` function (lines 1007-1046 in `determinant.py`) performs the following transformations to matrix indices:\n   - **Negative index normalization**: If `i < 0`, it adds `M.rows` to `i`; if `j < 0`, it adds `M.cols` to `j` (lines 1034-1037)\n   - **Exclusion list creation**: Creates lists of all row indices except `i` and all column indices except `j` (lines 1043-1044): `rows = [a for a in range(M.rows) if a != i]` and `cols = [a for a in range(M.cols) if a != j]`\n   - **Submatrix extraction**: Calls `M.extract(rows, cols)` to extract the submatrix (line 1046)\n\n5. **Additional index normalization in `extract`**: The `extract` method (in `sympy/matrices/matrixbase.py` at lines 468-528) further normalizes indices using the `a2idx` function (line 525-526), which:\n   - Converts negative indices to positive by adding the dimension size\n   - Validates that indices are within the valid range\n\n6. **Final computation**: The extracted submatrix then has its determinant computed using the specified method (bareiss, berkowitz, bird, laplace, or lu) via the `.det(method=method)` call.\n\nThe intermediate transformations ensure that negative indices are properly normalized and that the correct rows and columns are excluded before the submatrix is extracted and its determinant is computed.",
+      "reference_sha256": "818ba25b62bc2b81e40b2f241a10d9ff8963049549acf5ee98522dd80f151b8c",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-dd8293e32bae2047df308e4d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 351,
+            "file_sha256": "6d9bc0db57d24cc736b102c9378028bd0b2975dce69c83415853ebf937869a6d",
+            "path": "sympy/tensor/array/ndim_array.py",
+            "start_line": 350
+          },
+          {
+            "end_line": 118,
+            "file_sha256": "e270ff1e0f89742ff5998413a2198a15f2f933552076ad1fa670d420b913b6af",
+            "path": "sympy/tensor/array/sparse_ndim_array.py",
+            "start_line": 118
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "e270ff1e0f89742ff5998413a2198a15f2f933552076ad1fa670d420b913b6af",
+            "kind": "file_reference",
+            "line_count": 196,
+            "path": "sympy/tensor/array/sparse_ndim_array.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the elementwise function application method for N-dimensional arrays contain special-case logic for sparse arrays that filters out zero-valued results?",
+      "question_sha256": "23961965abf149c9ecf18f3c0ecc076de3d8fd7bfd6d8b3481844213c3d426cc",
+      "reference_answer": "The elementwise function application method for N-dimensional arrays contains special-case logic for sparse arrays that filters out zero-valued results to maintain the sparse representation's storage efficiency.\n\nThe special-case logic is located in `sympy/tensor/array/ndim_array.py` at lines 350-351:\n\n```python\nif isinstance(self, SparseNDimArray) and f(S.Zero) == 0:\n    return type(self)({k: f(v) for k, v in self._sparse_array.items() if f(v) != 0}, self.shape)\n```\n\nThis optimization applies only when:\n1. The array is a `SparseNDimArray` instance\n2. The function maps zero to zero (`f(S.Zero) == 0`)\n\nWhen both conditions are met, the method:\n- Iterates only over the stored non-zero entries in `_sparse_array` (a dictionary)\n- Applies the function to each stored value\n- Filters out any results that become zero (`if f(v) != 0`)\n- Returns a new sparse array with only non-zero results\n\nThis aligns with the broader sparse array optimization strategy:\n\n1. **Storage efficiency**: Sparse arrays store only non-zero values in `_sparse_array` (see `sparse_ndim_array.py` lines 118, 155). During creation, zeros are excluded: `if el != 0: sparse_array[i] = _sympify(el)`.\n\n2. **Maintaining sparsity**: When setting items to zero, they are removed from the dictionary (lines 179-182, 186-187 in `sparse_ndim_array.py`). This keeps the representation compact.\n\n3. **Avoiding unnecessary computation**: Without this optimization, applying a function would require iterating over all array positions (including implicit zeros), defeating the purpose of sparse storage. The special case preserves sparsity by only processing stored entries and filtering out results that become zero.\n\n4. **Conditional optimization**: The check `f(S.Zero) == 0` ensures the optimization is safe\u2014if a function can produce non-zero from zero, all positions must be considered, so the method falls back to the general implementation that processes all elements.\n\nThis design maintains the sparse array's memory efficiency and computational advantages while ensuring correctness for functions that preserve or create zeros.",
+      "reference_sha256": "ae58327e9eb219104c309da8fcf68fe6a03efcbf280cc0e724a4a8846ae28858",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-e310871482d281d17b111f45"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 410,
+            "file_sha256": "43eba252301980c3971caa0115eda85bfa89b094a30bc7ccdb8eb2cf13266740",
+            "path": "sympy/physics/quantum/operator.py",
+            "start_line": 409
+          },
+          {
+            "end_line": 227,
+            "file_sha256": "f10899fe8f91a157f4d862b13b080d7d0e689586186e2929073fb013ec0e66c2",
+            "path": "sympy/physics/quantum/state.py",
+            "start_line": 227
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the constructor method's commutative factor separation and subsequent dual state class compatibility verification ensure type safety when building outer product operators from multiplied quantum state expressions?",
+      "question_sha256": "7b7ff6c664f97482fe1243db24a5a374ca26be2bbd0d70e84560d82694f727fd",
+      "reference_answer": "The constructor method's type safety mechanism works through a two-stage validation process when handling multiplied quantum state expressions (like `2*k*b` where `k` is a ket and `b` is a bra).\n\n**Stage 1: Commutative Factor Separation**\n\nWhen the constructor receives expressions that are `Mul` instances (lines 409-410 in `sympy/physics/quantum/operator.py`), it calls `args_cnc()` on both the ket and bra expressions (lines 411-412). This method separates commutative factors (scalars, numbers) from non-commutative factors (the actual quantum state objects). For example, `Mul(2, k, 3)` would decompose into `ket_c = [2, 3]` (commutative) and `kets = [k]` (non-commutative).\n\n**Stage 2: Dual State Class Compatibility Verification**\n\nAfter extraction, the constructor validates that:\n1. There is exactly one ket and one bra in the non-commutative parts (lines 414-420)\n2. The ket's `dual_class()` method returns a class that matches the bra's actual class (line 422)\n\nThe `dual_class()` method is defined in `KetBase` (line 227 in `sympy/physics/quantum/state.py`) and returns `BraBase`, while each specific ket subclass (like `Qubit`, `Ket`) overrides it to return its corresponding bra class (like `QubitBra`, `Bra`). This ensures that only compatible dual pairs can form valid outer products - for instance, a `Ket` can only pair with a `Bra`, not with a `QubitBra`.\n\n**Type Safety Guarantee**\n\nThis two-stage process ensures type safety because:\n- The `args_cnc()` decomposition isolates the actual quantum state objects from any commutative multipliers, allowing the constructor to access the core ket/bra objects for validation\n- The `dual_class()` check enforces that the ket and bra belong to compatible dual state hierarchies, preventing type mismatches that would violate quantum mechanical principles\n- If validation fails at either stage, appropriate `TypeError` or `ValueError` exceptions are raised (lines 414-426)\n\nThe relationship between these stages is that `args_cnc()` must successfully extract exactly one ket and one bra before `dual_class()` validation can occur, making the decomposition a prerequisite for the compatibility check.",
+      "reference_sha256": "3b77635eb7a710ad68199133d5be1b0093ae12ab282227dacc7caeb685474069",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-e3cdaf1c6a18fd5d4904816f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": [
+          {
+            "candidates": [
+              "sympy/geometry/curve.py",
+              "sympy/physics/biomechanics/curve.py"
+            ],
+            "end_line": 408,
+            "path": "curve.py",
+            "reason": "ambiguous_basename",
+            "reference": "curve.py",
+            "start_line": 404
+          },
+          {
+            "candidates": [
+              "sympy/geometry/tests/test_curve.py",
+              "sympy/physics/biomechanics/tests/test_curve.py"
+            ],
+            "end_line": 301,
+            "path": "test_curve.py",
+            "reason": "ambiguous_basename",
+            "reference": "test_curve.py",
+            "start_line": 298
+          }
+        ]
+      },
+      "question": "Why does repeated instantiation of the inverse tendon force-length curve function class within the test method that verifies object instantiation impact overall test suite performance when scaled across hundreds of biomechanical curve function tests?",
+      "question_sha256": "a4c0dcde110931ebb5dcaca1a0ee64c7897d544770a154390567e44c5874cd35",
+      "reference_answer": "Based on my exploration of the SymPy repository, the repeated instantiation of `TendonForceLengthInverseDeGroote2016` objects in `test_instance` impacts test suite performance due to several memory allocation overhead factors:\n\n**1. Float Object Creation Overhead:**\nEach instantiation of `TendonForceLengthInverseDeGroote2016` requires creating multiple `Float` objects for the constants. In the `with_defaults` class method (lines 404-408 in `curve.py`), four new `Float` instances are created every time:\n```python\nc0 = Float('0.2')\nc1 = Float('0.995')\nc2 = Float('0.25')\nc3 = Float('33.93669377311689')\nreturn cls(fl_T, c0, c1, c2, c3)\n```\nWhen `test_instance` is called repeatedly across hundreds of biomechanical curve function tests, this creates thousands of `Float` objects, each requiring memory allocation and initialization.\n\n**2. Symbolic Expression Tree Construction:**\nEach `TendonForceLengthInverseDeGroote2016` instance stores its arguments in `self.args`, creating a symbolic expression tree structure. The class inherits from `Function` (via `CharacteristicCurveFunction`), which maintains these arguments as immutable tuples. Each instantiation creates new argument tuples and expression nodes, even when the same values are used repeatedly.\n\n**3. Test Method Isolation:**\nThe `test_instance` method (line 298-301 in `test_curve.py`) creates a fresh instance in each test:\n```python\ndef test_instance(self):\n    fl_T_inv = TendonForceLengthInverseDeGroote2016(self.fl_T, *self.constants)\n    assert isinstance(fl_T_inv, TendonForceLengthInverseDeGroote2016)\n```\nWhen this pattern is repeated across multiple test classes (`TestTendonForceLengthInverseDeGroote2016`, `TestTendonForceLengthDeGroote2016`, `TestFiberForceLengthPassiveDeGroote2016`, etc.), each test creates new instances without reusing previously allocated objects.\n\n**4. Symbol Creation:**\nThe test fixture (lines 284-290) creates new `Symbol` objects (`self.fl_T`, `self.c0`, etc.) for each test class, and these symbols are used in every instantiation. While symbols may be cached by SymPy's internals, the test structure doesn't leverage this optimization.\n\n**5. Scaling Effect:**\nThe test suite contains multiple characteristic curve function classes (7 different curve types), each with their own `test_instance` method. When scaled across hundreds of tests, the cumulative effect of:\n- Creating new `Float` constants for each instantiation\n- Building new symbolic expression trees\n- Allocating memory for function instances and their argument tuples\n- Garbage collection overhead from many short-lived objects\n\ncreates significant memory allocation overhead that impacts overall test suite performance, especially when running the full test suite sequentially.\n\n**Potential Optimization Strategies (for reference):**\nWhile not part of the \"why\" question, the codebase could benefit from:\n- Caching `Float` constants as module-level or class-level variables\n- Reusing test fixtures across similar tests\n- Using `with_defaults` more consistently (which already exists but creates new `Float` objects each time)\n- Implementing object pooling for frequently instantiated curve functions in tests\n</start_of_answer>",
+      "reference_sha256": "c871550bd9247888c4a9cbbdc272c873a8a786f759359fc0a123ca134f156a73",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-e491b6aeb15b6aafba8faef9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "43d60df16d077753de7e51cbbcebd267e87178b5382aade75052d80c2d31d04f",
+            "kind": "file_reference",
+            "line_count": 251,
+            "path": "sympy/plotting/pygletplot/plot_axes.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the three-dimensional axes rendering class in the pyglet plotting module maintain synchronization between coordinate range updates and tick mark recalculation when child plot object bounds contain infinite coordinate values?",
+      "question_sha256": "36037f2ac29a04f3f7d5933e56c2b13da85229019090b0363f4930966d3ec0a3",
+      "reference_answer": "The three-dimensional axes rendering class maintains synchronization by coordinating both operations within a single method that checks for infinite values before performing either operation.\n\nIn `sympy/plotting/pygletplot/plot_axes.py`, the `adjust_bounds` method (lines 98-107) handles this coordination:\n\n```python\ndef adjust_bounds(self, child_bounds):\n    b = self._bounding_box\n    c = child_bounds\n    for i in range(3):\n        if abs(c[i][0]) is S.Infinity or abs(c[i][1]) is S.Infinity:\n            continue\n        b[i][0] = c[i][0] if b[i][0] is None else min([b[i][0], c[i][0]])\n        b[i][1] = c[i][1] if b[i][1] is None else max([b[i][1], c[i][1]])\n        self._bounding_box = b\n        self._recalculate_axis_ticks(i)\n```\n\nWhen infinite values are detected (line 102), the method uses `continue` to skip both the bounding box update (lines 104-106) and the tick recalculation call (line 107). This keeps them synchronized: both are skipped together when infinite values are present, and both are performed together when values are finite.\n\nThe separation of concerns is achieved by having `_recalculate_axis_ticks` as a separate method (lines 109-115), while `adjust_bounds` orchestrates both operations. This ensures that:\n1. Tick calculation logic is isolated in its own method\n2. Both operations are always performed or skipped together, maintaining consistency\n3. The bounding box state and tick marks remain synchronized\n\nChild plot objects (like `PlotCurve` and `PlotSurface`) initialize their bounds with `S.Infinity` and `S.NegativeInfinity` as placeholders. When these infinite values are passed to `adjust_bounds`, the method correctly skips updating that axis's bounds and ticks, preventing invalid coordinate ranges from affecting the visualization.",
+      "reference_sha256": "def6bd6d7fde0fd1fafb7eb1b26695d1611c81db34433b405eceb6f6c77ad735",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-e500b7a23bdb2ebaa272893b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 395,
+            "file_sha256": "62e0f4e53fb8cdcb2552137ea30b9fbc4f81ce40a68c38b19d0800f2fa427307",
+            "path": "sympy/functions/special/zeta_functions.py",
+            "start_line": 395
+          },
+          {
+            "end_line": 1060,
+            "file_sha256": "8243d074c351ee4e6e635bd252eeb3cf2a0928ca1065f0bdd188cb45cc9fb797",
+            "path": "sympy/functions/special/gamma_functions.py",
+            "start_line": 1060
+          },
+          {
+            "end_line": 564,
+            "file_sha256": "8243d074c351ee4e6e635bd252eeb3cf2a0928ca1065f0bdd188cb45cc9fb797",
+            "path": "sympy/functions/special/gamma_functions.py",
+            "start_line": 564
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where are the lower-level helper functions located that the evaluation method of the Dirichlet eta function class delegates to for computing zeta function values and digamma transformations?",
+      "question_sha256": "9844cee04c7d77225b7d8fbecf9ee6360390562e8e10c7e2e5b1cc0b3a300f84",
+      "reference_answer": "The `dirichlet_eta.eval` method delegates to helper functions in two modules:\n\n1. For computing zeta function values:\n   - The `zeta` class is defined in the same file as `dirichlet_eta`: `sympy/functions/special/zeta_functions.py` (line 395). The `eval` method calls `zeta(s)` on line 638, `zeta(s, a)` on line 645, and `zeta(s, (a+1)/2)` on line 646.\n\n2. For digamma transformations:\n   - The `digamma` class is defined in `sympy/functions/special/gamma_functions.py` (line 1060). The `eval` method calls `digamma(a)` and `digamma((a+1)/2)` on line 644.\n   - The `digamma.eval` method (line 1135-1136) delegates to `polygamma(0, z)`, which is also defined in `sympy/functions/special/gamma_functions.py` (line 564), making `polygamma` a lower-level helper for digamma computations.\n\nSummary:\n- `zeta`: `sympy/functions/special/zeta_functions.py` (line 395)\n- `digamma`: `sympy/functions/special/gamma_functions.py` (line 1060)\n- `polygamma`: `sympy/functions/special/gamma_functions.py` (line 564)",
+      "reference_sha256": "c9f6f46b4c198fe53828f6975509fa48f4103367a1e06259198131e9609931a3",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-e92542bf5a046255f098d304"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the operator that increments upper indices in hypergeometric functions enable composition of index-shifting transformations when chained with other differential operator subclasses in the expansion framework?",
+      "question_sha256": "46215f010759a34a5d2918c51ceb0afe8943b15c6285adbd792f00941fdd1549",
+      "reference_answer": "The operator that increments upper indices enables composition through its polynomial representation in the differential operator `z*d/dz`. \n\nIn the implementation (lines 1009-1019), the operator stores `Poly(_x/ai + 1, _x)` where `_x` is a Dummy variable representing `z*d/dz` (line 672), and `ai` is the upper index parameter. This polynomial form allows sequential composition when operators are chained.\n\nThe `Operator.apply()` method (lines 976-999) evaluates the polynomial by:\n1. Extracting coefficients from `self._poly.all_coeffs()`\n2. Building a sequence of derivatives using the provided generator function\n3. Combining coefficients with derivatives to compute the result\n\nWhen multiple operators are chained via `apply_operators()` (lines 1504-1512), each operator's polynomial representation is evaluated sequentially. The polynomial form `_x/ai + 1` represents the linear differential operator `(z*d/dz)/ai + 1`, which when applied transforms the hypergeometric function's parameters correctly.\n\nThe composition works because:\n- Each operator's polynomial encodes its transformation as a polynomial in the differential operator\n- The `apply()` method interprets this polynomial to compute the actual transformation\n- When chained, operators are applied in reverse order (line 1510: `for o in reversed(ops)`), ensuring correct composition semantics\n- The polynomial representation allows algebraic manipulation while preserving the operator's effect on hypergeometric function parameters\n\nThis design enables the `devise_plan()` function (lines 1515-1649) to create sequences of operators that transform one hypergeometric function into another, which is then executed by `apply_operators()` in the `_hyperexpand()` function (lines 1954-2058) to perform the actual expansion.",
+      "reference_sha256": "902c8f58243cef481ccd82a0a7623b0e7e8b57098dd85b02529eb1f16b90ce5f",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-e9745c18665251bebf23f6b4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 146,
+            "file_sha256": "8ddf227a6138d5a5be6f25e014360a68cbf654e3949f252d88cc7f4005c8fa7e",
+            "path": "sympy/stats/crv.py",
+            "start_line": 145
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "66ef082bdcadebd5c914ab7e4a1a097d96ef67e086330beb28d897be2eaafe7e",
+            "kind": "file_reference",
+            "line_count": 350,
+            "path": "sympy/stats/drv.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 571,
+            "line_count": 570,
+            "path": "sympy/stats/crv.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "sympy/stats/crv.py",
+            "resolved_path": "sympy/stats/crv.py",
+            "start_line": 558
+          }
+        ]
+      },
+      "question": "What is the separation enforced by the discrete conditional domain class between inequality constraint resolution and base domain set intersection?",
+      "question_sha256": "cec0bc273e392855cec3b22ae7d00f3c7d74aac9eb2ab75099bf7d9757365d55",
+      "reference_answer": "The discrete conditional domain class (`ConditionalDiscreteDomain` in `sympy/stats/drv.py`) enforces a two-step separation in its `set` property (lines 198-206):\n\n1. Inequality constraint resolution: First, it calls `reduce_rational_inequalities_wrap(self.condition, rv)` to convert the condition (e.g., `x > 2`) into a set/interval representation. This wrapper function (defined in `sympy/stats/crv.py`, lines 558-571) handles different condition types:\n   - Relational conditions (e.g., `x > 2`) \u2192 converted to intervals\n   - `Or` conditions \u2192 converted to unions of intervals\n   - `And` conditions \u2192 converted to intersections of intervals\n\n2. Domain set intersection: Second, it intersects the result with `self.fulldomain.set` using `.intersect()`, which represents the base domain set before the condition is applied.\n\nThe separation is explicit in the code structure:\n```python\nreturn reduce_rational_inequalities_wrap(self.condition, rv).intersect(self.fulldomain.set)\n```\n\nThis design separates:\n- The conversion of logical conditions into set-theoretic representations (inequality resolution)\n- The application of those constraints to the underlying domain (set intersection)\n\nThis pattern appears in both `ConditionalDiscreteDomain` (line 205-206) and `ConditionalContinuousDomain` (line 145-146 in `crv.py`), showing a consistent architectural approach across discrete and continuous domains in the SymPy statistics module.",
+      "reference_sha256": "af441e449e44f411101dd2fb4cf5acacf3a3f454e02ffdff84b1d1158da89f59",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-ea8c8f68cf16be4a60c5c370"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 338,
+            "file_sha256": "60340fde612a8994952c6cbdb503fe347840cd64ca1f85b18d4f1b5db0f4d54e",
+            "path": "sympy/printing/tests/test_repr.py",
+            "start_line": 332
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "c2183254729a42914853a311cc3e461a1c965ef6b50b6de0fe8ff8b2c7b70321",
+            "kind": "file_reference",
+            "line_count": 335,
+            "path": "sympy/printing/repr.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What mechanism in the string representation generated by the test function that verifies matrix expression string representations ensures that matrix expression semantics are preserved when symbolic matrix dimensions are parameterized with symbolic integers rather than concrete values?",
+      "question_sha256": "8a8f99f2c17fe4ff63c61fe846c4e369871df779931b5955b99f7acd75057a50",
+      "reference_answer": "The mechanism that preserves matrix expression semantics when dimensions are parameterized with symbolic integers is implemented in the `_print_Symbol` method of the `ReprPrinter` class in `sympy/printing/repr.py`.\n\nWhen `srepr()` is called on a `MatrixSymbol` with symbolic integer dimensions (e.g., `MatrixSymbol(\"A\", n, n)` where `n = symbols('n', integer=True)`), the printer recursively processes the dimension symbols. The `_print_Symbol` method (lines 222-234) preserves semantic information by:\n\n1. Accessing the `_assumptions_orig` attribute: The method retrieves the original assumptions dictionary from the Symbol object using `expr._assumptions_orig` (line 223).\n\n2. Including assumptions in the representation: If assumptions exist, they are formatted as keyword arguments in the string representation. For example, a Symbol with `integer=True` is represented as `Symbol('n', integer=True)` rather than just `Symbol('n')` (lines 232-234).\n\n3. Ensuring round-trip evaluation: This ensures that when the generated string is evaluated with `eval()`, the recreated Symbol object maintains the same assumptions (like `integer=True`), which is critical for preserving the semantic meaning that the dimension is an integer.\n\nIn the test `test_matrix_expressions()` in `sympy/printing/tests/test_repr.py` (lines 332-338), this mechanism is verified by checking that `srepr(A)` produces `\"MatrixSymbol(Str('A'), Symbol('n', integer=True), Symbol('n', integer=True))\"`, demonstrating that the `integer=True` assumption on the dimension symbol `n` is preserved in the string representation.\n\nThis preservation is essential because matrix operations and validations depend on dimension assumptions (e.g., checking if dimensions are integers, nonnegative, etc.), and losing these assumptions during serialization would break the semantic correctness of matrix expressions.",
+      "reference_sha256": "3cbb1698d0427ce52307778d4183c72ce05f8b6baab2dfbdf8f01ebc4bacfdfa",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-f5d21d1c64c9b16fc40851e3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "d5bee63029ae9def33214c7679e6ebe9a7d667a71b8793d49795faff3f8a93c0",
+            "kind": "file_reference",
+            "line_count": 1841,
+            "path": "sympy/core/power.py"
+          },
+          {
+            "file_sha256": "a238c2d1a69f59a41e81955857b6e0c72bd60044bf7aba5e6136f74749bd5792",
+            "kind": "file_reference",
+            "line_count": 810,
+            "path": "sympy/functions/elementary/tests/test_exponential.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the power decomposition method validate correct transformation of unit-numerator rational bases into inverted integer bases with negated exponents?",
+      "question_sha256": "095abe627bb3f9a810c1cea332c1a3ba8f0adba00f6b335546c42a78a53030f5",
+      "reference_answer": "The `as_base_exp()` method in `sympy/core/power.py` validates the correct decomposition to ensure mathematical correctness and maintain the reconstruction invariant. \n\nThe method implements a normalization transformation: when a power has a rational base with numerator 1 and denominator != 1 (e.g., (1/2)^x), it returns the inverted form (2, -x) instead of (1/2, x). This transformation is based on the mathematical identity (1/b)^e = b^(-e).\n\nThe validation ensures that the invariant `Pow(*expr.as_base_exp()) == expr` holds - meaning that reconstructing a power expression from its decomposed base and exponent returns an expression mathematically equivalent to the original. This is explicitly tested in `sympy/functions/elementary/tests/test_exponential.py` where the comment states: \"Pow(*expr.as_base_exp()) == expr invariant should hold.\"\n\nThe validation is necessary because:\n1. It ensures mathematical correctness of the decomposition transformation\n2. It maintains consistency across the codebase where `as_base_exp()` is used extensively (found in 156 locations) for pattern matching, simplification, and symbolic manipulation\n3. It prevents errors in downstream operations that rely on the decomposed form, such as in solvers, simplifiers, and series expansions\n\nThe specific check `if b.is_Rational and b.p == 1 and b.q != 1:` validates that only unit-numerator rationals (fractions like 1/2, 1/3, etc.) are transformed, ensuring the decomposition correctly handles this special case while leaving other rational bases (like 2/3) unchanged.",
+      "reference_sha256": "79f0324589757fa402eb7a485f6c6458cc7e72d71744979183117ccda57c9b0c",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-fd5459f1e5864a161492e539"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 404,
+            "file_sha256": "5f2bc40cd174f62e439c77fe62509e7041c374a2bd8f8f3a3763f9603f3f5da3",
+            "path": "sympy/physics/mechanics/kane.py",
+            "start_line": 333
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where in the KanesMethod class do implicit and explicit forms diverge when extracting kinematic differential equation coefficient matrices?",
+      "question_sha256": "d23e889a8436a97a3c2b8bedb2ad040bad4598ffb0f7b7ab61beb1c462678922",
+      "reference_answer": "The implicit and explicit forms diverge during coefficient matrix extraction in the `_initialize_kindiffeq_matrices` method of the KanesMethod class, located in `./sympy/physics/mechanics/kane.py` at lines 333-404.\n\n**Initial Extraction (Lines 364-366):**\nBoth forms start by extracting the same coefficient matrices from the kinematic differential equations using Jacobian operations:\n- `k_ku = kdeqs.jacobian(u)` - coefficient matrix for generalized speeds u\n- `k_kqdot = kdeqs.jacobian(qdot)` - coefficient matrix for time derivatives of coordinates q'\n- `f_k = kdeqs.xreplace(u_zero).xreplace(qdot_zero)` - forcing term\n\nThese extract the linear coefficients from equations in the form: `k_ku(q,t)*u(t) + k_kqdot(q,t)*q'(t) + f_k(q,t) = 0`\n\n**Divergence Point (Lines 379-397):**\n\n**Implicit Form (Lines 379-381):**\nStores the original extracted matrices directly without solving:\n- `self._f_k_implicit = f_k.xreplace(uaux_zero)`\n- `self._k_ku_implicit = k_ku.xreplace(uaux_zero)`\n- `self._k_kqdot_implicit = k_kqdot` (original matrix, typically not identity)\n\n**Explicit Form (Lines 391-397):**\nSolves the system to express q' explicitly in terms of u by premultiplying by `k_kqdot^-1`:\n- `f_k_explicit = linear_solver(k_kqdot, f_k)` - solves for q' forcing term\n- `k_ku_explicit = linear_solver(k_kqdot, k_ku)` - solves for q' coefficient\n- `self._k_kqdot = eye(len(qdot))` - becomes identity matrix\n- `self._f_k = f_k_explicit.xreplace(uaux_zero)`\n- `self._k_ku = k_ku_explicit.xreplace(uaux_zero)`\n\nThe explicit form transforms the equation to: `I*q'(t) + (k_kqdot^-1*k_ku)*u(t) + (k_kqdot^-1*f_k) = 0`, where the mass matrix becomes identity.\n\n**Usage (Lines 795-805):**\nThe `explicit_kinematics` attribute (set during initialization, line 230) determines which form is used:\n- `mass_matrix_kin` property returns `_k_kqdot` (identity) for explicit or `_k_kqdot_implicit` (original matrix) for implicit\n- `forcing_kin` property uses the corresponding `_k_ku` and `_f_k` matrices based on the flag\n\nThe divergence occurs because the explicit form solves the kinematic differential equations at initialization (line 393 creates `_qdot_u_map`), while the implicit form preserves the original unsolved matrix structure, allowing more compact representation for non-simple kinematics (as noted in the class docstring, lines 111-117).",
+      "reference_sha256": "afe025fd16aa07d90f172852262eae5133e1eeac9665042aca4d1a9362872fa7",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-ff59c1a2df87e2cbe908fab6"
+    }
+  ]
+}

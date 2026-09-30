@@ -1,0 +1,512 @@
+{
+  "schema_version": "1.0",
+  "created_at": "2026-09-28T21:44:34.805272+00:00",
+  "reviewer_kind": "independent_codex_agent",
+  "reviewer_authored_these_tasks": false,
+  "human_reviewed": false,
+  "training_eligible": false,
+  "review_scope": "Independent source/reference/prompt/fixture review; not a solver evaluation or hidden-answer investigation.",
+  "status": "supported",
+  "spec_path": "examples/dataset_sources/tanstack-query-generation-v2.json",
+  "spec_sha256": "ef9c5198ae516c0488a619f8d0470be8ec5c85801a7af36904faa7937f73afcc",
+  "repository_commit_verified": "fd96529f3e0b748874be4655516caecc5d6a0521",
+  "repository_worktree_clean": true,
+  "tasks": [
+    {
+      "task_id": "tanstack-signal-consumption-unsubscribe",
+      "status": "supported",
+      "required_claims": [
+        {
+          "id": "signal-getter",
+          "verdict": "supported",
+          "reason": "query.ts getter explicitly sets #abortSignalConsumed=true on access; no listener check. Actual paired probe varies only signal access and observes aborted=true in the consumed case.",
+          "evidence": [
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 636,
+              "end_line": 647
+            }
+          ],
+          "execution_evidence": {
+            "report": "data/generated/tanstack-query-generation-v2/private/verification-report.json",
+            "assertion_id": "tanstack-signal-consumption-unsubscribe-matrix",
+            "sandbox_id": "sb-oWUx4vuAe5jVOL4K6i8tel"
+          }
+        },
+        {
+          "id": "unobserved-unconsumed",
+          "verdict": "supported",
+          "reason": "Last-observer removal chooses cancelRetry when signal is unconsumed and fetch is active; retryer.cancelRetry only sets retry cancellation flag. Probe retains seed/fetching before late completion.",
+          "evidence": [
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 523,
+              "end_line": 541
+            }
+          ],
+          "execution_evidence": {
+            "report": "data/generated/tanstack-query-generation-v2/private/verification-report.json",
+            "assertion_id": "tanstack-signal-consumption-unsubscribe-matrix",
+            "sandbox_id": "sb-oWUx4vuAe5jVOL4K6i8tel"
+          }
+        },
+        {
+          "id": "unobserved-consumed",
+          "verdict": "supported",
+          "reason": "Last-observer removal chooses retryer.cancel({revert:true}); onCancel restores #revertState with idle and aborts controller. Probe observes seed/idle/aborted=true.",
+          "evidence": [
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 523,
+              "end_line": 541
+            },
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 727,
+              "end_line": 738
+            }
+          ],
+          "execution_evidence": {
+            "report": "data/generated/tanstack-query-generation-v2/private/verification-report.json",
+            "assertion_id": "tanstack-signal-consumption-unsubscribe-matrix",
+            "sandbox_id": "sb-oWUx4vuAe5jVOL4K6i8tel"
+          }
+        },
+        {
+          "id": "late-resolution",
+          "verdict": "supported",
+          "reason": "Retryer resolve ignores settlement after status becomes rejected; Query success path only updates after retryer fulfillment. Actual late remote result updates only the unconsumed branch.",
+          "evidence": [
+            {
+              "path": "packages/query-core/src/retryer.ts",
+              "start_line": 136,
+              "end_line": 152
+            },
+            {
+              "path": "packages/query-core/src/retryer.ts",
+              "start_line": 191,
+              "end_line": 197
+            },
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 754,
+              "end_line": 790
+            }
+          ],
+          "execution_evidence": {
+            "report": "data/generated/tanstack-query-generation-v2/private/verification-report.json",
+            "assertion_id": "tanstack-signal-consumption-unsubscribe-matrix",
+            "sandbox_id": "sb-oWUx4vuAe5jVOL4K6i8tel"
+          }
+        },
+        {
+          "id": "scoped-results",
+          "verdict": "supported",
+          "reason": "Official matrix records one queryFn call for each branch and both final success/idle states; state branch explicitly excludes paused pending behavior.",
+          "evidence": [
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 532,
+              "end_line": 540
+            },
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 767,
+              "end_line": 790
+            }
+          ],
+          "execution_evidence": {
+            "report": "data/generated/tanstack-query-generation-v2/private/verification-report.json",
+            "assertion_id": "tanstack-signal-consumption-unsubscribe-matrix",
+            "sandbox_id": "sb-oWUx4vuAe5jVOL4K6i8tel"
+          }
+        }
+      ],
+      "fixture_agrees_with_prompt": true,
+      "execution_claims_supported": true,
+      "assertion_discrimination": [
+        "Signal consumption varies independently of listener/transport cancellation; pre-resolution state and late resolution distinguish cancelRetry from cancel/revert."
+      ],
+      "reproducibility_notes": [
+        "Deferred promises avoid dependence on wall-clock durations. Node setImmediate flushes allow scheduled settlement; no exact elapsed times are asserted.",
+        "Source image is the fixed pinned query-core bundle. Author and separate official sandbox runs report the same semantic outputs."
+      ],
+      "citation_notes": [
+        {
+          "path": "packages/query-core/src/retryer.ts",
+          "start_line": 114,
+          "end_line": 126,
+          "note": "Additional supporting range independently inspected."
+        }
+      ],
+      "material_behavior_errors": [],
+      "difficulty": "unmeasured; no independent solver or question-only control in this review"
+    },
+    {
+      "task_id": "tanstack-manual-cache-edit-cancel-revert",
+      "status": "supported",
+      "required_claims": [
+        {
+          "id": "default-revert",
+          "verdict": "supported",
+          "reason": "cancelQueries creates options with revert:true default and returns Promise.all(...).then(noop).catch(noop), supporting its own rejection swallowing separately from fetch return semantics.",
+          "evidence": [
+            {
+              "path": "packages/query-core/src/queryClient.ts",
+              "start_line": 441,
+              "end_line": 454
+            }
+          ],
+          "execution_evidence": {
+            "report": "data/generated/tanstack-query-generation-v2/private/verification-report.json",
+            "assertion_id": "tanstack-manual-cache-edit-cancel-revert-matrix",
+            "sandbox_id": "sb-aez82bptbrhEZjkm5f89Eh"
+          }
+        },
+        {
+          "id": "manual-update-fetch-status",
+          "verdict": "supported",
+          "reason": "QueryClient.setQueryData calls setData(manual:true); success reducer resets fetchStatus only for nonmanual updates. Probe records all before-cancel states as fetching.",
+          "evidence": [
+            {
+              "path": "packages/query-core/src/queryClient.ts",
+              "start_line": 298,
+              "end_line": 310
+            },
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 846,
+              "end_line": 861
+            }
+          ],
+          "execution_evidence": {
+            "report": "data/generated/tanstack-query-generation-v2/private/verification-report.json",
+            "assertion_id": "tanstack-manual-cache-edit-cancel-revert-matrix",
+            "sandbox_id": "sb-aez82bptbrhEZjkm5f89Eh"
+          }
+        },
+        {
+          "id": "revert-checkpoint",
+          "verdict": "supported",
+          "reason": "Manual success assigns #revertState=newState, and onCancel spreads that checkpoint then forces idle. Initial checkpoint is set at query.ts714-715; actual none/manual cases yield seed/edited.",
+          "evidence": [
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 718,
+              "end_line": 737
+            },
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 846,
+              "end_line": 861
+            }
+          ],
+          "execution_evidence": {
+            "report": "data/generated/tanstack-query-generation-v2/private/verification-report.json",
+            "assertion_id": "tanstack-manual-cache-edit-cancel-revert-matrix",
+            "sandbox_id": "sb-aez82bptbrhEZjkm5f89Eh"
+          }
+        },
+        {
+          "id": "raw-state-counterfactual",
+          "verdict": "supported",
+          "reason": "setState dispatch only merges partial state; unlike manual success it does not assign #revertState. Source and raw-state probe show edited visible before cancellation but seed afterwards.",
+          "evidence": [
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 331,
+              "end_line": 335
+            },
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 884,
+              "end_line": 889
+            },
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 859,
+              "end_line": 861
+            }
+          ],
+          "execution_evidence": {
+            "report": "data/generated/tanstack-query-generation-v2/private/verification-report.json",
+            "assertion_id": "tanstack-manual-cache-edit-cancel-revert-matrix",
+            "sandbox_id": "sb-aez82bptbrhEZjkm5f89Eh"
+          }
+        },
+        {
+          "id": "promise-and-late-result",
+          "verdict": "supported",
+          "reason": "CancelledError with revert returns current data when defined; late retryer resolution is ignored after rejection. Actual original promises resolve seed/edited/seed and states remain success/idle.",
+          "evidence": [
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 777,
+              "end_line": 791
+            },
+            {
+              "path": "packages/query-core/src/retryer.ts",
+              "start_line": 136,
+              "end_line": 152
+            }
+          ],
+          "execution_evidence": {
+            "report": "data/generated/tanstack-query-generation-v2/private/verification-report.json",
+            "assertion_id": "tanstack-manual-cache-edit-cancel-revert-matrix",
+            "sandbox_id": "sb-aez82bptbrhEZjkm5f89Eh"
+          }
+        }
+      ],
+      "fixture_agrees_with_prompt": true,
+      "execution_claims_supported": true,
+      "assertion_discrimination": [
+        "Three controls distinguish normal cancellation, public manual-success edits and raw state merges; both public promise value and late state are checked."
+      ],
+      "reproducibility_notes": [
+        "Deferred promises avoid dependence on wall-clock durations. Node setImmediate flushes allow scheduled settlement; no exact elapsed times are asserted.",
+        "Source image is the fixed pinned query-core bundle. Author and separate official sandbox runs report the same semantic outputs."
+      ],
+      "citation_notes": [
+        {
+          "path": "packages/query-core/src/query.ts",
+          "start_line": 714,
+          "end_line": 715,
+          "note": "Additional supporting range independently inspected."
+        }
+      ],
+      "material_behavior_errors": [],
+      "difficulty": "unmeasured; no independent solver or question-only control in this review"
+    },
+    {
+      "task_id": "tanstack-inflight-options-retry-capture",
+      "status": "supported",
+      "required_claims": [
+        {
+          "id": "observer-propagation",
+          "verdict": "supported",
+          "reason": "Observer.setOptions immediately defaults options and forwards to current Query even without listeners. Probe directly records cachedRetry=false before rejecting first request.",
+          "evidence": [
+            {
+              "path": "packages/query-core/src/queryObserver.ts",
+              "start_line": 192,
+              "end_line": 209
+            }
+          ],
+          "execution_evidence": {
+            "report": "data/generated/tanstack-query-generation-v2/private/verification-report.json",
+            "assertion_id": "tanstack-inflight-options-retry-capture-matrix",
+            "sandbox_id": "sb-cS4X7cbOsp7U2JiIehHOg2"
+          }
+        },
+        {
+          "id": "dedup-before-options",
+          "verdict": "supported",
+          "reason": "Query.fetch live retryer branch returns at608, preceding supplied options application at612-615. Probe never records duplicate call and subsequent fresh request still invokes newFn.",
+          "evidence": [
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 590,
+              "end_line": 616
+            }
+          ],
+          "execution_evidence": {
+            "report": "data/generated/tanstack-query-generation-v2/private/verification-report.json",
+            "assertion_id": "tanstack-inflight-options-retry-capture-matrix",
+            "sandbox_id": "sb-cS4X7cbOsp7U2JiIehHOg2"
+          }
+        },
+        {
+          "id": "captured-retry-policy",
+          "verdict": "supported",
+          "reason": "createRetryer captures context.options.retry and retryDelay; error handler consults captured config. Old callback executes once and first failure retries despite updated Query retry=false.",
+          "evidence": [
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 721,
+              "end_line": 752
+            },
+            {
+              "path": "packages/query-core/src/retryer.ts",
+              "start_line": 199,
+              "end_line": 223
+            }
+          ],
+          "execution_evidence": {
+            "report": "data/generated/tanstack-query-generation-v2/private/verification-report.json",
+            "assertion_id": "tanstack-inflight-options-retry-capture-matrix",
+            "sandbox_id": "sb-cS4X7cbOsp7U2JiIehHOg2"
+          }
+        },
+        {
+          "id": "dynamic-query-function",
+          "verdict": "supported",
+          "reason": "fetchFn resolves ensureQueryFn(this.options) on each invocation; retryer calls config.fn on each run. Probe records old,new and both pending callers resolve new-result.",
+          "evidence": [
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 649,
+              "end_line": 678
+            },
+            {
+              "path": "packages/query-core/src/retryer.ts",
+              "start_line": 184,
+              "end_line": 186
+            },
+            {
+              "path": "packages/query-core/src/retryer.ts",
+              "start_line": 228,
+              "end_line": 233
+            }
+          ],
+          "execution_evidence": {
+            "report": "data/generated/tanstack-query-generation-v2/private/verification-report.json",
+            "assertion_id": "tanstack-inflight-options-retry-capture-matrix",
+            "sandbox_id": "sb-cS4X7cbOsp7U2JiIehHOg2"
+          }
+        },
+        {
+          "id": "fresh-fetch-and-delay-side-effect",
+          "verdict": "supported",
+          "reason": "New fetch creates retryer from current options; retryer calculates delay before shouldRetry/reject. Probe records freshError=new-failure, calls old,new,new and exactly one evaluation of each delay callback.",
+          "evidence": [
+            {
+              "path": "packages/query-core/src/query.ts",
+              "start_line": 721,
+              "end_line": 752
+            },
+            {
+              "path": "packages/query-core/src/retryer.ts",
+              "start_line": 199,
+              "end_line": 215
+            }
+          ],
+          "execution_evidence": {
+            "report": "data/generated/tanstack-query-generation-v2/private/verification-report.json",
+            "assertion_id": "tanstack-inflight-options-retry-capture-matrix",
+            "sandbox_id": "sb-cS4X7cbOsp7U2JiIehHOg2"
+          }
+        }
+      ],
+      "fixture_agrees_with_prompt": true,
+      "execution_claims_supported": true,
+      "assertion_discrimination": [
+        "Logged queryFn names, separate delay counters, current retry option, duplicate caller results and fresh failure distinguish mutable function dispatch from captured retry configuration."
+      ],
+      "reproducibility_notes": [
+        "Deferred promises avoid dependence on wall-clock durations. Node setImmediate flushes allow scheduled settlement; no exact elapsed times are asserted.",
+        "Source image is the fixed pinned query-core bundle. Author and separate official sandbox runs report the same semantic outputs."
+      ],
+      "citation_notes": [
+        {
+          "path": "packages/query-core/src/query.ts",
+          "start_line": 649,
+          "end_line": 678,
+          "note": "Additional supporting range independently inspected."
+        }
+      ],
+      "material_behavior_errors": [],
+      "difficulty": "unmeasured; no independent solver or question-only control in this review"
+    }
+  ],
+  "required_corrections": [
+    {
+      "task_id": "tanstack-manual-cache-edit-cancel-revert",
+      "kind": "remove_answer_hint",
+      "required": true,
+      "replace": {
+        "old": "Trace exactly where the rollback checkpoint changes and why the two ways of editing visible state may differ.",
+        "new": "Trace how each operation affects visible state and any state used during cancellation; compare the two editing APIs."
+      },
+      "delete": "do not infer that cancelling query work must reject every public promise or roll back every edit.",
+      "reason": "Current wording presupposes a changing checkpoint and points toward the non-rejection/preserved-edit outcome being graded.",
+      "resolution_status": "resolved_in_reviewed_spec"
+    },
+    {
+      "task_id": "tanstack-inflight-options-retry-capture",
+      "kind": "remove_answer_hint",
+      "required": true,
+      "delete": "do not assume changing options retroactively changes all active-fetch behavior.",
+      "reason": "This warns away from the precise incorrect alternative the task should discriminate. Keep the neutral request to explain mutable options, deduplication and retry configuration.",
+      "resolution_status": "resolved_in_reviewed_spec"
+    }
+  ],
+  "summary": {
+    "claims_supported": 15,
+    "claims_needing_revision": 0,
+    "tasks_with_prompt_revisions": 2,
+    "official_assertions_passed": 3,
+    "author_official_outputs_agree": true,
+    "unresolved_prompt_revisions": 0
+  },
+  "duplicate_review": {
+    "scope": "These three tasks and prior tanstack hydration/freshness task.",
+    "finding": "No hydration restatement. A and B share cancellation code but differ in tested mechanism: signal-driven last-observer lifecycle versus manual-success checkpoint versus raw state. C tests option capture and retry dispatch.",
+    "full_corpus_semantic_audit": "pending"
+  },
+  "quality_limitations": [
+    "All tasks are synthesized from public implementation and may be familiar to pretrained models. Passing execution does not establish difficulty or answer quality.",
+    "Tests verify reference behavior; no blinded model solution was reviewed.",
+    "Only development split; no benchmark clearance or human approval."
+  ],
+  "observed_artifacts": {
+    "author_report": "reports/task-generation/query-authoring.json",
+    "official_verification": "data/generated/tanstack-query-generation-v2/private/verification-report.json"
+  },
+  "execution_policy": "Read source on host; inspected recorded isolated executions, did not execute repository code on host.",
+  "review_history": [
+    {
+      "stage": "initial",
+      "status": "needs_revision",
+      "spec_path": "examples/dataset_sources/tanstack-query-generation-v2.json",
+      "spec_sha256": "ef9c5198ae516c0488a619f8d0470be8ec5c85801a7af36904faa7937f73afcc",
+      "summary": {
+        "claims_supported": 15,
+        "claims_needing_revision": 0,
+        "tasks_with_prompt_revisions": 2,
+        "official_assertions_passed": 3,
+        "author_official_outputs_agree": true
+      },
+      "required_corrections": [
+        {
+          "task_id": "tanstack-manual-cache-edit-cancel-revert",
+          "kind": "remove_answer_hint",
+          "required": true,
+          "replace": {
+            "old": "Trace exactly where the rollback checkpoint changes and why the two ways of editing visible state may differ.",
+            "new": "Trace how each operation affects visible state and any state used during cancellation; compare the two editing APIs."
+          },
+          "delete": "do not infer that cancelling query work must reject every public promise or roll back every edit.",
+          "reason": "Current wording presupposes a changing checkpoint and points toward the non-rejection/preserved-edit outcome being graded."
+        },
+        {
+          "task_id": "tanstack-inflight-options-retry-capture",
+          "kind": "remove_answer_hint",
+          "required": true,
+          "delete": "do not assume changing options retroactively changes all active-fetch behavior.",
+          "reason": "This warns away from the precise incorrect alternative the task should discriminate. Keep the neutral request to explain mutable options, deduplication and retry configuration."
+        }
+      ],
+      "task_statuses": {
+        "tanstack-signal-consumption-unsubscribe": "supported",
+        "tanstack-manual-cache-edit-cancel-revert": "needs_revision",
+        "tanstack-inflight-options-retry-capture": "needs_revision"
+      }
+    }
+  ],
+  "final_reviewed_spec_path": "examples/dataset_sources/tanstack-query-generation-v2-reviewed.json",
+  "final_reviewed_spec_sha256": "b84d0e9ca12abea76aa42aec794c7d50d2ca75b1a33530c83a8601d0321efbcb",
+  "final_reviewed_at": "2026-09-28T21:46:11.186892+00:00",
+  "resolutions": [
+    {
+      "task_id": "tanstack-manual-cache-edit-cancel-revert",
+      "status": "resolved",
+      "change": "Removed cancellation-outcome hint and replaced presupposed checkpoint change with neutral state/cancellation comparison."
+    },
+    {
+      "task_id": "tanstack-inflight-options-retry-capture",
+      "status": "resolved",
+      "change": "Removed active-fetch option-effect hint; extended dynamic-query-function citation to query.ts649-678 to include invocation."
+    }
+  ],
+  "final_execution_scope": "Assertions are byte-for-byte unchanged from the initial spec and prior official three-task verification remains behavioral evidence. Verification of the newly prepared reviewed bundle is separate and pending at this review update; do not infer two fresh runs from this report."
+}

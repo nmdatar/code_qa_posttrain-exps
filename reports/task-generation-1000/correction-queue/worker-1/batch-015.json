@@ -1,0 +1,58 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 1,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-015.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/docker--docker-py-b2a18d7209f8",
+      "original_reference_sha256": "35e1c99c18a4de37767f7cd085a94c2d42c38a0fae6d33609bdb4d66c489390d",
+      "question": "Where is the main URL parsing and connection adapter selection logic implemented for different Docker host protocols (unix, tcp, ssh, npipe)?",
+      "question_sha256": "103edd733d25f0858976ea286810391e6a3b9904a8bca59ff78fb584ff80a7c7",
+      "reference_answer": "Host parsing is in docker/utils/utils.py:210 onward; adapter selection is APIClient.__init__ in docker/api/client.py:136-190. Parsed http+unix, npipe and ssh schemes select their specialized adapters. Ordinary URLs use normal session behavior unless TLSConfig configures the client or a truthy tls value mounts SSLHTTPAdapter for https.",
+      "reference_sha256": "24be88b5cfe4efe043527e34ca2fe7e6f732362786d3c9f2a79c71fa6643b261",
+      "repository": {
+        "commit": "b2a18d7209f827d83cc33acb80aa31bf404ffd4b",
+        "family_id": "docker/docker-py",
+        "url": "https://github.com/docker/docker-py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/docker--docker-py-b2a18d7209f827d83cc33acb80aa31bf404ffd4b",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-4e9b74e94d9bda4d05cc5588"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/docker--docker-py-b2a18d7209f8",
+      "original_reference_sha256": "040d880b7fc76a361d5456e5774634353de91c88e7efd033775d0c708b5aaeff",
+      "question": "Where is the Docker connection transport adapter selection logic implemented for different URL schemes like unix://, npipe://, and ssh://?",
+      "question_sha256": "73038fd2d62763e7fcee421a92569be4c26c1390958b870c74d042d01e5fcd88",
+      "reference_answer": "APIClient.__init__ selects transports after utils.parse_host (docker/api/client.py:136-190). Unix and named-pipe adapters mount on http+docker://, SSH on http+docker://ssh. TLSConfig configures the client, or truthy tls mounts SSLHTTPAdapter on https://. Ordinary HTTP does not pass through the custom Docker transport prefix.",
+      "reference_sha256": "6f0c9960eb52c06ff1c22ded92133812dcd7c4ac0038142e98e83f612f44daac",
+      "repository": {
+        "commit": "b2a18d7209f827d83cc33acb80aa31bf404ffd4b",
+        "family_id": "docker/docker-py",
+        "url": "https://github.com/docker/docker-py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/docker--docker-py-b2a18d7209f827d83cc33acb80aa31bf404ffd4b",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-c0e28ea8cf026491d6afc10a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/docker--docker-py-b2a18d7209f8",
+      "original_reference_sha256": "5171634fe8b95d5f5e2f70aee9ae1948d23b62cebda50f462dbafb96c74c44b2",
+      "question": "Why does the docker-py library's stream and socket resource cleanup system fail to scale efficiently under high-concurrency streaming operations with multiple containers?",
+      "question_sha256": "4f49a4247c17870f4361bf76e49c80459b29d562912d5faafc9b10581745b5bd",
+      "reference_answer": "The cited code does not establish a high-concurrency cleanup failure. DockerClient.close delegates to its API session (docker/client.py:210-212); custom adapters are mounted on that session (docker/api/client.py:143-190). BaseHTTPAdapter.close calls its parent close and clears its pools (docker/transport/basehttpadapter.py:4-8), and Unix pools explicitly configure disposal with p.close (unixconn.py:71-73). CancellableStream.close shuts down its own underlying socket and explicitly rejects Paramiko SSH channels (docker/types/daemon.py:40-74). A leak or cross-stream race would require reproducing and measuring a specific failure, not inferring it from absence of async context management.",
+      "reference_sha256": "0f5062f4ad7cf5315a2fc720ed61d3adc70b2b59e54137f5c0a614403a5eb56a",
+      "repository": {
+        "commit": "b2a18d7209f827d83cc33acb80aa31bf404ffd4b",
+        "family_id": "docker/docker-py",
+        "url": "https://github.com/docker/docker-py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/docker--docker-py-b2a18d7209f827d83cc33acb80aa31bf404ffd4b",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-dcca3a2ee660c865c628193f"
+    }
+  ]
+}

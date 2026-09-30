@@ -1,0 +1,481 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/hylang--hy-902233d854d7",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 19,
+            "file_sha256": "540bc8591c29ca22ef3ec509b90490ae175b7a2d5ba9458286efb8e7f7a84ca8",
+            "path": "conftest.py",
+            "start_line": 13
+          },
+          {
+            "end_line": 7,
+            "file_sha256": "540bc8591c29ca22ef3ec509b90490ae175b7a2d5ba9458286efb8e7f7a84ca8",
+            "path": "conftest.py",
+            "start_line": 7
+          },
+          {
+            "end_line": 3,
+            "file_sha256": "19cbbe0a39e9d8569de30bc16fcbe8c68f3097c8ae625aa2f03c724cb89a4a8e",
+            "path": "setup.cfg",
+            "start_line": 3
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "540bc8591c29ca22ef3ec509b90490ae175b7a2d5ba9458286efb8e7f7a84ca8",
+            "kind": "file_reference",
+            "line_count": 19,
+            "path": "conftest.py"
+          },
+          {
+            "file_sha256": "19cbbe0a39e9d8569de30bc16fcbe8c68f3097c8ae625aa2f03c724cb89a4a8e",
+            "kind": "file_reference",
+            "line_count": 8,
+            "path": "setup.cfg"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the Hy language pytest integration implemented for collecting and running .hy test files?",
+      "question_sha256": "ae884ba73a174d0536c9e8dce7b6697d4cea4bce486e3a240135967cce069067",
+      "reference_answer": "The pytest integration is centrally implemented in the root conftest.py file via the pytest_collect_file hook (conftest.py: line 13-19). This function acts as a custom collector that specifically targets files with the .hy extension, provided they reside within the tests/native_tests/ directory (defined by the NATIVE_TESTS constant at conftest.py: line 7) and are not named __init__.hy. When matches are found, it returns a pytest.Module.from_parent object to register them as test modules. Additionally, the configuration in setup.cfg (setup.cfg: line 3) sets python_functions = test_* hyx_test_*, which is critical for recognizing Hy test functions that undergo name mangling (e.g., test-func becomes hyx_test_func) during compilation.",
+      "reference_sha256": "9070a29e4157041ca52b5c7712987947c917b73989bfe82f2d853034eba09372",
+      "repository": {
+        "commit": "902233d854d765058927402d60f1ee8bef02daf8",
+        "family_id": "hylang/hy",
+        "url": "https://github.com/hylang/hy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hylang--hy-902233d854d765058927402d60f1ee8bef02daf8",
+      "task_id": "import-0f6f649727d8a9e3210b711d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hylang--hy-902233d854d7",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 103,
+            "file_sha256": "547f7ea970934d2d84ef65b996d9e630cf933294dd1cc606f7e30b3c45a38948",
+            "path": "hy/models.py",
+            "start_line": 103
+          },
+          {
+            "end_line": 139,
+            "file_sha256": "547f7ea970934d2d84ef65b996d9e630cf933294dd1cc606f7e30b3c45a38948",
+            "path": "hy/models.py",
+            "start_line": 138
+          },
+          {
+            "end_line": 524,
+            "file_sha256": "547f7ea970934d2d84ef65b996d9e630cf933294dd1cc606f7e30b3c45a38948",
+            "path": "hy/models.py",
+            "start_line": 516
+          },
+          {
+            "end_line": 579,
+            "file_sha256": "547f7ea970934d2d84ef65b996d9e630cf933294dd1cc606f7e30b3c45a38948",
+            "path": "hy/models.py",
+            "start_line": 574
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does Hy's as_model function implement circular reference detection to prevent infinite recursion when converting self-referential Python objects to Hy models?",
+      "question_sha256": "22f5c0badda967a5195bbf1b5a5cba25c0fe752dc009f0f8fb5bc20272b5f354",
+      "reference_answer": "Hy's circular reference detection within as_model prevents infinite recursion through a two-tier architecture involving a global tracking set and specialized wrapper functions. At the core level, a global _seen set maintains object IDs currently being processed (hy/models.py: line 103). The base as_model function checks this set; if id(x) is found, it immediately raises a HyWrapperError with \"Self-referential structure detected\" (hy/models.py: line 138-139). Crucially, as_model does not add IDs to the set itself. Instead, this state management is delegated to wrapper functions, primarily implemented via the recwrap decorator (hy/models.py: line 516-524). This decorator enforces a protocol: add the object's ID to _seen, process it, and guarantee removal via a finally block. This pattern is applied to sequence types including FComponent (line 527), List (line 531-532), Expression (line 594), Set (line 6076-607), and Tuple (line 618-619). For dictionary types, the _dict_wrapper function (hy/models.py: line 574-579) manually implements the same add-process-remove logic.",
+      "reference_sha256": "58d828a809cdc8c49dd2b9a015fd22f40176bcf476dcb2d89920d152325964a2",
+      "repository": {
+        "commit": "902233d854d765058927402d60f1ee8bef02daf8",
+        "family_id": "hylang/hy",
+        "url": "https://github.com/hylang/hy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hylang--hy-902233d854d765058927402d60f1ee8bef02daf8",
+      "task_id": "import-1d56f337f7af2b7f3211654a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hylang--hy-902233d854d7",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 27,
+            "file_sha256": "547f7ea970934d2d84ef65b996d9e630cf933294dd1cc606f7e30b3c45a38948",
+            "path": "hy/models.py",
+            "start_line": 27
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the complete inheritance hierarchy of Hy's object model system starting from the Object base class?",
+      "question_sha256": "a3922955ae7a1e97135b2cf3927b993a04f2020ba11646f77bc94b14c899c4a7",
+      "reference_answer": "Hy's object model implements a three-level hierarchy rooted in the abstract Object class (hy/models.py: line 27). The second level consists of nine direct subclasses: primitive types including String (line 161), Bytes (line 191), Symbol (line 202), Integer (line 309), Float (line 341), and Complex (line 355)\u2014all of which dual-inherit from their Python built-in counterparts\u2014plus Keyword (line 228) and Lazy (line 622) which inherit only from Object. Additionally, Sequence (line 374) inherits from both Object and tuple. Sequence serves as the abstract base for the third level, which comprises seven collection types: FComponent (line 427) and FString (line 460) for formatting, List (line 503) and Dict (line 535) for data structures, Expression (line 586) for code forms, and Set (line 597) and Tuple (line 610) for literals.",
+      "reference_sha256": "15fc61fa260cc17434a20cb67f262bb4b61b5297262b365a279e55406c4711c7",
+      "repository": {
+        "commit": "902233d854d765058927402d60f1ee8bef02daf8",
+        "family_id": "hylang/hy",
+        "url": "https://github.com/hylang/hy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hylang--hy-902233d854d765058927402d60f1ee8bef02daf8",
+      "task_id": "import-43ba4b7d41182c8cb13e3ba1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hylang--hy-902233d854d7",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 41,
+            "file_sha256": "8b6696d1084a1583644bb4b3c78dacb0a26fc055d85dcf47c342997e5744d284",
+            "path": "setup.py",
+            "start_line": 29
+          },
+          {
+            "end_line": 13,
+            "file_sha256": "3deb629e420175834ae16c0d91bb6da93094956495c0894b9a52da5f0e979b8a",
+            "path": "hy/__init__.py",
+            "start_line": 13
+          },
+          {
+            "end_line": 14,
+            "file_sha256": "8b6696d1084a1583644bb4b3c78dacb0a26fc055d85dcf47c342997e5744d284",
+            "path": "setup.py",
+            "start_line": 14
+          },
+          {
+            "end_line": 83,
+            "file_sha256": "e356091db365ae890a397b63e459b84ed026b67f38d53fe468469f627c3e32b0",
+            "path": "fastentrypoints.py",
+            "start_line": 83
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "e64cc0979ba3b10e217e06edfb67d29fcdc2f4c2e5dea474ace2982db8c5a22e",
+            "kind": "file_reference",
+            "line_count": 186,
+            "path": "hy/importer.py"
+          },
+          {
+            "file_sha256": "e356091db365ae890a397b63e459b84ed026b67f38d53fe468469f627c3e32b0",
+            "kind": "file_reference",
+            "line_count": 116,
+            "path": "fastentrypoints.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does Hy exhibit significantly slower startup performance when installed from wheel distributions compared to source installations, despite including precompiled bytecode?",
+      "question_sha256": "55f43fe368615caec1ff0690ebe36aabdd74b9c230dfe304cc5fd7dc6786385e",
+      "reference_answer": "Hy exhibits slower startup performance when installed from wheels due to three interconnected architectural decisions that circumvent Python's standard bytecode optimization mechanisms. First, the custom install class defined in setup.py (lines 29-41) forces recompilation of all .hy files during installation using py_compile.compile with CHECKED_HASH invalidation mode, rather than relying on pre-built bytecode from the wheel. This occurs regardless of whether bytecode already exists in the wheel distribution. Second, Hy's runtime import machinery fundamentally bypasses Python's bytecode cache system. The importer.py module (lines 105, 128) monkey-patches Python's importlib machinery by inserting \".hy\" into SOURCE_SUFFIXES and replacing SourceFileLoader.source_to_code with _hy_source_to_code. This custom source-to-code function (lines 116-125) always recompiles .hy files from source at import time, completely ignoring any existing .pyc files that may have been included in the wheel distribution. Third, the import system actively invalidates Python's import caches (lines 156, 159) and clears path importer caches when the hy package is imported, which happens at startup through the automatic import of hy.importer and call to _inject_builtins (hy/__init__.py lines 13, 15). Additionally, the fastentrypoints.py monkey-patching (setup.py line 14, fastentrypoints.py line 83) modifies console script generation in ways that may interact poorly with wheel installation metadata, potentially causing additional overhead during script startup. The fundamental issue is that Hy's architecture treats .hy files as source code that must be compiled at runtime, making the precompiled bytecode in wheel distributions effectively unused.",
+      "reference_sha256": "e469f2b1d34c14615e38e17383ace75d85a71d0581bd114dc99f27fdced3308c",
+      "repository": {
+        "commit": "902233d854d765058927402d60f1ee8bef02daf8",
+        "family_id": "hylang/hy",
+        "url": "https://github.com/hylang/hy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hylang--hy-902233d854d765058927402d60f1ee8bef02daf8",
+      "task_id": "import-788dfcdf0987b8c1c5905128"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hylang--hy-902233d854d7",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 231,
+            "file_sha256": "cf4c03558e4b0a9fb6c707c91e39d2e141062736afdbe22e6b6e927caf253d99",
+            "path": "hy/errors.py",
+            "start_line": 213
+          },
+          {
+            "end_line": 210,
+            "file_sha256": "cf4c03558e4b0a9fb6c707c91e39d2e141062736afdbe22e6b6e927caf253d99",
+            "path": "hy/errors.py",
+            "start_line": 187
+          },
+          {
+            "end_line": 238,
+            "file_sha256": "cf4c03558e4b0a9fb6c707c91e39d2e141062736afdbe22e6b6e927caf253d99",
+            "path": "hy/errors.py",
+            "start_line": 235
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where are the hidden module identifiers defined that control which internal frames get filtered from Hy exception tracebacks?",
+      "question_sha256": "67ec466a2b71a389af3929ad770e5a83372c57e3852aec945fac9fd8ca12e1d7",
+      "reference_answer": "The hidden module identifiers are defined in the _tb_hidden_modules set (hy/errors.py: line 213-231). This set is populated by applying the _module_filter_name function (hy/errors.py: line 187-210) to a static list of Hy internal modules (such as hy.compiler, hy.reader, and hy.models, listed in line 217-228). The helper function resolves these names to their absolute filesystem paths or package directories. Additionally, the set is explicitly updated (hy/errors.py: line 235-238) to include formatted identifiers for frozen modules (importlib._bootstrap and importlib._bootstrap_external). These are formatted as <frozen ...> strings (or <builtin>/frozen ... on PyPy) to match their distinct representation in tracebacks, as they lack standard file paths.",
+      "reference_sha256": "2251ffc58fde4c4459ed3e69f8c26eef5193bab7933ab55daae74588fceb24f8",
+      "repository": {
+        "commit": "902233d854d765058927402d60f1ee8bef02daf8",
+        "family_id": "hylang/hy",
+        "url": "https://github.com/hylang/hy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hylang--hy-902233d854d765058927402d60f1ee8bef02daf8",
+      "task_id": "import-9727687cbe94d470df0524fb"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hylang--hy-902233d854d7",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 41,
+            "file_sha256": "8b6696d1084a1583644bb4b3c78dacb0a26fc055d85dcf47c342997e5744d284",
+            "path": "setup.py",
+            "start_line": 29
+          },
+          {
+            "end_line": 40,
+            "file_sha256": "8b6696d1084a1583644bb4b3c78dacb0a26fc055d85dcf47c342997e5744d284",
+            "path": "setup.py",
+            "start_line": 40
+          },
+          {
+            "end_line": 14,
+            "file_sha256": "8b6696d1084a1583644bb4b3c78dacb0a26fc055d85dcf47c342997e5744d284",
+            "path": "setup.py",
+            "start_line": 14
+          },
+          {
+            "end_line": 54,
+            "file_sha256": "e356091db365ae890a397b63e459b84ed026b67f38d53fe468469f627c3e32b0",
+            "path": "fastentrypoints.py",
+            "start_line": 43
+          },
+          {
+            "end_line": 20,
+            "file_sha256": "7cd5e9c32df8e1ed831b55eb362cbde1959b584c19c372e3b6f0df1bc16cf19a",
+            "path": "get_version.py",
+            "start_line": 11
+          },
+          {
+            "end_line": 23,
+            "file_sha256": "7cd5e9c32df8e1ed831b55eb362cbde1959b584c19c372e3b6f0df1bc16cf19a",
+            "path": "get_version.py",
+            "start_line": 22
+          },
+          {
+            "end_line": 63,
+            "file_sha256": "8b6696d1084a1583644bb4b3c78dacb0a26fc055d85dcf47c342997e5744d284",
+            "path": "setup.py",
+            "start_line": 61
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "hy/version.py",
+            "reason": "not_tracked",
+            "reference": "hy/version.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "What custom behaviors and configurations are applied during the Hy package installation process defined in setup.py?",
+      "question_sha256": "9f42c56a3998b19be3067431a0de52eb450cd7f390e0f9abb39f52a9feb6eb4e",
+      "reference_answer": "The installation process is customized through three key mechanisms: bytecode compilation, optimized entry points, and dynamic versioning. First, a custom install class (setup.py: line 29-41) extends the standard command to compile all .hy files into .pyc bytecode using py_compile.compile with the CHECKED_HASH invalidation mode (setup.py: line 40). Second, console scripts are generated using a fastentrypoints monkey patch (setup.py: line 14) which overrides the default script writer (fastentrypoints.py: line 43-54) to create lightweight wrappers that bypass pkg_resources overhead. Finally, the package version is dynamically resolved from the HY_VERSION env var or git tags (get_version.py: line 11-20) and written to hy/version.py (get_version.py: line 22-23), while .hy source files are included as package data (setup.py: line 61-63) for runtime availability.",
+      "reference_sha256": "b58c8dc81ce19613f628c6c298cff075fc7358296644184fd14401a9ad8d5e8e",
+      "repository": {
+        "commit": "902233d854d765058927402d60f1ee8bef02daf8",
+        "family_id": "hylang/hy",
+        "url": "https://github.com/hylang/hy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hylang--hy-902233d854d765058927402d60f1ee8bef02daf8",
+      "task_id": "import-a1c330b35030b4338aab1cf4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hylang--hy-902233d854d7",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 707,
+            "file_sha256": "7df28e2e8136b467691e7918d6bc0249b3116f51b0f989d93d0a85c81690f333",
+            "path": "hy/core/result_macros.py",
+            "start_line": 643
+          },
+          {
+            "end_line": 309,
+            "file_sha256": "e7ba50cd831b07b2efb44d38b5b57c29d43f24fe7a392eb3127baa4cb3ccb60f",
+            "path": "hy/compiler.py",
+            "start_line": 144
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does Hy's conditional compilation system generate redundant anonymous variable assignments instead of optimizing nested conditionals into efficient elif chains?",
+      "question_sha256": "b37f875be56f48876302f784b87095aa7da1e89e3bf7d9d8e1ace1c2ee83c373",
+      "reference_answer": "Hy's conditional compilation system generates redundant anonymous variable assignments primarily because the \"cond\" macro recursively expands into nested \"if\" expressions (hy/core/macros.hy: line 36-41) that do not utilize the compiler's internal \"if*\" optimization symbol. While the \"compile_if\" function (hy/core/result_macros.py: line 643-707) includes logic to reuse temporary variables for nested conditionals (specifically checking for \"if*\" at line 652), the standard \"cond\" macro emits standard \"if\" forms, causing this optimization to be skipped. Consequently, \"compile_if\" treats each nesting level as a separate statement-to-expression conversion context. To bridge Hy's expression-oriented semantics with Python's statement-oriented architecture, the compiler is forced to create a new temporary variable via \"get_anon_var\" (line 681) and generate explicit assignment statements (lines 685-689) for each level. This behavior is structurally enforced by the \"Result\" class (hy/compiler.py: line 144-309), which separates statements from expression contexts, necessitating these assignments to maintain correct evaluation semantics across nested statement blocks.",
+      "reference_sha256": "56ff214bfa77a524a4c107126e0f76aef90baa86922ccfa162ce8d19fd925c56",
+      "repository": {
+        "commit": "902233d854d765058927402d60f1ee8bef02daf8",
+        "family_id": "hylang/hy",
+        "url": "https://github.com/hylang/hy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hylang--hy-902233d854d765058927402d60f1ee8bef02daf8",
+      "task_id": "import-a80b5d2b022efb16ab0950e0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hylang--hy-902233d854d7",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 397,
+            "file_sha256": "7859c13989d6d0762c49cecf29e0636e17fd5812e7008c60ec257d16d90dbcd3",
+            "path": "hy/macros.py",
+            "start_line": 327
+          },
+          {
+            "end_line": 324,
+            "file_sha256": "7859c13989d6d0762c49cecf29e0636e17fd5812e7008c60ec257d16d90dbcd3",
+            "path": "hy/macros.py",
+            "start_line": 289
+          },
+          {
+            "end_line": 624,
+            "file_sha256": "e7ba50cd831b07b2efb44d38b5b57c29d43f24fe7a392eb3127baa4cb3ccb60f",
+            "path": "hy/compiler.py",
+            "start_line": 560
+          },
+          {
+            "end_line": 80,
+            "file_sha256": "7859c13989d6d0762c49cecf29e0636e17fd5812e7008c60ec257d16d90dbcd3",
+            "path": "hy/macros.py",
+            "start_line": 37
+          },
+          {
+            "end_line": 24,
+            "file_sha256": "7859c13989d6d0762c49cecf29e0636e17fd5812e7008c60ec257d16d90dbcd3",
+            "path": "hy/macros.py",
+            "start_line": 24
+          },
+          {
+            "end_line": 87,
+            "file_sha256": "7859c13989d6d0762c49cecf29e0636e17fd5812e7008c60ec257d16d90dbcd3",
+            "path": "hy/macros.py",
+            "start_line": 83
+          },
+          {
+            "end_line": 156,
+            "file_sha256": "cf4c03558e4b0a9fb6c707c91e39d2e141062736afdbe22e6b6e927caf253d99",
+            "path": "hy/errors.py",
+            "start_line": 156
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "7df28e2e8136b467691e7918d6bc0249b3116f51b0f989d93d0a85c81690f333",
+            "kind": "file_reference",
+            "line_count": 1977,
+            "path": "hy/core/result_macros.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the macro expansion pipeline implemented across the compilation process in this Lisp-to-Python transpiler?",
+      "question_sha256": "76d2b1f7fa42cdb39ffc4efce639e5a72f43ae9b9c0255c554a909499458050e",
+      "reference_answer": "The macro expansion pipeline is implemented across four main components. The core engine resides in the macroexpand() function (hy/macros.py: line 327-397), which recursively processes Expression models by looking up macros in _hy_macros dictionaries and executing them within a MacroExceptions context (hy/macros.py: line 289-324). This engine is integrated into the compilation process via the compile_expression method in the HyASTCompiler class (hy/compiler.py: line 560-624), ensuring macros are expanded before AST transformation. Core macros are defined in hy/core/result_macros.py (e.g., do at line 113) using the pattern_macro decorator (hy/macros.py: line 37-80) and loaded via the EXTRA_MACROS list (hy/macros.py: line 24). Finally, the system uses install_macro (hy/macros.py: line 83-87) for registration and raises HyMacroExpansionError (hy/errors.py: line 156) to handle expansion failures with preserved stack traces.",
+      "reference_sha256": "a7f90b57ac652c61a074ef5e97150490b833473e22078fd41bac64b31f13c56d",
+      "repository": {
+        "commit": "902233d854d765058927402d60f1ee8bef02daf8",
+        "family_id": "hylang/hy",
+        "url": "https://github.com/hylang/hy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hylang--hy-902233d854d765058927402d60f1ee8bef02daf8",
+      "task_id": "import-aa1108f825baba2e331398d1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hylang--hy-902233d854d7",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 27,
+            "file_sha256": "547f7ea970934d2d84ef65b996d9e630cf933294dd1cc606f7e30b3c45a38948",
+            "path": "hy/models.py",
+            "start_line": 27
+          },
+          {
+            "end_line": 161,
+            "file_sha256": "547f7ea970934d2d84ef65b996d9e630cf933294dd1cc606f7e30b3c45a38948",
+            "path": "hy/models.py",
+            "start_line": 161
+          },
+          {
+            "end_line": 309,
+            "file_sha256": "547f7ea970934d2d84ef65b996d9e630cf933294dd1cc606f7e30b3c45a38948",
+            "path": "hy/models.py",
+            "start_line": 309
+          },
+          {
+            "end_line": 102,
+            "file_sha256": "547f7ea970934d2d84ef65b996d9e630cf933294dd1cc606f7e30b3c45a38948",
+            "path": "hy/models.py",
+            "start_line": 102
+          },
+          {
+            "end_line": 146,
+            "file_sha256": "547f7ea970934d2d84ef65b996d9e630cf933294dd1cc606f7e30b3c45a38948",
+            "path": "hy/models.py",
+            "start_line": 106
+          },
+          {
+            "end_line": 524,
+            "file_sha256": "547f7ea970934d2d84ef65b996d9e630cf933294dd1cc606f7e30b3c45a38948",
+            "path": "hy/models.py",
+            "start_line": 516
+          },
+          {
+            "end_line": 103,
+            "file_sha256": "547f7ea970934d2d84ef65b996d9e630cf933294dd1cc606f7e30b3c45a38948",
+            "path": "hy/models.py",
+            "start_line": 103
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the dependency relationship between Python builtin types and Hy model types in the automatic type promotion system?",
+      "question_sha256": "4661336384be06305d835e1de368b4e935e0e722424425d517d1f67f0c886b4a",
+      "reference_answer": "The relationship consists of two core mechanisms: structural inheritance and runtime registry mapping. Structurally, Hy model types implement a dual-inheritance pattern where they subclass both the abstract Object base class (hy/models.py: line 27) and their corresponding Python builtin types. For instance, the String class inherits from str (hy/models.py: line 161), and the Integer class inherits from int (hy/models.py: line 309). At runtime, the dependency is managed by the _wrappers registry (hy/models.py: line 102), which maps Python types to these Hy model constructors. The as_model function (hy/models.py: line 106-146) acts as the central promoter, using this registry to convert Python objects into Hy models. For collection types, the system uses the recwrap decorator (hy/models.py: line 516-524) to recursively promote nested elements, while the _seen set (hy/models.py: line 103, 138) is used within as_model to detect and prevent infinite recursion in self-referential structures.",
+      "reference_sha256": "80b1f5f70fb437c30fac7e306f9d88f2b8ae61c79f1c4b4903b181629d92265d",
+      "repository": {
+        "commit": "902233d854d765058927402d60f1ee8bef02daf8",
+        "family_id": "hylang/hy",
+        "url": "https://github.com/hylang/hy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hylang--hy-902233d854d765058927402d60f1ee8bef02daf8",
+      "task_id": "import-cefead944ec86189b2d4046d"
+    }
+  ]
+}

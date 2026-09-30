@@ -1,0 +1,490 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "c5e63141fa8970247bd7a7f2338648cfe70eef586a3c67fc9c7e78b550c05fa7",
+            "kind": "file_reference",
+            "line_count": 313,
+            "path": "sphinx/_cli/__init__.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where in the method that formats optional command-line arguments for help text does the conditional evaluation control whether the static method that formats metavar information receives its parameters?",
+      "question_sha256": "271b2725aac0e98d4f78f10583bf628cd1ba2f0810c43c71e882e2fed6287626",
+      "reference_answer": "The conditional evaluation occurs at line 131 in the `_format_optional_arguments` method of the `_RootArgumentParser` class in `sphinx/_cli/__init__.py`.\n\nThe method iterates through argument actions (lines 128-138). For each action, it builds an option string `opt` by concatenating a prefix (based on whether option strings start with '-'), spaces, and the bold-formatted option strings (line 130). The conditional `if action.nargs != 0:` at line 131 controls whether `_format_metavar` is called.\n\nWhen the condition is true (the action expects arguments, i.e., `nargs != 0`), the code at lines 132-134 calls `self._format_metavar(action.nargs, action.metavar, action.choices, action.dest)` and appends a space plus the formatted metavar string to `opt`. When false (the action expects no arguments, like a boolean flag), `_format_metavar` is not called and `opt` is yielded without metavar information.\n\nThe option string `opt` is then yielded at line 135. Before yielding, `opt` undergoes these transformations:\n1. Initial construction (line 130): `prefix + '  ' + ', '.join(map(bold, action.option_strings))` - creates the base option string with formatting\n2. Conditional metavar appending (lines 131-134): if `action.nargs != 0`, appends `' ' + self._format_metavar(...)` to include metavar information\n\nThis conditional check ensures that only actions expecting arguments (non-zero nargs) have their metavar information formatted and displayed in the help text, while flag-style actions (nargs=0) are displayed without metavar suffixes.",
+      "reference_sha256": "a9dd05b7c4a5cfbdb743f3bd931120943d3d2c9c09a6d214adcf6c50117006a8",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-4f654066f7ac2657befe7092"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 595,
+            "file_sha256": "98d1d93ad2560aed528904e5bd01dfcbe92ef7ee9abee30f407cdb8ef26d297a",
+            "path": "sphinx/domains/python/__init__.py",
+            "start_line": 570
+          },
+          {
+            "end_line": 143,
+            "file_sha256": "bd84920768b2416cca8660b2747570280aaf5334b00fe0c3a884dc6794f51888",
+            "path": "sphinx/roles.py",
+            "start_line": 143
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the Python domain cross-reference handler's link processing method require optimization to reduce redundant string operations when processing multiple similar cross-references in high-volume builds?",
+      "question_sha256": "0cb9a78198ee1a36bb7a0d7659aa0df392c9a335d2d02c8c3b130919eaaeac27",
+      "reference_answer": "The Python domain cross-reference handler's link processing method (`PyXRefRole.process_link` in `sphinx/domains/python/__init__.py`, lines 570-595) requires optimization because it performs multiple redundant string operations that create new string objects for each cross-reference processed, even when patterns are similar.\n\n**The redundant operations:**\n\n1. **String stripping operations** (lines 581-582):\n   - `title.lstrip('.')` creates a new string by removing leading dots\n   - `target.lstrip('~')` creates a new string by removing leading tildes\n\n2. **Character checking and slicing** (lines 585-589):\n   - `title[0:1] == '~'` checks the first character\n   - `title[1:]` creates a new string by slicing\n   - `title.rfind('.')` searches for the last dot position\n   - `title[dot + 1 :]` creates another new string by slicing\n\n3. **Target processing** (lines 592-593):\n   - `target[0:1] == '.'` checks the first character\n   - `target[1:]` creates a new string by slicing\n\n**Why this is problematic in high-volume builds:**\n\nWhen processing thousands of cross-references with similar patterns (e.g., many titles starting with `~` or targets starting with `.`), the method:\n- Creates multiple temporary string objects per cross-reference\n- Performs the same pattern checks repeatedly\n- Executes string operations that could be optimized or cached\n\nFor example, if 1000 cross-references all have titles starting with `~`, the method performs `title[0:1] == '~'`, `title[1:]`, `title.rfind('.')`, and `title[dot + 1 :]` 1000 times, creating thousands of intermediate string objects.\n\n**The method's role:**\nThis method is called from `XRefRole.create_xref_node()` (in `sphinx/roles.py`, line 143) for every cross-reference role invocation. Since `PyXRefRole` instances are registered for multiple Python domain roles (`'data'`, `'exc'`, `'func'`, `'class'`, `'const'`, `'attr'`, `'type'`, `'meth'`, `'mod'`, `'obj'` - see lines 766-776), it's invoked frequently during documentation builds.\n\n**Optimization opportunities:**\n- Cache results for identical title/target patterns\n- Use more efficient string checking (e.g., `startswith()` instead of slicing)\n- Minimize intermediate string object creation\n- Batch process similar patterns together\n\nThe redundant string operations become a performance bottleneck when scaling to large documentation projects with many cross-references sharing similar patterns.",
+      "reference_sha256": "dbc9a193aee6f72444b68bc7e1bf1495a36433228626b20d0afede5ab33dd580",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-5b009b0c0f46da0ef68686e3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 288,
+            "file_sha256": "84e67b529f86d7c25c3ca1fd1c56dd2374306d0aa179f29ef6829e349a1c31a0",
+            "path": "sphinx/util/cfamily.py",
+            "start_line": 287
+          },
+          {
+            "end_line": 289,
+            "file_sha256": "811fb133c0413925aa68a6d6287683f50a97367abda7a5afc8702795acf39e5a",
+            "path": "sphinx/domains/c/_ast.py",
+            "start_line": 285
+          },
+          {
+            "end_line": 501,
+            "file_sha256": "5f93c327d5c10386c07718e83b7ed09908299a3b63f58a5cba32f86c946bf571",
+            "path": "sphinx/domains/cpp/_ast.py",
+            "start_line": 497
+          },
+          {
+            "end_line": 165,
+            "file_sha256": "ed37f51e7747531a9b7aaec62932f7ceaa21b47ede00bee59a0779478b7c8c43",
+            "path": "sphinx/domains/c/_parser.py",
+            "start_line": 155
+          },
+          {
+            "end_line": 235,
+            "file_sha256": "7733662ca9b9b5b93cbb4b50ce49c50de7a9802eaeae4bdb543c30bdd658fadf",
+            "path": "sphinx/domains/cpp/_parser.py",
+            "start_line": 225
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the exception raised when character literal decoding produces multiple characters integrate with the parser's error handling to distinguish valid single-character from invalid multi-character literals during AST construction?",
+      "question_sha256": "d7ce1121fa941ef1e19b37ca1e81203194741a07a1523e66d2e131c4ced8e68b",
+      "reference_answer": "The exception integrates with the parser's error handling to distinguish valid single-character from invalid multi-character literals during AST construction as follows:\n\n1. Exception definition and purpose: `UnsupportedMultiCharacterCharLiteral` is defined in `sphinx/util/cfamily.py` (lines 287-288) as a simple exception class. It signals when a character literal decodes to more than one character.\n\n2. Exception raising during AST construction: In both C and C++ AST modules (`sphinx/domains/c/_ast.py` lines 285-289 and `sphinx/domains/cpp/_ast.py` lines 497-501), the `ASTCharLiteral.__init__` method:\n   - Decodes the character literal data using `data.encode().decode('unicode-escape')`\n   - Checks if the decoded result has exactly one character\n   - If `len(decoded) == 1`, it stores the character's ordinal value\n   - If `len(decoded) != 1`, it raises `UnsupportedMultiCharacterCharLiteral(decoded)`\n\n3. Integration with parser error handling: Both C and C++ parsers (`sphinx/domains/c/_parser.py` lines 155-165 and `sphinx/domains/cpp/_parser.py` lines 225-235) catch this exception in their `_parse_literal` methods:\n   - When parsing character literals, they attempt to create an `ASTCharLiteral` instance\n   - If `UnsupportedMultiCharacterCharLiteral` is raised, they catch it and convert it to a `DefinitionError` with the message: \"Can not handle character literal resulting in multiple decoded characters.\"\n   - This allows the parser to provide a clear error message instead of letting the exception propagate\n\n4. Distinction mechanism: This design distinguishes valid from invalid literals during AST construction:\n   - Valid single-character literals: The `ASTCharLiteral` constructor succeeds, stores the character value, and the AST node is created\n   - Invalid multi-character literals: The constructor raises the exception, which is caught by the parser and converted to a user-friendly error message\n\nThis approach separates validation logic (in the AST node constructor) from error reporting (in the parser), enabling the parser to handle invalid character literals gracefully while maintaining a clear distinction between valid and invalid cases during AST construction.\n</start_of_answer>",
+      "reference_sha256": "30464be92517bd7df002905fefb37d7d015d1d422d84130fafd189b2f56bf81a",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-62754687cf75112341a70c15"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "75450e64c888c87361705f648336a2b8eb55141d8ab70a8d20bb119f632dd27a",
+            "kind": "file_reference",
+            "line_count": 1,
+            "path": "tests/roots/test-ext-autodoc/circular_import/a.py"
+          },
+          {
+            "file_sha256": "2b9dee23134a8287e001aa0029e38a80bc9f50c28514b043fe3c05def25d20b9",
+            "kind": "file_reference",
+            "line_count": 4,
+            "path": "tests/roots/test-ext-autodoc/circular_import/b.py"
+          },
+          {
+            "file_sha256": "6ac211c41adbdb4df67ed950d6f25dbe07c342f017305646522a64c2f60a4bbf",
+            "kind": "file_reference",
+            "line_count": 6,
+            "path": "tests/roots/test-ext-autodoc/circular_import/c.py"
+          },
+          {
+            "file_sha256": "c8f007482de2ec30ad1db1d29f5806d9db5ddbd9fbe0648ed4e78f7d9fe7c730",
+            "kind": "file_reference",
+            "line_count": 3362,
+            "path": "tests/test_extensions/test_ext_autodoc.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "circular_import.c",
+            "reason": "not_tracked",
+            "reference": "circular_import.c",
+            "start_line": null
+          },
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "circular_import.__init__.py",
+            "reason": "not_tracked",
+            "reference": "circular_import.__init__.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "What architectural pattern does the class defined in the third module use to resolve the circular dependency between the first module and the second module in the test package?",
+      "question_sha256": "11eefbbfcfab8d0c315405aa1c87d5af99802596a3176874717d8e1dd3e5b7bb",
+      "reference_answer": "The pattern is a mediator/third-party module combined with deferred import using `TYPE_CHECKING` and re-export.\n\nStructure:\n1. `circular_import.a` (`a.py`): Defines `X = 42`.\n2. `circular_import.b` (`b.py`): Uses `if typing.TYPE_CHECKING:` to conditionally import `SomeClass` from the parent package, avoiding a runtime circular dependency.\n3. `circular_import.c` (`c.py`): Imports both `circular_import.a` and `circular_import.b`, and defines `SomeClass` referencing `circular_import.a.X`.\n4. `circular_import.__init__.py`: Re-exports `SomeClass` from `circular_import.c`.\n\nHow it resolves the circular dependency:\n- `a` doesn't import `b` or `SomeClass`.\n- `b` only imports `SomeClass` under `TYPE_CHECKING`, so no runtime circular dependency.\n- `c` can import both `a` and `b` because `b`'s import is deferred.\n- The package re-exports `SomeClass`, providing a clean API.\n\nSeparation of concerns:\n- `a` remains independent.\n- `b` uses deferred imports for type hints only.\n- `c` acts as the mediator.\n- The package level provides the public API.\n\nThis is tested in `test_autodoc_TYPE_CHECKING_circular_import` in `tests/test_extensions/test_ext_autodoc.py`, which verifies that the modules can be imported without circular dependency errors.",
+      "reference_sha256": "2f7f1a80da646d7ef0ed143fe1a8e7d47270ec8233cec5b676e7581eee23698a",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-6275e02f56a74277a42d67b6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1329,
+            "file_sha256": "0d4bd8d05bf3ff2ff65f8654cb5888cd417f6052dbc5a55259a28f5e6deeb470",
+            "path": "sphinx/domains/std/__init__.py",
+            "start_line": 1294
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the standard domain method that resolves cross-references across multiple object types apply case-lowering selectively to only heading references and glossary terms rather than normalizing targets uniformly?",
+      "question_sha256": "63ebd243f204f6c191f5a7850752aacda48fb6c22e6bde89c18dfdcdcd4b1a41",
+      "reference_answer": "The selective case-lowering in `resolve_any_xref` (lines 1294-1329 in `sphinx/domains/std/__init__.py`) exists because different object types use different storage mechanisms and case-sensitivity requirements.\n\n**For 'ref' role (heading references):**\nThe 'ref' role has `lowercase=True` in its `XRefRole` definition (line 757), so it automatically lowercases targets during normal resolution. The comment on line 1304 confirms this: `# :ref: lowercases its target automatically`. When `resolve_any_xref` calls `resolve_xref` for the 'ref' role (line 1311), it passes the lowercased target (`ltarget`) to match this expected behavior.\n\n**For 'term' object type (glossary terms):**\nTerms are stored in lowercase in the `_terms` dictionary (line 877: `self._terms[term.lower()] = ...`). The `_note_term` method stores terms with both original case (via `note_object` on line 875) and lowercase (in `_terms` on line 877). The `resolve_xref` method for 'term' performs case-insensitive lookup using `target.lower()` (lines 1267-1268). Therefore, `resolve_any_xref` must use the lowercased target when checking `self.objects` for terms (line 1321).\n\n**For other object types:**\nOther object types (like 'token', 'envvar', 'confval', 'cmdoption', etc.) are stored in `self.objects` with their original case preserved (line 863: `self.objects[objtype, name] = ...`). These require exact case matching, so `resolve_any_xref` uses the original `target` without lowercasing (line 1319).\n\nThis selective approach maintains compatibility with each object type's storage and lookup semantics rather than forcing uniform normalization that would break case-sensitive lookups for other types.",
+      "reference_sha256": "c7117c3ad37cd3eb8ccdec3ceae304dd166286511bca4d07ae29404ac2a43640",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-6415455829303c366ad8ff47"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 66,
+            "file_sha256": "95a4750707d35f858ff6db7e60bd111c509a6b1c3744b80d9dd68a899628f064",
+            "path": "sphinx/directives/patches.py",
+            "start_line": 66
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "95a4750707d35f858ff6db7e60bd111c509a6b1c3744b80d9dd68a899628f064",
+            "kind": "file_reference",
+            "line_count": 240,
+            "path": "sphinx/directives/patches.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the dependency mechanism in the directive class that handles CSV table rendering in the patches module's execution method on the build environment context to correctly resolve file paths?",
+      "question_sha256": "360e4ad442ed12b6a263b9ba2f62a8c7327894c4c2c3e42a2af092c72a25be20",
+      "reference_answer": "The dependency mechanism in the directive class that handles CSV table rendering (CSVTable in `sphinx/directives/patches.py`) relies on the build environment context accessed through `self.state.document.settings.env` to resolve file paths when absolute paths are provided via the `:file:` option.\n\nThe mechanism works as follows:\n\n1. **Environment Access**: The execution method (`run()`) retrieves the build environment from `self.state.document.settings.env` (line 66 in `sphinx/directives/patches.py`).\n\n2. **Source Directory Resolution**: When an absolute path (starting with `/` or `os.sep`) is detected in the `:file:` option, the method uses `env.srcdir` (the source directory property of BuildEnvironment) to construct the absolute path by joining it with the path string after removing the leading separator: `abspath = env.srcdir / self.options['file'][1:]` (line 78).\n\n3. **Document Directory Resolution**: The method uses `env.doc2path(env.current_document.docname).parent` to obtain the directory containing the current document being processed (line 79). The `doc2path()` method converts a document name to its file path, and `.parent` extracts the directory.\n\n4. **Relative Path Conversion**: Finally, the absolute path is converted to a relative path from the document's directory using `relpath(abspath, doc_dir)` (line 80), which ensures the CSV file path is correctly resolved relative to the document's location.\n\nThis mechanism allows absolute paths in the `:file:` option to be interpreted as relative to the source directory, then converted to paths relative to the current document's directory, enabling proper file resolution regardless of document location within the project structure.\n\nIf `env.srcdir` were unavailable, the absolute path construction on line 78 would fail with an AttributeError. If `env.doc2path` were unavailable, the document directory resolution on line 79 would fail, preventing the relative path conversion and causing incorrect file path resolution.",
+      "reference_sha256": "cb3f2aa0fcfdae359091e0f82bfbc918fd8a9d9c3de8df498218b799f58bc3ad",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-6b86a8542b1f719a255eaa9b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 935,
+            "file_sha256": "98d1d93ad2560aed528904e5bd01dfcbe92ef7ee9abee30f407cdb8ef26d297a",
+            "path": "sphinx/domains/python/__init__.py",
+            "start_line": 921
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the Python domain's object resolution method reconcile the tension between fully-qualified and unqualified references while maintaining predictable resolution order?",
+      "question_sha256": "120dd1045c08787bb6b2c5fb1e39f0512ebc2635d20f3fc78d95cbcc0d55a2ec",
+      "reference_answer": "The Python domain's object resolution method (`find_obj` in the `PythonDomain` class) reconciles this tension through a hierarchical search order that prioritizes more specific (fully-qualified) names before less specific (unqualified) ones, ensuring deterministic resolution across documentation contexts.\n\nThe method implements two search modes with distinct strategies:\n\n**Search Mode 0 (Exact Match Mode)** - Used for standard cross-references:\n1. First checks for exact name match (`name` in `self.objects`)\n2. If not found and a classname is provided, tries `classname + '.' + name`\n3. If not found and a modname is provided, tries `modname + '.' + name`\n4. Finally, if both modname and classname are provided, tries `modname + '.' + classname + '.' + name`\n\nThis order (lines 921-935 in `sphinx/domains/python/__init__.py`) ensures that unqualified names are checked first (for simplicity), but when context (modname/classname) is available, it progressively tries more qualified forms, maintaining predictability by always following the same sequence.\n\n**Search Mode 1 (Fuzzy Search Mode)** - Used when `refspecific` attribute is present:\n1. First tries fully-qualified: `modname + '.' + classname + '.' + name` (if both provided)\n2. Then tries module-qualified: `modname + '.' + name` (if modname provided)\n3. Then tries unqualified: just `name`\n4. Finally falls back to fuzzy matching: searches for objects ending with `'.' + name`\n\nThis mode (lines 886-918) prioritizes fully-qualified names first, then progressively less qualified forms, ensuring that when multiple matches exist, the most specific (and likely intended) match is found first.\n\nThe key insight is that the method uses **context-aware progressive qualification**: it starts with the most specific form available (given the provided modname/classname context) and falls back to less specific forms in a deterministic order. This approach:\n\n1. **Supports fully-qualified references**: When users provide `module.Class.method`, it can resolve it directly\n2. **Supports unqualified references**: When users provide just `method`, it searches for it\n3. **Maintains predictable order**: The search always follows the same sequence, so resolution behavior is consistent regardless of documentation context\n4. **Handles context**: When documentation provides module/class context (via `modname`/`classname` parameters), it uses that context to try qualified forms before falling back to unqualified\n\nThe method is called from `resolve_xref` (line 953), which determines the search mode based on whether the reference node has a `refspecific` attribute, allowing different documentation contexts to use different search strategies while maintaining the same predictable resolution order within each mode.",
+      "reference_sha256": "fc217c76534967199451ccd36df085fd52689fdc99cd8d0d64f1bb5d715d01f6",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-721ac1a2f9bb10c32d99fb87"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "5f93c327d5c10386c07718e83b7ed09908299a3b63f58a5cba32f86c946bf571",
+            "kind": "file_reference",
+            "line_count": 4748,
+            "path": "sphinx/domains/cpp/_ast.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where are the conditional branches that determine whether the pointer suffix identifier generation method in the parenthesized declarator node class of the C++ domain applies version-specific transformations?",
+      "question_sha256": "dd7e7c9c4a07c13ec25a329eecd8769e624282b483ff92ff133bfd482dfa6c48",
+      "reference_answer": "The conditional branches that determine whether version-specific transformations are applied in the pointer suffix identifier generation method of the parenthesized declarator node class in the C++ domain are implemented at **line 3228** in the file `sphinx/domains/cpp/_ast.py`, within the `get_ptr_suffix_id` method of the `ASTDeclaratorParen` class.\n\nThe specific conditional branch is:\n\n```python\nif version == 1:\n    raise NoOldIdError  # TODO: was this implemented before?\n    ptr_suffix_id_next = self.next.get_ptr_suffix_id(version)\n    ptr_suffix_id_inner = self.inner.get_ptr_suffix_id(version)\n    return ptr_suffix_id_next + ptr_suffix_id_inner\n```\n\nThis `if version == 1:` condition at line 3228 determines the version-specific transformation behavior:\n\n- **For version 1**: The code raises `NoOldIdError` (indicating that version 1 identifier generation is not supported for this node type). There is commented-out code that would have concatenated the identifiers in the order `ptr_suffix_id_next + ptr_suffix_id_inner`.\n\n- **For version 2 and later** (the else branch, lines 3233-3235): The method concatenates the pointer suffix identifiers in the order `ptr_suffix_id_inner + ptr_suffix_id_next`, which is the reverse order compared to what version 1 would have used.\n\nThe version parameter represents different identifier generation schemes used by Sphinx for generating unique identifiers for C++ symbols. Version 1 is an older scheme that is no longer fully supported (hence the `NoOldIdError`), while version 2+ represents the current identifier generation scheme. The conditional branch at line 3228 is the exact location where this version-specific transformation logic is implemented.",
+      "reference_sha256": "054695ce3257bb9ede0d4203dd3bb776ac71dfa93e6696cd19a48f8cfc13afe0",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-7318b2894e8550d08fc091e1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "9373d280bad21697ad38e922965468625dae20b816c595300b14ab3890b40623",
+            "kind": "file_reference",
+            "line_count": 302,
+            "path": "sphinx/transforms/post_transforms/images.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the remote image downloader use a two-level structure with URI hash parent and sanitized basename, rather than a flat directory?",
+      "question_sha256": "f0c81a6ffeed7b54368865df25b1cad79f0fac96a04e7ba2292a2bf76f786c3b",
+      "reference_answer": "The remote image downloader (implemented in the `ImageDownloader` class in `sphinx/transforms/post_transforms/images.py`) uses a two-level directory structure (`imagedir/uri_hash/basename`) to prevent filename collisions when different URIs share the same basename.\n\nIn the implementation (lines 61-76), the path is constructed as:\n```python\nuri_hash = sha1(node['uri'].encode(), usedforsecurity=False).hexdigest()\npath = Path(self.imagedir, uri_hash, basename)\n```\n\nThis design addresses a critical problem: if images were stored in a flat directory using only the basename, different URIs with identical filenames would overwrite each other. For example, `https://example.com/image.png` and `https://other.com/image.png` both have the basename `image.png`, and in a flat structure, one would overwrite the other, causing data loss or incorrect image references.\n\nThe two-level structure provides:\n1. **Uniqueness**: The URI hash ensures different URIs get different parent directories, preventing collisions even when basenames are identical.\n2. **Readability**: The sanitized basename preserves human-readable information from the original URI, making it easier to identify files during debugging or inspection.\n3. **Deduplication**: The same URI always maps to the same hash directory, enabling efficient caching and avoiding duplicate downloads.\n\nIf only the URI hash were used as the filename (flat structure with hash-only names), the human-readable basename would be lost, making file management and debugging significantly more difficult. The combination of hash-based parent directory and basename-based filename balances uniqueness, readability, and organization.",
+      "reference_sha256": "ee29a7b3cf8b585a01f41ee07b19462bb30df94f4185237cec1dd9d98d8b3385",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-7a44b24f12a20b78f8f0c5f5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 53,
+            "file_sha256": "48e07187ca850d6c571930816cda4294bf37649e9ba2080cb1e11f856f21217b",
+            "path": "tests/test_intl/test_catalogs.py",
+            "start_line": 52
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "48e07187ca850d6c571930816cda4294bf37649e9ba2080cb1e11f856f21217b",
+            "kind": "file_reference",
+            "line_count": 94,
+            "path": "tests/test_intl/test_catalogs.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why do separate recursive directory traversals for source and compiled translation files in the catalog compilation verification test impact performance with thousands of locale catalog files?",
+      "question_sha256": "5e5846014fe0f2466c192420de288bea4e08fc28a5f16dab7bd2cb6c15a94bbe",
+      "reference_answer": "The separate recursive directory traversals impact performance because each `rglob()` call performs a full recursive walk of the filesystem tree, which is expensive when there are thousands of catalog files.\n\nIn `tests/test_intl/test_catalogs.py`, the `test_compile_all_catalogs` function (lines 47-55) performs two separate `rglob()` operations on the same directory:\n\n```52:53:tests/test_intl/test_catalogs.py\nexpect = {x.with_suffix('.mo') for x in catalog_dir.rglob('*.po')}\nactual = set(catalog_dir.rglob('*.mo'))\n```\n\nEach `rglob()` call:\n1. Recursively traverses the entire directory tree under `catalog_dir` (which is `locale_dir / language / 'LC_MESSAGES'`)\n2. Visits every directory and file to match the pattern\n3. Performs filesystem I/O operations (stat calls, directory reads) for each entry\n\nWhen there are thousands of catalog files, this means:\n- The first `rglob('*.po')` traverses all directories and files to find .po files\n- The second `rglob('*.mo')` repeats the same traversal to find .mo files\n- This doubles the filesystem I/O overhead\n\nThe performance impact is compounded because:\n- Filesystem operations are relatively slow compared to in-memory operations\n- Each directory entry requires a system call\n- With thousands of files, the cumulative overhead becomes significant\n- The two traversals are independent, so there's no caching benefit between them\n\nA more efficient approach would be to perform a single recursive traversal and collect both .po and .mo files in one pass, or cache the results of the first traversal if both are needed separately. The test in `test_compile_update_catalogs` (line 91) shows a slight optimization by converting the first `rglob` result to a set before processing, but it still performs two separate traversals.",
+      "reference_sha256": "22255369fed271a391e1d90b35d29b4da2165458a5493565631879600c41b83a",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-7c4badf82e8577dbcd4566d4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 239,
+            "file_sha256": "1d7757ac6b3d58b6f48341f347b5720660fe0c2a4ff1a885cd4458c6ce70e2fa",
+            "path": "sphinx/ext/autosummary/generate.py",
+            "start_line": 224
+          },
+          {
+            "end_line": 457,
+            "file_sha256": "1d7757ac6b3d58b6f48341f347b5720660fe0c2a4ff1a885cd4458c6ce70e2fa",
+            "path": "sphinx/ext/autosummary/generate.py",
+            "start_line": 442
+          },
+          {
+            "end_line": 517,
+            "file_sha256": "1d7757ac6b3d58b6f48341f347b5720660fe0c2a4ff1a885cd4458c6ce70e2fa",
+            "path": "sphinx/ext/autosummary/generate.py",
+            "start_line": 485
+          },
+          {
+            "end_line": 439,
+            "file_sha256": "1d7757ac6b3d58b6f48341f347b5720660fe0c2a4ff1a885cd4458c6ce70e2fa",
+            "path": "sphinx/ext/autosummary/generate.py",
+            "start_line": 300
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "1d7757ac6b3d58b6f48341f347b5720660fe0c2a4ff1a885cd4458c6ce70e2fa",
+            "kind": "file_reference",
+            "line_count": 952,
+            "path": "sphinx/ext/autosummary/generate.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the documentation generation system determine which class members should be excluded from generated documentation?",
+      "question_sha256": "566d26a0db18c794e4f1928fdcb74d5c1bdba24cda9b867083195e5c079b6897",
+      "reference_answer": "The documentation generation system determines which class members to exclude through an event-based filtering mechanism that operates during the member collection phase, before template rendering.\n\n**Exclusion Mechanism:**\n\n1. **Member Scanning Phase**: When generating documentation for a module, the system uses a scanner class (located in `sphinx/ext/autosummary/generate.py`) that iterates through all members of the object. For each member, it:\n   - Determines the member's object type (function, class, method, attribute, etc.)\n   - Calls an `is_skipped()` method that emits the `autodoc-skip-member` event\n\n2. **Event-Based Filtering**: The `is_skipped()` method (lines 224-239 in `generate.py`) emits the `autodoc-skip-member` event with parameters: object type, member name, member value, and default skip status. Extensions can connect to this event to return `True` (skip) or `False` (include) for specific members.\n\n3. **Member Collection Functions**: For both modules and classes, the system uses a `_get_members()` function (lines 485-517) that:\n   - Collects all members of the object\n   - For each member matching the requested types, calls `_skip_member()` (lines 442-457)\n   - `_skip_member()` also emits the `autodoc-skip-member` event\n   - Members are only included if the event returns `False` or `None` (default behavior)\n\n4. **Integration with Document Generation**: The filtering occurs during the content generation phase in `generate_autosummary_content()` (lines 300-439):\n   - For modules: Uses the scanner's `scan()` method which applies filtering via `is_skipped()`\n   - For classes: Uses `_get_members()` which applies filtering via `_skip_member()`\n   - Filtered member lists are stored in a namespace dictionary (`ns`)\n   - This namespace is passed to a template renderer that uses Jinja2 templates to generate RST output\n   - The filtering happens **before** template rendering, ensuring excluded members never appear in the final documentation\n\n**Key Code Locations:**\n- `sphinx/ext/autosummary/generate.py:224-239` - `is_skipped()` method in ModuleScanner\n- `sphinx/ext/autosummary/generate.py:442-457` - `_skip_member()` function\n- `sphinx/ext/autosummary/generate.py:485-517` - `_get_members()` function that uses `_skip_member()`\n- `sphinx/ext/autosummary/generate.py:300-439` - `generate_autosummary_content()` orchestrates the process\n\nThe system provides extensibility through the `autodoc-skip-member` event, allowing custom filtering logic to be added via Sphinx extensions without modifying core code.",
+      "reference_sha256": "792755aec3dbdb2e9cae7368ea930ccf6ee235da4403bd29fc66e0c941df0c36",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-7c700b38e0ebd554d85a122f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 41,
+            "file_sha256": "811fb133c0413925aa68a6d6287683f50a97367abda7a5afc8702795acf39e5a",
+            "path": "sphinx/domains/c/_ast.py",
+            "start_line": 41
+          },
+          {
+            "end_line": 102,
+            "file_sha256": "84e67b529f86d7c25c3ca1fd1c56dd2374306d0aa179f29ef6829e349a1c31a0",
+            "path": "sphinx/util/cfamily.py",
+            "start_line": 102
+          },
+          {
+            "end_line": 1914,
+            "file_sha256": "811fb133c0413925aa68a6d6287683f50a97367abda7a5afc8702795acf39e5a",
+            "path": "sphinx/domains/c/_ast.py",
+            "start_line": 1844
+          },
+          {
+            "end_line": 1696,
+            "file_sha256": "811fb133c0413925aa68a6d6287683f50a97367abda7a5afc8702795acf39e5a",
+            "path": "sphinx/domains/c/_ast.py",
+            "start_line": 1695
+          },
+          {
+            "end_line": 389,
+            "file_sha256": "2dbcfa8028f4c73cc0ff538e05d41bc60b8d3739e0df48f3fee0d2da5b6e15bd",
+            "path": "sphinx/domains/c/__init__.py",
+            "start_line": 386
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 739,
+            "line_count": 738,
+            "path": "sphinx/domains/c/_symbol.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "sphinx/domains/c/_symbol.py",
+            "resolved_path": "sphinx/domains/c/_symbol.py",
+            "start_line": 70
+          }
+        ]
+      },
+      "question": "What is the integration mechanism between the macro declaration node class and the abstract syntax tree hierarchy that maintains consistency between identifier resolution via the versioned identifier method and symbol table management in the C domain?",
+      "question_sha256": "9dcebe8325cb38fd860aa05f4a6cf2ff2fcdd26897f322944bca2329f2bcf838",
+      "reference_answer": "The integration mechanism between the macro declaration node class (ASTMacro) and the abstract syntax tree hierarchy maintains consistency through a delegation pattern that bridges the AST layer and the symbol table management system.\n\n**Architectural Structure:**\n1. **AST Hierarchy Integration**: ASTMacro inherits from ASTBase (defined in `sphinx/domains/c/_ast.py:41`), which inherits from ASTBaseBase (from `sphinx/util/cfamily.py:102`). This places it within the standard AST node hierarchy used throughout the C domain.\n\n2. **Declaration Wrapping**: ASTMacro instances are wrapped in ASTDeclaration objects (see `sphinx/domains/c/_ast.py:1844-1914`). ASTDeclaration serves as the coordination layer between AST nodes and the Symbol system.\n\n3. **Identifier Resolution Strategy**: ASTMacro's `get_id()` method (lines 1695-1696 in `sphinx/domains/c/_ast.py`) implements identifier resolution by delegating to the Symbol's hierarchical structure:\n   ```python\n   def get_id(self, version: int, objectType: str, symbol: Symbol) -> str:\n       return symbol.get_full_nested_name().get_id(version)\n   ```\n   This method receives a Symbol parameter and uses `symbol.get_full_nested_name()` to traverse the symbol hierarchy.\n\n4. **Symbol Table Consistency**: The Symbol class (`sphinx/domains/c/_symbol.py:70-739`) maintains the symbol table through:\n   - Hierarchical parent-child relationships stored in `_children_by_name` and `_children_by_docname` dictionaries\n   - The `get_full_nested_name()` method (lines 255-263) that builds an ASTNestedName by traversing up the parent chain\n   - Symbol addition through `add_declaration()` (lines 601-614) which calls `_add_symbols()` to maintain the tree structure\n\n5. **Integration Flow**: When a macro is documented:\n   - CMacroObject directive (`sphinx/domains/c/__init__.py:386-389`) parses the signature\n   - CObject.handle_signature() (lines 234-300) creates an ASTDeclaration wrapping an ASTMacro\n   - The declaration is added to the symbol table via `parent_symbol.add_declaration()` (line 261)\n   - When identifier resolution is needed, ASTDeclaration.get_id() (lines 1907-1914) calls ASTMacro.get_id() with the associated Symbol\n   - ASTMacro.get_id() uses the Symbol's hierarchical structure to resolve the full qualified name\n\n**Consistency Mechanism**: The consistency is maintained because:\n- ASTMacro doesn't directly access the symbol table; it receives a Symbol instance that already represents its position in the hierarchy\n- The Symbol's `get_full_nested_name()` method ensures that identifier resolution always reflects the current symbol table state\n- All AST nodes in the C domain follow the same pattern: they receive a Symbol parameter in their `get_id()` methods, ensuring uniform identifier resolution across the domain\n\nThis design ensures that identifier resolution always reflects the current symbol table state, maintaining consistency between the AST representation and the actual symbol hierarchy managed by the Symbol class.",
+      "reference_sha256": "e3cb038983c6417e48eb86fd7edae2efc11f06867f9c2acaa69c7b5e5e969696",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-81bc9bf81eab283b29478b41"
+    }
+  ]
+}

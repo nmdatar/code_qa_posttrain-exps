@@ -1,0 +1,283 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-80f76ce045575a9e5c2cea91",
+      "reference_sha256": "1bc256c7654c4d2129e17df4633c6f5de8b2ae49fec0f7d156c71643478b12f5",
+      "question_sha256": "760dd964d0d4d09a3eb71939041f77bb05fb2b405a809264f0482669727e62a5",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "MockResponse header delegation",
+          "verdict": "partially_supported",
+          "reason": "Delegation and missing return are visible, but unconditional None assumes delegated method exists and succeeds; modern HTTPMessage may lack getheaders.",
+          "evidence": {
+            "path": "src/requests/cookies.py",
+            "start_line": 110,
+            "end_line": 137
+          }
+        }
+      ],
+      "material_errors": [
+        "Delegation and missing return are visible, but unconditional None assumes delegated method exists and succeeds; modern HTTPMessage may lack getheaders."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "MockResponse stores supplied headers and getheaders calls self._headers.getheaders(name) without returning its result (src/requests/cookies.py:110-121). extract_cookies_to_jar supplies response._original_response.msg, then passes the wrapper to jar.extract_cookies (src/requests/cookies.py:124-137). Thus a successful delegated call discards its result and returns None; if the wrapped object lacks that method, the call raises instead. info returns the header object directly, so the cookie extraction path is not evidence that getheaders is actually used."
+    },
+    {
+      "task_id": "import-860809fc71bc5535bfa6c36a",
+      "reference_sha256": "6ce87bea4a33ec1715b4d93f1b99a2ac500a24f0d6cb452fb4359506fb8e4931",
+      "question_sha256": "f9d320ea2b22b13fe1b120c7621f053d0abbdb96271007f298de6241dd4b9a77",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Redirect body-header purge",
+          "verdict": "partially_supported",
+          "reason": "Purge accurately described; blanket statement that HTTP forbids GET bodies is false, and exploit claims are not demonstrated.",
+          "evidence": {
+            "path": "src/requests/sessions.py",
+            "start_line": 221,
+            "end_line": 232
+          }
+        }
+      ],
+      "material_errors": [
+        "Purge accurately described; blanket statement that HTTP forbids GET bodies is false, and exploit claims are not demonstrated."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The test starts with a generator-backed POST, producing Transfer-Encoding, and simulates a 302 redirect (tests/test_requests.py:327-341). Requests converts applicable redirect methods to GET (src/requests/sessions.py:333-353), and for statuses other than 307/308 clears the body and its Content-Length, Content-Type, and Transfer-Encoding headers (src/requests/sessions.py:221-232). Keeping old framing headers after dropping the body could mislead downstream parsers about the transmitted message. This is consistency of the rewritten request, not a blanket prohibition on GET bodies or proof of a specific security exploit."
+    },
+    {
+      "task_id": "import-8e6c3d3d1c2420ab958e4019",
+      "reference_sha256": "8e44641c53d3857c4423bbc926168cd55aa374b4951240bd7a07ee9350c32139",
+      "question_sha256": "a5b209811e0a3252c774a925d2e5996f9ededeb2b4ea7909ff928174041fa87c",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "BaseAdapter cooperative super call",
+          "verdict": "supported",
+          "reason": "The zero-argument super delegates to next MRO initializer. Extensibility is a reasonable interpretation, not a guarantee for arbitrary mixin signatures.",
+          "evidence": {
+            "path": "src/requests/adapters.py",
+            "start_line": 113,
+            "end_line": 117
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-8ed00ecf9c50f52fe8c7d8fd",
+      "reference_sha256": "9e3b229f9a1a4a2734d44c805d8f49e6199b62eb7e6c4c59e2d5ead0bdff3d73",
+      "question_sha256": "407bcefdef6d4320d692dc84130d3a845b0c3c7896825acf8473f9d24048255e",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "SSL context refactoring addresses builder design",
+          "verdict": "partially_supported",
+          "reason": "Current configuration accurate, but response only suggests methods and omits requested builder boundary and CERT_OPTIONAL semantics.",
+          "evidence": {
+            "path": "tests/testserver/server.py",
+            "start_line": 159,
+            "end_line": 176
+          }
+        }
+      ],
+      "material_errors": [
+        "Current configuration accurate, but response only suggests methods and omits requested builder boundary and CERT_OPTIONAL semantics."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "TLSServer currently creates a server SSLContext, loads its certificate/key, and conditionally sets CERT_OPTIONAL and CA trust before wrapping the socket (tests/testserver/server.py:159-176). A proposed SSLContextBuilder can accept those configuration values, create the context, separately load server credentials and client trust/verification settings, then return the configured context. TLSServer would retain socket lifecycle ownership and consume that result. This creates an independently testable configuration boundary but adds an abstraction worth using only if reuse or policy complexity justifies it. Preserve CERT_OPTIONAL in a behavior-preserving refactor; requiring a client certificate is a separate policy change."
+    },
+    {
+      "task_id": "import-8f3b3367fe7626a04434b5a1",
+      "reference_sha256": "528dd71863354e23ead04f25b420235eed91c1ff0070aa85bcaf46e0be24a7c4",
+      "question_sha256": "1752fe210dc9413a9fc686d20fc9dc0e6176a0e315509d06ecd890be39c73081",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Auth and hook preparation ordering",
+          "verdict": "partially_supported",
+          "reason": "Auth needs prepared body and may add hooks; reference falsely says earlier user hooks are necessarily lost despite register_hook appending.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 366,
+            "end_line": 377
+          }
+        }
+      ],
+      "material_errors": [
+        "Auth needs prepared body and may add hooks; reference falsely says earlier user hooks are necessarily lost despite register_hook appending."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "prepare builds method, URL, headers, cookies, and body before auth so authenticators such as OAuth see a prepared request; auth can modify it and content length is recomputed (src/requests/models.py:366-377,597-608). User hooks are prepared after auth, explicitly because authenticators may add hooks. register_hook appends or extends the event list (src/requests/models.py:207-216), so this order places authenticator hooks before subsequently registered user hooks; merely reversing it does not inherently erase hooks. These stateful dependent steps are unsuitable for arbitrary parallelization."
+    },
+    {
+      "task_id": "import-9701f44e1692a89b3ac45607",
+      "reference_sha256": "64583be63fa53c8453e1d2bcc61f4bf0d50aeb50c6d68d7c9c39db257b673dea",
+      "question_sha256": "ea133669708d40b589decb4bf7fa23fff9e1b019dfb6a266d9e6c67e112c11fc",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "CIDR parameter-dependent branches",
+          "verdict": "supported",
+          "reason": "Slash count, integer conversion, mask bounds and inet_aton error map to all five invalid test parameters; two values share bounds branch.",
+          "evidence": {
+            "path": "src/requests/utils.py",
+            "start_line": 715,
+            "end_line": 730
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-a136b5b7d111041c2be44e91",
+      "reference_sha256": "2330d0c979d01af0c510428971db0bab4418cdbb8faeb411a78266faba7c06fa",
+      "question_sha256": "24bfac5257394edc6e0e27b8a92a05dbf32ec36441cd529687f16f50aa42f1fd",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Streaming and multipart incompatibility",
+          "verdict": "partially_supported",
+          "reason": "Current implementation excludes combination, but multipart is not fundamentally incompatible with streaming and NotImplementedError does not prove permanent design impossibility.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 517,
+            "end_line": 555
+          }
+        }
+      ],
+      "material_errors": [
+        "Current implementation excludes combination, but multipart is not fundamentally incompatible with streaming and NotImplementedError does not prove permanent design impossibility."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "prepare_body takes a streaming data object as the whole body and explicitly rejects simultaneous files (src/requests/models.py:517-555). The alternative file path uses _encode_files, which reads file objects and assembles multipart data (src/requests/models.py:185-203). Requests does not implement an encoder combining those paths here. Supporting it would require defining how streamed input maps to multipart parts and a suitable encoder, potentially streaming; the limitation is this implementation, not a fundamental prohibition on streaming multipart."
+    },
+    {
+      "task_id": "import-aaeb63954dae3a661c8a99b0",
+      "reference_sha256": "3ab3e837aba8ee63b8c9530b91920202fe13c1ff9588529d5bf9c92ceb3b5d52",
+      "question_sha256": "4cf75043846521994aaac548897c3ace1ac7c2079219d95f060a23e071202325",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Cookie merge precedence and authentication",
+          "verdict": "partially_supported",
+          "reason": "Merge is necessary for combined cookie input, but request precedence here comes from conversion to CookieJar and update, not overwrite=False dictionary path; effect of removal depends replacement.",
+          "evidence": {
+            "path": "src/requests/sessions.py",
+            "start_line": 467,
+            "end_line": 476
+          }
+        }
+      ],
+      "material_errors": [
+        "Merge is necessary for combined cookie input, but request precedence here comes from conversion to CookieJar and update, not overwrite=False dictionary path; effect of removal depends replacement."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "prepare_request converts request cookies to a CookieJar, then merges session cookies and request cookies into a fresh jar (src/requests/sessions.py:467-476). CookieJar merging uses update or set_cookie; the separate dictionary branch uses overwrite=False (src/requests/cookies.py:542-561). Removing the merge without equivalent replacement can omit cookies required jointly by the server and thereby break cookie-based authentication; exact effects depend on which source remains. Redirects also merge session cookies before regenerating the Cookie header (src/requests/sessions.py:234-242). Cookie matching rules still determine which cookies are transmitted."
+    },
+    {
+      "task_id": "import-aba43394bd84208f58b18887",
+      "reference_sha256": "76ec3ac9ece03753fc2ecef6f8e8ccec6c680fdc19668beed1cdeb2c5dc3805e",
+      "question_sha256": "acdab0d7ffb844ee24fff0037b1a49a66e6a230bc516843ee74363ed994cf041",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Native string conversion implementation",
+          "verdict": "supported",
+          "reason": "Function passes native strings through and decodes other inputs with chosen encoding.",
+          "evidence": {
+            "path": "src/requests/_internal_utils.py",
+            "start_line": 25,
+            "end_line": 35
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-af0bea45befe058b4862c1c4",
+      "reference_sha256": "d56dc64f2bf20a2177e9be47cfbfb38f1b25a8f8469f823da4a64da6afa8aa91",
+      "question_sha256": "6e906223fd0f6d1090995baad64d3874f7120b5217c4a330447494b40a73efa2",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Lowercase calls demonstrate significant bottleneck",
+          "verdict": "partially_supported",
+          "reason": "Per-operation normalization is visible, but dataset size does not itself establish a bottleneck; requested optimization omitted.",
+          "evidence": {
+            "path": "src/requests/structures.py",
+            "start_line": 46,
+            "end_line": 55
+          }
+        }
+      ],
+      "material_errors": [
+        "Per-operation normalization is visible, but dataset size does not itself establish a bottleneck; requested optimization omitted."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "CaseInsensitiveDict lowercases the supplied key on set/get/delete and stores the lowercase key alongside the original casing and value (src/requests/structures.py:46-55). That adds work proportional to key processing on each operation, but the source does not establish significant performance degradation. Profile the workload first. For repeated access in an internal hot path, a carefully designed normalized-key lookup interface could reuse a normalized key; a bounded normalization cache is another tradeoff, adding lookup and memory costs. Preserve case-insensitive public semantics and original-key iteration behavior."
+    },
+    {
+      "task_id": "import-b348a53f091aeaf41581e3f4",
+      "reference_sha256": "08b1b260bf7bcaa188b4ba5ffa41647634ad68295dd0bb7a49fb005e47958a13",
+      "question_sha256": "6b4d903086e218da45d868c5f9210985d67cc8acfb556d423bae2421c444a27d",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Dependency version validation warns without failure",
+          "verdict": "partially_supported",
+          "reason": "Warning conversion exists but warnings can be configured as errors; urllib3 code checks major/minor, not asserted 1.21.1 patch bound.",
+          "evidence": {
+            "path": "src/requests/__init__.py",
+            "start_line": 58,
+            "end_line": 90
+          }
+        }
+      ],
+      "material_errors": [
+        "Warning conversion exists but warnings can be configured as errors; urllib3 code checks major/minor, not asserted 1.21.1 patch bound."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "Validation belongs in check_compatibility rather than exception classes. It parses versions and checks urllib3 major >=1 and, for major 1, minor >=21; despite its comment it does not check the 1.21 patch value. It checks chardet in [3.0.2,6.0.0) or charset_normalizer in [2.0.0,4.0.0) (src/requests/__init__.py:58-90). Import-time code converts AssertionError and ValueError into RequestsDependencyWarning (src/requests/__init__.py:107-119), a RequestsWarning subclass (src/requests/exceptions.py:142-151). This normally permits execution while reporting incompatibility; warning filters can turn warnings into errors, and asserts are disabled under optimized Python."
+    },
+    {
+      "task_id": "import-c0c0e3ccdd8a6e0f1043fa81",
+      "reference_sha256": "1b304a3248c603a078e314e7dfd75c28cd8b3d6cb113f1df0027d457b0498fa8",
+      "question_sha256": "c49791ba0dc835b7134f24dc99c3c2f95574b22a057ff5314157ed33b5ec936c",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Proxy errors translation and catch hierarchy",
+          "verdict": "supported",
+          "reason": "Adapter wraps retry-reason proxy errors and direct urllib3 proxy errors; exceptions.py:12,59-64 establishes IOError inheritance chain.",
+          "evidence": {
+            "path": "src/requests/adapters.py",
+            "start_line": 670,
+            "end_line": 683
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    }
+  ]
+}

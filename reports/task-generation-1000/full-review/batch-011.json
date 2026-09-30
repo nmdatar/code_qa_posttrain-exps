@@ -1,0 +1,280 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-15860ccdbb3364165d80f200",
+      "reference_sha256": "e83350c4496322f9cbc13d27bf89215ea730f6e494e918d1611682fd7c4352ee",
+      "question_sha256": "46f506603d0071a96a70a2a145c9cb68bb196f0415cfa5e53e5b3a52310c5f17",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Router explains title-specific fixture database placement",
+          "verdict": "contradicted",
+          "reason": "save_obj gate is correct, but title-specific placement also depends on database-qualified fixture discovery; router controls models, not individual titles.",
+          "evidence": {
+            "path": "django/core/management/commands/loaddata.py",
+            "start_line": 292,
+            "end_line": 303
+          }
+        }
+      ],
+      "material_errors": [
+        "save_obj gate is correct, but title-specific placement also depends on database-qualified fixture discovery; router controls models, not individual titles."
+      ],
+      "citation_corrections": [],
+      "notes": "Static source review of central claims; no repository execution.",
+      "corrected_reference_answer": "loaddata.save_obj evaluates router.allow_migrate_model(self.using, model) before saving to that alias (django/core/management/commands/loaddata.py:198-210), and ConnectionRouter returns the first non-None router decision (django/db/utils.py:256-276). Distinct Book titles across aliases in test_fixture_loading are not selected by per-title router rules: fixture discovery also searches alias-qualified names (django/core/management/commands/loaddata.py:292-303); the test declares multidb-common and multidb fixtures and AntiPetRouter only distinguishes Pet from other models (tests/multiple_database/tests.py:1995-2011)."
+    },
+    {
+      "task_id": "import-18cdc933c81746fed784ad05",
+      "reference_sha256": "d2b7f939f71871ba4146dd8aebbb02df2ddd469f7ffbd88b8c2f86f6059b5cd1",
+      "question_sha256": "98e74531b90d107172c6b2b4372160d2df8ce9ba5a12d326f3a804cbbea92222",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "OFTInteger value passes _bit64 to integer extraction while forcing exposed type",
+          "verdict": "supported",
+          "reason": "Value passes bit flag; base as_int chooses integer64 or integer C API and checks is_set.",
+          "evidence": {
+            "path": "django/contrib/gis/gdal/field.py",
+            "start_line": 135,
+            "end_line": 150
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static source review of central claims; no repository execution."
+    },
+    {
+      "task_id": "import-19d6f513923e689e9f865c82",
+      "reference_sha256": "3f7887b1e3b6d501f56f89be66e8661727cf5145abf99626e75e1d2bcc57982a",
+      "question_sha256": "21df5a3ce050db0d3c4381b1777595a4148cae9e09cafe25e77909fe9ef1d863",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Direct None call returns empty security warning list by short-circuit",
+          "verdict": "supported",
+          "reason": "Empty middleware makes first disjunct true; remaining HSTS settings are not accessed despite earlier broad wording.",
+          "evidence": {
+            "path": "django/core/checks/security/base.py",
+            "start_line": 179,
+            "end_line": 185
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static source review of central claims; no repository execution."
+    },
+    {
+      "task_id": "import-1b9c21f4f33bbc7d8727987c",
+      "reference_sha256": "08b5c1717be8f6e2747e0439ab7eefda9c20eb235bc396d9c861a526cce6170c",
+      "question_sha256": "a3487769db292d3e1452630c8a3b2cbb9863a8359393b36c28b8b93cf3cf614c",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Declared url remains form field but is excluded from model validation",
+          "verdict": "supported",
+          "reason": "Meta field exclusion explicitly covers manually declared form fields; metaclass merges declared fields at 335-340.",
+          "evidence": {
+            "path": "django/forms/models.py",
+            "start_line": 394,
+            "end_line": 415
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static source review of central claims; no repository execution."
+    },
+    {
+      "task_id": "import-1ce1b514fbfb95085d7141f2",
+      "reference_sha256": "21af09915b5b9e01e6fba050e0a9d583d4d8a7698f5ceff3214d5e6d7c31018b",
+      "question_sha256": "98a8a7edabf45144b071d67015aff8f74fd8825278d14a876ddfaa9b76aa689c",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Reversibility preflight prevents any partial rollback across composite operations",
+          "verdict": "contradicted",
+          "reason": "Top-level phase checks reversible but SeparateDatabaseAndState invokes nested backwards directly; universal preflight guarantee is unsupported.",
+          "evidence": {
+            "path": "django/db/migrations/operations/special.py",
+            "start_line": 43,
+            "end_line": 58
+          }
+        }
+      ],
+      "material_errors": [
+        "Top-level phase checks reversible but SeparateDatabaseAndState invokes nested backwards directly; universal preflight guarantee is unsupported."
+      ],
+      "citation_corrections": [],
+      "notes": "Static source review of central claims; no repository execution.",
+      "corrected_reference_answer": "Migration.unapply first checks each top-level operation.reversible and builds intermediate states, raising IrreversibleError before its second phase executes backwards operations (django/db/migrations/migration.py:139-170). Operations supply polymorphic reversible properties; IrreversibleError derives from RuntimeError (django/db/migrations/exceptions.py:34-35). This is local preflight, not a guarantee that every nested operation or entire migration plan is reversible: SeparateDatabaseAndState delegates backwards execution directly to contained operations (django/db/migrations/operations/special.py:43-58). Transaction scope and backend behavior determine rollback of changes if execution later fails."
+    },
+    {
+      "task_id": "import-25f3e9c0ab67425942f5083a",
+      "reference_sha256": "fd7774a16270839fedb06b51ddafbe8590f97520f5ca1b87852586361e8ca033",
+      "question_sha256": "64e692d9dbed6677442b4c2be675a039098960fb0bad0f44b10852e2fc1500cf",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "No-argument aggregation returns empty mapping without SQL",
+          "verdict": "supported",
+          "reason": "Explicit early return supports empty dictionary API and avoidance of SQL; type-safety motivation is inferred rather than documented.",
+          "evidence": {
+            "path": "django/db/models/sql/query.py",
+            "start_line": 453,
+            "end_line": 458
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static source review of central claims; no repository execution."
+    },
+    {
+      "task_id": "import-2a5efe1fe971140b25385746",
+      "reference_sha256": "dee77344b200d2c9fb2cbae9ceb5d4f3a30b68a846f165bffd5bd52aeb34c820",
+      "question_sha256": "5cb94e30ba6f2360c70477d313c7a346306396fc2b3179ac384723093526082f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "MultipleChoiceField normalizes integers to strings before checking choices",
+          "verdict": "supported",
+          "reason": "List/tuple input is stringified and each resulting value checked; tests explicitly cover integer input.",
+          "evidence": {
+            "path": "django/forms/fields.py",
+            "start_line": 961,
+            "end_line": 981
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static source review of central claims; no repository execution."
+    },
+    {
+      "task_id": "import-2abae249aa84a3e55b6bd506",
+      "reference_sha256": "dcfd8ede2eeb7a8bd85101cd8e8077ce5a326938f6eeaa49da3d8f8b1a74d2b5",
+      "question_sha256": "6fb59e0168d7c27d390d42d6252386f8dc92d78484eaa02a2a96fd0d1d5919bc",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Eager UUID validation occurs outside transaction boundaries",
+          "verdict": "contradicted",
+          "reason": "Preparation validates before binding SQL value but may occur inside existing atomic scope; no universal transaction timing guarantee.",
+          "evidence": {
+            "path": "django/db/models/fields/__init__.py",
+            "start_line": 2753,
+            "end_line": 2774
+          }
+        }
+      ],
+      "material_errors": [
+        "Preparation validates before binding SQL value but may occur inside existing atomic scope; no universal transaction timing guarantee."
+      ],
+      "citation_corrections": [],
+      "notes": "Static source review of central claims; no repository execution.",
+      "corrected_reference_answer": "UUIDField.get_db_prep_value converts non-UUID values through to_python, returning a UUID for native support or hex otherwise. Invalid string/integer representations caught by to_python raise ValidationError (django/db/models/fields/__init__.py:2753-2774). Keeping this conversion provides a common field-level error before SQL execution, but does not place the error outside transactions: preparation can occur inside an existing atomic block, whose exception handling governs rollback (django/db/transaction.py:224-303). Deferring validation to a database would make behavior backend-dependent, particularly where UUIDs are stored as text."
+    },
+    {
+      "task_id": "import-2e008fd0effc857cb5eaa555",
+      "reference_sha256": "afa7377ad499963b67d58a8f6a4f8c0ee57b843228ea4ad52a54e69508b245c7",
+      "question_sha256": "9a8e0bdacdf40795bfa33954a97fd356e61a9d65e4392a45915a89627413f11d",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Caching dynamic field properties is safe and cached properties incur repeated descriptor cost",
+          "verdict": "contradicted",
+          "reason": "Cached values bypass descriptor on subsequent access; choices/settings/backend-dependent properties are mutable/contextual, and performance magnitude is unmeasured.",
+          "evidence": {
+            "path": "django/utils/functional.py",
+            "start_line": 39,
+            "end_line": 48
+          }
+        }
+      ],
+      "material_errors": [
+        "Cached values bypass descriptor on subsequent access; choices/settings/backend-dependent properties are mutable/contextual, and performance magnitude is unmeasured."
+      ],
+      "citation_corrections": [],
+      "notes": "Static source review of central claims; no repository execution.",
+      "corrected_reference_answer": "Non-cached properties can repeat work: flatchoices rebuilds a list, db_tablespace consults current settings, and db_returning uses current connection features (django/db/models/fields/__init__.py:928-937,1093-1096). Cached properties store results in instance.__dict__, bypassing their descriptor thereafter (django/utils/functional.py:39-48). Source alone does not establish a regression or its size. Profile actual hot paths before optimizing; unconditional caching needs invalidation because choices can be reassigned and settings/connection context can change (django/db/models/fields/__init__.py:548-554)."
+    },
+    {
+      "task_id": "import-31fa259054670e03aaccc7e9",
+      "reference_sha256": "c3a00bec6d3907cab64d6c20ef21a3e5510336ea090ba92d1a260eb7a6de2587",
+      "question_sha256": "ac39253f2579c28c824ed3f445da2ad8a2ecebbd9e4b27c5f233c40a9c20e476",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "only(address) prevents overwrite through set_cached_value guard",
+          "verdict": "contradicted",
+          "reason": "The guard is is_cached in reverse manager, not set_cached_value; inner only does not enable protection. Removing it still loads address.",
+          "evidence": {
+            "path": "django/db/models/fields/related_descriptors.py",
+            "start_line": 762,
+            "end_line": 769
+          }
+        }
+      ],
+      "material_errors": [
+        "The guard is is_cached in reverse manager, not set_cached_value; inner only does not enable protection. Removing it still loads address."
+      ],
+      "citation_corrections": [],
+      "notes": "Static source review of central claims; no repository execution.",
+      "corrected_reference_answer": "The chain is House.only(\"name\") -> Prefetch(\"rooms\", Room.prefetch_related(Prefetch(\"house\", House.only(\"address\")))) (tests/prefetch_related/tests.py:1975-1995). When iterating the child queryset, the reverse manager only fills Room.house if that field is not already cached (django/db/models/fields/related_descriptors.py:762-769). set_cached_value itself simply assigns (django/db/models/fields/mixins.py:30-31). The inner only clause makes different field loading visible in the regression test; removing it still fetches address and does not disable cache protection or inherently break the zero-query address access."
+    },
+    {
+      "task_id": "import-338c4cc17ad313af94f731c3",
+      "reference_sha256": "e8052b9c2b100a5e4c8778d12b1a2177ab5a0ee594870ce4675c1f9a053c7174",
+      "question_sha256": "a4018c83d661bd078b828b00034385115e6a0b7bc19a8ad6f5865b6482d81a92",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "to_python failure does not short-circuit and sequential clean proves regression",
+          "verdict": "contradicted",
+          "reason": "An exception from to_python already stops subsequent calls; no baseline or measurements establish regression.",
+          "evidence": {
+            "path": "django/forms/fields.py",
+            "start_line": 182,
+            "end_line": 208
+          }
+        }
+      ],
+      "material_errors": [
+        "An exception from to_python already stops subsequent calls; no baseline or measurements establish regression."
+      ],
+      "citation_corrections": [],
+      "notes": "Static source review of central claims; no repository execution.",
+      "corrected_reference_answer": "Field.clean converts, validates requiredness, then runs validators in that order (django/forms/fields.py:200-208). Exceptions from to_python or validate immediately abort later steps. run_validators skips empty values and collects validator errors (django/forms/fields.py:182-198). Large workloads repeat these operations, but the source does not demonstrate a performance regression. Profile conversion and validators before optimizing, and preserve normalization order, errors and validation semantics; blindly skipping unchanged fields or caching conversions can change results."
+    },
+    {
+      "task_id": "import-3585fdbf9eb6949cd2d1a51f",
+      "reference_sha256": "a0b2b70609f478b2f387fd0014d8ab2d77d5e3b3742b81579dc385054cc3c5aa",
+      "question_sha256": "507a46dcc4f740e6fe3c22186ea393228aeded3ac2ca6eed5d83a103304c1038",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Formset.save is automatically atomic and dropping uniqueness requires duplicate cleanup",
+          "verdict": "contradicted",
+          "reason": "No atomic wrapper here; Model.save does not automatically run full_clean. Dropping uniqueness does not require duplicate cleanup; adding uniqueness does.",
+          "evidence": {
+            "path": "django/forms/models.py",
+            "start_line": 798,
+            "end_line": 814
+          }
+        }
+      ],
+      "material_errors": [
+        "No atomic wrapper here; Model.save does not automatically run full_clean. Dropping uniqueness does not require duplicate cleanup; adding uniqueness does."
+      ],
+      "citation_corrections": [],
+      "notes": "Static source review of central claims; no repository execution.",
+      "corrected_reference_answer": "AbstractUser.username declares unique=True (django/contrib/auth/models.py:454-467). Model/form validation can detect duplicates early, while the database constraint protects against concurrent races. BaseModelFormSet.save saves existing/new objects without wrapping the whole batch in atomic (django/forms/models.py:798-814); all-or-nothing behavior requires an enclosing transaction, handled by Atomic.__exit__ (django/db/transaction.py:224-303). Removing the database constraint permits duplicate writes even if model metadata remains unique; changing metadata too changes validation and may trigger auth uniqueness checks (django/contrib/auth/checks.py:71-99). Dropping the constraint does not itself require duplicate cleanup; reintroducing uniqueness after duplicates arise does."
+    }
+  ]
+}

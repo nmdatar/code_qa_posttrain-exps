@@ -1,0 +1,371 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-0605181b03a9578272c653c8",
+      "reference_sha256": "b3d38890b0eb04d5e9859ad454c3358bc81c1e0f2787449e710da78915ca39f1",
+      "question_sha256": "0a7216a5b66049ce3ce515882272d2b37fe70cb6bb412f6ceccccf00c6d2150d",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Dummy manager delegates to Dask without wrapping returned arrays",
+          "verdict": "supported",
+          "reason": "from_array return annotation is DummyChunkedArray but returns da.from_array directly.",
+          "evidence": {
+            "path": "xarray/tests/test_parallelcompat.py",
+            "start_line": 59,
+            "end_line": 128
+          }
+        }
+      ],
+      "material_errors": [
+        "Conflates return annotation with actual DummyChunkedArray conversion and overstates test mock as a universally compatible backend."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "DummyChunkManager recognizes DummyChunkedArray and exposes its chunks, while delegating normalization, array creation, compute, and gufunc application to Dask (xarray/tests/test_parallelcompat.py:59-128). In particular from_array directly returns da.from_array; its annotation does not convert that result to DummyChunkedArray. The dispatch boundary selects a manager whose is_chunked_array recognizes the input and rejects mixed or ambiguous chunk types (xarray/namedarray/parallelcompat.py:143-183). This test mock illustrates delegation, not full independence from Dask or compatibility with every backend operation."
+    },
+    {
+      "task_id": "import-0ccc017740cc72ba478d6212",
+      "reference_sha256": "dbf24ed33ce6204b61c4d02da7f946e438afb2f82b444f4193c98e04e8d645cd",
+      "question_sha256": "20c239b58ea3852e2bd9edacb7113ab368be937b40a97b93f9f40dcd57c5bd75",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Dataset arithmetic composes three bases and sets priority",
+          "verdict": "supported",
+          "reason": "Ordinary class inheritance resolves attributes; array priority is separate from MRO.",
+          "evidence": {
+            "path": "xarray/computation/arithmetic.py",
+            "start_line": 109,
+            "end_line": 115
+          }
+        },
+        {
+          "claim": "Reduction wrapper forwards options to reduce",
+          "verdict": "supported",
+          "reason": "Reduction support is a separate method factory.",
+          "evidence": {
+            "path": "xarray/core/common.py",
+            "start_line": 105,
+            "end_line": 128
+          }
+        },
+        {
+          "claim": "NumPy ufunc dispatch has explicit protocol implementation",
+          "verdict": "supported",
+          "reason": "Array priority alone is not complete modern ufunc dispatch; central distinction from MRO is correct.",
+          "evidence": {
+            "path": "xarray/computation/arithmetic.py",
+            "start_line": 44,
+            "end_line": 84
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-1286486da6b74ddb5248c1bc",
+      "reference_sha256": "654967704ceec886512b0fd8be8d657873b5bddb4f0f5c06b6d9094974560b47",
+      "question_sha256": "56a86180f7ae9183a8a27a6d0fcd662b8f2f3861691e3d6c2db3fb5df3905a8c",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "First/last select missing-value-aware path by skipna and dtype",
+          "verdict": "supported",
+          "reason": "Chunked and NumPy paths split; fallback takes first or last position.",
+          "evidence": {
+            "path": "xarray/core/duck_array_ops.py",
+            "start_line": 812,
+            "end_line": 837
+          }
+        },
+        {
+          "claim": "Nanfirst/nanlast locate valid positions along requested axis",
+          "verdict": "supported",
+          "reason": "Boolean mask argmax, reversal for last, then selection.",
+          "evidence": {
+            "path": "xarray/core/nputils.py",
+            "start_line": 48,
+            "end_line": 70
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-17422b22d16d64b11ac50cbc",
+      "reference_sha256": "9956bdf6c26afbe7d81999a3ef51209433a25e78cdc0e5efa7d4254f3af592b0",
+      "question_sha256": "101af3c1d98dc0bacc69cfbd9943d5d2cd47f4677b9cc70429e7f84be9749d24",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Factory creates intermediate nodes and sorts mapping paths",
+          "verdict": "supported",
+          "reason": "Both mechanisms exist, but a one-entry mapping cannot test ordering.",
+          "evidence": {
+            "path": "xarray/core/datatree.py",
+            "start_line": 1204,
+            "end_line": 1224
+          }
+        },
+        {
+          "claim": "Node access test uses only one mapping entry",
+          "verdict": "supported",
+          "reason": "Removing sorting would not make these single-entry fixtures fail.",
+          "evidence": {
+            "path": "xarray/tests/test_datatree.py",
+            "start_line": 281,
+            "end_line": 313
+          }
+        }
+      ],
+      "material_errors": [
+        "Falsely claims these tests would fail without depth sorting and validate sorting."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "The from_dict fixtures create nested paths; from_dict copies or creates each node and calls _set_item with new_nodes_along_path=True, creating missing intermediate nodes (xarray/core/datatree.py:1204-1224). TestGetItem then checks intermediate/nested node names, nested variable access, and missing-path KeyError (xarray/tests/test_datatree.py:281-313). These are integration-style checks dependent on factory construction as well as lookup. The factory also sorts paths by depth, but these single-entry fixtures do not establish that sorting is necessary or test input-order handling."
+    },
+    {
+      "task_id": "import-188040463405615ffa93ff21",
+      "reference_sha256": "aee2206a94321dcfd8e7a7de9c49228b2ef17b70e8067212bf49ab3934daea48",
+      "question_sha256": "812b87d39081b074920925fce0c5a3414fb6fe16554f328d6280d3d4ab7993bd",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Test verifies explicit per-variable chunk encodings roundtrip",
+          "verdict": "supported",
+          "reason": "Only explicit chunks are tested; no no-encoding failure case supports necessity.",
+          "evidence": {
+            "path": "xarray/tests/test_backends.py",
+            "start_line": 4630,
+            "end_line": 4645
+          }
+        }
+      ],
+      "material_errors": [
+        "Claims explicit chunks are mandatory and omission impossible without evidence; test only demonstrates preservation."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "test_write_inconsistent_chunks creates two Dask arrays sharing dimensions but with different chunk shapes, explicitly assigns each variable chunksizes and original_shape encoding, and verifies both chunksizes values after a backend roundtrip (xarray/tests/test_backends.py:4630-4645; equivalent netCDF4 test at 2326-2341). It demonstrates preservation of independent file chunk metadata, not that writing without explicit chunksizes is impossible or that all files require explicit user-provided chunk sizes."
+    },
+    {
+      "task_id": "import-19ae734d0dabcf8ee646e50a",
+      "reference_sha256": "978a6646e6bf2d588029e35712b759211c534b1f570df21eeb5cdea2566020bd",
+      "question_sha256": "e7908a8473a6c60686a0a65d8ca89a4b201f2f3e2561f5a9cef659168407cbb3",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Test treats object skipna=False expectation differently",
+          "verdict": "supported",
+          "reason": "Concrete object fixture expects minimum instead of missing index; not a guarantee for every object array ordering.",
+          "evidence": {
+            "path": "xarray/tests/test_dataarray.py",
+            "start_line": 4869,
+            "end_line": 4923
+          }
+        },
+        {
+          "claim": "False skipna selects namespace reduction",
+          "verdict": "supported",
+          "reason": "Nan-aware default applies to floating/complex/object only unless explicitly requested.",
+          "evidence": {
+            "path": "xarray/core/duck_array_ops.py",
+            "start_line": 509,
+            "end_line": 527
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-19e9bb1ce7326cfc87908604",
+      "reference_sha256": "2e401f53b82933584746f72607b7dc63c440bdc9ad6e5a895448713b9ff9f979",
+      "question_sha256": "b3d2639e3abaa6849725ebffdecfd15886047be36bffecdde8ff5ef9476e08cf",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Orthogonal fallback indexes axes in reverse order",
+          "verdict": "supported",
+          "reason": "Catches NotImplementedError and applies one subkey per iteration with preceding full slices.",
+          "evidence": {
+            "path": "xarray/core/indexing.py",
+            "start_line": 1685,
+            "end_line": 1694
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-268cc538309c6cacd996bb20",
+      "reference_sha256": "8049a194f1703a5e4b6cb8d171fde63f617cd4277ebd395c326eac0823afd3ea",
+      "question_sha256": "d9d31ce271b2adf178119ab4bd87041d3780629aead7c285c3af3abff83a8343",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Stack replaces variables and merges unaffected indexes",
+          "verdict": "supported",
+          "reason": "Affected index coordinates removed, new index coordinates ordered consistently, replacement object returned; preservation applies to unaffected indexes.",
+          "evidence": {
+            "path": "xarray/core/dataset.py",
+            "start_line": 5123,
+            "end_line": 5168
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-29f14948a0198770ace2e117",
+      "reference_sha256": "62f7466dd1a6bb316ab451c063338f9a85ce8c16d55fd96c22393db601d0ebfb",
+      "question_sha256": "229796847f8da77870e250bbabc13b387067b5d684d65763ebef1b8ba5868c69",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Tests construct small independent objects with differing fixtures",
+          "verdict": "supported",
+          "reason": "No benchmark establishes substantial cost, several claimed counts omit expected objects, no actual strategy given.",
+          "evidence": {
+            "path": "xarray/tests/test_combine.py",
+            "start_line": 1125,
+            "end_line": 1193
+          }
+        }
+      ],
+      "material_errors": [
+        "Unsupported significant runtime claim and missing optimization proposal."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "These tests repeatedly construct small DataArrays and Datasets with deliberately different names and coordinates (xarray/tests/test_combine.py:1125-1193). Construction adds some work, but source alone does not establish a significant test-suite bottleneck. If profiling identifies redundant construction as costly, a possible refactor is shared immutable input specifications with function-scoped fixture creation; reusing mutable xarray instances would require copying and may erase savings. Preserve each test\u2019s distinct inputs and measure any proposed optimization rather than assuming it improves runtime."
+    },
+    {
+      "task_id": "import-2cd473d74c28806e0acfd8bf",
+      "reference_sha256": "f32aabefb6becfeb12d3f16f7a0fd5006323148164dfec08279b8317c0b3c73a",
+      "question_sha256": "69185723ebbdbb53679840ad84c428dd00d6700985655cfa3e34e996883ec0f1",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Index concat preserves pandas representation where possible and reorders",
+          "verdict": "supported",
+          "reason": "Extracts indexes, appends, optionally inverse-permutation takes, then reconstructs.",
+          "evidence": {
+            "path": "xarray/core/variable.py",
+            "start_line": 2757,
+            "end_line": 2798
+          }
+        },
+        {
+          "claim": "String restoration conditional on original dtype",
+          "verdict": "supported",
+          "reason": "Coercion applies only to S/U result kind; incompatible index type preservation not guaranteed.",
+          "evidence": {
+            "path": "xarray/core/utils.py",
+            "start_line": 207,
+            "end_line": 222
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-2ec98971fdc7abbb9599adfc",
+      "reference_sha256": "fe86a8eb816186fc187c3b3ea31795f4a07aa4e705750085ce3c8d2cba420b7a",
+      "question_sha256": "fedc7324c053b51227ebb1d91da42055f770cc8d54e07998008c905f808a964d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Mixin delegates dtype shape indexing and derives dimensional properties",
+          "verdict": "supported",
+          "reason": "Subclass override guidance explicit; size/ndim/len use shape.",
+          "evidence": {
+            "path": "xarray/core/utils.py",
+            "start_line": 620,
+            "end_line": 671
+          }
+        },
+        {
+          "claim": "Lazy wrapper overrides shape",
+          "verdict": "supported",
+          "reason": "Returns calculated stored shape.",
+          "evidence": {
+            "path": "xarray/core/indexing.py",
+            "start_line": 644,
+            "end_line": 646
+          }
+        },
+        {
+          "claim": "Elementwise wrapper overrides dtype",
+          "verdict": "supported",
+          "reason": "Stored dtype rather than wrapped array dtype.",
+          "evidence": {
+            "path": "xarray/coding/common.py",
+            "start_line": 56,
+            "end_line": 64
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-2f62436038689e7a08ed6f40",
+      "reference_sha256": "a500658c1420d847cf88a8408089141cec1dfbe93c689e902c3e155e7ce2598a",
+      "question_sha256": "fe81cad2dea045ed892587c951005db2d28f6d3f1a21a53bc33601438b655192",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "DataArray reset delegates through coordinate dataset",
+          "verdict": "supported",
+          "reason": "Defaults exclude indexes, calls Dataset reset then handles drop/name.",
+          "evidence": {
+            "path": "xarray/core/dataarray.py",
+            "start_line": 1087,
+            "end_line": 1095
+          }
+        },
+        {
+          "claim": "Coordinates dataset preserves index dictionary",
+          "verdict": "supported",
+          "reason": "Shallow copied coordinate variables and index mapping.",
+          "evidence": {
+            "path": "xarray/core/coordinates.py",
+            "start_line": 986,
+            "end_line": 991
+          }
+        },
+        {
+          "claim": "Dataset rejects indexed coordinate removal",
+          "verdict": "supported",
+          "reason": "Only non-index coordinates may move/drop; reference final phrase about associated index coordinates moving is imprecise, earlier invariant correct.",
+          "evidence": {
+            "path": "xarray/core/dataset.py",
+            "start_line": 1845,
+            "end_line": 1863
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

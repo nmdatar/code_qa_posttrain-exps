@@ -1,0 +1,109 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/semantic-review-1.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "original_reference_sha256": "7d9fe0423b667591300f6144ab69b46234b3830f0a37a6823d08ea4433778e9f",
+      "question": "Why does the boolean caching control parameter in the wrapper class initialization method for convolution models create a trade-off between memory consumption and computational overhead when the discretization step size for integration approximation limits is dynamically increased during runtime?",
+      "question_sha256": "c8df26c2f688adc0882a3f816deca5b05e2a5e043c4b34c8d069843cf188e811",
+      "reference_answer": "The cache flag retains a RegularGridInterpolator for reuse; disabling it recomputes the domain, mesh and convolution on every call (astropy/modeling/convolution.py:68-85). Increasing the step size generally reduces the number of grid points, hence the grid storage and computation, because the domain uses np.arange(..., resolution) (astropy/modeling/bounding_box.py:133-134). Runtime changes to _resolution alone do not invalidate an existing cache: call clear_cache() or create a new model before evaluating the changed grid (astropy/modeling/convolution.py:61-80). Caching saves repeated convolution work at the cost of retaining grid data; disabling caching removes retained cache storage, but still needs temporary computation memory.",
+      "reference_sha256": "567318976f3038ac968fbabeabbcff307aa2e957cf3509a52baea1ddadbe5222",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-044fbaedd790bfa9f36b0f7b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/conan-io--conan-52f43d98fe44",
+      "original_reference_sha256": "25be1f59caa560d5a1c0f9d11f66f6f4653a9e895b91b7e03900b9e00908e3bf",
+      "question": "Why does the method that checks if a repository has uncommitted changes implement its own exclusion filtering instead of using git's built\u2011in pathspec options?",
+      "question_sha256": "398215b212b50d4744d9bfeaa41a4bcf64d763ba47ead21a575bad12fa38deca",
+      "reference_answer": "Git.is_dirty runs git status, extracts each reported path, strips surrounding quotes, then removes paths matching self._excluded using fnmatch.fnmatch (conan/tools/scm/git.py:143-155). The comments explicitly account for paths containing spaces (150-152). The pinned implementation does not explain why git pathspec exclusions were not chosen; simplicity or shell-quoting benefits would be plausible interpretations, not established design intent.",
+      "reference_sha256": "9ae0406d6c69e1026275b02258c7304882aa939286b2da52e6fc793fa1d7e74d",
+      "repository": {
+        "commit": "52f43d98fe44ab92d01317110488d0670c3e9e64",
+        "family_id": "conan-io/conan",
+        "url": "https://github.com/conan-io/conan"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/conan-io--conan-52f43d98fe44ab92d01317110488d0670c3e9e64",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-07783c19f1efdb9b1314b31f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/geopandas--geopandas-7d460d9efff5",
+      "original_reference_sha256": "246db94aa831c03fba864fc9af41bb49860a413f06e30967f31cb8a56fbcfa9a",
+      "question": "Why does geopandas' spatial indexing implementation fail to scale efficiently when processing large datasets with high-concurrency spatial operations?",
+      "question_sha256": "2cafd95f4701560eff0ae029e0b8dd7fe0de9001cef66cb859b57c597219ca78",
+      "reference_answer": "The code alone does not establish a general concurrency scaling failure. GeoSeries/GeoDataFrame.sindex delegates to the geometry array (geopandas/base.py:4938), whose property lazily caches SpatialIndex (geopandas/array.py:335-341). Construction copies the geometry array and creates a Shapely STRtree (geopandas/sindex.py:25-35). Queries delegate to that tree and optionally sort or construct dense/sparse NumPy/SciPy outputs (geopandas/sindex.py:210-243). Index rebuilding and large outputs can add cost, but attributing a particular slowdown to serialization, GIL contention or pandas alignment requires the actual operation, data, object-reuse pattern and measurements.",
+      "reference_sha256": "9c769a172abe1156b233832d9bab467c66f1ca16de0008ebb1d91d54e881f612",
+      "repository": {
+        "commit": "7d460d9efff57720c970fd6a040914286846c589",
+        "family_id": "geopandas/geopandas",
+        "url": "https://github.com/geopandas/geopandas"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/geopandas--geopandas-7d460d9efff57720c970fd6a040914286846c589",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-08933d31a87481f23a4dc833"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/omni-us--jsonargparse-dd0f9e3767fc",
+      "original_reference_sha256": "6ca6085492bbb0ab159282cbde366bc411b30203310ddbb54ec8da3d6b5e445f",
+      "question": "What is the hierarchical structure and responsibility distribution of jsonargparse's type hint validation system that enables complex type annotation parsing for CLI argument generation?",
+      "question_sha256": "3d725edc1767c882c84a4818aac486e3054be193fb5a6940fa006e79e4c62c8e",
+      "reference_answer": "ActionsContainer.add_argument detects supported type hints and prepares ActionTypeHint (jsonargparse/_core.py:119-132). ActionTypeHint.__call__ delegates values to _check_type (jsonargparse/_typehints.py:412-433), which uses recursive adapt_typehints. Schema support is checked by is_supported_typehint; Union is special because unsupported alternatives can be discarded rather than requiring every alternative to work (jsonargparse/_typehints.py:165-178,224-254). Runtime primitive conversion uses YAML parsing and instance validation, and Union conversion tries alternatives until one succeeds (jsonargparse/_typehints.py:618-625,670-682). Class configurations support class_path/init_args, with instantiation requested separately through instantiate_classes (jsonargparse/_typehints.py:497-504,871-900). SignatureArguments uses get_signature_parameters to populate parser arguments (jsonargparse/_signatures.py:233).",
+      "reference_sha256": "f4a4c235a4bf96bb8411f0ea1acbf19cb40a37952590c4ac0ae8b6f8fd8f4307",
+      "repository": {
+        "commit": "dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+        "family_id": "omni-us/jsonargparse",
+        "url": "https://github.com/omni-us/jsonargparse"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/omni-us--jsonargparse-dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-034d845133236ae9b7f5a3f3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "e2e2dad01955bb0c1df7ea3eef58c40f84b8c78d3e57bcbebe1387b357578b46",
+      "question": "Why would repeated invocations of pytester.getitem() followed by evaluate_xfail_marks() impact test suite performance, and what internal caching mechanisms could mitigate redundant AST parsing and mark evaluation across multiple test evaluations?",
+      "question_sha256": "f89ec53e9a1d4045f413b3a2faaf9a089dff8cc6deadb29881616d37fa47187b",
+      "reference_answer": "getitem obtains a new module collection and generates items, so repeated calls may repeat collection work (src/_pytest/pytester.py:1254-1283,1308-1317). String xfail conditions are compiled and evaluated each time evaluate_condition is reached (src/_pytest/skipping.py:97-118). evaluate_xfail_marks itself does not read or populate a cache, even on the same Item (src/_pytest/skipping.py:213-235). The runtest hooks store and reuse xfailed_key separately, and reevaluate when it is None (src/_pytest/skipping.py:238-268). _mod_collections caches collect_by_name results for an existing collector, not arbitrary getitem invocations (src/_pytest/pytester.py:1319-1332). Reusing collected items can avoid collection work, but caching condition results across evaluations requires preserving dynamic-condition semantics; measuring AST/import costs needs the actual invocation and cache behavior.",
+      "reference_sha256": "483d60cb10aad309359321929b612ced4a2d98e76db4cd1e78a3b9138a04caed",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-05c4419df577dcd774daea5a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-47757c4062a6",
+      "original_reference_sha256": "e96f703faedec50f813fefe7995f18a8d79ab66f9ebb0fb01a26f565166c425f",
+      "question": "Why does Sphinx's incremental build system fail to scale efficiently when dealing with large documentation projects in containerized CI environments?",
+      "question_sha256": "614cf9534e78a40955ffa217fc0ae68a58dc6c173ccff12f240f8eaa12cedb9c",
+      "reference_answer": "Incremental builds still inspect discovered documents and dependencies for missing files or changed mtimes (sphinx/environment/__init__.py:477-540); HTML also checks output/source/template times (sphinx/builders/html/__init__.py:382-425). Missing, fresh or unreadable environment caches produce a new environment (sphinx/application.py:326-348), and updated environments are pickled (sphinx/builders/__init__.py:318-334). __getstate__ excludes doctree caches from the serialized copy, not the live object (sphinx/environment/__init__.py:275-284). These operations can matter for large projects, but the code does not establish that containerized CI necessarily scales poorly. That diagnosis requires cache persistence, filesystem and profiling information.",
+      "reference_sha256": "13c5bccde0d2e1df3549349c47267b633d4b17e7f0b584b54caac30b5c56be15",
+      "repository": {
+        "commit": "47757c4062a6421feeaf0ae2ded89896d6cb3526",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-47757c4062a6421feeaf0ae2ded89896d6cb3526",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-02afcdc8ff44636a2507af03"
+    }
+  ]
+}

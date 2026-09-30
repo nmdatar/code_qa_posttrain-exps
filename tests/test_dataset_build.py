@@ -81,6 +81,17 @@ class DatasetBuildTests(unittest.TestCase):
         self.checkout.assert_called_once_with(
             {"repo": "example/repository", "commit_id": self.commit}, self.base / "repos")
 
+    def test_configured_budgets_are_shared_and_invalid_values_rejected(self):
+        self.spec["budgets"] = {"latency_seconds": 1200, "compute_units": 100000,
+                                "max_tool_calls": 40, "max_output_tokens": 6000,
+                                "max_submission_bytes": 64000}
+        output, _ = self.prepare_spec()
+        self.assertEqual(read_jsonl(output / "public/tasks.jsonl")[0]["budgets"], self.spec["budgets"])
+        self.assertEqual(read_jsonl(output / "private/tasks.jsonl")[0]["budgets"], self.spec["budgets"])
+        self.spec["budgets"]["latency_seconds"] = -1
+        with self.assertRaises(ValueError):
+            self.prepare_spec(name="bad-budget")
+
     def test_repeat_preparation_has_deterministic_content_hashes(self):
         _, first = self.prepare_spec(name="first")
         _, second = self.prepare_spec(name="second")

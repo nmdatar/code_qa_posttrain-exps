@@ -1,0 +1,181 @@
+{
+  "schema_version": "1.0",
+  "authored_at": "2026-09-28",
+  "author_kind": "codex_agent",
+  "human_reviewed": false,
+  "training_export_allowed": false,
+  "spec_path": "examples/dataset_sources/sqlalchemy-generation-v2.json",
+  "spec_sha256": "74d9500786e2ce184bd30a9ee83c6f1254755a7db00d434de15da67fed449586",
+  "repository_commit": "749086adb0cc5b966aa3854712f16e213b979310",
+  "environment_image_id": "im-klaBAlIS5AAdvSlwbWH75M",
+  "environment_changed": false,
+  "budgets_changed": false,
+  "tasks": [
+    {
+      "id": "sqlalchemy-savepoint-preflush-state",
+      "source_candidate_id": "SA-GEN-01",
+      "provenance_kind": "synthesized_from_repository",
+      "mechanism": "Transaction boundary creation and selective state restoration",
+      "quality_rationale": "Contrasts pre-savepoint state, nested state, unchanged state, and a preflush failure; requires explaining source boundary rather than reciting savepoints.",
+      "required_claims": 5,
+      "matrix_cases": "normal boundary plus preflush IntegrityError",
+      "author_probe": {
+        "stdout": "{\"after_nested_rollback\": {\"a_expired\": true, \"active\": true, \"b_expired\": false, \"c_persistent\": true, \"d_transient\": true, \"nested\": false, \"outer\": true}, \"before\": {\"c_persistent\": true, \"rows\": [[1, \"outer\"], [2, \"two\"], [3, \"pre\"]]}, \"committed_rows\": [[1, \"outer\"], [2, \"two\"], [3, \"pre\"]], \"preflush_failure\": {\"active_after_rollback\": true, \"active_before_rollback\": false, \"error\": \"IntegrityError\", \"nested\": false}, \"restored\": \"outer\"}\n",
+        "stderr": "",
+        "exit_code": 0,
+        "timed_out": false,
+        "truncated": false,
+        "duration_seconds": 0.941514344,
+        "sandbox_id": "sb-PJxfCgeEgQMAJKtwM5Zfp3",
+        "provisioning_and_run_seconds": 3.3335473749320954
+      }
+    },
+    {
+      "id": "sqlalchemy-json-joinedload-uniquing",
+      "source_candidate_id": "SA-GEN-02",
+      "provenance_kind": "synthesized_from_repository",
+      "mechanism": "ORM result uniquing, JSON result decoding, and semantic custom keys",
+      "quality_rationale": "Two distinct payloads expose both failure to deduplicate and over-aggressive deduplication. Entity-only control distinguishes data on a graph from explicit result values.",
+      "required_claims": 6,
+      "matrix_cases": "legacy, missing unique, default unique, full semantic key, lossy parent-only key, entity-only control",
+      "author_probe": {
+        "stdout": "{\"default\": {\"error\": \"InvalidRequestError\", \"reason\": \"non_hashable\"}, \"entity_only\": {\"children\": [1, 2], \"parents\": 1}, \"full_key\": {\"count\": 2, \"payloads\": [{\"x\": 1}, {\"x\": 2}], \"same_parent\": true}, \"legacy\": {\"count\": 4, \"payloads\": [{\"x\": 1}, {\"x\": 1}, {\"x\": 2}, {\"x\": 2}], \"same_parent\": true}, \"none\": {\"error\": \"InvalidRequestError\", \"reason\": \"requires_unique\"}, \"parent_key\": {\"count\": 1, \"payloads\": [{\"x\": 1}], \"same_parent\": true}}\n",
+        "stderr": "",
+        "exit_code": 0,
+        "timed_out": false,
+        "truncated": false,
+        "duration_seconds": 0.956531049,
+        "sandbox_id": "sb-KfaTUCtbgOek7oiB9CU6L2",
+        "provisioning_and_run_seconds": 3.179458917118609
+      }
+    },
+    {
+      "id": "sqlalchemy-none-default-json-matrix",
+      "source_candidate_id": "SA-GEN-03",
+      "provenance_kind": "synthesized_from_repository",
+      "mechanism": "ORM insert omission, type None flags, Core insertion and JSON storage",
+      "quality_rationale": "Four insertion cases across four columns force separation of omission, SQL NULL, JSON null, defaults, and decoded Python None.",
+      "required_claims": 6,
+      "matrix_cases": "omitted, ORM explicit None, ORM explicit null, Core explicit None",
+      "author_probe": {
+        "stdout": "{\"decoded\": [[1, \"fallback\", \"fallback\", \"fallback\", \"fallback\"], [2, \"fallback\", null, null, \"fallback\"], [3, null, null, null, null], [4, null, null, null, null]], \"raw\": [[1, \"fallback\", \"fallback\", \"\\\"fallback\\\"\", \"\\\"fallback\\\"\"], [2, \"fallback\", null, \"null\", \"\\\"fallback\\\"\"], [3, null, null, null, null], [4, null, null, \"null\", null]]}\n",
+        "stderr": "",
+        "exit_code": 0,
+        "timed_out": false,
+        "truncated": false,
+        "duration_seconds": 0.9504841339999999,
+        "sandbox_id": "sb-bkc1QkkwBor3GKwmYDMh6q",
+        "provisioning_and_run_seconds": 3.496720707975328
+      }
+    }
+  ],
+  "validation": {
+    "author_sandbox_runs": 3,
+    "author_successful_runs": 3,
+    "author_failed_sandbox_runs": 0,
+    "local_launcher_failures": 1,
+    "local_launcher_failure_reason": "Temporary script did not initially include project in PYTHONPATH; corrected before any Modal run.",
+    "assertion_code_corrections_after_live_run": 0,
+    "citation_corrections_before_freeze": 4,
+    "probe_total_seconds": 2.8485295269999997,
+    "provisioning_and_run_seconds": 10.009727000026032,
+    "cost_usd": null,
+    "token_usage": null,
+    "wall_clock_authoring_seconds": null
+  },
+  "optimization_log": [
+    {
+      "change": "Reuse same pinned repo, split, environment recipe, dependencies and immutable image",
+      "benefit": "Zero image builds for three new independently assignable questions; only fresh sandbox execution."
+    },
+    {
+      "change": "Batch contrastive matrices within one probe per task",
+      "benefit": "Three sandbox calls cover state/failure branches, six result modes, and sixteen insert cells instead of one sandbox per case."
+    },
+    {
+      "change": "Adapt SA-02 mechanism to SQLite JSON with explicit adaptation provenance",
+      "benefit": "Tests legacy-versus-modern nonhashable result uniqueness without PostgreSQL provisioning; does not claim coverage of PostgreSQL ARRAY."
+    },
+    {
+      "change": "Read source before generating expectations and correct citation ranges at pinned revision",
+      "benefit": "Avoids historical-version API drift and rejects unsupported references before release."
+    },
+    {
+      "change": "Review prompt setup against exact runnable fixture before packaging",
+      "benefit": "Caught incorrect SQL literal quoting and failure-case setup drift that green runtime checks alone missed. Review corrections retained as a new spec revision."
+    }
+  ],
+  "duplicate_screening": {
+    "against_existing_sqlalchemy_task": "Different from filtered contains_eager/populate_existing identity-map refresh: savepoint boundaries; result-row unique key semantics; insert None/default serialization. Shared ORM vocabulary is not reused question mechanism.",
+    "within_batch": "Three distinct cross-layer mechanisms; contrastive cases are within each task, not inflated as separate records.",
+    "benchmark_overlap": "Not screened beyond inherited pending repository audit; no benchmark question used as a seed.",
+    "text_or_semantic_dedup_automated": false
+  },
+  "limitations": [
+    "Generated synthesized prompts, not three newly discovered real user reports.",
+    "Runtime assertions validate expected behavior but do not establish independent solver success or measured difficulty.",
+    "No question-only control or blind solver trajectory collected by author.",
+    "Independent review and reruns are separate downstream checks.",
+    "Development split only; cannot be promoted to training without family/split policy, overlap and human quality gates."
+  ],
+  "revision_history": [
+    {
+      "reason": "Independent review identified prompt quoting mismatch and fresh-run fixture mismatch; original spec, outputs and counts above preserved.",
+      "review_path": "reports/task-generation/sqlalchemy-independent-review.json",
+      "new_spec_path": "examples/dataset_sources/sqlalchemy-generation-v2-reviewed.json",
+      "new_spec_sha256": "efddf7555322924891ef3ed012ad85c13355649127786821ad68fa6fa4403eb3",
+      "changes": [
+        "SA-GEN-03 exact fenced model copied from executed fixture, syntactically parsed without executing repository code on host.",
+        "SA-GEN-01 failure control uses a fresh seeded database, same Session flags and outer modification, and confirms rollback restores seed rows.",
+        "SA-GEN-01 inspects item 3 expiration and captures same-Session raw rows after nested rollback before outer commit.",
+        "SA-GEN-01 captures and validates expected identity-conflict SAWarning without nondeterministic object addresses in stderr.",
+        "SA-GEN-02 distinguishes known uniqueness errors explicitly and rethrows unexpected errors.",
+        "Expanded current source citations for rollback restoration and JSON decoding."
+      ],
+      "new_author_sandbox_runs": 3,
+      "successful_runs": 3,
+      "failed_exit_or_expectation_runs": 0,
+      "intermediate_run_with_expected_nondeterministic_warning": {
+        "stdout": "{\"after_nested_rollback\": {\"a_expired\": true, \"active\": true, \"b_expired\": false, \"c_persistent\": true, \"d_transient\": true, \"nested\": false, \"outer\": true}, \"before\": {\"c_persistent\": true, \"rows\": [[1, \"outer\"], [2, \"two\"], [3, \"pre\"]]}, \"committed_rows\": [[1, \"outer\"], [2, \"two\"], [3, \"pre\"]], \"preflush_failure\": {\"active_after_rollback\": true, \"active_before_rollback\": false, \"duplicate_transient\": true, \"error\": \"IntegrityError\", \"first_expired\": true, \"nested\": false, \"restored_first\": \"one\", \"rows_after_recovery\": [[1, \"one\"], [2, \"two\"]]}, \"restored\": \"outer\"}\n",
+        "stderr": "<string>:35: SAWarning: New instance <Item at 0x2af745d8ffb0> with identity key (<class '__main__.Item'>, (2,), None) conflicts with persistent instance <Item at 0x2af745d90e00>\n",
+        "exit_code": 0,
+        "timed_out": false,
+        "truncated": false,
+        "duration_seconds": 0.9649887119999999,
+        "sandbox_id": "sb-Ed8yj6aT60PIQIYe2rTnsb",
+        "provisioning_and_run_seconds": 2.840631416067481
+      },
+      "final_changed_fixture_runs": [
+        {
+          "task_id": "sqlalchemy-savepoint-preflush-state",
+          "result": {
+            "stdout": "{\"after_nested_rollback\": {\"a_expired\": true, \"active\": true, \"b_expired\": false, \"c_expired\": false, \"c_persistent\": true, \"d_transient\": true, \"nested\": false, \"outer\": true}, \"before\": {\"c_persistent\": true, \"rows\": [[1, \"outer\"], [2, \"two\"], [3, \"pre\"]]}, \"committed_rows\": [[1, \"outer\"], [2, \"two\"], [3, \"pre\"]], \"preflush_failure\": {\"active_after_rollback\": true, \"active_before_rollback\": false, \"duplicate_transient\": true, \"error\": \"IntegrityError\", \"first_expired\": true, \"identity_conflict_warning\": true, \"nested\": false, \"restored_first\": \"one\", \"rows_after_recovery\": [[1, \"one\"], [2, \"two\"]]}, \"restored\": \"outer\", \"rows_after_nested_rollback\": [[1, \"outer\"], [2, \"two\"], [3, \"pre\"]]}\n",
+            "stderr": "",
+            "exit_code": 0,
+            "timed_out": false,
+            "truncated": false,
+            "duration_seconds": 0.7720194119999999,
+            "sandbox_id": "sb-dUWcIGFSJthBqc2HhFaTV0",
+            "provisioning_and_run_seconds": 3.1062062080018222
+          }
+        },
+        {
+          "task_id": "sqlalchemy-json-joinedload-uniquing",
+          "result": {
+            "stdout": "{\"default\": {\"error\": \"InvalidRequestError\", \"reason\": \"non_hashable\"}, \"entity_only\": {\"children\": [1, 2], \"parents\": 1}, \"full_key\": {\"count\": 2, \"payloads\": [{\"x\": 1}, {\"x\": 2}], \"same_parent\": true}, \"legacy\": {\"count\": 4, \"payloads\": [{\"x\": 1}, {\"x\": 1}, {\"x\": 2}, {\"x\": 2}], \"same_parent\": true}, \"none\": {\"error\": \"InvalidRequestError\", \"reason\": \"requires_unique\"}, \"parent_key\": {\"count\": 1, \"payloads\": [{\"x\": 1}], \"same_parent\": true}}\n",
+            "stderr": "",
+            "exit_code": 0,
+            "timed_out": false,
+            "truncated": false,
+            "duration_seconds": 0.937945619,
+            "sandbox_id": "sb-oC8FtLDBjVYvBliSmyx2Lj",
+            "provisioning_and_run_seconds": 2.8440637080930173
+          }
+        }
+      ],
+      "unchanged_defaults_assertion": "Original successful Modal probe remains applicable; prompt now uses byte-identical mapping, assertion unchanged.",
+      "expectations_set_before_execution": true,
+      "status": "ready_for_independent_recheck"
+    }
+  ]
+}

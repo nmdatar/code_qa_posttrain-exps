@@ -1,0 +1,322 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the base state management class implement a method that creates setter functions for state variables and registers them as event handlers instead of using direct attribute assignment?",
+      "question_sha256": "4b8ea4b00f109bcefdd3920395cf703fc57e6793bea04262ba75e5afd761c46d",
+      "reference_answer": "BaseState uses _create_setter to register setters as event handlers for three core reasons: 1) Event-driven architecture - all state changes must flow through the event system for consistent frontend-backend synchronization via WebSocket connections, 2) Change tracking - event handlers enable automatic dependency tracking and computed variable invalidation to keep UI consistent with state changes, 3) Type validation - the setter wrapper provides automatic type conversion (e.g., string to int/float) with graceful error handling. Direct attribute assignment would bypass the event processing pipeline, breaking client-server synchronization and reactive updates.",
+      "reference_sha256": "b015b4100b69197c9d31701dacc0df63cf3cec1131dee5a9a26d60a1024e31fa",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-46b285409b97d8aaf72bc8f9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the use of a callable protocol for event argument specifications with a variadic callable signature returning a sequence of reactive variable objects impact runtime performance when invoked millions of times in a high-concurrency reactive web framework application?",
+      "question_sha256": "bb599d09c400312f1a2f27568317666ba624555a959e1b2c6587bbf5975d887f",
+      "reference_answer": "The performance impact comes from three main sources:\nVariadic argument overhead: Each call with *args creates tuple objects for argument packing, adding Python-level allocation overhead that scales poorly at high frequency.\nSequence[Var] construction: Each return constructs a new Sequence containing Var objects. Reflex's Var.create() iterates through registered subclasses for type inference, and figure_out_type() performs complex type analysis including unionize() operations for heterogeneous collections.\nMemory allocation pressure: The combination of tuple creation, Sequence construction, and VarData.merge() operations generates significant garbage collection pressure in high-concurrency scenarios, leading to increased latency and memory contention.",
+      "reference_sha256": "667fa84157013f900df6c7575d78738538638e93b162e4a5a6aea5dc16c7bb80",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-4bf5aa8929b36861bbfce409"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the type stub generator determine when to add a component instantiation method to a class during signature generation from component properties?",
+      "question_sha256": "d6a436b1dec6290f9711f630ddf30484e354ecfd3e0c824b0f71c3165135462f",
+      "reference_answer": "StubGenerator adds create functions through two mechanisms:\n1. Replacement in visit_FunctionDef: If function name is \"create\" AND current class is a Component subclass, regenerates with full type hints.\n2. Addition in visit_ClassDef: After processing class body, if no create function exists AND class is Component subclass (via _current_class_is_component()), appends _generate_component_create_functiondef.\nKey logic: _current_class_is_component() checks if self.current_class exists in self.classes dict and issubclass(clz, Component). The generated function includes component properties as typed parameters and event triggers.",
+      "reference_sha256": "e5fca9a24e91bfdef5495078ee38a7fc8d7589427bcc77ac30ca31b23fab249f",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-5646e91dc2e7b3f401e55a3b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the role of the computation function returned by the derived state variable class's computation function accessor in the framework's dependency tracking for state recomputation?",
+      "question_sha256": "407e64429f98aed767e195179f8aa4076050601ba35a36d1c22b6170a5aa83be",
+      "reference_answer": "The `ComputedVar.fget` function serves three key roles: 1) Dependency discovery - DependencyTracker analyzes its bytecode to identify accessed state variables via `LOAD_ATTR` operations, building a dependency map. 2) Value computation - Called by `__get__` to compute values directly (no cache) or populate cache when stale. 3) Recomputation trigger - Invoked when `needs_update` detects dependency changes, ensuring state consistency. This enables automatic reactive computed properties without manual dependency specification.",
+      "reference_sha256": "98a9ae4d8a859dddb1221ead806d47691c3331dcad9d5b711c73f24917ffe9a9",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-58452135aaf7061a9c0f3943"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the role of the string representation method in the base component class in supporting the architectural separation of rendering logic from component state and lifecycle management in this framework?",
+      "question_sha256": "15efe10dc29d86a0530ef34aefc0fc305dd258fc3e62a97d811ec65effeeba83",
+      "reference_answer": "The `__repr__` method provides architectural separation by calling `format.json_dumps(self.render())` to convert components into JSON-serializable dictionaries, decoupling internal state from rendering logic.\nKey functions:\n- Serialization Bridge: Transforms component state into pure data via `render()` method, which returns a dictionary containing tag structure, props, and children\n- Rendering Separation: Unlike `__str__` (generates React JSX via compiler), `__repr__` provides stateless data representation without compilation\n- Cross-Boundary Communication: Enables Python-JavaScript communication through standardized JSON interface without tight coupling\n- Lifecycle Independence: Creates deterministic snapshots that can be cached, transmitted, or processed without preserving Python object lifecycle concerns\nThis separation allows components to maintain internal state management while exposing clean data interfaces for compilation and rendering pipelines.",
+      "reference_sha256": "10b16017f54fb294e3f0cca8d3e52b1ebb88414c87121136083ed367c7944c7e",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-6de8bb71306bba0126cedcf4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "ab6619bfe172c10682f8b1ef47553741363c92c3d849d8f9452244cca18e168d",
+            "kind": "file_reference",
+            "line_count": 3711,
+            "path": "reflex/vars/base.py"
+          },
+          {
+            "file_sha256": "213e08c5fa4a7efbaa29e197e9aaa3d4385f2569d1241f1d814218c5ef639cf9",
+            "kind": "file_reference",
+            "line_count": 2777,
+            "path": "reflex/state.py"
+          },
+          {
+            "file_sha256": "b371abaedde9fcbb24f48d603a111ac72323d198f422099f14ece6aa5414dc83",
+            "kind": "file_reference",
+            "line_count": 2228,
+            "path": "reflex/app.py"
+          },
+          {
+            "file_sha256": "c46169329c396669871c80477a80d145e13b926c517d2248f88a91bbf2b04910",
+            "kind": "file_reference",
+            "line_count": 334,
+            "path": "reflex/vars/dep_tracking.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where is the logic that registers dependencies for computed state properties defined?",
+      "question_sha256": "84ddd5b2e3a79fc2335f5835ea23e2711e2865809e97b73b008322ce3a132cec",
+      "reference_answer": "Primarily in reflex/vars/base.py, which defines the ComputedVar class with methods add_dependency() and _deps(). The dependency initialization occurs in reflex/state.py via BaseState._init_var_dependency_dicts(), and validation is handled in reflex/app.py through App._validate_var_dependencies(). Automatic dependency tracking uses DependencyTracker from reflex/vars/dep_tracking.py.",
+      "reference_sha256": "7a960c2180231b357295e24e51fd77e7c79433fdbb459e483aab4ea094241b26",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-789879cccc3b20671fe7cee9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the exception class raised when a computed variable shadows a base variable inherit from both the framework's base exception class and the built-in Python exception for naming conflicts?",
+      "question_sha256": "34483ae895817f2a93195b800dbc59e9c520738954a446a8ca828f4192630c91",
+      "reference_answer": "ComputedVarShadowsBaseVarsError inherits from both ReflexError and NameError following Reflex's dual inheritance pattern:\n- ReflexError: Enables framework-specific exception handling and unified error categorization\n- NameError: Maintains Python's built-in exception semantics for naming conflicts where computed variables shadow base variables\nThis pattern is consistent across Reflex exceptions (VarNameError, StateValueError, VarTypeError, etc.) allowing exceptions to be caught either as framework-specific or standard Python exceptions while preserving semantic correctness.",
+      "reference_sha256": "a95fccf5d258a31677933897f933c536d2dd3f9975aaea9c8ed01142fbaa93dc",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-7a5ec3af3b744877a8bf6075"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the placeholder element component integrate with Reflex's rendering engine to ensure correct placeholder projection in composed web components?",
+      "question_sha256": "d8614c67c7f0c177c67734a9fd35770875fe124c4d089bee8ef48dce543cf95d",
+      "reference_answer": "Slot integrates through Reflex's standard component hierarchy and compilation pipeline:\nInheritance: Slot inherits from BaseHTML \u2192 Element \u2192 Component \u2192 BaseComponent with tag = \"slot\", making it a thin wrapper around the native HTML <slot> element.\nRendering: Component.render() generates a dictionary with tag name, props, and children. The compiler's _RenderUtils.render_tag() converts this to JSX via jsx(name, props, ...children).\nProjection: Slot delegates to browser's native Shadow DOM mechanism. Reflex emits <slot> tags in JSX; actual content projection is handled by the browser, not custom logic.\nThis ensures correct projection by leveraging web standards while maintaining consistency with Reflex's declarative model.",
+      "reference_sha256": "0db8b7224c36f64e7704030f8b49ed2deef7171ca0b76b1a63d3632cb682e23a",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-826043763a899130635fdcb4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "0565dad039816155ae78111dd9f153152edd7d9736d699c285a064097d7944bc",
+            "kind": "file_reference",
+            "line_count": 2909,
+            "path": "reflex/components/component.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where is a validation error exception for invalid component child types instantiated or raised when an invalid component child is detected in the repository?",
+      "question_sha256": "fa6372ba5275a38563c23ed32cbf995460e938001e6714de92c63f9ce6e2bb96",
+      "reference_answer": "reflex/components/component.py in the Component._validate_children method when invalid component children are detected",
+      "reference_sha256": "adfcf3655f18e6d0fdec7db3b4bfc47a9671c98f086cb6308ee00953aa9be012",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-882cc6b0f9735091d2bd30e5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the function that checks whether rendered JavaScript code attempts to access state context objects influence the inclusion of the state context objects in the generated client-side JavaScript bundle?",
+      "question_sha256": "2efc6b8d242aa9f61c4309742b170398a5435331d81be1228d12f6baa20b5eb8",
+      "reference_answer": "The code_uses_state_contexts function performs validation, not bundle inclusion control. It searches for \"useContext(StateContexts\" in compiled stateful components code. If found when no rx.State subclass exists (self._state is None), it raises ReflexRuntimeError during compilation. StateContexts inclusion is determined by context_template during context compilation: if state classes exist, it generates StateContexts with createContext entries; if none exist, it generates an empty object. The function prevents runtime errors by catching mismatched state access at build time.",
+      "reference_sha256": "af8f452ccc66085271306a38a9f48d2db71c15c6e1aa433d05039fdea9d5e186",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-92d425e576a2fba2280026c1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "8cc72520a48e6f67adcd369f465ee1381fb417d1e851402922f2808004d108ab",
+            "kind": "file_reference",
+            "line_count": 798,
+            "path": "reflex/components/el/elements/forms.py"
+          },
+          {
+            "file_sha256": "f2f6aa4b630155343031511e9ad2a98cb94cc5d94cf7920ef2ef14f5807fdf54",
+            "kind": "file_reference",
+            "line_count": 2512,
+            "path": "reflex/event.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where are the event handler type annotations for the value change, focus gain, and focus loss events of the numeric input form component defined?",
+      "question_sha256": "aacea6c2b40e796b89c15f966a8e46597f4cd55a75bab562b8a90e274efe43bf",
+      "reference_answer": "The EventHandler types for ValueNumberInput's on_change, on_focus, and on_blur events are defined in reflex/components/el/elements/forms.py in the ValueNumberInput class. The event spec functions (float_input_event, int_input_event, input_event) are defined in reflex/event.py, and the EventHandler class itself is also defined in reflex/event.py.",
+      "reference_sha256": "d2fa8a6e55d25613e476fdbbeda4879f71d2015066c6474886af1131027361bb",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-9626dedaeacdde487dc32607"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "_document.js",
+            "reason": "not_tracked",
+            "reference": "_document.js",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "What modules or components in the compiler rely on the string output of the function that generates the document root component source code?",
+      "question_sha256": "bc70baebd503dc7b7214868d08f2c5dd1344b828f3ac489063a19d9613f7a7ae",
+      "reference_answer": "The document_root_template output is consumed by:\n- reflex.compiler.compiler._compile_document_root: Calls the template to generate _document.js\n- reflex.compiler.templates.app_root_template: Hardcodes import { Layout as AppLayout } from './_document'\n- reflex.app.App._compile: Writes template output to _document.js via compiler.compile_document_root\n- Frontend module system: Uses the exported Layout component for document structure\nChanges to the template's export signature or component name would break the hardcoded import and expected interface.",
+      "reference_sha256": "b8f5f8c168f98eb5d4772832100e4d2cd2778006a8c91c1bce47d29bcaab5f07",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-9d6847f23a7ae3108a173ffa"
+    }
+  ]
+}

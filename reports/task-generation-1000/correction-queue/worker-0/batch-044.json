@@ -1,0 +1,58 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-044.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-82fd8320b1be",
+      "original_reference_sha256": "bf935fa84c946c3a35e9e97c39e353955b4912684adcf4c059ff995e6feeb5f8",
+      "question": "Where are the CRS format conversion methods (PROJ.4 vs WKT string) defined and implemented in xarray's rasterio backend?",
+      "question_sha256": "d48f32dbc716f60b001d58d5073ce3d23d07785826aec389f0f663c57de63103",
+      "reference_answer": "Xarray's call sites are in open_rasterio: it calls riods.crs.to_proj4(), falling back on AttributeError to riods.crs.to_string(), and stores the result in attrs['crs'] (xarray/backends/rasterio_.py:284-291). WarpedVRT setup also calls vrt.crs.to_string() (xarray/backends/rasterio_.py:219-230). The conversion methods belong to rasterio's CRS object, not implementations defined by xarray. Do not infer that to_string always means WKT from this call site.",
+      "reference_sha256": "c5def5f003eb02fb5931cf285c21ddb95a84116e9432330780cab040ca079147",
+      "repository": {
+        "commit": "82fd8320b1be7a434effd247baf07004b66b802f",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-82fd8320b1be7a434effd247baf07004b66b802f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-65a2fbcce26ca2301616d77b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-82fd8320b1be",
+      "original_reference_sha256": "8321a5d92e81b15dbfbc450f69c569a6ec9c3177ea5a78ecf274c039f70b3761",
+      "question": "Why does xarray's chunked array indexing exhibit quadratic performance degradation when accessing non-contiguous slices across multiple dimensions with heterogeneous chunk sizes?",
+      "question_sha256": "4580eb62571e62276fedb2d275de0569a6945903bad537ea080a7565a2ecc6b9",
+      "reference_answer": "The question's quadratic-scaling premise is not established. DaskIndexingAdapter dispatches basic indexers directly, vectorized indexers to vindex, and outer indexers directly with an axis-by-axis fallback on NotImplementedError (xarray/core/indexing.py:1192-1208). These paths can create different task and data-access costs, but heterogeneous chunk sizes alone do not imply a universal quadratic bound. Determine the actual indexer type, accessed chunks, task graph, and measured scaling before attributing a bottleneck.",
+      "reference_sha256": "f07b73024e5286a00b34c2ef9596b53edbaa6cd20b2e82ea05dbbf43c2bd88c8",
+      "repository": {
+        "commit": "82fd8320b1be7a434effd247baf07004b66b802f",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-82fd8320b1be7a434effd247baf07004b66b802f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-aa0876fa2b0671d67b3e4510"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-82fd8320b1be",
+      "original_reference_sha256": "412855d44222b33d97ba8f8c4160758c0583126943e71a632ed9a939d742945f",
+      "question": "Why does xarray's interpolation pipeline create performance bottlenecks when preserving attributes across the layered architecture from Dataset to Variable levels?",
+      "question_sha256": "33486384f118572395d75c5230cf4701f7dfb8ba9d68d9795c7bb714bceaae96",
+      "reference_answer": "Interpolation constructs Variables with attrs=var.attrs (xarray/core/missing.py:453-456), whose attribute setter copies into an OrderedDict (xarray/core/variable.py:724-726). Dataset.interp also constructs intermediate and final datasets (xarray/core/dataset.py:2220-2239); _replace shallow-copies default dataset attrs (xarray/core/dataset.py:779-780). These are concrete overhead sources scaling with mappings copied, but the source does not show they dominate interpolation or cause a bottleneck. Profiling is needed to compare metadata copying with interpolation and I/O costs.",
+      "reference_sha256": "b5f846edb8033bab0fcc670bbaf73d06e1e2ad72842c3ef8bc7e7278bf5e66a7",
+      "repository": {
+        "commit": "82fd8320b1be7a434effd247baf07004b66b802f",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-82fd8320b1be7a434effd247baf07004b66b802f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-cd122a483759090a50e0b275"
+    }
+  ]
+}

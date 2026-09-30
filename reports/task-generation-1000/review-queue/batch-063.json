@@ -1,0 +1,398 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "cc96de7ffeb2e0b7211db873d6feabc866d43efd2b61ba4fbef4a7472e30d9d8",
+            "kind": "file_reference",
+            "line_count": 518,
+            "path": "sklearn/neighbors/_lof.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the architectural rationale for LocalOutlierFactor's decision to cache _distances_fit_X_, _neighbors_indices_fit_X_, and _lrd as instance attributes during fit(), and how does this caching strategy impact the control flow of predict() versus score_samples()?",
+      "question_sha256": "f8202c44d1172720ea068c7277a0cb91b109240cb0b4edaa0730dff26c11d352",
+      "reference_answer": "Based on my exploration of the scikit-learn repository, specifically the `LocalOutlierFactor` class in `sklearn/neighbors/_lof.py`, the architectural rationale for caching training sample neighbor distances (`_distances_fit_X_`) and local reachability density values (`_lrd`) as instance attributes during `fit()` is to enable efficient computation of outlier scores for new samples during prediction without recomputing expensive operations on the training data.\n\n**Key Architectural Reasons:**\n\n1. **Reachability Distance Computation**: When computing the local reachability density (LRD) for new query samples in `score_samples()` (line 483), the method `_local_reachability_density()` (line 493-518) requires the k-th neighbor distance from the training samples. Specifically, at line 514, it accesses `self._distances_fit_X_[neighbors_indices, self.n_neighbors_ - 1]` to compute the reachability distance as `max(distances_X, dist_k)`. Without caching `_distances_fit_X_`, this would require recomputing all k-nearest neighbor queries for the training set during each prediction call.\n\n2. **LRD Ratio Calculation**: The LOF score computation in `score_samples()` (line 488) requires comparing the LRD of new samples with the LRD of their training neighbors: `lrd_ratios_array = self._lrd[neighbors_indices_X] / X_lrd[:, np.newaxis]`. The cached `_lrd` array stores precomputed LRD values for all training samples, allowing direct indexing without recomputation.\n\n3. **Performance Optimization**: The LOF algorithm requires comparing each new sample's density with its neighbors' densities. Since neighbors are always drawn from the training set, caching their distances and LRD values avoids redundant expensive operations:\n   - Neighbor search using tree structures (ball_tree, kd_tree) or brute force\n   - LRD computation involving reachability distance calculations\n   - These operations scale with training set size and are computationally intensive\n\n4. **Memory vs. Computation Trade-off**: The caching strategy trades memory (storing O(n_samples \u00d7 n_neighbors) arrays) for computational efficiency during prediction. This is particularly beneficial when making multiple predictions on different query sets, as the training data computations are done once during `fit()` rather than repeatedly during `predict()` or `score_samples()`.\n\n**Implementation Details:**\n- `_distances_fit_X_` is cached at line 290 during `fit()` via `self.kneighbors()`\n- `_lrd` is cached at line 300 by calling `_local_reachability_density()` with the training data\n- Both are used in `score_samples()` (lines 488 and 514) when processing new query samples\n- The cached values enable the algorithm to compute LOF scores for new samples by only performing neighbor searches for the query points, not the entire training set\n\nThis design follows the scikit-learn pattern of caching expensive computations during `fit()` to optimize subsequent prediction operations, which is especially important for algorithms like LOF that require density comparisons between query points and their training neighbors.",
+      "reference_sha256": "1a50dedf4414c8ccc32cc13f3b1df68ec5ba7d7aaaef74c02a62f05e5f632dd9",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-e3922d09de456a389e48d130"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2079,
+            "file_sha256": "fc65539b6a08eccfe9fa67de8e2cb7486113ea41b831aee968f3d2154ec8418f",
+            "path": "sklearn/decomposition/_nmf.py",
+            "start_line": 2077
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the test_minibatch_nmf_transform function require the fresh_restarts parameter to be set to True to guarantee equivalence between fit_transform and transform outputs, and what underlying algorithmic behavior would be violated if this constraint were removed?",
+      "question_sha256": "f07ba44926629888424655a2c1c4ef357182d97dd233d714af4136d145761c49",
+      "reference_answer": "The test requires `fresh_restarts=True` because it ensures that `fit_transform` and `transform` use the same algorithm to compute the transformation matrix W, guaranteeing equivalence.\n\n**Algorithmic behavior:**\n\n1. When `fresh_restarts=False` (default):\n   - During `_fit_transform`, W is updated incrementally via `_multiplicative_update_w` during minibatch iterations (lines 2077-2079 in `_nmf.py`)\n   - The final W depends on minibatch order and incremental update history\n   - At the end of `_fit_transform`, W is not recomputed (line 2299 check is False)\n\n2. When `fresh_restarts=True`:\n   - During `_fit_transform`, W is recomputed from scratch for each batch using `_solve_W` (lines 2074-2075)\n   - At the end of `_fit_transform`, W is recomputed from scratch using `_solve_W(X, H, self._transform_max_iter)` (lines 2299-2300)\n   - This matches what `transform` does: it calls `_solve_W(X, self.components_, self._transform_max_iter)` (line 2338)\n\n3. The `_solve_W` method (lines 2038-2063):\n   - Initializes W from scratch with a default value\n   - Iteratively solves for W given fixed H using multiplicative updates until convergence\n   - This produces a deterministic solution for W given H\n\n**Why equivalence requires `fresh_restarts=True`:**\n\nWithout `fresh_restarts=True`, `fit_transform` returns a W built incrementally through minibatch updates, which may not match the solution from solving W from scratch given the final H (what `transform` does). With `fresh_restarts=True`, both methods end by solving W from scratch given the final H, ensuring equivalence.\n\n**What would be violated if removed:**\n\nIf `fresh_restarts=False`, the incremental update path makes W depend on minibatch order and history, so `fit_transform` and `transform` can produce different W values even with the same final H, breaking the equivalence guarantee.",
+      "reference_sha256": "987846ac8df895622cb9d0788f8064146f866762dea7655b38556e1263d811e2",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-e583913bede853b178c4f963"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "cfcec571ae55c145d808e23cdb47fb3d5510d33c15411b73d3796fdc503578a1",
+            "kind": "file_reference",
+            "line_count": 256,
+            "path": "asv_benchmarks/benchmarks/common.py"
+          },
+          {
+            "file_sha256": "0c909bbb560bfb5f98fd9a6fc3f851aad98c0159e310672425eaa659182e6cf6",
+            "kind": "file_reference",
+            "line_count": 33,
+            "path": "asv_benchmarks/benchmarks/config.json"
+          },
+          {
+            "file_sha256": "b0b29b888554de89fd0681895bae32bdf584ac2b9427c385e0bad89f0d88c82a",
+            "kind": "file_reference",
+            "line_count": 96,
+            "path": "asv_benchmarks/benchmarks/decomposition.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "asv_benchmarks/benchmarks/common.py",
+              "sklearn/cluster/tests/common.py",
+              "sklearn/model_selection/tests/common.py"
+            ],
+            "end_line": null,
+            "path": "common.py",
+            "reason": "ambiguous_basename",
+            "reference": "common.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "What is the architectural pattern established by the DictionaryLearningBenchmark class that integrates the Transformer, Estimator, and Benchmark base classes for performance measurement in the decomposition module?",
+      "question_sha256": "d7e8da1a7244d8c74b7f20bc5a45b62ce8aef08ca3d0630fbdc369ede87c6100",
+      "reference_answer": "The architectural pattern is a multiple inheritance mixin pattern that combines three abstract base classes to create a unified benchmarking interface for algorithms that implement both estimator and transformer capabilities.\n\nThe pattern works as follows:\n\n1. Core Benchmarking Infrastructure (Benchmark base class):\n   - Located in `asv_benchmarks/benchmarks/common.py`\n   - Provides abstract base class with core benchmarking infrastructure\n   - Defines timing configuration (timer, processes, timeout)\n   - Manages benchmark profiles (fast, regular, large_scale)\n   - Provides abstract `params` property that must be implemented\n   - Handles configuration loading from config.json\n\n2. Estimator Benchmarking Capabilities (Estimator mixin):\n   - Also in `common.py`\n   - Provides methods for benchmarking estimator interfaces:\n     - `make_data(params)`: Abstract method to generate datasets\n     - `make_estimator(params)`: Abstract method to create estimator instances\n     - `setup_cache()`: Caches fitted estimators for all parameter combinations\n     - `setup(*params)`: Loads datasets and pre-fitted estimators\n     - `time_fit()`: Measures fit() method execution time\n     - `peakmem_fit()`: Measures memory usage during fitting\n     - `track_train_score()` and `track_test_score()`: Track performance metrics\n\n3. Transformer Benchmarking Capabilities (Transformer mixin):\n   - Also in `common.py`\n   - Provides methods for benchmarking transformer interfaces:\n     - `time_transform()`: Measures transform() method execution time\n     - `peakmem_transform()`: Measures memory usage during transformation\n     - `track_same_transform()`: Validates consistency across versions\n\n4. Integration Pattern:\n   - The `DictionaryLearningBenchmark` class (in `asv_benchmarks/benchmarks/decomposition.py`) inherits from all three: `class DictionaryLearningBenchmark(Transformer, Estimator, Benchmark)`\n   - This multiple inheritance allows a single benchmark class to:\n     - Use core benchmarking infrastructure from Benchmark\n     - Benchmark the estimator interface (fit method) via Estimator mixin\n     - Benchmark the transformer interface (transform method) via Transformer mixin\n   - The class implements required abstract methods:\n     - `make_data()`: Returns Olivetti faces dataset\n     - `make_estimator()`: Creates DictionaryLearning instances with specific parameters\n     - `make_scorers()`: Sets up custom scoring functions for dictionary learning\n\nThis pattern enables comprehensive performance measurement of algorithms that serve dual roles as both estimators (learn from data via fit) and transformers (modify data via transform), which is common in dimensionality reduction algorithms like DictionaryLearning, PCA, and similar decomposition techniques.\n\nThe same pattern is used by other benchmark classes in the decomposition module (PCABenchmark, MiniBatchDictionaryLearningBenchmark) and in other modules (KMeansBenchmark uses Predictor, Transformer, Estimator, Benchmark), demonstrating a consistent architectural approach across the benchmarking framework.",
+      "reference_sha256": "203b5508eefa9e618001e8787a1f5bb97cc52193d7bdbb57e646fa412117ae9e",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-ec6773e300e48385e55ada1d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 51,
+            "file_sha256": "4d9b728c1be7a3f30bfa7db33c5a0cca08e8f6dd33742f35167d462da6515298",
+            "path": "sklearn/utils/_plotting.py",
+            "start_line": 37
+          },
+          {
+            "end_line": 317,
+            "file_sha256": "bd11e4cd7eac7b0df69ce0e2318e6ccd2017a677e046c4f8d3cc1ab1bfb425ea",
+            "path": "sklearn/utils/_response.py",
+            "start_line": 249
+          },
+          {
+            "end_line": 246,
+            "file_sha256": "bd11e4cd7eac7b0df69ce0e2318e6ccd2017a677e046c4f8d3cc1ab1bfb425ea",
+            "path": "sklearn/utils/_response.py",
+            "start_line": 116
+          },
+          {
+            "end_line": 2322,
+            "file_sha256": "fcbd6e0f7823f6b50feef32ded7c133c1eff60ac2cc9c6ee173448dd7c5bd164",
+            "path": "sklearn/utils/validation.py",
+            "start_line": 2279
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the `response_method` parameter's 'auto' fallback mechanism interact with the `_validate_and_get_response_values` method to determine which scoring function to use when an estimator lacks `predict_proba`?",
+      "question_sha256": "22bab5ff629743ef704a2151b0d380942c88311b593deed55cfe9ac90bacb8d3",
+      "reference_answer": "The automatic method selection mechanism interacts with the binary classifier validation method through a cascading fallback process that determines which prediction method to use when an estimator lacks probability prediction capability.\n\nHere's how the interaction works:\n\n1. **Entry Point**: The `_validate_and_get_response_values` class method (in `sklearn/utils/_plotting.py`, lines 37-51) receives `response_method=\"auto\"` as a parameter. This method is part of the `_BinaryClassifierCurveDisplayMixin` class and serves as the validation entry point for binary classifier curve displays.\n\n2. **Auto Conversion**: The method calls `_get_response_values_binary` (in `sklearn/utils/_response.py`, lines 249-317) with `response_method=\"auto\"`. When this function detects `response_method == \"auto\"` (line 308), it converts it to a preference-ordered list: `[\"predict_proba\", \"decision_function\"]` (line 309). This establishes the fallback order: try probability prediction first, then decision function.\n\n3. **Method Resolution**: `_get_response_values_binary` then calls `_get_response_values` (in `sklearn/utils/_response.py`, lines 116-246), which in turn calls `_check_response_method` (in `sklearn/utils/validation.py`, lines 2279-2322) with the list of methods.\n\n4. **Fallback Logic**: The `_check_response_method` function implements the actual fallback mechanism (lines 2314-2315):\n   - It uses `getattr(estimator, method, None)` for each method in the preference list\n   - It returns the first method that exists (is not `None`) using `reduce(lambda x, y: x or y, prediction_method)`\n   - If an estimator lacks `predict_proba`, `getattr` returns `None` for that method\n   - The function then tries the next method in the list (`decision_function`)\n   - If `decision_function` exists, it is returned and used\n\n5. **Result**: When an estimator lacks `predict_proba`, the automatic selection falls back to `decision_function` because:\n   - The 'auto' value is converted to `[\"predict_proba\", \"decision_function\"]`\n   - `_check_response_method` tries `predict_proba` first and gets `None`\n   - It then tries `decision_function` and returns it if available\n   - This selected method is then used by `_get_response_values` to compute the response values\n\nThis design ensures that binary classifier displays and scoring functions can automatically adapt to different estimator capabilities without requiring explicit method specification, providing a robust fallback mechanism when probability prediction is unavailable.",
+      "reference_sha256": "562fb3e25c089eff759eaf233896403194d2f3410d3c6dd338c00cb133d6cbf9",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-ed5acf5cd60b245c5176209d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does AdditiveChi2Sampler's design decouple the mathematical transformation logic from input validation and sparse/dense matrix handling to maintain separation of concerns?",
+      "question_sha256": "cdfadce13dad6aabe95c9f8c4d11b88d14e77dc7e7fddcfde6dc4df492c62ed6",
+      "reference_answer": "The additive chi-squared kernel approximation transformer achieves separation of concerns through a layered design that isolates input validation, matrix type detection, and mathematical transformation into distinct components.\n\n**Input Validation Separation:**\nThe transformer delegates all input validation to the `validate_data()` utility function from `sklearn.utils.validation`. This function is called in both `fit()` (line 691) and `transform()` (line 717-719) methods with parameters like `accept_sparse=\"csr\"` and `ensure_non_negative=True`. This centralizes validation logic, ensuring data format requirements (sparse matrix format, non-negative values) are checked separately from the core transformation algorithm.\n\n**Sparse/Dense Matrix Handling Decoupling:**\nMatrix type detection is handled by a simple check: `sparse = sp.issparse(X)` (line 720). Based on this boolean flag, the transformer selects the appropriate transformation method via a conditional assignment: `transf = self._transform_sparse if sparse else self._transform_dense` (line 744). This design pattern separates the decision logic (which method to use) from the implementation details (how each method works).\n\n**Mathematical Transformation Isolation:**\nThe core mathematical transformation logic is encapsulated in two static methods:\n- `_transform_dense()` (lines 778-802): Handles dense NumPy arrays using operations like `np.sqrt()`, `np.log()`, `np.cos()`, `np.sin()`, and `np.hstack()`\n- `_transform_sparse()` (lines 804-833): Handles sparse SciPy CSR matrices using `sp.csr_matrix()` and `sp.hstack()`\n\nBoth methods implement the same mathematical algorithm (Fourier transform sampling of the chi-squared kernel characteristic function) but are adapted for their respective matrix types. The mathematical operations (square root, logarithm, cosine, sine transformations with sample intervals) are identical in both methods, demonstrating that the transformation logic is independent of the matrix representation.\n\n**Design Benefits:**\nThis architecture maintains separation of concerns by:\n1. Keeping validation logic external (via utility functions)\n2. Using a simple boolean check for matrix type routing\n3. Isolating mathematical operations in static methods that can be tested independently\n4. Allowing the same mathematical algorithm to work with both sparse and dense matrices without code duplication of the core transformation logic\n\nThe transformer's `transform()` method acts as a coordinator that: validates input, detects matrix type, selects the appropriate handler, and delegates to the mathematical transformation - each concern handled separately.",
+      "reference_sha256": "75c23f1f0077c5b51710dcd5c1cd213c3a7a34cfce467eef4fa156f53a0f40ce",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-f0b02694091900c5a86c7d2d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1864,
+            "file_sha256": "6f827153629bf893bb985f762947b9db75a3d058c1f5d9f4c5f6698cdbf6ef2f",
+            "path": "sklearn/metrics/tests/test_common.py",
+            "start_line": 1857
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the permutation loop control the data transformation flow between y_true and y_score, and what specific inverse mapping mechanism ensures that the metric computation remains invariant across all class label permutations?",
+      "question_sha256": "8d7838409195555d21b6fdc34091086c9d4c0a52926c45a43f42cffce4ff1345",
+      "reference_answer": "The permutation loop that controls the data transformation flow between ground truth labels (`y_true`) and prediction scores (`y_score`) is located in the `test_thresholded_metric_permutation_invariance` function in `sklearn/metrics/tests/test_common.py` at lines 1857-1864.\n\nThe specific inverse mapping mechanism that ensures metric computation remains invariant across all class label permutations is implemented as follows:\n\n```python\nfor perm in permutations(range(n_classes), n_classes):\n    inverse_perm = np.zeros(n_classes, dtype=int)\n    inverse_perm[list(perm)] = np.arange(n_classes)\n    y_score_perm = y_score[:, inverse_perm]\n    y_true_perm = np.take(perm, y_true)\n    \n    current_score = metric(y_true_perm, y_score_perm)\n    assert_almost_equal(score, current_score)\n```\n\n**The Inverse Mapping Mechanism:**\n\nThe inverse permutation array (`inverse_perm`) is constructed using:\n```python\ninverse_perm = np.zeros(n_classes, dtype=int)\ninverse_perm[list(perm)] = np.arange(n_classes)\n```\n\nThis creates an array where `inverse_perm[perm[i]] = i` for all indices `i`. For example, if `perm = [2, 0, 1]` (meaning class 0\u21922, 1\u21920, 2\u21921), then `inverse_perm = [1, 2, 0]` (meaning class 2\u21920, 0\u21921, 1\u21922).\n\n**How It Ensures Invariance:**\n\n1. **For `y_score`**: The transformation uses `y_score[:, inverse_perm]`, which applies the inverse permutation to the columns of the score matrix. This reverses the column permutation so that the scores align correctly with the permuted labels.\n\n2. **For `y_true`**: The transformation uses `np.take(perm, y_true)`, which applies the direct permutation to remap the true class labels according to the permutation.\n\n3. **The Key Insight**: By applying the inverse permutation to `y_score` and the direct permutation to `y_true`, both arrays are transformed in a coordinated way that preserves the relationship between true labels and their corresponding scores, ensuring the metric computation produces identical results regardless of the class label ordering.\n\nThis mechanism is specifically used in the test function `test_thresholded_metric_permutation_invariance` (line 1846) to verify that thresholded classification metrics (like `roc_auc_score`, `average_precision_score`, `brier_score_loss`, etc.) remain invariant under class label permutations, which is a critical property for metrics that should not depend on arbitrary label ordering.",
+      "reference_sha256": "1aa9e4ce1910edf7131a8b5b84fb7c3b0b3a61b5025c96ae7b50cf4bb3f8d428",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-f4c97e8c10c43fbdd5c928cf"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2216,
+            "file_sha256": "408abff3d754077d26f7d0fb5db4b612a862538f2ca8365dd7f414cffdfa261f",
+            "path": "sklearn/tree/tests/test_tree.py",
+            "start_line": 2201
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the test_check_n_classes function construct allowed_dtypes by combining both int32 and int64 with their byte-order variants, and what would be the consequence of removing the newbyteorder() transformation step for detecting endianness-related validation failures?",
+      "question_sha256": "02a28898a8b0c80767d72bc4352c9725787f66fa00a521f8da9417417c5292aa",
+      "reference_answer": "The test function `test_check_n_classes` in `sklearn/tree/tests/test_tree.py` (lines 2201-2216) constructs the list of allowed dtypes through a two-step process:\n\n1. **Initial dtype list creation** (line 2203): It starts with a list containing two NumPy dtypes:\n   ```python\n   allowed_dtypes = [np.dtype(np.int32), np.dtype(np.int64)]\n   ```\n\n2. **Byte-order variant addition** (line 2204): It then extends this list by creating byte-order swapped variants of each dtype using list comprehension:\n   ```python\n   allowed_dtypes += [dt.newbyteorder() for dt in allowed_dtypes]\n   ```\n\nThe `newbyteorder()` method creates a new dtype with swapped byte order (little-endian \u2194 big-endian). This results in a total of 4 dtypes:\n- Native `int32` (e.g., `<i4` on little-endian systems)\n- Native `int64` (e.g., `<i8` on little-endian systems)  \n- Byte-order swapped `int32` (e.g., `>i4` on little-endian systems)\n- Byte-order swapped `int64` (e.g., `>i8` on little-endian systems)\n\n**Purpose and Context:**\nThis test validates the `_check_n_classes` function (defined in `sklearn/tree/_tree.pyx` at line 1423), which is called during tree model unpickling to validate the `n_classes` array's dtype. The function must handle models pickled on machines with different endianness or bitness (32-bit vs 64-bit platforms).\n\nThe `_check_n_classes` implementation (lines 1423-1441) accepts integer dtypes with itemsize 4 or 8 bytes (int32/int64) regardless of byte order, as indicated by the comment on line 1433: \"Handles both different endianness and different bitness\". It performs dtype conversion using `astype()` with `casting=\"same_kind\"` when the dtype matches the expected integer type but differs in byte order or bitness.\n\n**Consequence of removing `newbyteorder()`:**\nIf the `newbyteorder()` transformation step were removed, the test would only verify native byte-order dtypes. This would mean:\n- The test suite would not catch potential failures when loading models pickled on machines with different endianness\n- Cross-platform compatibility issues (e.g., loading a model pickled on a big-endian system on a little-endian system) might go undetected\n- The validation logic's ability to handle endianness differences (as implemented in `_check_n_classes` lines 1434-1435) would remain untested\n\nThis is particularly important given that scikit-learn includes explicit endianness compatibility tests elsewhere (e.g., `test_different_endianness_pickle` at line 2055 and `test_different_endianness_joblib_pickle` at line 2080), demonstrating that cross-platform pickle compatibility is a critical requirement for the library.\n</start_of_answer>",
+      "reference_sha256": "8585d2165faf412f117c67ad0aeb96cba31353866650363ccc5cc38061f54a50",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-f63a91060c9b4476e6c3796c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2200,
+            "file_sha256": "3bd5882915757e65680f45aa07edd0f65f8aa277658a714b7434eb6e619add89",
+            "path": "sklearn/preprocessing/_data.py",
+            "start_line": 2195
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "sklearn/base.py",
+              "sklearn/utils/_repr_html/base.py"
+            ],
+            "end_line": 837,
+            "path": "base.py",
+            "reason": "ambiguous_basename",
+            "reference": "base.py",
+            "start_line": 834
+          },
+          {
+            "candidates": [],
+            "end_line": 246,
+            "path": "utils/_tags.py",
+            "reason": "not_tracked",
+            "reference": "utils/_tags.py",
+            "start_line": 246
+          },
+          {
+            "candidates": [],
+            "end_line": 1765,
+            "path": "utils/validation.py",
+            "reason": "not_tracked",
+            "reference": "utils/validation.py",
+            "start_line": 1765
+          }
+        ]
+      },
+      "question": "Why does the Normalizer class's __sklearn_tags__ method set requires_fit to False despite inheriting from TransformerMixin, and how does this design choice reflect the fundamental algorithmic nature of row normalization?",
+      "question_sha256": "7f6128c0b4f24716a80c793fbb50b6176178972e6f96d0677328d567f11b46c6",
+      "reference_answer": "The preprocessing transformer that scales each sample independently to unit norm sets `requires_fit=False` in its `__sklearn_tags__` method because the operation is stateless and does not require learning parameters from training data.\n\n**Implementation details:**\nIn `sklearn/preprocessing/_data.py` (lines 2195-2200), the transformer's `__sklearn_tags__` method explicitly sets:\n```python\ndef __sklearn_tags__(self):\n    tags = super().__sklearn_tags__()\n    tags.input_tags.sparse = True\n    tags.requires_fit = False\n    tags.array_api_support = True\n    return tags\n```\n\n**Why this design choice:**\n1. **Stateless operation**: The normalization function (line 1953) processes each row independently. Each sample is scaled to unit norm (l1, l2, or max) based solely on that sample's values, not on global statistics from training data.\n\n2. **No learned parameters**: The `fit` method (lines 2150-2170) only validates parameters; it doesn't learn or store any statistics. The docstring states: \"This estimator is stateless and does not need to be fitted\" (line 2120).\n\n3. **Inheritance vs. behavior**: While the transformer inherits from `TransformerMixin` (which provides `fit_transform` and transformer tags), `TransformerMixin.__sklearn_tags__` (base.py:834-837) doesn't override `requires_fit`, which defaults to `True` in the `Tags` class (utils/_tags.py:246). The transformer overrides this default because its algorithm doesn't require fitting.\n\n4. **Algorithmic nature**: Row normalization is a per-sample operation. The `transform` method (lines 2172-2193) calls `normalize(X, norm=self.norm, axis=1, copy=False)`, which computes norms per row and scales each row independently. This differs from transformers like `StandardScaler` that learn mean/std from training data.\n\n**Framework implications:**\nSetting `requires_fit=False` tells the framework (e.g., `check_is_fitted` in utils/validation.py:1765) that the transformer can be used without calling `fit`, reflecting its stateless nature while maintaining API consistency through the transformer interface.",
+      "reference_sha256": "6072cd1b580d2ff0f9e9cdfa97c46811d890dc8ddff39a428350070cc3b511ce",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-f8e03464345a73f88e553a17"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "cc96de7ffeb2e0b7211db873d6feabc866d43efd2b61ba4fbef4a7472e30d9d8",
+            "kind": "file_reference",
+            "line_count": 518,
+            "path": "sklearn/neighbors/_lof.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the architectural responsibility of the _local_reachability_density() method within LocalOutlierFactor's computational pipeline, and how does its encapsulation enable the separation between training-time and inference-time density calculations?",
+      "question_sha256": "b9f66d90929bb98386ad8248fc8590f5c902793707163de53537116811e1b968",
+      "reference_answer": "The private method that computes local reachability density serves as an encapsulated, reusable component in the unsupervised outlier detection estimator's computational pipeline. Its architectural responsibility is to centralize the local reachability density (LRD) calculation logic, enabling separation between training-time and inference-time density computations.\n\nImplementation details (from `./sklearn/neighbors/_lof.py`):\n\n1. **Method signature and design** (lines 493-518): The method `_local_reachability_density(distances_X, neighbors_indices)` takes distance matrices and neighbor indices as parameters, making it data-agnostic. It computes LRD as the inverse of the average reachability distance of k-nearest neighbors.\n\n2. **Training-time usage** (lines 300-302): During `fit()`, the method computes LRD for training samples:\n   ```python\n   self._lrd = self._local_reachability_density(\n       self._distances_fit_X_, _neighbors_indices_fit_X_\n   )\n   ```\n   The result is stored in `self._lrd` and used to compute `negative_outlier_factor_` for training samples.\n\n3. **Inference-time usage** (lines 483-486): During `score_samples()` (for novelty detection), the method computes LRD for new query samples:\n   ```python\n   X_lrd = self._local_reachability_density(\n       distances_X,\n       neighbors_indices_X,\n   )\n   ```\n   This `X_lrd` is then compared with stored training LRD values (`self._lrd`) to compute outlier scores for new data.\n\n4. **Encapsulation benefits**: By parameterizing the method with distances and neighbor indices, it can operate on both training data (during fit) and query data (during prediction), enabling code reuse while maintaining clear separation between training and inference phases. The method's encapsulation allows the same calculation logic to be applied consistently in both contexts without duplication.\n\nThis design pattern enables the estimator to compute density-based outlier scores for both training samples (outlier detection mode) and new unseen samples (novelty detection mode) using the same core calculation logic.",
+      "reference_sha256": "4b761a0c82a4c5aa7af160798904f0a4b954b983f36301010256d8bbf92fc8dd",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-ff63c98045e66a3835ea35b8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2140,
+            "file_sha256": "fcbd6e0f7823f6b50feef32ded7c133c1eff60ac2cc9c6ee173448dd7c5bd164",
+            "path": "sklearn/utils/validation.py",
+            "start_line": 1970
+          },
+          {
+            "end_line": 148,
+            "file_sha256": "09a6854b80d56ea86a52276203e70cbd33fa0d1eaa205984533ba2312e470de7",
+            "path": "sklearn/exceptions.py",
+            "start_line": 148
+          },
+          {
+            "end_line": 368,
+            "file_sha256": "75ace457864e47b44dbeba1dff62b0a809d161e9b4798cbc1de3b31f1938eeab",
+            "path": "sklearn/decomposition/_kernel_pca.py",
+            "start_line": 368
+          },
+          {
+            "end_line": 1596,
+            "file_sha256": "9be410144cf2576738473b6eaa086950b91c86fdd0d47a316e82f5c4522e4ea0",
+            "path": "sklearn/utils/tests/test_validation.py",
+            "start_line": 1533
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the integration mechanism between the PositiveSpectrumWarning class and the _check_psd_eigenvalues function that propagates matrix conditioning issues through the scikit-learn validation pipeline, and what downstream dependencies rely on this warning mechanism to handle numerical instability in kernel matrices?",
+      "question_sha256": "bb7748ddd9c06c3d7d72382585d9d2d808e27e2a2f8e43480a04fa6fc299791c",
+      "reference_answer": "The integration mechanism between the warning class for positive semidefinite matrix eigenvalue issues and the validation function that propagates matrix conditioning issues uses Python's standard `warnings.warn()` API with conditional emission based on an `enable_warnings` parameter.\n\n**Integration Mechanism:**\n\nThe validation function (`_check_psd_eigenvalues` in `sklearn/utils/validation.py`, lines 1970-2140) conditionally emits warnings using `warnings.warn()` with the warning class (`PositiveSpectrumWarning` from `sklearn/exceptions.py`, line 148) when `enable_warnings=True`. This occurs in three scenarios:\n\n1. **Imaginary parts removal** (lines 2079-2087): When non-significant imaginary parts in eigenvalues are detected and removed, a warning is emitted if `enable_warnings=True`.\n\n2. **Negative eigenvalues correction** (lines 2116-2124): When insignificant negative eigenvalues are set to zero, a warning is emitted if `enable_warnings=True`.\n\n3. **Bad conditioning handling** (lines 2130-2137): When small positive eigenvalues are replaced with zero due to poor matrix conditioning (where the largest eigenvalue is more than 1e12 times the smallest in double precision, or 2e7 times in single precision), a warning is emitted if `enable_warnings=True`.\n\n**Propagation through Validation Pipeline:**\n\nThe function validates eigenvalues from positive semidefinite matrices (like kernel/gram matrices) by:\n- Checking for significant imaginary parts, negative eigenvalues, and conditioning issues\n- Fixing numerical issues by setting problematic values to zero\n- Optionally propagating warnings through Python's warning system when `enable_warnings=True`\n\n**Downstream Usage:**\n\nThe primary downstream dependency is `KernelPCA` in `sklearn/decomposition/_kernel_pca.py` (line 368), which calls the validation function with `enable_warnings=False`, meaning warnings are suppressed in production use but the numerical fixes still occur. The validation tests in `sklearn/utils/tests/test_validation.py` (lines 1533-1596) verify the warning mechanism works correctly when `enable_warnings=True`.",
+      "reference_sha256": "dd9554fb3dd5b04dc4f5bce267cd78a3ab362c66427955c6bcb32835005a69b3",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-ff895b1270303ee54b633df1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the Splitter API handle the interaction between categorical feature splitting and missing value routing when the missing_values_bin_idx parameter is combined with the is_categorical flag, and what determines whether missing samples are routed to the left or right child node during the find_node_split operation?",
+      "question_sha256": "f00c18dc0f9772d00795249d028e68128c50e8bbd0bec7eeac6f43724393e6fa",
+      "reference_answer": "The histogram-based gradient boosting splitter handles the interaction between categorical feature splitting and missing value routing by treating missing values as a native category when the categorical feature flag is enabled.\n\n**Key Mechanism:**\n\nWhen `is_categorical[feature_idx]` is `True`, the splitter calls `_find_best_bin_to_split_category()` (lines 546-551 in `splitting.pyx`). In this method:\n\n1. **Missing values as a category**: Missing values are explicitly added to the category information array (`cat_infos`) if they meet the minimum category support threshold (`MIN_CAT_SUPPORT = 10.0`) (lines 967-983). The `missing_values_bin_idx` parameter identifies which bin index represents missing values (typically the last bin, equal to `n_bins - 1`).\n\n2. **Category sorting**: All categories, including missing values, are sorted by their value (computed as `sum_gradients / (sum_hessians + MIN_CAT_SUPPORT)`) using quicksort (lines 990-991).\n\n3. **Bidirectional scanning**: The algorithm scans the sorted categories in both directions (left-to-right and right-to-left) to find the optimal split point, considering all possible category groupings (lines 995-1046).\n\n4. **Bitset creation**: The best split creates a bitset (`left_cat_bitset`) indicating which categories (including missing values) go to the left child (lines 1072-1080).\n\n5. **Missing value routing determination**: If missing values exist (`has_missing_values[feature_idx]` is `True`), the routing decision is made by checking whether `missing_values_bin_idx` is included in the `left_cat_bitset` (lines 1082-1084):\n   ```cython\n   if has_missing_values:\n       split_info.missing_go_to_left = in_bitset(\n           split_info.left_cat_bitset, missing_values_bin_idx)\n   ```\n\n6. **Sample routing**: During actual sample routing in `sample_goes_left()` (lines 1152-1172), for categorical features, the function checks if the sample's bin value is in the `left_cat_bitset`:\n   ```cython\n   if is_categorical:\n       # note: if any, missing values are encoded in left_cat_bitset\n       return in_bitset(left_cat_bitset, bin_value)\n   ```\n\n**Key Difference from Numerical Features:**\n\nFor numerical features, missing values are handled separately through left-to-right and right-to-left scans (lines 563-577), where missing values can go to either child based on which direction yields better gain. For categorical features, missing values participate in the same category-based splitting logic as regular categories, making them an integral part of the split decision rather than being handled as a special case.\n\n**Result:**\n\nThe combination of `missing_values_bin_idx` and `is_categorical` ensures that missing values are treated as a first-class category in categorical splits, participating in the sorting, gain calculation, and split optimization process, with their routing determined by their position in the sorted category array and inclusion in the optimal left child bitset.",
+      "reference_sha256": "1f99ece36fa6c9675b5717c84ce0bc34c62440dfae76d24c857c79a3308ba433",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-fff2787180a82fce7846e89b"
+    }
+  ]
+}

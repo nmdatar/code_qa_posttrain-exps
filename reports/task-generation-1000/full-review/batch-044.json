@@ -1,0 +1,205 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-275369560076404671ccbe96",
+      "reference_sha256": "817477b2e19308cdd7be81eb7bd4a8a907c02f4254169104ccda4165fb8d2c14",
+      "question_sha256": "0f539c43d5be08640f2def706b1c5006d58855c764b442de76b1c03f6cdd9103",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Interpolation retains variable and dataset attributes",
+          "verdict": "supported",
+          "reason": "New Variable receives attrs, Dataset replace copies default attrs at779-780; this is generic metadata preservation, not CRS transformation or validity checking.",
+          "evidence": {
+            "path": "xarray/core/missing.py",
+            "start_line": 446,
+            "end_line": 456
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-38e5b69915296d87bcbe2319",
+      "reference_sha256": "58bcec95f610ae3687c01a92a33bda71917627eaef81484f3a5e39a45a908cba",
+      "question_sha256": "aea0ef63d8bd967cd9fc4fd6ef5107ab7ec4a05d56346870e978a96566e2e0f6",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Optional backend selection and magic sniffing",
+          "verdict": "supported",
+          "reason": "Imports occur in selection helpers, magic reads 8 bytes and restores position. GRIB helper always errors with engine guidance, including when dependencies exist; reference wording about neither is incomplete but not false.",
+          "evidence": {
+            "path": "xarray/backends/api.py",
+            "start_line": 36,
+            "end_line": 107
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-458ffd8ac8b79f910276065e",
+      "reference_sha256": "5a25c029a24312fdf91f44b13595ef31225d326e44312306e484029f70cb0993",
+      "question_sha256": "e8c27d20d9f65380be9b4b81f302bdfb749dbb501408faeceaa3715b2d136b16",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Rasterio CRS stored as string metadata",
+          "verdict": "supported",
+          "reason": "PROJ4 attempted then to_string fallback; VRT settings are captured222 and reopened238; returned DataArray attrs341-342.",
+          "evidence": {
+            "path": "xarray/backends/rasterio_.py",
+            "start_line": 284,
+            "end_line": 291
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-65a2fbcce26ca2301616d77b",
+      "reference_sha256": "bf935fa84c946c3a35e9e97c39e353955b4912684adcf4c059ff995e6feeb5f8",
+      "question_sha256": "d48f32dbc716f60b001d58d5073ce3d23d07785826aec389f0f663c57de63103",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "CRS conversion methods implemented inside xarray and to_string means WKT",
+          "verdict": "partially_supported",
+          "reason": "Xarray calls rasterio CRS methods; this snapshot does not implement conversion or guarantee to_string yields WKT.",
+          "evidence": {
+            "path": "xarray/backends/rasterio_.py",
+            "start_line": 284,
+            "end_line": 291
+          }
+        }
+      ],
+      "material_errors": [
+        "Xarray calls rasterio CRS methods; this snapshot does not implement conversion or guarantee to_string yields WKT."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "Xarray's call sites are in open_rasterio: it calls riods.crs.to_proj4(), falling back on AttributeError to riods.crs.to_string(), and stores the result in attrs['crs'] (xarray/backends/rasterio_.py:284-291). WarpedVRT setup also calls vrt.crs.to_string() (xarray/backends/rasterio_.py:219-230). The conversion methods belong to rasterio's CRS object, not implementations defined by xarray. Do not infer that to_string always means WKT from this call site."
+    },
+    {
+      "task_id": "import-7848efdcebd046b062320a67",
+      "reference_sha256": "b5371c23a1d7d3b6b47f3fee2fd9a927b53fc43564b8efd2a707fae0afef9c67",
+      "question_sha256": "5bf020c75cc158b61c4ca6f4ea29aa2d5632893ca36a4799ae1d2dc4084c0897",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Attached coordinate representation and validation",
+          "verdict": "supported",
+          "reason": "Converts coordinate inputs and validates dimensions/sizes; coordinate update implementations186-202,233-243 enforce coherent parent state.",
+          "evidence": {
+            "path": "xarray/core/dataarray.py",
+            "start_line": 81,
+            "end_line": 109
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-aa0876fa2b0671d67b3e4510",
+      "reference_sha256": "8321a5d92e81b15dbfbc450f69c569a6ec9c3177ea5a78ecf274c039f70b3761",
+      "question_sha256": "4580eb62571e62276fedb2d275de0569a6945903bad537ea080a7565a2ecc6b9",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Non-contiguous indexing implies quadratic scaling",
+          "verdict": "partially_supported",
+          "reason": "Branch implementation supports potential extra work but neither quadratic complexity nor automatic vectorization of arbitrary noncontiguous slices is proved.",
+          "evidence": {
+            "path": "xarray/core/indexing.py",
+            "start_line": 1192,
+            "end_line": 1208
+          }
+        }
+      ],
+      "material_errors": [
+        "Branch implementation supports potential extra work but neither quadratic complexity nor automatic vectorization of arbitrary noncontiguous slices is proved."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The question's quadratic-scaling premise is not established. DaskIndexingAdapter dispatches basic indexers directly, vectorized indexers to vindex, and outer indexers directly with an axis-by-axis fallback on NotImplementedError (xarray/core/indexing.py:1192-1208). These paths can create different task and data-access costs, but heterogeneous chunk sizes alone do not imply a universal quadratic bound. Determine the actual indexer type, accessed chunks, task graph, and measured scaling before attributing a bottleneck."
+    },
+    {
+      "task_id": "import-cd122a483759090a50e0b275",
+      "reference_sha256": "412855d44222b33d97ba8f8c4160758c0583126943e71a632ed9a939d742945f",
+      "question_sha256": "33486384f118572395d75c5230cf4701f7dfb8ba9d68d9795c7bb714bceaae96",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Attribute copying establishes interpolation bottleneck",
+          "verdict": "partially_supported",
+          "reason": "Attribute shallow-copy work exists but source cannot establish it as bottleneck or main total cost.",
+          "evidence": {
+            "path": "xarray/core/variable.py",
+            "start_line": 724,
+            "end_line": 726
+          }
+        }
+      ],
+      "material_errors": [
+        "Attribute shallow-copy work exists but source cannot establish it as bottleneck or main total cost."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "Interpolation constructs Variables with attrs=var.attrs (xarray/core/missing.py:453-456), whose attribute setter copies into an OrderedDict (xarray/core/variable.py:724-726). Dataset.interp also constructs intermediate and final datasets (xarray/core/dataset.py:2220-2239); _replace shallow-copies default dataset attrs (xarray/core/dataset.py:779-780). These are concrete overhead sources scaling with mappings copied, but the source does not show they dominate interpolation or cause a bottleneck. Profiling is needed to compare metadata copying with interpolation and I/O costs."
+    },
+    {
+      "task_id": "import-db1cf0b778ee847c54934db3",
+      "reference_sha256": "a9288bc8dfbeeaef0e02e750c25bb8207f8b8ef3cd0288e9ab3e0c5dbcbb0d6a",
+      "question_sha256": "13bb76b20ec123a58a9546a88053c98becd1d57a7125ecf9c5ceb1643997ea1c",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "PROJ4 preference fixes documented regression",
+          "verdict": "supported",
+          "reason": "Release notes explicitly describe WKT-to-PROJ4 regression fix; source284-291 confirms fallback for unavailable method.",
+          "evidence": {
+            "path": "doc/whats-new.rst",
+            "start_line": 355,
+            "end_line": 357
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-e17a060d3341b67f50564305",
+      "reference_sha256": "6261345effc800ca60116e3d0ab7e2cce9835028829aedb80906f0e52cdebf08",
+      "question_sha256": "d0b202f866e5e735ac4676450e50342b5c7e876a84eee03a875adbb59180a94e",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Non-NumPy supported type tuple",
+          "verdict": "supported",
+          "reason": "Tuple ExplicitlyIndexed,pd.Index plus optional dask_array_type used by as_compatible_data157; this is pinned-version acceptance list rather than dynamic registration.",
+          "evidence": {
+            "path": "xarray/core/variable.py",
+            "start_line": 30,
+            "end_line": 31
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    }
+  ]
+}

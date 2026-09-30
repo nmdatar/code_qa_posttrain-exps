@@ -1,0 +1,667 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "purposive sample not all1000",
+  "tasks": [
+    {
+      "task_id": "import-1bd73f2caf250c79536f4328",
+      "reference_sha256": "199c09a602770ad1abe2102c5d44dea3f74773ed3056b9aab863bc0c23a1fc49",
+      "question_sha256": "15ee2c62f48a1905d2361f8508bc6f7cf633ba3ec0a003b3cacc581470841785",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Remote theme and disabled search",
+          "verdict": "supported",
+          "evidence": {
+            "path": "docs/_config.yml",
+            "start_line": 1,
+            "end_line": 10
+          },
+          "reason": "Configuration matches; search.html separately loads Lunr."
+        },
+        {
+          "claim": "Registry-driven documentation generation and release integration",
+          "verdict": "supported",
+          "evidence": {
+            "path": "checkov/common/util/docs_generator.py",
+            "start_line": 5,
+            "end_line": 37
+          },
+          "reason": "Traverses Terraform resource/data/provider, CloudFormation and Kubernetes registries; build.yml 50-62 invokes it."
+        },
+        {
+          "claim": "BaseCheck lacks guideline URL fields",
+          "verdict": "supported",
+          "evidence": {
+            "path": "checkov/common/checks/base_check.py",
+            "start_line": 7,
+            "end_line": 19
+          },
+          "reason": "The listed fields are present and no guideline field is declared."
+        }
+      ],
+      "material_errors": [
+        "Claims deliberate architecture intent and a requirement for external guideline mapping without evidence; generator path is incorrect."
+      ],
+      "citation_corrections": [
+        {
+          "original": "checkov/docs_generator.py",
+          "corrected": "checkov/common/util/docs_generator.py:5-37",
+          "reason": "Actual generator location."
+        },
+        {
+          "original": "Lunr.js",
+          "corrected": "docs/search.html:15",
+          "reason": "External script reference, not a missing tracked source file."
+        }
+      ],
+      "notes": "Broad but answerable architecture question. YAML uses nav_order, not a literal order field. Missing evidence of design intent should be omitted. Source inspection only; no repository code executed.",
+      "corrected_reference_answer": "Checkov uses a Jekyll-style documentation site configured with remote_theme: bridgecrewio/checkov-theme and search_enabled: false (docs/_config.yml:1-10). Numbered documentation sections and YAML front matter organize the content; resource-scans.md uses layout, title and nav_order (docs/3.Scans/resource-scans.md:1-7). checkov/common/util/docs_generator.py:5-37 collects check metadata from Terraform, CloudFormation and Kubernetes registries and renders a table. The version-bump workflow regenerates that page with the generator (.github/workflows/build.yml:38-62). docs/search.html:15 loads Lunr, although search is disabled by configuration. BaseCheck declares identifying and categorization fields but no guideline URL field (checkov/common/checks/base_check.py:7-19); this alone does not establish why the architecture was chosen."
+    },
+    {
+      "task_id": "import-0e5fbd5e6c0ac53b965271f5",
+      "reference_sha256": "46b61e8c906d77cbd843ab805b063bea083bc8324486a6bbc62c22ff93cf47ad",
+      "question_sha256": "9b75a9d6b0845287b09dd1b37ddd369c8a5f595bc0cc5f9819b8acd97e585347",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Empty direct RHS raises EmptyResultSet after removing None",
+          "verdict": "supported",
+          "evidence": {
+            "path": "django/db/models/lookups.py",
+            "start_line": 527,
+            "end_line": 542
+          },
+          "reason": "Exact implementation matches; iterable preparation at 287-303 consumes generators into prepared values."
+        },
+        {
+          "claim": "AND/OR and negation preserve predicate semantics",
+          "verdict": "supported",
+          "evidence": {
+            "path": "django/db/models/sql/where.py",
+            "start_line": 125,
+            "end_line": 176
+          },
+          "reason": "Counts empty/full children and reverses result under negation."
+        },
+        {
+          "claim": "Regression coverage for empty iterator and OR",
+          "verdict": "supported",
+          "evidence": {
+            "path": "tests/queries/tests.py",
+            "start_line": 2236,
+            "end_line": 2239
+          },
+          "reason": "Explicit empty iterator regression; tests/or_lookups/tests.py:146-153 covers OR with a satisfiable branch."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Answerable statically. The named iterator test uses iter(()) rather than a generator expression, but the shared iterable preparation supports the central claim. No material error found. Source inspection only; no repository code executed."
+    },
+    {
+      "task_id": "import-241e31f0666e9c2890e9eb8f",
+      "reference_sha256": "da0ba9e7f1c3f6c043632d054b6607984462c6b60d2569dd0b38697786576dd6",
+      "question_sha256": "ee3aef720218ff542fa02e6a5aa74324c05d4131d4fa7416acb92460e06497d3",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Six fit-combination levels and per-evaluation checking",
+          "verdict": "supported",
+          "evidence": {
+            "path": "fitbenchmarking/core/fitting_benchmarking.py",
+            "start_line": 40,
+            "end_line": 49
+          },
+          "reason": "Documented combination nesting; fitting_problem.py:140 checks each eval_model call."
+        },
+        {
+          "claim": "Timer check performs an active-clock read",
+          "verdict": "supported",
+          "evidence": {
+            "path": "fitbenchmarking/utils/timer.py",
+            "start_line": 50,
+            "end_line": 61
+          },
+          "reason": "time() is called only when start_time is set, so not every model evaluation necessarily makes a time call."
+        },
+        {
+          "claim": "Two timer resets are redundant and prove poor scaling",
+          "verdict": "unsupported",
+          "evidence": {
+            "path": "fitbenchmarking/core/fitting_benchmarking.py",
+            "start_line": 577,
+            "end_line": 611
+          },
+          "reason": "First prevents result evaluation from losing completed fits; second resets state after exception handling. Distinct purposes are explicit."
+        }
+      ],
+      "material_errors": [
+        "Question assumes measured inefficiency absent from inspected evidence. Repeated constant-time checks scale with evaluations; this does not establish disproportionate timer scaling or a bottleneck. Resets are called redundant despite documented purposes."
+      ],
+      "citation_corrections": [],
+      "notes": "Mechanism is answerable, performance conclusion requires workload measurements; no execution needed to explain potential overhead. Source inspection only; no repository code executed.",
+      "corrected_reference_answer": "The source shows potential cumulative overhead, not a demonstrated scaling bottleneck. Benchmark combinations span problems, starts, software, minimizers, Jacobians and Hessians (fitbenchmarking/core/fitting_benchmarking.py:40-49). Each eval_model calls check_elapsed_time (fitbenchmarking/parsing/fitting_problem.py:126-143), which reads the clock while the timer is active and compares cumulative elapsed time against max_runtime (fitbenchmarking/utils/timer.py:50-61). BaseController.execute brackets fit with start/stop (fitbenchmarking/controllers/base_controller.py:207-214), while Bumps also checks through an abort callback (fitbenchmarking/controllers/bumps_controller.py:126-145). More fit evaluations imply more checks, but profiling would be needed to establish their cost relative to fitting. The resets at fitting_benchmarking.py:577-578 and 610-611 protect completed results and clear timer state after exception handling; the source does not show they are redundant."
+    },
+    {
+      "task_id": "import-1858f3ada8c0a29a6f8c0877",
+      "reference_sha256": "05474d2ccf97fbf8a25318237a374ac9788087ce6c7fc0527807030853fc370c",
+      "question_sha256": "ba4e0eb9ad718cc24806c1130c6ac22988068c2bdd842fd9e7a93d02e6b21335",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Explicit package_data contains marker and main stub only",
+          "verdict": "supported",
+          "evidence": {
+            "path": "setup.py",
+            "start_line": 77,
+            "end_line": 78
+          },
+          "reason": "Exact configuration includes py.typed and __init__.pyi, plus include_package_data=True."
+        },
+        {
+          "claim": "All pyi files are included through the manifest",
+          "verdict": "supported",
+          "evidence": {
+            "path": "MANIFEST.in",
+            "start_line": 1,
+            "end_line": 4
+          },
+          "reason": "Pattern includes **/*.pyi; actual file is repository-root MANIFEST.in."
+        },
+        {
+          "claim": "Wheels ignore MANIFEST.in entirely so matcher stubs are missing",
+          "verdict": "contradicted",
+          "evidence": {
+            "path": "setup.py",
+            "start_line": 77,
+            "end_line": 78
+          },
+          "reason": "include_package_data=True is precisely relevant to incorporating manifest-listed package data; package_data is not the sole possible wheel inclusion mechanism. No built artifact supports the claimed absence."
+        },
+        {
+          "claim": "Matcher stubs define callable return types",
+          "verdict": "supported",
+          "evidence": {
+            "path": "responses/matchers.pyi",
+            "start_line": 13,
+            "end_line": 19
+          },
+          "reason": "Both named matcher functions are typed."
+        }
+      ],
+      "material_errors": [
+        "Central packaging explanation incorrectly says wheels completely ignore manifest data with include_package_data=True and asserts an unverified wheel/mypy failure."
+      ],
+      "citation_corrections": [
+        {
+          "original": "responses/responses/MANIFEST.in:3",
+          "corrected": "MANIFEST.in:3",
+          "reason": "Repository-root manifest."
+        }
+      ],
+      "notes": "Question answerable from configuration; exact release wheel contents require inspecting an artifact, not guessing from package_data. No package build executed. Source inspection only; no repository code executed.",
+      "corrected_reference_answer": "setup.py:77-78 explicitly includes py.typed and __init__.pyi and sets include_package_data=True. MANIFEST.in:3 additionally includes **/*.pyi, covering responses/matchers.pyi, whose matcher functions return Callable[..., Any] (responses/matchers.pyi:13-19). The PEP 561 marker advertises package typing, and the stub supplies matcher signatures. The explicit package_data list alone does not prove that a wheel omits matchers.pyi: include_package_data enables manifest-listed package data to participate in packaging. Inspect the actual distribution to establish omission or a mypy failure; neither is demonstrated by this source configuration."
+    },
+    {
+      "task_id": "import-06b49ee02708261c54545230",
+      "reference_sha256": "82c91342b2f79da81c17b7e3259baa570b3359b4561f8d45f413ba8863ff824b",
+      "question_sha256": "382f2348112ec45ed3c91c419d854c3f1da08800f6626949bc4133765f9a8aff",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "__new__ parses a name and float-valued arguments then instantiates the selected style",
+          "verdict": "supported",
+          "evidence": {
+            "path": "lib/matplotlib/patches.py",
+            "start_line": 2336,
+            "end_line": 2352
+          },
+          "reason": "All string processing, dictionary lookup and kwargs merge are visible."
+        },
+        {
+          "claim": "Unknown names and malformed pairs preserve causes in ValueError",
+          "verdict": "supported",
+          "evidence": {
+            "path": "lib/matplotlib/patches.py",
+            "start_line": 2342,
+            "end_line": 2351
+          },
+          "reason": "Both exception handlers explicitly chain the original exception."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Answerable statically. Type safety is loose wording: unsupported keyword names can produce constructor TypeError at 2352, and explicit kwargs bypass float parsing. Core mechanism is correct; deferred means selected at call time, not lazy construction. Source inspection only; no repository code executed."
+    },
+    {
+      "task_id": "import-0d0fc175b21a3af99a3fa5ff",
+      "reference_sha256": "9d1d7e8209541f48df6595ca3b5ffc6259e0e56562d31f727cdeefbe4e00c218",
+      "question_sha256": "337786a7ca2a2ea43b22f8b6b657b2975c70b022e975a6748b381d4260b5c68f",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Multiple grouping variables create a full Cartesian product",
+          "verdict": "supported",
+          "evidence": {
+            "path": "seaborn/_core/groupby.py",
+            "start_line": 49,
+            "end_line": 70
+          },
+          "reason": "Product is used when more than one present grouping variable exists."
+        },
+        {
+          "claim": "Aggregation reindexes observed results to all combinations",
+          "verdict": "supported",
+          "evidence": {
+            "path": "seaborn/_core/groupby.py",
+            "start_line": 79,
+            "end_line": 100
+          },
+          "reason": "Docstring and reindex explicitly support empty-combination rows."
+        },
+        {
+          "claim": "Other observed=False paths materially amplify the same bottleneck",
+          "verdict": "unsupported",
+          "evidence": {
+            "path": "seaborn/_core/plot.py",
+            "start_line": 1621,
+            "end_line": 1628
+          },
+          "reason": "GroupBy creation alone does not show an aggregation or fully materialized result index; subsequent use must be distinguished."
+        },
+        {
+          "claim": "Pair processing keeps separate results",
+          "verdict": "supported",
+          "evidence": {
+            "path": "seaborn/_core/plot.py",
+            "start_line": 1234,
+            "end_line": 1238
+          },
+          "reason": "Stores stat outputs by coordinate pair; this is not proof every entry is a redundant full copy."
+        }
+      ],
+      "material_errors": [
+        "Proven Cartesian expansion is mixed with unsupported significance claims about observed=False and redundant DataFrame copies. No workload evidence establishes a bottleneck for all large datasets."
+      ],
+      "citation_corrections": [],
+      "notes": "Question premise should be qualified. Cardinality product analysis is possible without execution, measured performance is not. Source inspection only; no repository code executed.",
+      "corrected_reference_answer": "For multiple present grouping variables, GroupBy._get_groups constructs pd.MultiIndex.from_product from their level orders (seaborn/_core/groupby.py:49-70). If their cardinalities are k1 through km, that index has product(ki) entries even when few combinations occur. agg groups with observed=True but then reindexes to this complete index, adding rows for absent combinations (groupby.py:79-100). apply also constructs the index and iterates its combinations (groupby.py:105-126). This can add substantial work and memory for sparse high-cardinality inputs. Plot.pair additionally stores separate statistical outputs per coordinate pair (seaborn/_core/plot.py:1234-1238; seaborn/_core/data.py:64-69), but the source alone does not quantify copying or establish that this is the dominant bottleneck."
+    },
+    {
+      "task_id": "import-06919193f30b63440265fcad",
+      "reference_sha256": "d7a728edac48b9cec5cecdf2390904c6620a4619cfc3528bb4f80fe84b3c1e04",
+      "question_sha256": "11576063885655d9ecce2ae5dac8a30c30608b82b7df662469cff8b40e38fdba",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Mapping permits TypedDict response annotations",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/flask/typing.py",
+            "start_line": 11,
+            "end_line": 40
+          },
+          "reason": "Explicit comment plus separate tuple status/header types."
+        },
+        {
+          "claim": "Runtime dict JSON conversion precedes status override",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/flask/app.py",
+            "start_line": 1230,
+            "end_line": 1263
+          },
+          "reason": "JSON provider builds response, then status is assigned separately."
+        },
+        {
+          "claim": "TypedDict support introduced in 2.1.3",
+          "verdict": "contradicted",
+          "evidence": {
+            "path": "CHANGES.rst",
+            "start_line": 336,
+            "end_line": 351
+          },
+          "reason": "Entry is above the Version 2.1.3 heading, not in that section."
+        }
+      ],
+      "material_errors": [
+        "Incorrect release attribution (2.1.3)."
+      ],
+      "citation_corrections": [],
+      "notes": "Central mechanism is correct and statically answerable; avoid implying runtime schema validation. StatusJSON example at tests/type_check/typing_route.py:41-47 supports payload meaning. Source inspection only; no repository code executed.",
+      "corrected_reference_answer": "Flask permits TypedDict annotations by including Mapping[str, Any] in ResponseValue, explicitly noting that runtime accepts dict (src/flask/typing.py:11-23). StatusJSON defines a payload field status: str and the route returns {\"status\": \"ok\"} (tests/type_check/typing_route.py:41-47). make_response unpacks optional status and headers from tuples (src/flask/app.py:1190-1207), serializes dict/list bodies through self.json.response (1230-1231), and then assigns HTTP status separately (1259-1263). TypedDict therefore describes the JSON body for static checking; it does not set HTTP status or provide runtime schema validation. ResponseReturnValue separately types tuple metadata (src/flask/typing.py:35-40)."
+    },
+    {
+      "task_id": "import-0a6671e6d87753ef56b24bb4",
+      "reference_sha256": "2a623094753e47cc4e1cb65ecf70a34078e272458847c6ae3bedd80cc60e84d8",
+      "question_sha256": "7ff4e164ee6c62801a0675c1d7b04c2a625d0a04ab9019a4f3b1a8539e0519de",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Scheduler-aware distributed named write locks",
+          "verdict": "supported",
+          "evidence": {
+            "path": "xarray/backends/locks.py",
+            "start_line": 42,
+            "end_line": 114
+          },
+          "reason": "DistributedLock factory receives key after scheduler detection."
+        },
+        {
+          "claim": "NetCDF backend combines library and file locks for writes",
+          "verdict": "supported",
+          "evidence": {
+            "path": "xarray/backends/netCDF4_.py",
+            "start_line": 317,
+            "end_line": 328
+          },
+          "reason": "Write branch creates CombinedLock with get_write_lock(filename)."
+        },
+        {
+          "claim": "h5netcdf uses same pattern",
+          "verdict": "supported",
+          "evidence": {
+            "path": "xarray/backends/h5netcdf_.py",
+            "start_line": 80,
+            "end_line": 90
+          },
+          "reason": "HDF5_LOCK is combined with named write lock outside read mode."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Statically answerable for default backend locks with a distributed scheduler. Library locks are process-local, not a cluster-wide library mutex. Custom locks can override defaults. Same resource key and active distributed scheduler are implicit requirements. Source inspection only; no repository code executed."
+    },
+    {
+      "task_id": "import-15a6f06f0687b4b3272302c0",
+      "reference_sha256": "aaf69f96167a2c488b5bd16cf75757c1763e63c79fe6d7df54881f77e29c29fc",
+      "question_sha256": "9112e7fbcce0e55191794a389707db20f23a47a1c79bcf76b8dfc66fab2a2e86",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "TIDELIFT_API_KEY referenced as GitHub secret",
+          "verdict": "supported",
+          "evidence": {
+            "path": ".github/workflows/tidelift.yml",
+            "start_line": 23,
+            "end_line": 28
+          },
+          "reason": "Environment variable draws from secrets namespace; this does not prove external secret is actually configured."
+        },
+        {
+          "claim": "Main coverage upload uses curl uploader",
+          "verdict": "supported",
+          "evidence": {
+            "path": ".github/workflows/test.yml",
+            "start_line": 106,
+            "end_line": 109
+          },
+          "reason": "Direct bash/curl upload and CODECOV_NAME visible."
+        },
+        {
+          "claim": "Codecov comments disabled",
+          "verdict": "supported",
+          "evidence": {
+            "path": "codecov.yml",
+            "start_line": 3,
+            "end_line": 9
+          },
+          "reason": "comment:false appears as claimed."
+        }
+      ],
+      "material_errors": [
+        "Repository only shows a secret reference, not where its value is defined or whether the external secret exists. Claims about tokenless service behavior are external assumptions."
+      ],
+      "citation_corrections": [],
+      "notes": "No CODECOV_ORG_TOKEN match in snapshot-wide hidden-file search. Workflow references and action locations verified; no credentials read. Source cannot answer external GitHub secret configuration. Source inspection only; no repository code executed.",
+      "corrected_reference_answer": "The repository references TIDELIFT_API_KEY through ${{ secrets.TIDELIFT_API_KEY }} in the Tidelift workflow (.github/workflows/tidelift.yml:23-28). Its value and external GitHub secret definition are not stored in these source files. No CODECOV_ORG_TOKEN reference appears in this snapshot. Codecov uploads use codecov/codecov-action in .github/workflows/test-docker.yml:79, test-cygwin.yml:95 and test-windows.yml:171, while test.yml:107 and test-mingw.yml:75 invoke the bash uploader through curl. .ci/after_success.sh:4 installs codecov, and codecov.yml:9 disables comments. Other workflows reference secrets.GITHUB_TOKEN (release-drafter.yml:18; stale.yml:21). Source configuration alone does not establish external token availability or successful uploads."
+    },
+    {
+      "task_id": "import-6a26e8b8371b267e34d1cac2",
+      "reference_sha256": "14529b6791875b7895be07a6fdade290cf6f924b43626c844033b0c126497963",
+      "question_sha256": "34c64d2b1772f1dad3508b7c926579ba7e2ed7966371197d02723998c246f487",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "serve selects HTTP3 or HTTP1",
+          "verdict": "supported",
+          "evidence": {
+            "path": "sanic/server/runners.py",
+            "start_line": 131,
+            "end_line": 153
+          },
+          "reason": "Checks identity with HTTP.VERSION_3, otherwise invokes HTTP1 runner. Default at line 59 is VERSION_1."
+        },
+        {
+          "claim": "Distinct protocol classes delegate HTTP implementations",
+          "verdict": "supported",
+          "evidence": {
+            "path": "sanic/server/protocols/http_protocol.py",
+            "start_line": 308,
+            "end_line": 310
+          },
+          "reason": "Http3Protocol binds Http3; HttpProtocol lines 79-91 binds Http and VERSION_1."
+        },
+        {
+          "claim": "HTTP3 runner configures QUIC server",
+          "verdict": "supported",
+          "evidence": {
+            "path": "sanic/server/runners.py",
+            "start_line": 319,
+            "end_line": 334
+          },
+          "reason": "Checks availability, creates protocol and TLS-derived config, calls quic_serve."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Answerable source-location question; supplied citations identify actual mechanisms. HTTP3 needs aioquic and TLS setup; answer is not an operational claim that every deployment enables it. Source inspection only; no repository code executed."
+    },
+    {
+      "task_id": "import-08a3d3a9ac5c0d79f7e14bc2",
+      "reference_sha256": "0727992d4bbed21cb9dda687f43d2dd768cb348fdef1b63efbe08ee5dde8c88f",
+      "question_sha256": "72ce2b8a067a5fc72af7451a15e37210658733b6a080f8544e176fa502b3b2b0",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "PublicBar with no explicit members is included in summary",
+          "verdict": "supported",
+          "evidence": {
+            "path": "tests/test_extensions/test_ext_autosummary.py",
+            "start_line": 859,
+            "end_line": 866
+          },
+          "reason": "Test checks PublicBar in generated module autosummary; fixture declares docstring and pass."
+        },
+        {
+          "claim": "Empty class has empty method/member lists",
+          "verdict": "contradicted",
+          "evidence": {
+            "path": "sphinx/ext/autosummary/generate.py",
+            "start_line": 396,
+            "end_line": 415
+          },
+          "reason": "dir includes inherited members and __init__ is explicitly included as public; importer.py:519-531 collects inherited attributes."
+        },
+        {
+          "claim": "Class template emits autoclass regardless of methods",
+          "verdict": "supported",
+          "evidence": {
+            "path": "sphinx/ext/autosummary/templates/autosummary/class.rst",
+            "start_line": 1,
+            "end_line": 28
+          },
+          "reason": "autoclass and automethod __init__ are unconditional; summary sections conditional."
+        }
+      ],
+      "material_errors": [
+        "Empty explicit class body is incorrectly equated with empty introspected method lists. Test establishes inclusion under __all__, not a special marker/placeholder design intent."
+      ],
+      "citation_corrections": [],
+      "notes": "Question does not identify the test class; answer can be grounded in PublicBar but must avoid extrapolating author intent. Source inspection only; no repository code executed.",
+      "corrected_reference_answer": "The PublicBar fixture has a docstring and pass, and the module-all test asserts that it appears in generated autosummary output (tests/roots/test-ext-autosummary-module_all/autosummary_dummy_package_all/autosummary_dummy_module.py:7-10; tests/test_extensions/test_ext_autosummary.py:859-866). This supports the narrow contract that a class need not define explicit methods to be listed. It does not mean its introspected member lists are empty: class handling uses dir(obj), tracks inherited members and includes __init__ in public methods (sphinx/ext/autosummary/generate.py:396-415; 485-517). The class template always emits autoclass and automethod __init__, with conditional method/attribute summaries (sphinx/ext/autosummary/templates/autosummary/class.rst:1-28). Module __all__ behavior is controlled separately by autosummary_ignore_module_all (generate.py:271-290)."
+    },
+    {
+      "task_id": "import-022bd5aaec20279be914e1ab",
+      "reference_sha256": "b957b24675dac1612c32f20dd6ce7259d06c60558e3d5e07bd19ab6cc116635c",
+      "question_sha256": "4a565701cc50eca3067b28e92d835219b9c5ce3a4d50d43e4fd2c9ace5046aad",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "UnevaluatedExpr instantiated in printing tests",
+          "verdict": "supported",
+          "evidence": {
+            "path": "sympy/printing/tests/test_c.py",
+            "start_line": 870,
+            "end_line": 877
+          },
+          "reason": "Multiple direct calls; string, LaTeX, Fortran and lambdify cited locations also checked."
+        },
+        {
+          "claim": "Biomechanics directly creates wrappers",
+          "verdict": "supported",
+          "evidence": {
+            "path": "sympy/physics/biomechanics/curve.py",
+            "start_line": 239,
+            "end_line": 274
+          },
+          "reason": "doit evaluate=False branch wraps subexpression; fdiff also directly wraps regardless of an evaluate argument."
+        },
+        {
+          "claim": "Code printer handles but does not construct wrapper",
+          "verdict": "supported",
+          "evidence": {
+            "path": "sympy/printing/codeprinter.py",
+            "start_line": 124,
+            "end_line": 126
+          },
+          "reason": "Uses isinstance in expression transformation; answer correctly distinguishes handling."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Answerable location search. Production location and named test examples match. evaluate=False describes doit branches, not every derivative call. List is representative, not proven exhaustive; no runtime needed. Source inspection only; no repository code executed."
+    },
+    {
+      "task_id": "import-054283390a7ca05883b3c10e",
+      "reference_sha256": "8d7cc1f3f44c22441e6f8b68f22bca6811f53328d8c2479f7e2f527fb1b3699a",
+      "question_sha256": "322fff7184c45208abd7a4207f830b057e3b08b481b48a93165a2105cb4d5134",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Dialect reference returns shared library element",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/sqlfluff/core/dialects/base.py",
+            "start_line": 285,
+            "end_line": 299
+          },
+          "reason": "Returns _library[name]; grammar Ref.match delegates at grammar/base.py:407-427."
+        },
+        {
+          "claim": "Each matching Ref immediately creates a segment",
+          "verdict": "contradicted",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/segments/base.py",
+            "start_line": 618,
+            "end_line": 645
+          },
+          "reason": "Matching returns a wrapped MatchResult; already-correct segments can be reused. Instantiation occurs later when apply is invoked."
+        },
+        {
+          "claim": "apply constructs matched classes",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/match_result.py",
+            "start_line": 275,
+            "end_line": 282
+          },
+          "reason": "Conditional matched_class construction delegates to from_result_segments."
+        },
+        {
+          "claim": "Constructor allocates child tuple and proven GC overhead",
+          "verdict": "unsupported",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/segments/base.py",
+            "start_line": 194,
+            "end_line": 212
+          },
+          "reason": "Constructor assigns supplied tuple; creates UUID and possibly marker, updates parents/caches. No measured GC cost or valid replacement of parse nodes with grammar objects established."
+        }
+      ],
+      "material_errors": [
+        "Conflates abstract matching with application, implies deferred allocation does not already exist, and compares necessary parse instances with shared grammar definitions as if interchangeable. Memory work is visible, GC impact unmeasured."
+      ],
+      "citation_corrections": [
+        {
+          "original": "base.py:322-448",
+          "corrected": "src/sqlfluff/core/parser/grammar/base.py:322-448",
+          "reason": "Ref definition."
+        },
+        {
+          "original": "base.py:285-299",
+          "corrected": "src/sqlfluff/core/dialects/base.py:285-299",
+          "reason": "Dialect ref lookup."
+        },
+        {
+          "original": "base.py:1233-1239 and 182-212",
+          "corrected": "src/sqlfluff/core/parser/segments/base.py:1233-1239 and 182-212",
+          "reason": "Segment construction."
+        }
+      ],
+      "notes": "Question embeds a misleading comparison. Source supports allocation mechanism and qualified potential cost, not demonstrated GC regression. Source inspection only; no repository code executed.",
+      "corrected_reference_answer": "SQLFluff already reuses grammar definitions: dialect.ref returns a library element, and Ref.match delegates to it (src/sqlfluff/core/dialects/base.py:285-299; src/sqlfluff/core/parser/grammar/base.py:407-427). Matching returns MatchResult and can reuse a segment of the required class (src/sqlfluff/core/parser/segments/base.py:618-645). Later MatchResult.apply recursively builds the selected tree and constructs matched classes (src/sqlfluff/core/parser/match_result.py:193-200,257-282), using from_result_segments (segments/base.py:1233-1239). Each new node stores its own children, UUID, marker and parent/cache state (segments/base.py:194-212), so more nested nodes imply additional objects and initialization work. Grammar objects cannot directly replace these occurrence-specific nodes. Additional GC cost is plausible but unmeasured; the source does not establish a bottleneck, and construction is already deferred until apply."
+    },
+    {
+      "task_id": "import-0d5da92978dc996d9ff1e090",
+      "reference_sha256": "7e78d3ee8994e6ab04848e1e47a82c7789d902efcaa969c124ad598297691ece",
+      "question_sha256": "bb8572ebeae9a247ad7a7cd34cecba68317ad941b8b3107ea7bc0bc6a6a3858e",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Missing detector returns utf-8",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 789,
+            "end_line": 797
+          },
+          "reason": "Exact guard and fallback are present."
+        },
+        {
+          "claim": "Same self.content path on detection absence/failure and success",
+          "verdict": "contradicted",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 792,
+            "end_line": 797
+          },
+          "reason": "No detector branch returns without accessing content; detect exceptions are not caught and None encoding is returned as-is."
+        },
+        {
+          "claim": "Content lazily joins stream bytes",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 890,
+            "end_line": 907
+          },
+          "reason": "Reads only when _content is False; consumed stream can raise and status/raw absence yields None."
+        }
+      ],
+      "material_errors": [
+        "Central data-flow conclusion is wrong: absent detector bypasses self.content, and failed detection has no utf-8 recovery in this property."
+      ],
+      "citation_corrections": [
+        {
+          "original": "compat.py:35",
+          "corrected": "src/requests/compat.py:30-42",
+          "reason": "Resolvable module import context, not tests/compat.py."
+        }
+      ],
+      "notes": "Question ambiguity between missing library, None detection result and thrown exception is material but can be answered by distinguishing all three. Source inspection only; no repository code executed.",
+      "corrected_reference_answer": "Response.apparent_encoding checks chardet is not None at src/requests/models.py:792. compat._resolve_char_detection first tries chardet then charset_normalizer (src/requests/compat.py:30-42). If neither is available, apparent_encoding returns utf-8 without accessing self.content (models.py:794-797). With a detector, it evaluates self.content and returns detect(...)[\"encoding\"] (792-793). content returns cached bytes or lazily consumes iter_content into bytes, with special error/None cases (890-907). A detector returning encoding=None produces None here; a detector exception propagates. Neither case is converted to utf-8 by apparent_encoding, so missing-library fallback and detection failure are different control-flow cases."
+    }
+  ]
+}

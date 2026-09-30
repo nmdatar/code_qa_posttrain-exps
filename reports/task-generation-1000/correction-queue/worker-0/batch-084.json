@@ -1,0 +1,75 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-084.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-0243d4a1ba29",
+      "original_reference_sha256": "5ba99a02326fc2314339658b5758b153982af8ffa149f6840cbba0e27bc312ff",
+      "question": "How does the BaseSegment caching algorithm manage cache invalidation and property recalculation when segments are mutated during SQL parsing and linting operations?",
+      "question_sha256": "88dc9614c13e16fdc1e6dcce875f98a19dc75a8f89c02f56b2b967189d10335b",
+      "reference_answer": "BaseSegment caches computed properties with cached_property (src/sqlfluff/core/parser/segments/base.py:385-513). Initialization and assigning segments call _recalculate_caches (308-318), while invalidate_caches recurses through children then clears self (889-898). Clearing pops a hardcoded key list, so subsequent access recomputes successfully removed entries (836-852). This revision has defects: descendant_type_set and direct_descendant_type_set keys have trailing spaces and is_templated is omitted. Thus it does not guarantee complete invalidation, nor does child mutation automatically notify ancestors.",
+      "reference_sha256": "9efc3f9df25f9d0576e63bde1dbdebe5a6f1d6c1fb033e61add04af2181dbd91",
+      "repository": {
+        "commit": "0243d4a1ba29e6cc3dc96bd9ea178d0f8a576a8f",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-0243d4a1ba29e6cc3dc96bd9ea178d0f8a576a8f",
+      "source_inventory_mode": "git_objects_primary",
+      "source_scope": "Primary repository regular Git blobs only; symbolic links are target metadata and submodules are unavailable pinned metadata. No repository execution.",
+      "task_id": "import-53601a04918107064022733c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-0243d4a1ba29",
+      "original_reference_sha256": "0d429a145e232f492c7118daffb91f734d96bee6ff94dcb02e137f495d1801a1",
+      "question": "Why does SQLFluff's file processing pipeline become significantly slower when handling large repositories with hundreds of SQL files?",
+      "question_sha256": "deb06adae80203a23b86497c88b9ef3903350d84380aa54fd23032609d273140",
+      "reference_answer": "There is sequential startup work: paths_from_path materializes os.walk for a directory and finds ignore files (src/sqlfluff/core/linter/linter.py:1013-1045), and lint_paths collects expanded filenames before starting the runner/progress bar (1160-1199). These can add discovery latency and memory cost on large trees. The source alone does not establish that they dominate parsing, templating or linting, or quantify slowdown; representative profiling is required. ParallelRunner explicitly streams partial jobs so main-thread I/O can overlap workers (src/sqlfluff/core/linter/runner.py:128-145).",
+      "reference_sha256": "7438a427c4eae50112a5dd191b1816c3163206e61da59374bbe11a450f579c38",
+      "repository": {
+        "commit": "0243d4a1ba29e6cc3dc96bd9ea178d0f8a576a8f",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-0243d4a1ba29e6cc3dc96bd9ea178d0f8a576a8f",
+      "source_inventory_mode": "git_objects_primary",
+      "source_scope": "Primary repository regular Git blobs only; symbolic links are target metadata and submodules are unavailable pinned metadata. No repository execution.",
+      "task_id": "import-52c3e212dce9fc4c4e9782f8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-0243d4a1ba29",
+      "original_reference_sha256": "b86420f1a0085bb2c684d2f14a91c5a00ffc5fecf838170c9a51ff98a3e7ba29",
+      "question": "Where are the cached property field names that need to be cleared defined in the BaseSegment._recalculate_caches method?",
+      "question_sha256": "506aa924753244fb090345084fde66d381e4032d4fcd84770f325b05075c8fb2",
+      "reference_answer": "The hardcoded list is in src/sqlfluff/core/parser/segments/base.py:837-851; line852 pops each key from __dict__ with a None default. It includes is_code, is_comment, is_whitespace, raw, raw_upper, matched_length, raw_segments, raw_segments_with_ancestors, first_non_whitespace_segment_raw_upper, source_fixes, full_type_set, and the literal space-suffixed keys descendant_type_set and direct_descendant_type_set. Those trailing spaces are defects: actual cached properties at418-440 have no spaces, so they are not removed. is_templated (493-513) is also absent. Initialization/segments assignment invokes clearing (308-318), but complete invalidation is not guaranteed.",
+      "reference_sha256": "d45f8f50e083ab5f258220968b69e69f79edc30d5ef38fba5cfb2af974b3c7af",
+      "repository": {
+        "commit": "0243d4a1ba29e6cc3dc96bd9ea178d0f8a576a8f",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-0243d4a1ba29e6cc3dc96bd9ea178d0f8a576a8f",
+      "source_inventory_mode": "git_objects_primary",
+      "source_scope": "Primary repository regular Git blobs only; symbolic links are target metadata and submodules are unavailable pinned metadata. No repository execution.",
+      "task_id": "import-e9014272c95c4beb2d940166"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-0243d4a1ba29",
+      "original_reference_sha256": "3023b443fd417ce6ae0e8fa6d610bcd56f4825c7809100673bbdc2b1187a6576",
+      "question": "Why does the MultiProcessRunner implementation in SQLFluff's parallel processing architecture not implement worker process recycling mechanisms to prevent memory accumulation during large-scale file linting operations?",
+      "question_sha256": "5d83c3b69fcd00d30a2b3588525114417bed8c4d24a1eedb2718004222fab9b5",
+      "reference_answer": "ParallelRunner creates its pool with process count, initializer and config arguments (src/sqlfluff/core/linter/runner.py:136-140); _create_pool delegates to POOL_TYPE (178-180), and MultiProcessRunner sets multiprocessing.Pool (188-203). No maxtasksperchild is supplied here, so worker recycling is not configured by this path. The source documents parent-controlled SIGINT handling and delayed exception propagation, but does not explain why recycling was omitted or prove memory/reliability tradeoffs. Adding it would require a separately evaluated design change.",
+      "reference_sha256": "ae644e58011d83740e46128342b19ae7d064861f6cb661986d0c3bc896ec7957",
+      "repository": {
+        "commit": "0243d4a1ba29e6cc3dc96bd9ea178d0f8a576a8f",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-0243d4a1ba29e6cc3dc96bd9ea178d0f8a576a8f",
+      "source_inventory_mode": "git_objects_primary",
+      "source_scope": "Primary repository regular Git blobs only; symbolic links are target metadata and submodules are unavailable pinned metadata. No repository execution.",
+      "task_id": "import-43485ea96059c7f844f04de6"
+    }
+  ]
+}

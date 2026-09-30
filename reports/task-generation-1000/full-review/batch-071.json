@@ -1,0 +1,274 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-887e0169f5cf34c4373be9f5",
+      "reference_sha256": "36a2ead63957933743d6349a8fc5387171c7ad069330d8a5f714d81c58e8af78",
+      "question_sha256": "1d17d28f544a4c223d728b2c6249415a8d67ef99bda8cf40a347852168d2c53c",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Hive ROW disambiguation requires datatype and first-match order",
+          "verdict": "partially_supported",
+          "reason": "Field datatype is optional; OneOf selection not simply first successful alternative.",
+          "evidence": {
+            "path": "src/sqlfluff/dialects/dialect_hive.py",
+            "start_line": 906,
+            "end_line": 934
+          }
+        }
+      ],
+      "material_errors": [
+        "Field datatype is optional; OneOf selection not simply first successful alternative."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "FunctionSegment has a special ROW function-name parser followed by RowFunctionContentsSegment, AS ROW, and bracketed comma-separated identifiers with optional datatype (src/sqlfluff/dialects/dialect_hive.py:906-920). The AS ROW shape distinguishes this branch from generic function parsing at922-934. Datatypes are not mandatory. Alternative selection uses longest-match priorities, with earlier alternatives resolving ties and first total matches (src/sqlfluff/core/parser/match_algorithms.py:146-156), not an unconditional first-success rule."
+    },
+    {
+      "task_id": "import-892c962a8c7a05aa0c90835c",
+      "reference_sha256": "46b1d5451ece19a488a391859aee60b26b3c760601f4ed0549e15a60a9d7138b",
+      "question_sha256": "8ecc9160d5e6afe7cc7bd7afa2ba22097d0d1e933676265f82372b9e53a54da1",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Indent string propagation",
+          "verdict": "supported",
+          "reason": "Generator output passed to lint_indent_points; other direct call sites break_long_lines634 and ST04191 confirmed. New parameter need only reach construction; resulting string propagates existing downstream signatures.",
+          "evidence": {
+            "path": "src/sqlfluff/utils/reflow/sequence.py",
+            "start_line": 602,
+            "end_line": 614
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-9b7f614e174db3236d68bd50",
+      "reference_sha256": "a84a872cbe955d6e5956301108f2dc662788fdbd1f1639ac8d2d287ca8a27e13",
+      "question_sha256": "a8ab19444bd79918292c5271afe5c15ca7a2a4e491797b665a147ac623fcdb5b",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "ParsedVariant permits templating-failure None input",
+          "verdict": "partially_supported",
+          "reason": "Actual field annotation TemplatedFile is nonoptional; parser constructs variants for rendered outputs, while templating failures live at outer result level.",
+          "evidence": {
+            "path": "src/sqlfluff/core/linter/common.py",
+            "start_line": 57,
+            "end_line": 64
+          }
+        }
+      ],
+      "material_errors": [
+        "Actual field annotation TemplatedFile is nonoptional; parser constructs variants for rendered outputs, while templating failures live at outer result level."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "ParsedVariant stores a nonoptional TemplatedFile, optional tree, and separate lexing/parsing violation lists, with violations combining the latter (src/sqlfluff/core/linter/common.py:57-64). parse_rendered constructs it for each existing templated variant; if there are no tokens it uses parsed=None while retaining lex errors (src/sqlfluff/core/linter/linter.py:333-361). The optional tree allows reporting without a usable parse tree. The docstring's suggestion that templated_file can be None should not be confused with the actual typed construction path; templating failure can instead yield no variants."
+    },
+    {
+      "task_id": "import-9f6a34e2a62a12135e9b52ed",
+      "reference_sha256": "9fed3c96c1cbb4fca73908284b0034d81d4e6455bd30a65e0394cdb0774b676d",
+      "question_sha256": "007f5ef1817446f255d1b7c48b5a36658ae0263dfde8aea754a905892b18b83a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Spacing precedence truthy cascade",
+          "verdict": "supported",
+          "reason": "Explicit values then dict then existing; exclusions split with empty fallback; falsy overrides skipped.",
+          "evidence": {
+            "path": "src/sqlfluff/utils/reflow/config.py",
+            "start_line": 38,
+            "end_line": 61
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-9ff163b78e5dbc3df37a03f4",
+      "reference_sha256": "29ec37cebf3880713e2992d61c5d60d984dd0e3a5661a32b2bbe78e3dea2464d",
+      "question_sha256": "b5a6c4605f0d416ca21fc05575cdec767d358c8c58b3700ee4d2d407f7c1be2f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Jinja modifier boundaries",
+          "verdict": "supported",
+          "reason": "Slices tags then guarded +/- checks expand pre/post and strip interior padding.",
+          "evidence": {
+            "path": "src/sqlfluff/rules/jinja/JJ01.py",
+            "start_line": 67,
+            "end_line": 84
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-a024a3c06872fce52cb804ad",
+      "reference_sha256": "0be9f691fef1468c91aeb3ca59f3d95f019a811696fd0074762977ac7ad49378",
+      "question_sha256": "4ba8dd51116c6da4ee5a8daa0beac5cebd283930e33d8a0ef92e14310bb0f6f7",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "AST restrictions guarantee safe Python library execution",
+          "verdict": "partially_supported",
+          "reason": "Intentional trusted-code extension executes modules; allowlists/AST filtering alone cannot sandbox arbitrary Python.",
+          "evidence": {
+            "path": "src/sqlfluff/core/templaters/jinja.py",
+            "start_line": 274,
+            "end_line": 289
+          }
+        }
+      ],
+      "material_errors": [
+        "Intentional trusted-code extension executes modules; allowlists/AST filtering alone cannot sandbox arbitrary Python."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The loader executes discovered modules with exec_module (src/sqlfluff/core/templaters/jinja.py:274-289), so library_path is a trusted-code extension boundary, not protected by Jinja's template sandbox. The repository recommends invocation-level configuration overrides or --library-path none for secure deployments (docs/source/production/security.rst:31-48). A redesign should disable untrusted library loading by default and permit administrator-controlled trusted libraries explicitly. If arbitrary untrusted Python must run, use an external process/container boundary with OS-enforced filesystem, network and resource restrictions; path/name allowlists, export checks and AST scans are defense-in-depth rather than sufficient execution isolation."
+    },
+    {
+      "task_id": "import-a2e2753b66b478645da990ce",
+      "reference_sha256": "e243142e5789bd20badff9cacb6cff1f93474014c32151a1871f739ad0aed2ea",
+      "question_sha256": "a1ccbe683996681e7a4004299a499e73bb0cce34acd608a8ffa9e628211a1fd7",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Drop view optional grammar clauses",
+          "verdict": "supported",
+          "reason": "Sequence wraps optional IF EXISTS and behavior around required table reference.",
+          "evidence": {
+            "path": "src/sqlfluff/dialects/dialect_ansi.py",
+            "start_line": 3511,
+            "end_line": 3522
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-a9fc9efa3e7bbf21ae1eb14d",
+      "reference_sha256": "ee45595426868a5229cc35c8d0576a204909ae89d82e7deff2d94f08c2d921f0",
+      "question_sha256": "c3cabfeefd5947eba9de1b408f7e362b0c9e8e851d3383baa0d95099f52d2ca2",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "NamedTuple allocations prove lint bottleneck",
+          "verdict": "partially_supported",
+          "reason": "Traversals and allocation visible but fragmentation, cache inefficiency and significant degradation unmeasured; tuple stores references not copies of whole trees.",
+          "evidence": {
+            "path": "src/sqlfluff/rules/layout/LT09.py",
+            "start_line": 109,
+            "end_line": 157
+          }
+        }
+      ],
+      "material_errors": [
+        "Traversals and allocation visible but fragmentation, cache inefficiency and significant degradation unmeasured; tuple stores references not copies of whole trees."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "_get_indexes computes target positions from child/sibling selections and returns SelectTargetsInfo, including a new list of pre-FROM whitespace (src/sqlfluff/rules/layout/LT09.py:109-157). Repeated SELECT clauses repeat this work, but that does not prove tuple allocation causes significant slowdown, GC pressure or fragmentation. The tuple mainly holds existing references and indices. Profile traversal, allocation and total lint time before caching; different clauses and modified trees may require different results."
+    },
+    {
+      "task_id": "import-b2e1c03e21b3142015d8113a",
+      "reference_sha256": "d1f957b3fafe7bcafdae675111e678c706e5ee063057d3ce93f52554758887e6",
+      "question_sha256": "a0ac2d03cbfb726e632f70d17b32c302fb478f0183500215046252c060a2acd8",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "BigQuery FOR query before body",
+          "verdict": "supported",
+          "reason": "Parent sequence places SelectableGrammar before DO/body; body consumes statements bounded by END FOR.",
+          "evidence": {
+            "path": "src/sqlfluff/dialects/dialect_bigquery.py",
+            "start_line": 694,
+            "end_line": 734
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-b47190d3a7f08a607a84569b",
+      "reference_sha256": "6700ad33df66378686133ba9c5f7415d0b89da8674deb135b7c06f2d19241ba2",
+      "question_sha256": "f07c0f2cb4768a608aebce2be8f0cd92a25ed13d8ff61afc023167f51061857e",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Subtree pruning avoids exponential traversal",
+          "verdict": "partially_supported",
+          "reason": "Pruning sound but naive tree traversal is linear in nodes, not inherently exponential; initial cache construction has cost.",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/segments/base.py",
+            "start_line": 1029,
+            "end_line": 1054
+          }
+        }
+      ],
+      "material_errors": [
+        "Pruning sound but naive tree traversal is linear in nodes, not inherently exponential; initial cache construction has cost."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "recursive_crawl checks self, then returns early if descendant_type_set has no requested types, otherwise recursing into allowed children (src/sqlfluff/core/parser/segments/base.py:1029-1054). Once cached, the summary avoids revisiting irrelevant subtrees. This saves traversal work but does not establish prevention of exponential complexity: a simple traversal of a tree is linear in visited nodes, and populating the cached descendant summaries also costs work."
+    },
+    {
+      "task_id": "import-b5bc934fd5189ab25b53562b",
+      "reference_sha256": "4749eb69741808b738c1f234518f04ee11680958bdc04791a96934752e0bce3c",
+      "question_sha256": "ee819bb0cc5001f2b2950b8cace5b33a551149ac24060a5bad6a8bdb6308b304",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "BigQuery search-index grammar",
+          "verdict": "supported",
+          "reason": "Required DROP SEARCH INDEX name ON table and optional IF EXISTS directly encoded; enables parse structure, not arbitrary semantic validation/autofix guarantees.",
+          "evidence": {
+            "path": "src/sqlfluff/dialects/dialect_bigquery.py",
+            "start_line": 3091,
+            "end_line": 3107
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-b7ad5de2757dedec24b6e416",
+      "reference_sha256": "2100e9f078f4586e0e0cd570ebd67c7024c62a34d05d9d55e8832bbcc124d29d",
+      "question_sha256": "05a4ff91ed8795a8b107acb784832afb38d48efda94013981fb3a4a95e3cafe2",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Inline configuration then list synchronization",
+          "verdict": "supported",
+          "reason": "Processes recognized inline directives sequentially then rebuilds comma-separated representations before rulepack consumption.",
+          "evidence": {
+            "path": "src/sqlfluff/core/config/fluffconfig.py",
+            "start_line": 725,
+            "end_line": 732
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    }
+  ]
+}

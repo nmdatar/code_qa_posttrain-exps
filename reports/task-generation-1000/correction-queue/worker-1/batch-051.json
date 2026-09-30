@@ -1,0 +1,126 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 1,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-051.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "9eafeb919104ef3ea6363ab4293cd8fe6245d96820bee9d36ac52bdb9a9d40bb",
+      "question": "Where does the data flow of marker information propagate from the autouse fixture in test_accessmarker_dynamic through the request object to multiple test functions, and what control flow mechanism ensures that dynamically applied markers via applymarker are visible to all dependent tests in the same scope?",
+      "question_sha256": "ecfc5ef9faab0622abafa41bf5b89cda2ddcdb724c3ccd992f4fd518f9575fb8",
+      "reference_answer": "applymarker calls request.node.add_marker (src/_pytest/fixtures.py:508-517). In test_accessmarker_dynamic, the autouse fixture has class scope but generated tests are module-level functions (testing/python/fixtures.py:1193-1218). SubRequest.node falls back to the function item when no class node exists (src/_pytest/fixtures.py:763-778), so this example marks the relevant function item rather than sharing a class marker. In a real test class, the class node is used and NodeKeywords parent lookup exposes the marker to child functions (src/_pytest/mark/structures.py:610-635).",
+      "reference_sha256": "ea033190bd82a26b7d288130481f4eb7cd3d57ff591c1f15e7fc4dddcb5e8fd4",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-8ef0e1b957a22b443baf00d3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "4ffcbb246e58918a1ec890efcd27fbe6f22cf831c4eb725b8dc38bbdc26c1f6c",
+      "question": "Where does the data flow from pytester.inline_run() through the test execution pipeline to ultimately validate that tmp_path remains functional when the current process's user id lacks a corresponding valid user entry?",
+      "question_sha256": "11971196abc30003181dd422d50315ac79c902672872c3d8ad43a496084d29c4",
+      "reference_answer": "break_getuser replaces os.getuid with -1 and clears username environment variables; the generated test requests tmp_path and asserts is_dir(), then inline_run records a passing outcome (testing/test_tmpdir.py:325-346). TempPathFactory uses get_user() or unknown, creates a private root directory, and skips ownership comparison when get_user_id returns None (src/_pytest/tmpdir.py:155-192; src/_pytest/compat.py:260-278). These distinct username and UID fallbacks allow this simulated case to succeed; the test assertion and passed outcome provide the validation.",
+      "reference_sha256": "73f66ac01945610e7fe849c7189660b1d1ea66e928fa0244d3d7dc550c550413",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-9465cff51c9989ebc615a4cd"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "6d2d5844c7d390aa8ec4f650604836425c811a006d84b2593c53ecf8f0d5850c",
+      "question": "How would you refactor a minimal test function like test_1 to implement a parameterized testing strategy that maintains backward compatibility while enabling data-driven test execution across multiple input scenarios?",
+      "question_sha256": "6372a0198e002860f7180b7ba1350e12e58962bdc935230ef045a53c3537f642",
+      "reference_answer": "Refactor test_1 to accept input_value and expected, add @pytest.mark.parametrize(\"input_value, expected\", cases), and keep the old scenario as one case with a stable explicit id. The hook processes markers through Metafunc.parametrize (src/_pytest/python.py:112-114). Keeping the test name preserves broad name selection such as -k test_1, while each case gets its own result. This changes the callable signature, collected node IDs and test count, so direct callers and exact-node-ID consumers may need updates; backward compatibility is not automatic.",
+      "reference_sha256": "8a9ad0ba5383de6415f614c255cdd62999ec4c89c317442678d73eb428d6796f",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-97b3c55fbe0d770d9d0d6e34"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "cef14e0fa4d9408ce6558cc5ecabfc86aff38a4dfe5c4c4971a5c02aef3a4d99",
+      "question": "What is the architectural separation in the pytest fixture resolution system that decouples fixture discovery and validation to enable the error reporting mechanism that distinguishes between missing fixtures and internal failures?",
+      "question_sha256": "29003487fe6b30048917fc074a48b4cb5bb9c973d40ec36f8ddc2b09fac51be0",
+      "reference_answer": "getfixturedefs separates name lookup from applicability filtering: absent names return None, while known but inapplicable names return an empty tuple (src/_pytest/fixtures.py:1853-1879). FixtureLookupError.formatrepr with no custom message distinguishes recursive dependency from fixture-not-found and lists available fixtures; a supplied message is displayed at the requesting side (lines 830-879). request.raiseerror explicitly creates such a custom lookup error (lines 519-525). This is not a universal classifier for internal fixture execution exceptions.",
+      "reference_sha256": "11090cdc6bf980ad495919daa1c9692b1a9bd018dd9dd5b1090e786d1440bc3f",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-9b15cd0e2e062e402dd64314"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "43d1e3eed2aebaf3b1402c7db21633958bfeeaa11f0580838f72fe78bfd70b1a",
+      "question": "Why does the TestImportHookInstallation class employ subprocess-based testing through pytester.runpytest_subprocess() rather than inline test execution, and what design constraints does this impose on the assertion rewrite hook installation verification?",
+      "question_sha256": "8fc32ed9aa5d626ff2d96a147b5aa83707955a6bf3bb13f4e5054d53be50319f",
+      "reference_answer": "The tests use subprocess runs to isolate import state and pytest startup configuration. For example, conftest rewrite tests start pytest with plain/rewrite modes and compare failure rendering (testing/test_assertion.py:79-108). install_importhook puts the rewriting hook at the front of sys.meta_path and arranges removal (src/_pytest/assertion/__init__.py:116-126). Cached modules generally bypass a new import hook, so tests must arrange imports after installation. A subprocess is a convenient isolation boundary, not a logical requirement for every hook test; assertions across it are checked through subprocess output/outcomes rather than shared Python objects.",
+      "reference_sha256": "149f166649c3737da90ca1c13edb3ff7d56a4ee277440ca18ec8e7fa0976022c",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-aef32c6831d57567c69c3f1c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "e5a41c0c735fea2ec0c11fea651afb88b1efc37f7089d691c05fb21b42c5535c",
+      "question": "Why does the TestShowFixtures class employ separate test methods for validating fixture documentation formatting across different contexts (trimmed docs, indented docs, first-line unindented, class-level fixtures) rather than consolidating these variations into parameterized tests?",
+      "question_sha256": "8c0b0944fe334976cb0b1c194681a649360e07026e98106e642905edddf2019e",
+      "reference_answer": "The tests separately generate fixture sources and assert the exact --fixtures output for indentation and first-line placement (testing/python/fixtures.py:3689-3742); another case uses a class fixture (lines 3744-3770). Separate methods keep each setup beside its expected output. That is a plausible readability benefit, not documented proof of the authors\u2019 reasoning or evidence that parameterization would be inferior. A table of source/expected-output cases with descriptive IDs could preserve the same coverage.",
+      "reference_sha256": "0033543e7137ab3e4c9b7c1f6bb3a826f983cc01333c37723f6e4176bb431b97",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-b4bd4d91f4d0e12cd83fdee1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "original_reference_sha256": "0c376cade8c77039aa2e410089aabe3f8eb38d79a1f4684d88b76f20025a92c5",
+      "question": "Where does the MockTiming.patch method's delegation to monkeypatch.setattr establish the interception points for timing module functions, and what is the relationship between the three separate setattr calls in terms of their execution order and potential side effects on the timing module's state?",
+      "question_sha256": "8dfd796150ef07aad165cabb694f1ed96dfd4e6bb62e338c7cfaf4b866f271cb",
+      "reference_answer": "MockTiming.patch sequentially replaces timing.sleep, timing.time and timing.perf_counter, using self.time for both clocks (src/_pytest/timing.py:86-91). Its sleep advances _current_time and time reads it (lines 78-84). Each monkeypatch update changes a separate module attribute and records restoration state; later lookups through the timing module see the replacements. Existing references imported before patching are not rebound, and the three updates are sequential rather than atomic.",
+      "reference_sha256": "ff0c2d170008b8259aabcbac7b194fb925883755ee8416eb7da04135fee0f96b",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-be34a26cecb95595b7a51d1f"
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 1,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-012.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "original_reference_sha256": "4011d2e426f4c5da92ad603bcb702382327cd1a04de65ad7931cb47d3c0a1f6e",
+      "question": "How does the `initial_form_count` method in `BaseFormSet` reconcile the dual data sources of management form state and initial data to determine the authoritative form count, and what are the implications of this branching logic for form validation consistency?",
+      "question_sha256": "cdeda6c64b0c434df0fca73352241b7289629229fa853ba27d14c1cec6c75644",
+      "reference_answer": "BaseFormSet.initial_form_count returns management_form.cleaned_data[INITIAL_FORM_COUNT] when bound; otherwise it uses len(initial) or zero (django/forms/formsets.py:192-199). This count determines initial versus extra forms. It is not reconciled against server initial-list length, so a valid but different submitted count changes that classification. Missing or invalid management values are not silently accepted: full_clean records a missing_management_form error (410-421).",
+      "reference_sha256": "53d676b950157be46d0a70a4a7dc09c51bce3f8f98e3a5b0f44756979c9ce2b2",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-3950d154749fe63577cf0c0a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "original_reference_sha256": "30d06a7485c2a11c4e0993f2e4696206703333091c238abeee3001cabd927c95",
+      "question": "What is the Reference base class design pattern that enables subclasses to implement different reference tracking strategies while maintaining a consistent interface for DDL operations?",
+      "question_sha256": "8a9e4e54f18abe1624b3509006586c7f0d56680ef93f5aba388c9b9506342dc5",
+      "reference_answer": "Reference is a polymorphic base interface for deferred DDL reference objects (django/db/backends/ddl_references.py:9-48). It supplies false predicates, no-op rename methods, and requires subclasses to implement SQL string conversion. Table implements table matching/renaming (51-69); richer subclasses track columns or compose statement parts. This is interface-based polymorphism rather than evidence of a classic Template Method algorithm.",
+      "reference_sha256": "f694637d358c6e7fb74a51024a581671c02f3e8a846e050a1547bff8e3ee1b4b",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-4c744eb48b4b9c0d749a377a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "original_reference_sha256": "487d6139e332db00decc888c811348b6c486f48f41b3f7bb9b84d90bcd68a2f4",
+      "question": "Why does the run_validators() method's exception handling pattern with hasattr() checks and error list concatenation impact performance under high validation load, and what refactoring would improve throughput?",
+      "question_sha256": "201588d0f600c7c23febb23f732fbdd5e508f0d03f1d2cc98bf1c9621dbee661",
+      "reference_answer": "run_validators invokes every validator, remaps an individual error message when its code exists in error_messages, extends a list with each error_list, then raises an aggregate ValidationError (django/forms/fields.py:186-198). ValidationError stores error_list during construction (django/core/exceptions.py:167-182); accessing it does not construct a new list. The code does not establish a bottleneck or that flattening later is faster. Any refactoring should be benchmarked and preserve missing-code behavior, message overrides, and error order.",
+      "reference_sha256": "c8a9d975d446bb08127298af4e497bf416222c9afc7f69321e686fdd37d9f673",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-7a8e5fce8ed60429423f422d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "original_reference_sha256": "58c4d8eeb4dc2289d26542cbacecefa96d9fbd11e78369b3c4f4589ce8920364",
+      "question": "What is the inhibit_post_migrate stealth option and how does it prevent unintended side effects when flushing a database with populated migration history?",
+      "question_sha256": "a123cf4148da96f57c8acb08d03c48fe03de50dc7088ef07ecc9be7aa3a23abf",
+      "reference_answer": "inhibit_post_migrate is an internal flush option. flush emits post_migrate only when SQL was executed and inhibition is false (django/core/management/commands/flush.py:86-91). TransactionTestCase enables inhibition for a restricted available_apps set or serialized_rollback with saved contents, avoiding recreation of data that will be restored (django/test/testcases.py:1251-1272). Populated migration history alone is not the condition.",
+      "reference_sha256": "14bd26cfa3c16444c8c314a79e2688e10d08069e2b9a880a541a0f8d788372da",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-80e0bd535d2dab28c20b2941"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "original_reference_sha256": "2e2b0df9a6781c287e0341e5dffc247a95f4eb9e0de861ca76b3d16815d46912",
+      "question": "Where does the unique constraint on the 'name' CharField in the Target model propagate through the ORM's data validation pipeline and affect the control flow when foreign key relationships from other models attempt to reference Target instances?",
+      "question_sha256": "cdc891ae8030e6a7d18a2291672f01f5c5c0a0a21e55be1db94597862bdc5c28",
+      "reference_answer": "Target.name uniqueness is checked when Target.validate_unique/full_clean is invoked; full_clean excludes failed fields before its unique checks (django/db/models/base.py:1594-1626). A ForeignKey to name requires an eligible unique target at model-check time (django/db/models/fields/related.py:638-674), and ForeignKey.validate checks that a matching target row exists (1127-1142). Referencing Target does not recursively call its uniqueness validation. save does not run full_clean and the related-save preparation can reject unsaved related objects (base.py:1202-1204).",
+      "reference_sha256": "743be66d73b067e3f2181be6bf4fc7cbc90a3d34e4d6790ae950e02d9d98106c",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-8256ac589aed18728dda2aef"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/django--django-14fc2e97036f",
+      "original_reference_sha256": "3a56f1092589667eedc0c5b0e98611b7aab2d644d3ee19415e838271ff72972f",
+      "question": "How should Django's ORM architecture be designed to ensure that when select_related and defer are combined on a related parent object, the deferred fields are properly excluded from the join query while maintaining lazy-loading semantics for non-deferred parent attributes?",
+      "question_sha256": "3de30c884a2793fa3b3709856ce880f660045d23c3b60dddfb979a3621ea92bd",
+      "reference_answer": "Django passes a nested related select mask into get_default_columns and excludes fields outside that mask (django/db/models/sql/compiler.py:1026-1030,1241-1260). Non-deferred fields selected by select_related are loaded eagerly. Deferred fields remain absent from instance data and DeferredAttribute retrieves them on access, using a parent-chain value if available or refresh_from_db otherwise (django/db/models/query_utils.py:209-231). Thus lazy loading applies to deferred fields, not non-deferred parent attributes.",
+      "reference_sha256": "b4838ea28cd02d21744c8aa16f449136859c32b610d5af8e5c0b08c795f248e4",
+      "repository": {
+        "commit": "14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+        "family_id": "django/django",
+        "url": "https://github.com/django/django"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/django--django-14fc2e97036fc9d7acb55ada4f16f1aa3bdc5ec7",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-87c5ca19ae578a5cf219738a"
+    }
+  ]
+}

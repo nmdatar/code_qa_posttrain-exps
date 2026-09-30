@@ -1,0 +1,2435 @@
+{
+  "schema_version": "1.0",
+  "reviewed_at": "2026-09-29T00:07:49.074810+00:00",
+  "review_type": "independent_agent_source_review",
+  "human_reviewed": false,
+  "scope": "Independent source review of supplied immutable source files, hashes, claim spans, surrounding implementation, and question distinctions; not environment admission or human calibration.",
+  "counts": {
+    "reviewed": 100,
+    "supported": 100,
+    "needs_review": 0
+  },
+  "collection_quality_notes": [
+    "Each reviewed prompt asks a distinct behavior; related APIs share some reasoning but are not identical paraphrases.",
+    "Current questions emphasize local implementation behavior; cross-file architecture and measured solver difficulty remain limited.",
+    "Independent agent review does not imply human gold approval, environment readiness or train release admission."
+  ],
+  "reviews": [
+    {
+      "task_id": "fresh-go-task-dedup-failure",
+      "status": "supported",
+      "reason": "Revised question explicitly requires the same nonempty execution hash; bypass case is excluded. Shared failure propagation, release/reacquire and completed-first cancellation semantics match task.go:481\u2013527.",
+      "question_answerable": true,
+      "reference_supported_conditional_on_question_scope": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "8c994fb00233574173f12dd70e691a9fc1104346e1ae0bf532fb2578c3dcbbcc",
+      "evidence": [
+        {
+          "end_line": 527,
+          "file_sha256": "49bede36531b4a2e57d4524f9532070ceb9501087b3c4234695afe07923382eb",
+          "path": "task.go",
+          "start_line": 481,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 517,
+          "file_sha256": "49bede36531b4a2e57d4524f9532070ceb9501087b3c4234695afe07923382eb",
+          "path": "task.go",
+          "start_line": 501,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-go-task-timeout-attribution",
+      "status": "supported",
+      "reason": "Timeout context is established before cmd.If. timedOut requires nonnil timeout and errors.Is(context.Cause(ctx), timeout), so inherited cancellation is not relabeled as this timeout. The answer does not promise all parent-cancellation paths propagate errors.",
+      "question_answerable": true,
+      "reference_supported_conditional_on_question_scope": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "b762c2a98395978253d457e47a8fbe1f1789ef215eba95163a9f5ef75e21dba2",
+      "evidence": [
+        {
+          "end_line": 390,
+          "file_sha256": "49bede36531b4a2e57d4524f9532070ceb9501087b3c4234695afe07923382eb",
+          "path": "task.go",
+          "start_line": 369,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 471,
+          "file_sha256": "49bede36531b4a2e57d4524f9532070ceb9501087b3c4234695afe07923382eb",
+          "path": "task.go",
+          "start_line": 445,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-go-task-force-dependencies",
+      "status": "supported",
+      "reason": "runDeps precedes preconditions/fingerprinting; Force only bypasses those checks for direct calls, dependencies use Indirect:true, and ForceAll bypasses for both.",
+      "question_answerable": true,
+      "reference_supported_conditional_on_question_scope": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "f5e5273f57c025935f699177ff0f8a523ac3f1a9b104416004f1b836ebf88d4f",
+      "evidence": [
+        {
+          "end_line": 238,
+          "file_sha256": "49bede36531b4a2e57d4524f9532070ceb9501087b3c4234695afe07923382eb",
+          "path": "task.go",
+          "start_line": 206,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 339,
+          "file_sha256": "49bede36531b4a2e57d4524f9532070ceb9501087b3c4234695afe07923382eb",
+          "path": "task.go",
+          "start_line": 320,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-go-task-dependency-failfast",
+      "status": "supported",
+      "reason": "WithContext is selected only for executor/task Failfast. The parent releases its slot, dependency closures launch through g.Go, timeout causes are checked, and g.Wait joins all results. Dependencies that honor the context can observe sibling cancellation.",
+      "question_answerable": true,
+      "reference_supported_conditional_on_question_scope": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "38dea6252e31f55aea1bda9eee88a44f6bb77264dd6f71bc77c212b58298c66d",
+      "evidence": [
+        {
+          "end_line": 328,
+          "file_sha256": "49bede36531b4a2e57d4524f9532070ceb9501087b3c4234695afe07923382eb",
+          "path": "task.go",
+          "start_line": 311,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 339,
+          "file_sha256": "49bede36531b4a2e57d4524f9532070ceb9501087b3c4234695afe07923382eb",
+          "path": "task.go",
+          "start_line": 320,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-go-task-deferred-cleanup",
+      "status": "supported",
+      "reason": "Registered deferred cleanup runs with a fresh background-derived context; exit status or TaskTimeoutError yields EXIT_CODE, and cleanup errors are logged without replacing the original return. This applies to deferred commands registered before the failing command; other failure kinds leave EXIT_CODE absent.",
+      "question_answerable": true,
+      "reference_supported_conditional_on_question_scope": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "a9e192ac0c949d5fa7ea8092671482560a9fccc70b8f063dd9881f8bc692a308",
+      "evidence": [
+        {
+          "end_line": 282,
+          "file_sha256": "49bede36531b4a2e57d4524f9532070ceb9501087b3c4234695afe07923382eb",
+          "path": "task.go",
+          "start_line": 256,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 363,
+          "file_sha256": "49bede36531b4a2e57d4524f9532070ceb9501087b3c4234695afe07923382eb",
+          "path": "task.go",
+          "start_line": 342,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-go-task-ignore-error-boundary",
+      "status": "supported",
+      "reason": "Both nested task and shell branches gate cmd.IgnoreError using isCommandFailure; only interpreter exit status and typed task timeout qualify. Arbitrary setup failures remain errors.",
+      "question_answerable": true,
+      "reference_supported_conditional_on_question_scope": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "a380fba7a01617a07fb27e14e6c50ccee1d8260150d3b8bdf1b74592f0e7b457",
+      "evidence": [
+        {
+          "end_line": 406,
+          "file_sha256": "49bede36531b4a2e57d4524f9532070ceb9501087b3c4234695afe07923382eb",
+          "path": "task.go",
+          "start_line": 398,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 465,
+          "file_sha256": "49bede36531b4a2e57d4524f9532070ceb9501087b3c4234695afe07923382eb",
+          "path": "task.go",
+          "start_line": 445,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-go-task-matrix-isolation",
+      "status": "supported",
+      "reason": "resolveMatrixRefs copies before modifying reference rows, returns the original for no-reference matrices, and propagates cache errors or non-list errors. The stated shared-AST isolation matches code and comment.",
+      "question_answerable": true,
+      "reference_supported_conditional_on_question_scope": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "7a0af375fbc01c3d77769042d2ea298641b35f1a2854cf64fd8c4f99e8d2ddba",
+      "evidence": [
+        {
+          "end_line": 477,
+          "file_sha256": "041c8fb2a0efbb40ef1e1525c484a771f4914f1f0e57b1a21c705dcfab562776",
+          "path": "variables.go",
+          "start_line": 445,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 480,
+          "file_sha256": "041c8fb2a0efbb40ef1e1525c484a771f4914f1f0e57b1a21c705dcfab562776",
+          "path": "variables.go",
+          "start_line": 469,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-go-task-matrix-product",
+      "status": "supported",
+      "reason": "product starts with one empty combination only when rows exist; nested combination/value iteration copies each map. No rows returns nil; an empty row leaves no combinations. Distinct from reference-resolution isolation.",
+      "question_answerable": true,
+      "reference_supported_conditional_on_question_scope": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "46c72a30b1cce52d8e288594e6f592422bc1f0cab91bc502ac2e7bbec1ca9a24",
+      "evidence": [
+        {
+          "end_line": 490,
+          "file_sha256": "041c8fb2a0efbb40ef1e1525c484a771f4914f1f0e57b1a21c705dcfab562776",
+          "path": "variables.go",
+          "start_line": 483,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 513,
+          "file_sha256": "041c8fb2a0efbb40ef1e1525c484a771f4914f1f0e57b1a21c705dcfab562776",
+          "path": "variables.go",
+          "start_line": 492,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-go-task-dynamic-loop-list",
+      "status": "supported",
+      "reason": "Unresolved dynamic variables fail the static-value/no-Sh gate without error. Strings split, accepted slices are preserved, and map iteration aligns keys/values without sorting. Unsupported eligible static types error.",
+      "question_answerable": true,
+      "reference_supported_conditional_on_question_scope": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "e54048f8a512ff37ca5d589177fa275dbcbf2076dec822d3c9fb58cadb62e828",
+      "evidence": [
+        {
+          "end_line": 426,
+          "file_sha256": "041c8fb2a0efbb40ef1e1525c484a771f4914f1f0e57b1a21c705dcfab562776",
+          "path": "variables.go",
+          "start_line": 408,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 442,
+          "file_sha256": "041c8fb2a0efbb40ef1e1525c484a771f4914f1f0e57b1a21c705dcfab562776",
+          "path": "variables.go",
+          "start_line": 428,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-go-task-if-prompt-order",
+      "status": "supported",
+      "reason": "Noninteractive required-variable check occurs before full compilation; task If follows compilation and skips with nil on failure, before prompting. Prompted values trigger fast recompilation and then required/allowed checks.",
+      "question_answerable": true,
+      "reference_supported_conditional_on_question_scope": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "ce904e30824f78615a62897b7b7100fca49d286154609e7eff68d6170e7dab12",
+      "evidence": [
+        {
+          "end_line": 173,
+          "file_sha256": "49bede36531b4a2e57d4524f9532070ceb9501087b3c4234695afe07923382eb",
+          "path": "task.go",
+          "start_line": 150,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 194,
+          "file_sha256": "49bede36531b4a2e57d4524f9532070ceb9501087b3c4234695afe07923382eb",
+          "path": "task.go",
+          "start_line": 175,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-otel-attribute-recency",
+      "status": "supported",
+      "reason": "Deleting an existing key before capacity check and reinserting makes a newest without a drop; adding c evicts oldest b and increments dropped once.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "4d7ff04907bd7c9bd1223810ce33594a4d1415754a5bba2070c640f090bf0b82",
+      "evidence": [
+        {
+          "end_line": 214,
+          "file_sha256": "40e46fdd33828a889da31e539add39b3b5528a569834f6a5aa85d6c1c4d48f57",
+          "path": "opentelemetry-api/src/opentelemetry/attributes/__init__.py",
+          "start_line": 202,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-otel-attribute-snapshot",
+      "status": "supported",
+      "reason": "Recursive cleaning makes tuples and fresh nested dicts; string values truncate but keys and bytes do not. Existing evidence must cite implementation rather than overload declaration.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "ec60ae36781bc2dc2706fb777049fbb6bbe4cb74ee8073e79b264d048de5105a",
+      "evidence": [
+        {
+          "end_line": 98,
+          "file_sha256": "40e46fdd33828a889da31e539add39b3b5528a569834f6a5aa85d6c1c4d48f57",
+          "path": "opentelemetry-api/src/opentelemetry/attributes/__init__.py",
+          "start_line": 41,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 189,
+          "file_sha256": "40e46fdd33828a889da31e539add39b3b5528a569834f6a5aa85d6c1c4d48f57",
+          "path": "opentelemetry-api/src/opentelemetry/attributes/__init__.py",
+          "start_line": 172,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-otel-attribute-key-paths",
+      "status": "supported",
+      "reason": "Batch cleaning handles mapping keys with falsy rejection and optional string conversion; direct assignment rejects nonstrings. Existing evidence must cite implementation rather than overload declaration.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "754fd4581ff7d35513072436350cb37fa74145205221b9b23b6adfcba5a6488f",
+      "evidence": [
+        {
+          "end_line": 201,
+          "file_sha256": "40e46fdd33828a889da31e539add39b3b5528a569834f6a5aa85d6c1c4d48f57",
+          "path": "opentelemetry-api/src/opentelemetry/attributes/__init__.py",
+          "start_line": 190,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 98,
+          "file_sha256": "40e46fdd33828a889da31e539add39b3b5528a569834f6a5aa85d6c1c4d48f57",
+          "path": "opentelemetry-api/src/opentelemetry/attributes/__init__.py",
+          "start_line": 41,
+          "claim_id": "c2"
+        },
+        {
+          "end_line": 189,
+          "file_sha256": "40e46fdd33828a889da31e539add39b3b5528a569834f6a5aa85d6c1c4d48f57",
+          "path": "opentelemetry-api/src/opentelemetry/attributes/__init__.py",
+          "start_line": 172,
+          "claim_id": "c3"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-otel-attribute-immutability",
+      "status": "supported",
+      "reason": "Constructor temporarily disables immutability; negative limits fail; zero capacity counts supplied attributes dropped without storing them; mutation guard raises.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "67872263b96fc927eb4271d55670f0d22d9c1b1ecca6df6551422b7487f21ad6",
+      "evidence": [
+        {
+          "end_line": 161,
+          "file_sha256": "40e46fdd33828a889da31e539add39b3b5528a569834f6a5aa85d6c1c4d48f57",
+          "path": "opentelemetry-api/src/opentelemetry/attributes/__init__.py",
+          "start_line": 139,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 201,
+          "file_sha256": "40e46fdd33828a889da31e539add39b3b5528a569834f6a5aa85d6c1c4d48f57",
+          "path": "opentelemetry-api/src/opentelemetry/attributes/__init__.py",
+          "start_line": 190,
+          "claim_id": "c2"
+        },
+        {
+          "end_line": 171,
+          "file_sha256": "40e46fdd33828a889da31e539add39b3b5528a569834f6a5aa85d6c1c4d48f57",
+          "path": "opentelemetry-api/src/opentelemetry/attributes/__init__.py",
+          "start_line": 168,
+          "claim_id": "c3"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-otel-attribute-copy",
+      "status": "supported",
+      "reason": "Deepcopy preserves limits, immutability and dropped while directly deep-copying underlying dict; copy returns shallow dict copy.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "3eb07d245e769ad5ba57c6328398bdafa513e63a6f6e85734c5025a48086e276",
+      "evidence": [
+        {
+          "end_line": 241,
+          "file_sha256": "40e46fdd33828a889da31e539add39b3b5528a569834f6a5aa85d6c1c4d48f57",
+          "path": "opentelemetry-api/src/opentelemetry/attributes/__init__.py",
+          "start_line": 228,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 243,
+          "file_sha256": "40e46fdd33828a889da31e539add39b3b5528a569834f6a5aa85d6c1c4d48f57",
+          "path": "opentelemetry-api/src/opentelemetry/attributes/__init__.py",
+          "start_line": 242,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-otel-context-copy-attach",
+      "status": "supported",
+      "reason": "set_value copies values and constructs a new Context; attach delegates and returns token; detach delegates with exception logging. No implicit attach occurs.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "e740d80b73860b90828f4056e40c532ce295138726ee9c6c9edfd05f55ed87db",
+      "evidence": [
+        {
+          "end_line": 94,
+          "file_sha256": "a979c3f42ea14c0e8309f29e9cf9b2f94af7ff63e963e8d3211e7ad1cc8b0ec6",
+          "path": "opentelemetry-api/src/opentelemetry/context/__init__.py",
+          "start_line": 74,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 118,
+          "file_sha256": "a979c3f42ea14c0e8309f29e9cf9b2f94af7ff63e963e8d3211e7ad1cc8b0ec6",
+          "path": "opentelemetry-api/src/opentelemetry/context/__init__.py",
+          "start_line": 106,
+          "claim_id": "c2"
+        },
+        {
+          "end_line": 147,
+          "file_sha256": "a979c3f42ea14c0e8309f29e9cf9b2f94af7ff63e963e8d3211e7ad1cc8b0ec6",
+          "path": "opentelemetry-api/src/opentelemetry/context/__init__.py",
+          "start_line": 119,
+          "claim_id": "c3"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-otel-baggage-copy",
+      "status": "supported",
+      "reason": "Set and remove copy baggage and call set_value; removing absent key uses pop default; get_all exposes read-only MappingProxyType. Context/baggage questions overlap context mechanics but ask different APIs and edge behavior.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "d12c9dd3d213d14067f7090ddacb51ce51fa81430c2d9aa5969d23485aed6a0e",
+      "evidence": [
+        {
+          "end_line": 69,
+          "file_sha256": "4cea8c0bdf6848885e2b17e357c75ce9cf9279a3e710169ad5886210b8838f5b",
+          "path": "opentelemetry-api/src/opentelemetry/baggage/__init__.py",
+          "start_line": 54,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 85,
+          "file_sha256": "4cea8c0bdf6848885e2b17e357c75ce9cf9279a3e710169ad5886210b8838f5b",
+          "path": "opentelemetry-api/src/opentelemetry/baggage/__init__.py",
+          "start_line": 70,
+          "claim_id": "c2"
+        },
+        {
+          "end_line": 38,
+          "file_sha256": "4cea8c0bdf6848885e2b17e357c75ce9cf9279a3e710169ad5886210b8838f5b",
+          "path": "opentelemetry-api/src/opentelemetry/baggage/__init__.py",
+          "start_line": 25,
+          "claim_id": "c3"
+        },
+        {
+          "end_line": 94,
+          "file_sha256": "a979c3f42ea14c0e8309f29e9cf9b2f94af7ff63e963e8d3211e7ad1cc8b0ec6",
+          "path": "opentelemetry-api/src/opentelemetry/context/__init__.py",
+          "start_line": 74,
+          "claim_id": "c4"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-otel-runtime-fallback",
+      "status": "supported",
+      "reason": "Unset config returns ContextVarsRuntimeContext directly; entry-point lookup/load/instantiation exceptions fall back; module initializes singleton before get_current delegates.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "06e8a6fa1ef17f482a6fe3ff3e9098c3a99dc80b752b1e4b03d110e6a97d981e",
+      "evidence": [
+        {
+          "end_line": 46,
+          "file_sha256": "a979c3f42ea14c0e8309f29e9cf9b2f94af7ff63e963e8d3211e7ad1cc8b0ec6",
+          "path": "opentelemetry-api/src/opentelemetry/context/__init__.py",
+          "start_line": 19,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 105,
+          "file_sha256": "a979c3f42ea14c0e8309f29e9cf9b2f94af7ff63e963e8d3211e7ad1cc8b0ec6",
+          "path": "opentelemetry-api/src/opentelemetry/context/__init__.py",
+          "start_line": 95,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-otel-status-description",
+      "status": "supported",
+      "reason": "Truthy nonstring or non-ERROR description is discarded; empty description passes to assignment. is_ok accepts UNSET and OK.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "b3015f5357f1165a51aa099845c07463a2dcab3c51eb33a42dbd2d86c99146bb",
+      "evidence": [
+        {
+          "end_line": 49,
+          "file_sha256": "a7e825e751ecb11fb09e7004d325bfc02d3cc327eb3edb04599108699a00e014",
+          "path": "opentelemetry-api/src/opentelemetry/trace/status.py",
+          "start_line": 32,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 64,
+          "file_sha256": "a7e825e751ecb11fb09e7004d325bfc02d3cc327eb3edb04599108699a00e014",
+          "path": "opentelemetry-api/src/opentelemetry/trace/status.py",
+          "start_line": 61,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-otel-baggage-validation",
+      "status": "supported",
+      "reason": "Setter stores into copy without helpers; validator splits semicolon properties and trims trailing space/tab from first portion; every property is separately matched; pair combines key/value helpers.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "2d014e4cbe076b5ab9b4eb0207fe50cace6a353eb3f48a0f371309b6ad4b77df",
+      "evidence": [
+        {
+          "end_line": 69,
+          "file_sha256": "4cea8c0bdf6848885e2b17e357c75ce9cf9279a3e710169ad5886210b8838f5b",
+          "path": "opentelemetry-api/src/opentelemetry/baggage/__init__.py",
+          "start_line": 54,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 120,
+          "file_sha256": "4cea8c0bdf6848885e2b17e357c75ce9cf9279a3e710169ad5886210b8838f5b",
+          "path": "opentelemetry-api/src/opentelemetry/baggage/__init__.py",
+          "start_line": 109,
+          "claim_id": "c2"
+        },
+        {
+          "end_line": 122,
+          "file_sha256": "4cea8c0bdf6848885e2b17e357c75ce9cf9279a3e710169ad5886210b8838f5b",
+          "path": "opentelemetry-api/src/opentelemetry/baggage/__init__.py",
+          "start_line": 121,
+          "claim_id": "c3"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-datasets-size-units",
+      "status": "supported",
+      "reason": "The explicit MB branch applies decimal scale then lowercase-b integer bit conversion; MiB uses powers of two. int on numeric substring rejects 1.5. Relevant suffix branches read directly.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "5f9452bc983690f539ef437203c99d691f1cd13c11fe7d3bb739cdcaa3b0dbe5",
+      "evidence": [
+        {
+          "end_line": 136,
+          "file_sha256": "286b1899798e5c3dd01d131ddda151617a63e3b6e24d2470b73514f9dd259bc5",
+          "path": "src/datasets/utils/py_utils.py",
+          "start_line": 95,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-datasets-zero-display",
+      "status": "supported",
+      "reason": "size_str checks input falsiness, while converter first returns int inputs unchanged. Zero asymmetry follows different function guards.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "613e0cbe8a781c2d7d80f444f2964ee779772df87a5fa271c93d2ebcedea610f",
+      "evidence": [
+        {
+          "end_line": 109,
+          "file_sha256": "286b1899798e5c3dd01d131ddda151617a63e3b6e24d2470b73514f9dd259bc5",
+          "path": "src/datasets/utils/py_utils.py",
+          "start_line": 71,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-datasets-temporary-attribute",
+      "status": "supported",
+      "reason": "getattr default None is saved; finally always restores using setattr, including absent original attribute and exception exit.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "5fb339f63cd82b91a3bf852726ffcbece4d35d0d229f6810e7835d54444d0aba",
+      "evidence": [
+        {
+          "end_line": 240,
+          "file_sha256": "286b1899798e5c3dd01d131ddda151617a63e3b6e24d2470b73514f9dd259bc5",
+          "path": "src/datasets/utils/py_utils.py",
+          "start_line": 231,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-datasets-temporary-seed",
+      "status": "supported",
+      "reason": "Read full contextmanager: numpy and optional torch states saved/seeded before yield and restored in finally. No Python random call. Successfully-entered scope excludes pre-yield setup failures.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "64f118ed741f4444c3b82ef45a5633687b9e61cb41beabde540fd196945e0ae5",
+      "evidence": [
+        {
+          "end_line": 296,
+          "file_sha256": "286b1899798e5c3dd01d131ddda151617a63e3b6e24d2470b73514f9dd259bc5",
+          "path": "src/datasets/utils/py_utils.py",
+          "start_line": 242,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-datasets-null-v-empty",
+      "status": "supported",
+      "reason": "First helper only excludes None; second additionally excludes empty list/dict. Empty string at index3 passes. Accurate concrete example.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "5e17bb3162397bf2d0a8b1db252504dd61e68e4426ee3c3b43f45aa459ded2eb",
+      "evidence": [
+        {
+          "end_line": 328,
+          "file_sha256": "286b1899798e5c3dd01d131ddda151617a63e3b6e24d2470b73514f9dd259bc5",
+          "path": "src/datasets/utils/py_utils.py",
+          "start_line": 314,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-datasets-zip-dict-mismatch",
+      "status": "supported",
+      "reason": "unique_values preserves encounter order; zip_dict indexes every mapping for first-seen union keys, raising on absent key rather than padding. Both functions cited.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "424711e0eb14f227681031b970c2e8eefc49f67e4616b93cc91928c3f8314c2a",
+      "evidence": [
+        {
+          "end_line": 303,
+          "file_sha256": "286b1899798e5c3dd01d131ddda151617a63e3b6e24d2470b73514f9dd259bc5",
+          "path": "src/datasets/utils/py_utils.py",
+          "start_line": 296,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 334,
+          "file_sha256": "286b1899798e5c3dd01d131ddda151617a63e3b6e24d2470b73514f9dd259bc5",
+          "path": "src/datasets/utils/py_utils.py",
+          "start_line": 330,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-datasets-nonmutable-update",
+      "status": "supported",
+      "reason": "Conflict preflight uses any before super.update; assignment checks key independently; constructor consumes only error_msg then rejects other kwargs. Claim explicitly bounded to this conflict case.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "fa592792cbea70b5b357fe0bf95490d662603ec7d42a74629b7f65a05f5257c8",
+      "evidence": [
+        {
+          "end_line": 362,
+          "file_sha256": "286b1899798e5c3dd01d131ddda151617a63e3b6e24d2470b73514f9dd259bc5",
+          "path": "src/datasets/utils/py_utils.py",
+          "start_line": 337,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-datasets-pool-worker-death",
+      "status": "supported",
+      "reason": "PID set is captured and compared during queue polling; change sets pool_changed before raising. Finally avoids async get when changed, distinct from ordinary slow pool.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "236c66472867bc27fc450ee4fb413755925ee732825e812d3796652c8d0bbd18",
+      "evidence": [
+        {
+          "end_line": 627,
+          "file_sha256": "286b1899798e5c3dd01d131ddda151617a63e3b6e24d2470b73514f9dd259bc5",
+          "path": "src/datasets/utils/py_utils.py",
+          "start_line": 590,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-datasets-pool-error-propagation",
+      "status": "supported",
+      "reason": "Normal empty-queue completion additionally requires all async results ready; finally calls get for result errors unless worker set changed. Distinct error-propagation path from worker death although same function.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "695526caa3934673dd74bbddda5784ebe96fba25ee2259acfb4535527bb650d8",
+      "evidence": [
+        {
+          "end_line": 627,
+          "file_sha256": "286b1899798e5c3dd01d131ddda151617a63e3b6e24d2470b73514f9dd259bc5",
+          "path": "src/datasets/utils/py_utils.py",
+          "start_line": 594,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-datasets-batch-tail",
+      "status": "supported",
+      "reason": "Generator rejects n<1 when advanced, yields full list batches, and nonempty unpadded remainder. Empty iterable leaves no yield.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "3282ca056fd40bfacb8130588da9097fa47abf19df21c8fc481e9ec33127e86b",
+      "evidence": [
+        {
+          "end_line": 640,
+          "file_sha256": "286b1899798e5c3dd01d131ddda151617a63e3b6e24d2470b73514f9dd259bc5",
+          "path": "src/datasets/utils/py_utils.py",
+          "start_line": 630,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-nushell-take-filesize",
+      "status": "supported",
+      "reason": "Both numeric forms pass usize conversion; filesize counts trigger an additional binary/ByteStream input check, excluding lists. ByteStream still requires binary coercibility in later branch.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "319b87168be0b9871a5812293e06ed45e0ae54cfbeaaba9bfd61758576d7ea3a",
+      "evidence": [
+        {
+          "end_line": 74,
+          "file_sha256": "7f664a9e53046cf9f737c058db56a08259aa89672bdfac550b1ff21a2a22cf7c",
+          "path": "crates/nu-command/src/filters/take/take_.rs",
+          "start_line": 47,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-nushell-take-mime",
+      "status": "supported",
+      "reason": "Binary and binary-coercible stream take branches unconditionally clear content type regardless count. List/range and ListStream pass metadata through.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "70c7ce78367c2b54e1d500ef2fd34c45494113f1271cf09cfc2b1038f00a735c",
+      "evidence": [
+        {
+          "end_line": 103,
+          "file_sha256": "7f664a9e53046cf9f737c058db56a08259aa89672bdfac550b1ff21a2a22cf7c",
+          "path": "crates/nu-command/src/filters/take/take_.rs",
+          "start_line": 77,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 128,
+          "file_sha256": "7f664a9e53046cf9f737c058db56a08259aa89672bdfac550b1ff21a2a22cf7c",
+          "path": "crates/nu-command/src/filters/take/take_.rs",
+          "start_line": 115,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-nushell-skip-zero-mime",
+      "status": "supported",
+      "reason": "Omitted count defaults one and explicit counts convert nonnegative usize; binary metadata clearing is conditional n>0 in both branches.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "1e29a3a943ed6680bf64bffd98cbc489621eb475dd428ce57b4fab67e0dfac4d",
+      "evidence": [
+        {
+          "end_line": 104,
+          "file_sha256": "bd0ca0d931e4e0fc800bde8975fec6e257c8e86e7596cce4ae71823e2b4fe738",
+          "path": "crates/nu-command/src/filters/skip/skip_.rs",
+          "start_line": 80,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 163,
+          "file_sha256": "bd0ca0d931e4e0fc800bde8975fec6e257c8e86e7596cce4ae71823e2b4fe738",
+          "path": "crates/nu-command/src/filters/skip/skip_.rs",
+          "start_line": 131,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-nushell-take-first-shape",
+      "status": "supported",
+      "reason": "first records rows.is_none before defaulting to one, then returns scalar only for omitted count. Explicit count yields list while take uses list iterator. Cross-file comparison is supported.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "ce8bb41f7d9b852a0d9864c821a58a67bfed669444957cda1aba918466753c30",
+      "evidence": [
+        {
+          "end_line": 132,
+          "file_sha256": "6a18c43bb9489f1aa9a269e9144a341f868a9e955d08bc2bfea5faf28c9ada09",
+          "path": "crates/nu-command/src/filters/first.rs",
+          "start_line": 118,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 198,
+          "file_sha256": "6a18c43bb9489f1aa9a269e9144a341f868a9e955d08bc2bfea5faf28c9ada09",
+          "path": "crates/nu-command/src/filters/first.rs",
+          "start_line": 177,
+          "claim_id": "c2"
+        },
+        {
+          "end_line": 86,
+          "file_sha256": "7f664a9e53046cf9f737c058db56a08259aa89672bdfac550b1ff21a2a22cf7c",
+          "path": "crates/nu-command/src/filters/take/take_.rs",
+          "start_line": 77,
+          "claim_id": "c3"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-nushell-first-zero-work",
+      "status": "supported",
+      "reason": "Zero-count branch precedes main match and returns empty binary for binary-coercible input with MIME removed, otherwise empty list retaining metadata. No reader/query call in branch.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "0bd76fb0026aadb148e33eff1452a89ed35848f9b0e5be101b52f087ccd9f7ee",
+      "evidence": [
+        {
+          "end_line": 174,
+          "file_sha256": "6a18c43bb9489f1aa9a269e9144a341f868a9e955d08bc2bfea5faf28c9ada09",
+          "path": "crates/nu-command/src/filters/first.rs",
+          "start_line": 147,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-nushell-first-empty-strict",
+      "status": "supported",
+      "reason": "Empty omitted-count list returns nothing or strict AccessEmptyContent; explicit count follows list-preserving branch, including empty list.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "eecb0313cf0e8af0aa6b2a104d87a71884ba89ac2fcc0cad4e9b9f771c882ccb",
+      "evidence": [
+        {
+          "end_line": 198,
+          "file_sha256": "6a18c43bb9489f1aa9a269e9144a341f868a9e955d08bc2bfea5faf28c9ada09",
+          "path": "crates/nu-command/src/filters/first.rs",
+          "start_line": 177,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-nushell-last-stream-space",
+      "status": "supported",
+      "reason": "Deque drops front when at requested bound before each push, consumes iterator, and checks signals per iteration. Does not retain entire source list stream.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "846be370a5bc441981ca634b9ae965ed29851e0b8ba4e4be2201a589d0edd796",
+      "evidence": [
+        {
+          "end_line": 196,
+          "file_sha256": "605a275cfa84e11976e5e8683c8b85ae0a3bf16e1676edc7cf6e0cd5d8a72e36",
+          "path": "crates/nu-command/src/filters/last.rs",
+          "start_line": 169,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-nushell-last-byte-chunks",
+      "status": "supported",
+      "reason": "Revised answer qualifies nonempty EOF integer and correctly includes empty EOF nothing/strict AccessEmptyContent. 8192-byte chunk copying and deque tail trimming match cited source.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "5866b9c1905645efefae515aef1c887e9e494bcca44e56b8dc1b27ce6d21bea7",
+      "evidence": [
+        {
+          "end_line": 344,
+          "file_sha256": "605a275cfa84e11976e5e8683c8b85ae0a3bf16e1676edc7cf6e0cd5d8a72e36",
+          "path": "crates/nu-command/src/filters/last.rs",
+          "start_line": 310,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-nushell-last-list-oversize",
+      "status": "supported",
+      "reason": "saturating_sub avoids underflow; zero starting index shares list, otherwise clones suffix. Oversized request returns whole list.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "b8f0055945a56058793709ec386157c5525046ec2cef65ff6b3d16ff661df233",
+      "evidence": [
+        {
+          "end_line": 219,
+          "file_sha256": "605a275cfa84e11976e5e8683c8b85ae0a3bf16e1676edc7cf6e0cd5d8a72e36",
+          "path": "crates/nu-command/src/filters/last.rs",
+          "start_line": 198,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-nushell-last-zero-strict",
+      "status": "supported",
+      "reason": "Zero early branch returns empty binary/list without reaching stream reader or omitted-count strict EOF checks; distinguishes no-read zero request from suffix consumption.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "tracking_remote",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "035455e3cd71de5925ec47bdd812abcb44df86ab9bf8d3f151cfcad79917597f",
+      "evidence": [
+        {
+          "end_line": 167,
+          "file_sha256": "605a275cfa84e11976e5e8683c8b85ae0a3bf16e1676edc7cf6e0cd5d8a72e36",
+          "path": "crates/nu-command/src/filters/last.rs",
+          "start_line": 137,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 342,
+          "file_sha256": "605a275cfa84e11976e5e8683c8b85ae0a3bf16e1676edc7cf6e0cd5d8a72e36",
+          "path": "crates/nu-command/src/filters/last.rs",
+          "start_line": 325,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-pnpm-env-null-array",
+      "status": "supported",
+      "reason": "parse_tri_array deserializes Vec<String> and maps Some; null cannot produce Some(None), matching all requested input cases.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "33e641b16be21f20ab525aa6b9eb21fae7807115d7b7c6a3e9926e78940ee66b",
+      "evidence": [
+        {
+          "end_line": 36,
+          "file_sha256": "b6c4039cbc6cc337e6d9d83b5f6314246c425dd724ef9e7b58d9ef97e30e6c51",
+          "path": "pnpm/crates/config/src/env_overlay/parse.rs",
+          "start_line": 24,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-pnpm-env-enum",
+      "status": "supported",
+      "reason": "Read both parser functions and macros: only enum macro invokes quote fallback; numeric JSON macro assigns only successful parsing.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "d29ecee511eee8b5028cb7328fb8ec65866c9da3883ba046582c0504092f0c20",
+      "evidence": [
+        {
+          "end_line": 21,
+          "file_sha256": "b6c4039cbc6cc337e6d9d83b5f6314246c425dd724ef9e7b58d9ef97e30e6c51",
+          "path": "pnpm/crates/config/src/env_overlay/parse.rs",
+          "start_line": 4,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 72,
+          "file_sha256": "00c61437f06216126b902eb1cd2c2242138a1c744373a5e1f60a82d9a54be8cf",
+          "path": "pnpm/crates/config/src/env_overlay.rs",
+          "start_line": 29,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-pnpm-env-string-clear",
+      "status": "supported",
+      "reason": "String and tri-string macros plus explicit-map readers show empty filtering versus preservation and absent explicit-null state.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "4a439322cbf99fa3185f6c4bcf98ab5c08614221e78cc482a93a1698eaeb6c65",
+      "evidence": [
+        {
+          "end_line": 85,
+          "file_sha256": "00c61437f06216126b902eb1cd2c2242138a1c744373a5e1f60a82d9a54be8cf",
+          "path": "pnpm/crates/config/src/env_overlay.rs",
+          "start_line": 39,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 120,
+          "file_sha256": "00c61437f06216126b902eb1cd2c2242138a1c744373a5e1f60a82d9a54be8cf",
+          "path": "pnpm/crates/config/src/env_overlay.rs",
+          "start_line": 109,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-pnpm-kebab-validation",
+      "status": "supported",
+      "reason": "Predicate checks second segment then lowercase-led nonempty segments; all four examples and camel predicate follow directly.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "f900a0833e726f0946e1d419dea57803efc9aaeabfe52a251ee20b54338e74f2",
+      "evidence": [
+        {
+          "end_line": 44,
+          "file_sha256": "1fc32095ec92606ee6f266c10b580e4d877bcee50812bb34093e4d0660de52e8",
+          "path": "pnpm/crates/config/src/naming_cases.rs",
+          "start_line": 9,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-pnpm-acronym-normalize",
+      "status": "supported",
+      "reason": "Traced XML/Http/2/Request through uppercase lookahead and letter-digit transitions; converters yield the stated exact strings.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "5dd3ff590d96f9e2f7197523fd0c697ca8e10159f948fec0ec2729ac8a99c07f",
+      "evidence": [
+        {
+          "end_line": 74,
+          "file_sha256": "1fc32095ec92606ee6f266c10b580e4d877bcee50812bb34093e4d0660de52e8",
+          "path": "pnpm/crates/config/src/naming_cases.rs",
+          "start_line": 46,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 137,
+          "file_sha256": "1fc32095ec92606ee6f266c10b580e4d877bcee50812bb34093e4d0660de52e8",
+          "path": "pnpm/crates/config/src/naming_cases.rs",
+          "start_line": 77,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-pnpm-separator-normalize",
+      "status": "supported",
+      "reason": "Non-ASCII-alphanumeric branch flushes, clears previous state; push_word prevents empty words.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "f3f6f815d5328fce725659d7e7f93fa057279db991ed2225529fdadfc52e9e60",
+      "evidence": [
+        {
+          "end_line": 111,
+          "file_sha256": "1fc32095ec92606ee6f266c10b580e4d877bcee50812bb34093e4d0660de52e8",
+          "path": "pnpm/crates/config/src/naming_cases.rs",
+          "start_line": 77,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-pnpm-global-path-order",
+      "status": "supported",
+      "reason": "Validation branches are PATH present, membership, then conditional write probe; skip flag affects only final branch.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "81709d761510a7689cdfda910cddac0f0da0a18f4665a455e06616bcbeef7776",
+      "evidence": [
+        {
+          "end_line": 72,
+          "file_sha256": "a43b45cac6f0a45b46ac534e2b702e4cba240033e3db07657b70f362c038cd5a",
+          "path": "pnpm/crates/config/src/global_bin_check.rs",
+          "start_line": 45,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-pnpm-global-symlink",
+      "status": "supported",
+      "reason": "Configured global directory alone is canonicalized; each comparison uses lexical normalization without resolving PATH entry symlinks.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "2ac33fcca4d428dca3197660c34a0cc79b00ae0c1ffa7abe0fc089f29d0656d6",
+      "evidence": [
+        {
+          "end_line": 82,
+          "file_sha256": "a43b45cac6f0a45b46ac534e2b702e4cba240033e3db07657b70f362c038cd5a",
+          "path": "pnpm/crates/config/src/global_bin_check.rs",
+          "start_line": 74,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 139,
+          "file_sha256": "a43b45cac6f0a45b46ac534e2b702e4cba240033e3db07657b70f362c038cd5a",
+          "path": "pnpm/crates/config/src/global_bin_check.rs",
+          "start_line": 111,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-pnpm-global-probe",
+      "status": "supported",
+      "reason": "Exclusive create_new plus process/time/counter name, five collision iterations, cleanup and other-error false behavior all present.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "e830402c5753b264900b61613ad65abba16220908111ef624eccc667c13ece1c",
+      "evidence": [
+        {
+          "end_line": 168,
+          "file_sha256": "a43b45cac6f0a45b46ac534e2b702e4cba240033e3db07657b70f362c038cd5a",
+          "path": "pnpm/crates/config/src/global_bin_check.rs",
+          "start_line": 141,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-pnpm-windows-path-hint",
+      "status": "supported",
+      "reason": "Paired percent segments require nonempty content and windows filter; lone/empty percent cases fall back to setup guidance.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "a9d4d14efcaf49c0de601f3b3a504126888b7e7484545622f9a7203c6ef349a6",
+      "evidence": [
+        {
+          "end_line": 109,
+          "file_sha256": "a43b45cac6f0a45b46ac534e2b702e4cba240033e3db07657b70f362c038cd5a",
+          "path": "pnpm/crates/config/src/global_bin_check.rs",
+          "start_line": 84,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-jq-raw0-nul",
+      "status": "supported",
+      "reason": "Verified raw string branch orders ASCII dumping before NUL-length comparison, and option parsing sets all framing flags.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "b899ff85149d975e27ff23e3e6f68b30add8f8bed8a4f6ac26cb0b00303d3b7f",
+      "evidence": [
+        {
+          "end_line": 208,
+          "file_sha256": "4023f8b833982e1e6abace084995f7214bda7e54b8753c75d31c319d827cc263",
+          "path": "src/main.c",
+          "start_line": 180,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 388,
+          "file_sha256": "4023f8b833982e1e6abace084995f7214bda7e54b8753c75d31c319d827cc263",
+          "path": "src/main.c",
+          "start_line": 383,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-jq-raw-nonstrings",
+      "status": "supported",
+      "reason": "RAW_OUTPUT condition explicitly requires string kind; false/null take JSON dump with null-kind status.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "a607c9429f293b9e4454d232f148df854741b6a70e1040e660e8534a6eac8d2a",
+      "evidence": [
+        {
+          "end_line": 202,
+          "file_sha256": "4023f8b833982e1e6abace084995f7214bda7e54b8753c75d31c319d827cc263",
+          "path": "src/main.c",
+          "start_line": 180,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-jq-color-precedence",
+      "status": "supported",
+      "reason": "Option parsing ORs both bits; post-parse COLOR then NO_COLOR operations establish monochrome precedence independent of order.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "7525ca4a9e11992450a22aeabb860952fd5e66841f306877e489c1dbcc98c89f",
+      "evidence": [
+        {
+          "end_line": 566,
+          "file_sha256": "4023f8b833982e1e6abace084995f7214bda7e54b8753c75d31c319d827cc263",
+          "path": "src/main.c",
+          "start_line": 556,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-jq-indent-validation",
+      "status": "supported",
+      "reason": "strtol conversion checks errno, [-1,7], leading whitespace, no conversion and trailing byte before resetting indent/tab flags.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "8f4f3fa2816b93b39e8750fc5ce0c8e28d9db6195629cc17500ff0c936c0ccb2",
+      "evidence": [
+        {
+          "end_line": 446,
+          "file_sha256": "4023f8b833982e1e6abace084995f7214bda7e54b8753c75d31c319d827cc263",
+          "path": "src/main.c",
+          "start_line": 431,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-jq-arg-first-wins",
+      "status": "supported",
+      "reason": "Both assignments guarded by object_has; argjson parser resides within guard and parameters always consumed.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "0737381e17fe431b0ff68e8fcd7536ff86169a00e836d94e305a429202415fec",
+      "evidence": [
+        {
+          "end_line": 482,
+          "file_sha256": "4023f8b833982e1e6abace084995f7214bda7e54b8753c75d31c319d827cc263",
+          "path": "src/main.c",
+          "start_line": 461,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-jq-rawfile-errors",
+      "status": "supported",
+      "reason": "Shared load branch passes raw discriminator, skips duplicate keys, emits load error and jumps out with system status.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "d14aecc9c145a17c05abdbcb2b996aab04c3be56dd5412d93a4ebea3c0aef3cc",
+      "evidence": [
+        {
+          "end_line": 502,
+          "file_sha256": "4023f8b833982e1e6abace084995f7214bda7e54b8753c75d31c319d827cc263",
+          "path": "src/main.c",
+          "start_line": 483,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-jq-sequence-errors",
+      "status": "supported",
+      "reason": "Verified JV_PARSE_SEQ flag, nonfatal sequence error loop, and RS prefix only in JSON/non-raw-string branch.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "1f99f1b6dabcf5dae65299d9a49221c8a146f2c63774ebcf2f3c9f08a594cd30",
+      "evidence": [
+        {
+          "end_line": 661,
+          "file_sha256": "4023f8b833982e1e6abace084995f7214bda7e54b8753c75d31c319d827cc263",
+          "path": "src/main.c",
+          "start_line": 655,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 700,
+          "file_sha256": "4023f8b833982e1e6abace084995f7214bda7e54b8753c75d31c319d827cc263",
+          "path": "src/main.c",
+          "start_line": 690,
+          "claim_id": "c2"
+        },
+        {
+          "end_line": 202,
+          "file_sha256": "4023f8b833982e1e6abace084995f7214bda7e54b8753c75d31c319d827cc263",
+          "path": "src/main.c",
+          "start_line": 194,
+          "claim_id": "c3"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-jq-null-input-reader",
+      "status": "supported",
+      "reason": "Callback set before PROVIDE_NULL branch, which replaces outer loop with one process(null) call rather than removing callback.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "7b1aafc969f3be4e004bd53d6108743ad6145257e891b7380f06afcbe8ab0a87",
+      "evidence": [
+        {
+          "end_line": 676,
+          "file_sha256": "4023f8b833982e1e6abace084995f7214bda7e54b8753c75d31c319d827cc263",
+          "path": "src/main.c",
+          "start_line": 658,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-jq-halt-diagnostics",
+      "status": "supported",
+      "reason": "Separate halt and exception paths match numeric exit code and string/null/other diagnostics exactly.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "ca92a45090efc6cb1a5954546967e5ca4025cd668935e5fe5794fe27fcb4bdca",
+      "evidence": [
+        {
+          "end_line": 232,
+          "file_sha256": "4023f8b833982e1e6abace084995f7214bda7e54b8753c75d31c319d827cc263",
+          "path": "src/main.c",
+          "start_line": 210,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 245,
+          "file_sha256": "4023f8b833982e1e6abace084995f7214bda7e54b8753c75d31c319d827cc263",
+          "path": "src/main.c",
+          "start_line": 233,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-jq-library-defaults",
+      "status": "supported",
+      "reason": "First -L creates array, repeats append realpath, missing arg dies; default array created only while value remains null.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "d2803e06b7153d7f515887a13667b84329f1f0f3558bf1984620cc42ef99f2da",
+      "evidence": [
+        {
+          "end_line": 419,
+          "file_sha256": "4023f8b833982e1e6abace084995f7214bda7e54b8753c75d31c319d827cc263",
+          "path": "src/main.c",
+          "start_line": 407,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 577,
+          "file_sha256": "4023f8b833982e1e6abace084995f7214bda7e54b8753c75d31c319d827cc263",
+          "path": "src/main.c",
+          "start_line": 571,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-biome-readonly-insert",
+      "status": "supported",
+      "reason": "Direct insert/remove ignore allow_write while open rejects any listed mutation flag before map access.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "947ee1cf5b98fae1df7972917ba432adccf0fe58c8fa685d501f78b2c73e90c9",
+      "evidence": [
+        {
+          "end_line": 112,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 86,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 144,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 131,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-biome-create-existing",
+      "status": "supported",
+      "reason": "Occupied create replaces Arc with empty Vec; create branch wins when create_new also true.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "0b9c5fc889e4a2d57170ad312107a90addbe009840e4fb30cb5f2959577a62a4",
+      "evidence": [
+        {
+          "end_line": 172,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 146,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-biome-create-handle-isolation",
+      "status": "supported",
+      "reason": "Confirmed FileEntry Arc ownership and MemoryFile ArcMutexGuard; insert/create replace allocation rather than mutate old allocation.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "9ea2e7d5a3e592108dcf75040f31e5117b093a34b9c07b6d45f42918446e22b7",
+      "evidence": [
+        {
+          "end_line": 65,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 52,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 103,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 100,
+          "claim_id": "c2"
+        },
+        {
+          "end_line": 162,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 157,
+          "claim_id": "c3"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-biome-read-append",
+      "status": "supported",
+      "reason": "Permission and UTF8 validation precede push_str, so success appends and failures leave destination untouched.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "d6395539b3c61c5f10d4047fd243f4b423b8fd15fb53e48883b45a432ffd658b",
+      "evidence": [
+        {
+          "end_line": 278,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 263,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-biome-write-version",
+      "status": "supported",
+      "reason": "Every constructed handle gets version0; set_content changes shared buffer but increments the handle field only.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "7fc824f5759362cfadb2fa8c53918befbc81649b3875da752710f4dbfad118fb",
+      "evidence": [
+        {
+          "end_line": 193,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 188,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 299,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 280,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-biome-directory-existence",
+      "status": "supported",
+      "reason": "Exact map membership differs from descendant-prefix directory inference; File and Directory flags false for symlink.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "24558e73b089d654056ed48b3884b03ff44c7cca46e691a71dbc08136d8f00e0",
+      "evidence": [
+        {
+          "end_line": 222,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 203,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-biome-change-callback-once",
+      "status": "supported",
+      "reason": "Defaults wrap Vec::new in Option<Box<FnOnce>>; take().unwrap() consumes it and second access panics.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "35affbd93bc4ce0f78c6de27defeacaae1dfb0ac5ead4ccf5e1c0a7577c5be07",
+      "evidence": [
+        {
+          "end_line": 47,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 36,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 246,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 228,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-biome-symlink-limit",
+      "status": "supported",
+      "reason": "read_link unconditionally Unsupported, symlink kind delegates ordinary kinds; synthetic error traversal is independent metadata only.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "b82291993604177959c4435d1a66b7127838fb64d21d930bccfa37a1d9f4ba77",
+      "evidence": [
+        {
+          "end_line": 226,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 224,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 254,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 248,
+          "claim_id": "c2"
+        },
+        {
+          "end_line": 348,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 332,
+          "claim_id": "c3"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-biome-traversal-filter",
+      "status": "supported",
+      "reason": "Source interns paths before can_handle and store_path; error loop does not invoke can_handle and emits warnings.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "f9e0990ae0666618655aaada6a02dfb47e7b59e3bc3c164392ee82e4c38124b6",
+      "evidence": [
+        {
+          "end_line": 330,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 307,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 348,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 332,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-biome-truncate-missing",
+      "status": "supported",
+      "reason": "Lookup-only path raises NotFound without create flags; truncate clear occurs only after a buffer is acquired.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "13bfaf356e00f2f8a51eb9dd5abacadc0ee334fd615820caa2d1088501406734",
+      "evidence": [
+        {
+          "end_line": 186,
+          "file_sha256": "12be1d2616cdb02ee4508b8f8cb59c2c887f84fb7a31f3f2ffa54ed070f61361",
+          "path": "crates/biome_fs/src/fs/memory.rs",
+          "start_line": 146,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-ruff-map-order",
+      "status": "supported",
+      "reason": "Map writes count then key-sorted key/value pairs, giving deterministic encoded sequence independent of hash iteration.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "2d1cec65e3390cb576e16cca164c9df678c79a92a1e5c749aa3f2c6025265ec0",
+      "evidence": [
+        {
+          "end_line": 327,
+          "file_sha256": "f335fb53a18288fdcb6e308774542a0b162dcec466787ae8fff176d820c12955",
+          "path": "crates/ruff_cache/src/cache_key.rs",
+          "start_line": 312,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-ruff-set-order",
+      "status": "supported",
+      "reason": "HashSet explicitly sorts while BTreeSet iterates directly; both write len first.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "f41a79e190a21660fe09cf5337de92ce9fc5cded226816915435f8003009c31e",
+      "evidence": [
+        {
+          "end_line": 345,
+          "file_sha256": "f335fb53a18288fdcb6e308774542a0b162dcec466787ae8fff176d820c12955",
+          "path": "crates/ruff_cache/src/cache_key.rs",
+          "start_line": 329,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-ruff-option-tag",
+      "status": "supported",
+      "reason": "Option implementation emits distinct usize0/1 prefixes before any inner emission; does not claim hash collision impossibility.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "961971b90575b08c144d8807af00a05b4764dd66d33dcd962dda6df5b1c73598",
+      "evidence": [
+        {
+          "end_line": 278,
+          "file_sha256": "f335fb53a18288fdcb6e308774542a0b162dcec466787ae8fff176d820c12955",
+          "path": "crates/ruff_cache/src/cache_key.rs",
+          "start_line": 267,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-ruff-slice-framing",
+      "status": "supported",
+      "reason": "Trait helper only loops; Vec/slice wrappers independently add length before helper.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "81c77f74a395e52d38595156768ce814ead64c402a7e542473e1a7eab52d0bd2",
+      "evidence": [
+        {
+          "end_line": 85,
+          "file_sha256": "f335fb53a18288fdcb6e308774542a0b162dcec466787ae8fff176d820c12955",
+          "path": "crates/ruff_cache/src/cache_key.rs",
+          "start_line": 74,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 286,
+          "file_sha256": "f335fb53a18288fdcb6e308774542a0b162dcec466787ae8fff176d820c12955",
+          "path": "crates/ruff_cache/src/cache_key.rs",
+          "start_line": 280,
+          "claim_id": "c2"
+        },
+        {
+          "end_line": 310,
+          "file_sha256": "f335fb53a18288fdcb6e308774542a0b162dcec466787ae8fff176d820c12955",
+          "path": "crates/ruff_cache/src/cache_key.rs",
+          "start_line": 302,
+          "claim_id": "c3"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-ruff-borrow-identity",
+      "status": "supported",
+      "reason": "Reference, mutable reference and Cow implementations dereference only, with no address/ownership tag.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "1ab0c5ae4e56bee02e37ba11974b2a9bd29eed516dd2415c7891aef0a3e65039",
+      "evidence": [
+        {
+          "end_line": 300,
+          "file_sha256": "f335fb53a18288fdcb6e308774542a0b162dcec466787ae8fff176d820c12955",
+          "path": "crates/ruff_cache/src/cache_key.rs",
+          "start_line": 288,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 381,
+          "file_sha256": "f335fb53a18288fdcb6e308774542a0b162dcec466787ae8fff176d820c12955",
+          "path": "crates/ruff_cache/src/cache_key.rs",
+          "start_line": 374,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-ruff-regex-flags",
+      "status": "supported",
+      "reason": "Regex/Pattern methods encode only as_str; claim correctly restricts omission to flags not present in that string.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "b5f70143e1b739a6b61ab34d034dccd763d4df810c3a2f8d4272c6ef72edcf35",
+      "evidence": [
+        {
+          "end_line": 393,
+          "file_sha256": "f335fb53a18288fdcb6e308774542a0b162dcec466787ae8fff176d820c12955",
+          "path": "crates/ruff_cache/src/cache_key.rs",
+          "start_line": 383,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-ruff-glob-matcher",
+      "status": "supported",
+      "reason": "Read separate globset module: matcher\u2192Glob\u2192glob string delegation, no compiled automaton serialization.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "e3ccbb717e6c471b251b77151d7a45cd56473dbe4f340d6360ab67e0d20e9ed4",
+      "evidence": [
+        {
+          "end_line": 15,
+          "file_sha256": "f5bc73cf0ce833d885ff3a1a4a28adcbd8aed4dca49ba2fa8a19dd2fb3a05f56",
+          "path": "crates/ruff_cache/src/globset.rs",
+          "start_line": 1,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-ruff-path-resolution",
+      "status": "supported",
+      "reason": "PathBuf delegates as_path and Path loops components.hash, never calling filesystem resolution/content APIs.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "e966ec82892150354e62aa98764834d39de74fc23822c882c55464bcf1a3b817",
+      "evidence": [
+        {
+          "end_line": 372,
+          "file_sha256": "f335fb53a18288fdcb6e308774542a0b162dcec466787ae8fff176d820c12955",
+          "path": "crates/ruff_cache/src/cache_key.rs",
+          "start_line": 358,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-ruff-tuple-framing",
+      "status": "supported",
+      "reason": "Unit macro body empty; nonempty body invokes each bound element without tuple tag/count.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "f5107c5d5cafdbba5417829556acecbdf13cb43b38fba088d17e58d0af57d53a",
+      "evidence": [
+        {
+          "end_line": 226,
+          "file_sha256": "f335fb53a18288fdcb6e308774542a0b162dcec466787ae8fff176d820c12955",
+          "path": "crates/ruff_cache/src/cache_key.rs",
+          "start_line": 207,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-ruff-portable-guarantee",
+      "status": "supported",
+      "reason": "Portability docs explicitly nonstrict and warn Hash portability; concrete SeaHasher forwarding supplies no cryptographic claim.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "c0803ae208bacaf66e34aef022fc4f81e55ea50a9a0f60daf63aa4314cab6fe3",
+      "evidence": [
+        {
+          "end_line": 72,
+          "file_sha256": "f335fb53a18288fdcb6e308774542a0b162dcec466787ae8fff176d820c12955",
+          "path": "crates/ruff_cache/src/cache_key.rs",
+          "start_line": 57,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 420,
+          "file_sha256": "f335fb53a18288fdcb6e308774542a0b162dcec466787ae8fff176d820c12955",
+          "path": "crates/ruff_cache/src/cache_key.rs",
+          "start_line": 395,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-zed-register-twice",
+      "status": "supported",
+      "reason": "Registration TypeId closure confirmed at416; occupied entry returns without recomputing or resetting existing value.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "f21f70e4ab0d027788b342cca64ef46a1c09fa73e16d5a9ff908ed359d6992fe",
+      "evidence": [
+        {
+          "end_line": 436,
+          "file_sha256": "e9c83c4478018cac8356152b38af3794398bae6253ba3a22583eb3205e8cadf8",
+          "path": "crates/settings/src/settings_store.rs",
+          "start_line": 426,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-zed-typed-lookup",
+      "status": "supported",
+      "reason": "get unwrap/expect and try_get map/and_then operate on same TypeId storage; missing/downcast behavior matches.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "0553eb7e134de37ea3f34bb6355acd93a7475a68633e0314824f8c97a42d69fb",
+      "evidence": [
+        {
+          "end_line": 463,
+          "file_sha256": "e9c83c4478018cac8356152b38af3794398bae6253ba3a22583eb3205e8cadf8",
+          "path": "crates/settings/src/settings_store.rs",
+          "start_line": 442,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-zed-transient-override",
+      "status": "supported",
+      "reason": "Method sets boxed global value only and docs explicitly say user settings changes overwrite it; no disk write.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "2577e1edef63ed521377b10acd4d93f806fdb598636a8502bdfcdb91fd7faea8",
+      "evidence": [
+        {
+          "end_line": 491,
+          "file_sha256": "e9c83c4478018cac8356152b38af3794398bae6253ba3a22583eb3205e8cadf8",
+          "path": "crates/settings/src/settings_store.rs",
+          "start_line": 483,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-zed-same-invalid-text",
+      "status": "supported",
+      "reason": "Last-content assignment precedes parse; repeat identical text returns Unchanged before parsing, and source settings assigned only on Some.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "e5cc86b1883860f60b4ba162be847975066fc188e5df1703853e13eb3324b54d",
+      "evidence": [
+        {
+          "end_line": 981,
+          "file_sha256": "e9c83c4478018cac8356152b38af3794398bae6253ba3a22583eb3205e8cadf8",
+          "path": "crates/settings/src/settings_store.rs",
+          "start_line": 959,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-zed-server-clear",
+      "status": "supported",
+      "reason": "Empty becomes None, nonempty parses Option with ? before assignment; null is clear and parse failure preserves prior value.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "84ecbb31b4507ecf85a271f207d03ccba2d85941a6957594cd167a7e45b10fef",
+      "evidence": [
+        {
+          "end_line": 1026,
+          "file_sha256": "e9c83c4478018cac8356152b38af3794398bae6253ba3a22583eb3205e8cadf8",
+          "path": "crates/settings/src/settings_store.rs",
+          "start_line": 1011,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-zed-local-empty",
+      "status": "supported",
+      "reason": "Trimming/filter converts whitespace to None; removal clears matching error. Failed nonempty parse returns via ? before map insertion.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "4620a9bbb51cb390802a927c0f320fc14fd6a1fbd77de5dbc268353e7317b9e9",
+      "evidence": [
+        {
+          "end_line": 1104,
+          "file_sha256": "e9c83c4478018cac8356152b38af3794398bae6253ba3a22583eb3205e8cadf8",
+          "path": "crates/settings/src/settings_store.rs",
+          "start_line": 1073,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 1124,
+          "file_sha256": "e9c83c4478018cac8356152b38af3794398bae6253ba3a22583eb3205e8cadf8",
+          "path": "crates/settings/src/settings_store.rs",
+          "start_line": 1110,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-zed-local-equivalent",
+      "status": "supported",
+      "reason": "Occupied branch compares parsed project content and sets change flag only on inequality; subtree recompute guarded by flag.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "cb4d15625d5e36e9ee451dc206f8d962c23cc1c525baa64ec81c902c4ee7f993",
+      "evidence": [
+        {
+          "end_line": 1144,
+          "file_sha256": "e9c83c4478018cac8356152b38af3794398bae6253ba3a22583eb3205e8cadf8",
+          "path": "crates/settings/src/settings_store.rs",
+          "start_line": 1125,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 1165,
+          "file_sha256": "e9c83c4478018cac8356152b38af3794398bae6253ba3a22583eb3205e8cadf8",
+          "path": "crates/settings/src/settings_store.rs",
+          "start_line": 1160,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-zed-local-kinds",
+      "status": "supported",
+      "reason": "Tasks/Debug rejected for in-worktree; Editorconfig match accepts either location; unsupported outside kinds log and return.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "527cf8bcb3b66d570491c6ecf3bc07ddd731b9452f06d63fc32ab5abd3646256",
+      "evidence": [
+        {
+          "end_line": 1096,
+          "file_sha256": "e9c83c4478018cac8356152b38af3794398bae6253ba3a22583eb3205e8cadf8",
+          "path": "crates/settings/src/settings_store.rs",
+          "start_line": 1077,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 1158,
+          "file_sha256": "e9c83c4478018cac8356152b38af3794398bae6253ba3a22583eb3205e8cadf8",
+          "path": "crates/settings/src/settings_store.rs",
+          "start_line": 1146,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-zed-clear-worktree",
+      "status": "supported",
+      "reason": "retain removes target worktree only, editorconfig removal and typed clear both keyed by same ID, then root-subtree recompute.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "b40b9e845161c53b788c1ab49a3e7d89bb45dfcbfe16e2cdba333f01978f5d9f",
+      "evidence": [
+        {
+          "end_line": 1196,
+          "file_sha256": "e9c83c4478018cac8356152b38af3794398bae6253ba3a22583eb3205e8cadf8",
+          "path": "crates/settings/src/settings_store.rs",
+          "start_line": 1185,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-zed-default-overlays",
+      "status": "supported",
+      "reason": "JSON-with-comments parser followed by base clone, release channel merge, then OS merge in explicit order.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "e4b0a80183c3661ddd17445fb2f666209784e4a3615decfbab4612e6fbbb8f8c",
+      "evidence": [
+        {
+          "end_line": 955,
+          "file_sha256": "e9c83c4478018cac8356152b38af3794398bae6253ba3a22583eb3205e8cadf8",
+          "path": "crates/settings/src/settings_store.rs",
+          "start_line": 949,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-vitest-nested-hooks",
+      "status": "supported",
+      "reason": "Parent recursion precedes current beforeEach and follows current afterEach; stack reversal limited to after hooks within suite.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "737a7b0ed04def975d66ebf06c91d55bdf6fc87405f620c8c3bd962d9e2e2e06",
+      "evidence": [
+        {
+          "end_line": 127,
+          "file_sha256": "fe6416563c16f0ea21af09761f2a66a80b74beae426640c7745e1453f5a90ec4",
+          "path": "packages/vitest/src/runtime/runner/run.ts",
+          "start_line": 122,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 224,
+          "file_sha256": "fe6416563c16f0ea21af09761f2a66a80b74beae426640c7745e1453f5a90ec4",
+          "path": "packages/vitest/src/runtime/runner/run.ts",
+          "start_line": 175,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-vitest-test-hook-registration",
+      "status": "supported",
+      "reason": "Both context registration methods replaced with throwing callbacks during hook processing, then originals restored after caught hook failures.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "d5f5bcd6b8442202484608b955000b4c241c747f838261b0072f6291ee59424a",
+      "evidence": [
+        {
+          "end_line": 172,
+          "file_sha256": "fe6416563c16f0ea21af09761f2a66a80b74beae426640c7745e1453f5a90ec4",
+          "path": "packages/vitest/src/runtime/runner/run.ts",
+          "start_line": 144,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-vitest-retry-last-error",
+      "status": "supported",
+      "reason": "Retry condition receives only errors.at(-1); absent error false, absent condition true, regex message or predicate as stated.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "af8cf28cb4252d4ad56a8ad8d2dde2c1ff20808338972f0e8100355eb717b379",
+      "evidence": [
+        {
+          "end_line": 563,
+          "file_sha256": "fe6416563c16f0ea21af09761f2a66a80b74beae426640c7745e1453f5a90ec4",
+          "path": "packages/vitest/src/runtime/runner/run.ts",
+          "start_line": 544,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-vitest-retry-repeat",
+      "status": "supported",
+      "reason": "Nested inclusive loops and hasFailedRepeat preserve exhausted earlier repeat failure despite later pass, before separate test.fails transformation.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "0a2e8a6d5d24fdbb7469d10509aa147580da22471df52ab57bfb20289c067ad8",
+      "evidence": [
+        {
+          "end_line": 604,
+          "file_sha256": "fe6416563c16f0ea21af09761f2a66a80b74beae426640c7745e1453f5a90ec4",
+          "path": "packages/vitest/src/runtime/runner/run.ts",
+          "start_line": 598,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 740,
+          "file_sha256": "fe6416563c16f0ea21af09761f2a66a80b74beae426640c7745e1453f5a90ec4",
+          "path": "packages/vitest/src/runtime/runner/run.ts",
+          "start_line": 709,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-vitest-aftereach-on-error",
+      "status": "supported",
+      "reason": "Separate body and cleanup try blocks ensure afterEach attempted; failure inside cleanup skips later statements in that try, including checkpoint cleanup.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "937294fe6868a722862d848dfa281fcf619718c761a1aaa8c0cd781356ce183b",
+      "evidence": [
+        {
+          "end_line": 663,
+          "file_sha256": "fe6416563c16f0ea21af09761f2a66a80b74beae426640c7745e1453f5a90ec4",
+          "path": "packages/vitest/src/runtime/runner/run.ts",
+          "start_line": 611,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-vitest-around-fixture-lifetime",
+      "status": "supported",
+      "reason": "Checkpoint comments and callFixtureCleanupFrom then outer callFixtureCleanup establish inner versus aroundEach fixture lifetime.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "163494ba2018e50ebce5eb8000abf03283634dd70b9f6062c98d08e694345439",
+      "evidence": [
+        {
+          "end_line": 610,
+          "file_sha256": "fe6416563c16f0ea21af09761f2a66a80b74beae426640c7745e1453f5a90ec4",
+          "path": "packages/vitest/src/runtime/runner/run.ts",
+          "start_line": 605,
+          "claim_id": "c1"
+        },
+        {
+          "end_line": 692,
+          "file_sha256": "fe6416563c16f0ea21af09761f2a66a80b74beae426640c7745e1453f5a90ec4",
+          "path": "packages/vitest/src/runtime/runner/run.ts",
+          "start_line": 658,
+          "claim_id": "c2"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-vitest-pending-retry",
+      "status": "supported",
+      "reason": "Pending/skip branch replaces result, emits finished, clears both active states, and returns before retry loop logic.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "3aa4fd888ad3ff3387939c905949b8a121562e181bd9d6397715df85eeabe7bf",
+      "evidence": [
+        {
+          "end_line": 707,
+          "file_sha256": "fe6416563c16f0ea21af09761f2a66a80b74beae426640c7745e1453f5a90ec4",
+          "path": "packages/vitest/src/runtime/runner/run.ts",
+          "start_line": 694,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-vitest-expected-failure",
+      "status": "supported",
+      "reason": "Passing result becomes explicit failure; failing result flips only absent syntax-error marker, then errors cleared.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "fd29695609410dbe32fc2dba79f3fecac0b4e4eba1a02c0dd49d7f1ab681f3f2",
+      "evidence": [
+        {
+          "end_line": 751,
+          "file_sha256": "fe6416563c16f0ea21af09761f2a66a80b74beae426640c7745e1453f5a90ec4",
+          "path": "packages/vitest/src/runtime/runner/run.ts",
+          "start_line": 742,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-vitest-finish-failure-hooks",
+      "status": "supported",
+      "reason": "onFinished stack execution precedes conditional onFailed; callback arrays cleared before runner onAfterRetryTask.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "9090fdd0cbb952831afc53a74748bf0a165dc2a111a21a2f38c7bd34653127f3",
+      "evidence": [
+        {
+          "end_line": 681,
+          "file_sha256": "fe6416563c16f0ea21af09761f2a66a80b74beae426640c7745e1453f5a90ec4",
+          "path": "packages/vitest/src/runtime/runner/run.ts",
+          "start_line": 665,
+          "claim_id": "c1"
+        }
+      ]
+    },
+    {
+      "task_id": "fresh-vitest-aggregate-errors",
+      "status": "supported",
+      "reason": "Pending and abort errors return early as skip; remaining errors mark fail and AggregateError children are processed individually.",
+      "question_answerable": true,
+      "human_reviewed": false,
+      "reviewer": "runtime_backend",
+      "author": "data_readiness",
+      "independent_of_author": true,
+      "task_sha256": "9e6eefd257a9703c47a936bd4a71e7fa70896226c022920d2e9ea167464123d2",
+      "evidence": [
+        {
+          "end_line": 787,
+          "file_sha256": "fe6416563c16f0ea21af09761f2a66a80b74beae426640c7745e1453f5a90ec4",
+          "path": "packages/vitest/src/runtime/runner/run.ts",
+          "start_line": 764,
+          "claim_id": "c1"
+        }
+      ]
+    }
+  ]
+}

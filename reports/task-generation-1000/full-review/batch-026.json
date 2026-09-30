@@ -1,0 +1,259 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-d1ac8a8041fcf21ed9326cc4",
+      "reference_sha256": "b444f9f0c016ec7ba391739b134f13f022f799e187a4639c1ea2000bc87e56e2",
+      "question_sha256": "ce86676739c099912a4ef8f444656ff3d69717d98d54d10ab3d6498076bcdb3c",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Default _Unset() is allocated on every function invocation",
+          "verdict": "contradicted",
+          "reason": "Python defaults are evaluated when function is defined, not every call; magnitude is unmeasured.",
+          "evidence": {
+            "path": "lib/matplotlib/_api/__init__.py",
+            "start_line": 30,
+            "end_line": 35
+          }
+        }
+      ],
+      "material_errors": [
+        "Python defaults are evaluated when function is defined, not every call; magnitude is unmeasured."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no code run.",
+      "corrected_reference_answer": "The module creates one shared UNSET sentinel (lib/matplotlib/_api/__init__.py:30-35). Reusing it avoids separate sentinel allocations and supplies a common identity for distinguishing omitted arguments from explicit None. However, def foo(arg=_Unset()) creates its default once at function definition, not once per call. Thousands of checks therefore do not imply thousands of new objects; only explicit per-call construction would create that allocation pattern."
+    },
+    {
+      "task_id": "import-d21d4d665ec323728c21f7cc",
+      "reference_sha256": "3495b6f9ff779c2f894031e393d0678440532bac574661c5de90fed3c854722f",
+      "question_sha256": "1da576c8e5eb4c7c6a37e9ec2d4046bbcdfc48119a9da713f01b42da2b81a5d6",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Regular prop/fontsize uses same mutual exclusivity validation as title",
+          "verdict": "contradicted",
+          "reason": "Regular prop takes precedence without a conflict error; answer also lacks proposed generalization.",
+          "evidence": {
+            "path": "lib/matplotlib/legend.py",
+            "start_line": 429,
+            "end_line": 434
+          }
+        }
+      ],
+      "material_errors": [
+        "Regular prop takes precedence without a conflict error; answer also lacks proposed generalization."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no code run.",
+      "corrected_reference_answer": "Legend rejects simultaneous non-None title_fontsize/title_fontproperties, normalizes properties and applies size fallback before set_title (lib/matplotlib/legend.py:555-571). A reusable normalization helper with an explicit mutually-exclusive-parameters check could generalize this while preserving parameter-specific precedence. Do not automatically apply that rule to regular prop/fontsize: existing code gives prop precedence instead of rejecting both (lib/matplotlib/legend.py:429-434)."
+    },
+    {
+      "task_id": "import-d6f3aa5c4d34fdfc95715ab3",
+      "reference_sha256": "75919e4ea8b759927b2b24ed20463751156db55fd74e051cd7b5df0d1cc14099",
+      "question_sha256": "cb5761027d06d853e80a3414c65a70e608f3a0bc8a4e9ba8926276a3cc071949",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "SVG flip maps display y to height-y",
+          "verdict": "supported",
+          "reason": "Composition applies original transform followed by y negation and canvas-height translation; clip rectangle manual counterpart verified.",
+          "evidence": {
+            "path": "lib/matplotlib/backends/backend_svg.py",
+            "start_line": 491,
+            "end_line": 492
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no code run."
+    },
+    {
+      "task_id": "import-dad0d5035ff9e67ef150d1d8",
+      "reference_sha256": "81b99ef5ee54e0cd9b2c8a2782f99f596c62a38f9e776e33613b5ba39221280f",
+      "question_sha256": "6f4af02098220bda49dcb3b00ca5371c2a2063b6d0461e2413d15c760f0d6b38",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "chr(glyph) maps T1 code back to original Unicode character",
+          "verdict": "contradicted",
+          "reason": "Subset expects encoding-array indices; chr/ord is code transport, not decoding T1 into Unicode.",
+          "evidence": {
+            "path": "lib/matplotlib/_type1font.py",
+            "start_line": 840,
+            "end_line": 850
+          }
+        }
+      ],
+      "material_errors": [
+        "Subset expects encoding-array indices; chr/ord is code transport, not decoding T1 into Unicode."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no code run.",
+      "corrected_reference_answer": "The test selects charter, T1 font encoding and UTF-8 input for accented text and ligatures (lib/matplotlib/tests/test_backend_pdf.py:470-479). PDF draw_tex writes bytes([glyph]) and tracks chr(glyph) (lib/matplotlib/backends/backend_pdf.py:2293-2299); tracking stores ord values (lib/matplotlib/backends/_backend_pdf_ps.py:109-113). These are font encoding indices, not decoded original Unicode characters. Embedding applies the map-file encoding before subsetting by tracked indices (lib/matplotlib/backends/backend_pdf.py:1018-1030; lib/matplotlib/_type1font.py:840-850)."
+    },
+    {
+      "task_id": "import-db94b4129abf44c0751880c9",
+      "reference_sha256": "d3568934127fd69caffe439d62c5651db19fa11db4c647060603f091f8dc39b7",
+      "question_sha256": "6d403b9e6adaaf22480d179183b38ef872d815ddaa99ca78ed5c5e52d2510d6e",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "AxLine coordinates transformed before view-bound intersections",
+          "verdict": "supported",
+          "reason": "points_transform applies to points; scaled view limits used for intersections then result maps through limits and axes.",
+          "evidence": {
+            "path": "lib/matplotlib/lines.py",
+            "start_line": 1499,
+            "end_line": 1538
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no code run."
+    },
+    {
+      "task_id": "import-dc384d10f392758f98771746",
+      "reference_sha256": "587246a76f3ea2ee2397de9c920f0ed09642600ac10a7d74691ea38d24d0cd16",
+      "question_sha256": "b65f95f37b3bed0ee423d6168fde5c3b6811fb9b6b797d7a9af293bebb519023",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Undo-log trajectory updates are atomic and independent for concurrency",
+          "verdict": "contradicted",
+          "reason": "Single shared _traj/_current_xy and immediate mask mutations do not provide concurrent isolation; adaptive implications omitted.",
+          "evidence": {
+            "path": "lib/matplotlib/streamplot.py",
+            "start_line": 453,
+            "end_line": 478
+          }
+        }
+      ],
+      "material_errors": [
+        "Single shared _traj/_current_xy and immediate mask mutations do not provide concurrent isolation; adaptive implications omitted."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no code run.",
+      "corrected_reference_answer": "StreamMask uses _traj as an undo log: entering an unoccupied cell records it and immediately marks _mask; undo clears logged cells (lib/matplotlib/streamplot.py:453-478). This supports serial rejection of a tentative trajectory. It is not a concurrency-safe transaction: one shared trajectory list/current position and mutable mask would require per-trajectory ownership and synchronization for concurrent generation. Adaptive changes to mask resolution would also need to preserve or remap recorded cell indices; the existing fixed-density grid does not provide that mechanism (lib/matplotlib/streamplot.py:437-448)."
+    },
+    {
+      "task_id": "import-e4b7685a734ffe6530a95c52",
+      "reference_sha256": "356d082fa7a299658310234c847839fce5d8b35155e14fc0a409eeb233c99df9",
+      "question_sha256": "74fec7a8c9f23f0fbfef83e838b1de50ca79bc899accd853394668739f101642",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "ToolContainer event routes to GTK-specific label update",
+          "verdict": "supported",
+          "reason": "Base event connection forwards event.message and GTK method sets label.",
+          "evidence": {
+            "path": "lib/matplotlib/backends/backend_gtk4.py",
+            "start_line": 528,
+            "end_line": 529
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no code run."
+    },
+    {
+      "task_id": "import-ed81278ad36885d8a1106b93",
+      "reference_sha256": "e84c64d34b5ee10f3ac592f66b9cabe52279f26d623d52a842d94c88c6b0e96a",
+      "question_sha256": "87e91d68a23137636c3991045a23781c34913bc8a236b96a34e2dd975382a7d8",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "LightSource direction consistently feeds illumination before blend selection",
+          "verdict": "supported",
+          "reason": "Angle conversion to vector explicit; shade_normals dots vector and rescales/clips, shade_rgb selects blend after hillshade.",
+          "evidence": {
+            "path": "lib/matplotlib/colors.py",
+            "start_line": 3486,
+            "end_line": 3497
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no code run."
+    },
+    {
+      "task_id": "import-f24c5d73a319fbd681b7e092",
+      "reference_sha256": "b355343ea6bf489def4e696b9034f3493f8e69a0919a2ce176440ad7ce2551db",
+      "question_sha256": "5fab1194df361b0f543e49bf572e57d60be7ab37c9d6c1bb144af57052bf1603",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "LogLocator.tick_values is pure axis-independent computation",
+          "verdict": "contradicted",
+          "reason": "Method explicitly reads axis tick-space/minpos when attached; tests do not enforce strict separation.",
+          "evidence": {
+            "path": "lib/matplotlib/ticker.py",
+            "start_line": 2414,
+            "end_line": 2427
+          }
+        }
+      ],
+      "material_errors": [
+        "Method explicitly reads axis tick-space/minpos when attached; tests do not enforce strict separation."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no code run.",
+      "corrected_reference_answer": "LogLocator.__call__ gets the axis view interval and delegates to tick_values (lib/matplotlib/ticker.py:2401-2404). tick_values can operate without an axis for valid explicit bounds, using nine automatic ticks, but is not purely axis-independent: attached axes provide tick space and a replacement minimum positive value (lib/matplotlib/ticker.py:2414-2427). nonsingular also considers shared axes minimum positive values (lib/matplotlib/ticker.py:2547-2564). Standalone versus axes tests exercise both uses; they do not enforce a strict pure-core/integration boundary."
+    },
+    {
+      "task_id": "import-fee4ece64bcde6a3a67c6001",
+      "reference_sha256": "ede6a11f7b686d637eb6be6f9fc286746239d2b3b49b74c46236e61c60ff7200",
+      "question_sha256": "bf4bc848790dc85cf7eeacef042ff4c5885a7d3f1da451cdffe64981c89eee9d",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Direct helpers test_pdflatex delegates to are all in backend_pgf.py",
+          "verdict": "contradicted",
+          "reason": "Direct test configures rcParams and calls local create_figure; answer skips actual requested local helper.",
+          "evidence": {
+            "path": "lib/matplotlib/tests/test_backend_pgf.py",
+            "start_line": 103,
+            "end_line": 110
+          }
+        }
+      ],
+      "material_errors": [
+        "Direct test configures rcParams and calls local create_figure; answer skips actual requested local helper."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no code run.",
+      "corrected_reference_answer": "test_pdflatex sets pgf.texsystem=pdflatex, font options and preamble via mpl.rcParams.update, then calls create_figure in the same test module (lib/matplotlib/tests/test_backend_pgf.py:103-110). That helper builds lines, markers, filled paths and text (lib/matplotlib/tests/test_backend_pgf.py:49-77). The image_comparison decorator then saves/compares output; PGF rendering and TeX compilation are implemented deeper in FigureCanvasPgf, including _print_pgf_to_fh and print_pdf in lib/matplotlib/backends/backend_pgf.py."
+    },
+    {
+      "task_id": "import-ff92be4e5f68ed7fd1bd2c84",
+      "reference_sha256": "c79fa6aed4afd0a1ae390603780c6dd2ca11fc02a13de4d52ae5a5e7ab21959b",
+      "question_sha256": "b63336bf860805a79a4d82ed7bb81169eacf47c54ad83cdd4c66fef3ee8d6af4",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Alignment offset calculation lives inside Text.get_window_extent",
+          "verdict": "contradicted",
+          "reason": "These lines belong to _get_layout, defined at 360; get_window_extent calls it at 985.",
+          "evidence": {
+            "path": "lib/matplotlib/text.py",
+            "start_line": 454,
+            "end_line": 503
+          }
+        }
+      ],
+      "material_errors": [
+        "These lines belong to _get_layout, defined at 360; get_window_extent calls it at 985."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct static source review; no code run.",
+      "corrected_reference_answer": "Text._get_layout computes alignment-dependent offsetx/offsety, including xtick/ytick rotation modes (lib/matplotlib/text.py:360,454-508). Text.get_window_extent invokes _get_layout to obtain its bounding box (lib/matplotlib/text.py:984-986). Axis._get_ticklabel_bboxes calls visible labels get_window_extent (lib/matplotlib/axis.py:1333-1338), and axis drawing/layout operations use that helper. The calculation is therefore reached through get_window_extent but is not defined inside it."
+    }
+  ]
+}

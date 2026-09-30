@@ -1,0 +1,205 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-3a5acbc8e87cf599d2b2c6ac",
+      "reference_sha256": "0617e935d45589ce95f600e4f637d40471847eacb87954bd0301431f3bae96c4",
+      "question_sha256": "7c59043a898ae086290e1479b581fd5a91f67ec7f135eedd597c0dd0a0c7099f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Definition loading branches on resources and resolves relative imports",
+          "verdict": "supported",
+          "reason": "Resource bytes and external text files recurse into same loader; @import preserves mode and uses containing directory.",
+          "evidence": {
+            "path": "pint/registry.py",
+            "start_line": 556,
+            "end_line": 602
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-608536679587551bab88f0fe",
+      "reference_sha256": "0b45478410e6ea42080363e37755bddafda7cccfaf3a67791ea7d37902892539",
+      "question_sha256": "3d8806d55246c1d817de92c8d968a3390510f6d65f685637bb02b8325fdce6de",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Lint runs pre-commit on pushes and PRs with weekly updating workflow",
+          "verdict": "supported",
+          "reason": "Workflow and pinned black/isort/flake8 configuration match.",
+          "evidence": {
+            "path": ".github/workflows/lint.yml",
+            "start_line": 1,
+            "end_line": 17
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-6359b8feb174527b953671e8",
+      "reference_sha256": "75426535680c1e650911419a8036faa16827de4e8641c6bf8b351fa7580d5755",
+      "question_sha256": "8426f1a97aee8b6137553645ec3f432b933c79423e79c05db563ab6b9674f071",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Pickled quantities store magnitude and unit name string",
+          "verdict": "partially_supported",
+          "reason": "Unpickle uses UnitsContainer, not merely one unit string; application registry dependency is correct.",
+          "evidence": {
+            "path": "pint/__init__.py",
+            "start_line": 53,
+            "end_line": 82
+          }
+        }
+      ],
+      "material_errors": [
+        "Unpickle uses UnitsContainer, not merely one unit string; application registry dependency is correct."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "_unpickle_quantity rebuilds using application_registry.Quantity (pint/__init__.py:80-82). _unpickle scans UnitsContainer arguments and calls application_registry.parse_units for each unit name before constructing the object (69-77). Custom unit definitions are not carried as a custom registry by this path; the application registry must know those units. The serialized unit representation should be described as a units container, not simply one string."
+    },
+    {
+      "task_id": "import-a76fd9f4eb74ea9d6f9d4eb2",
+      "reference_sha256": "b5d1a878bf16a72977298d0347ccd9ade2c45c6e05ceb270f23659b370651f42",
+      "question_sha256": "0dcf9d79d968774a61d3ed43b87fb02b9bd10989fdb067bcb23cf795560dfe7f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Dask hooks delegate magnitude execution and reattach units",
+          "verdict": "supported",
+          "reason": "Graph, keys, scheduler/optimizer and postcompute/postpersist wrapper are explicit.",
+          "evidence": {
+            "path": "pint/quantity.py",
+            "start_line": 2039,
+            "end_line": 2073
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-bc30185425e80f6b1d4cfda3",
+      "reference_sha256": "e9ce7675eb1965a1de1ecb2f49311203091e8423eb2285dbbba7b262ead8b930",
+      "question_sha256": "b807d384dc312e1783df21cc48dcd11569a705ff50c114daa1b6f9e2dae0ac18",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Delta-squared units for offset temperature variance are semantically incorrect",
+          "verdict": "contradicted",
+          "reason": "Code rejects by constructing an addition of offset quantities; that does not prove mathematical variance requires adding absolute readings or that delta-squared units are wrong.",
+          "evidence": {
+            "path": "pint/numpy_func.py",
+            "start_line": 195,
+            "end_line": 196
+          }
+        }
+      ],
+      "material_errors": [
+        "Code rejects by constructing an addition of offset quantities; that does not prove mathematical variance requires adding absolute readings or that delta-squared units are wrong."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "In this revision, get_op_output_unit(\"variance\", units) derives its result through ((1*units + 1*units)**2).units (pint/numpy_func.py:195-196). For offset units this encounters Pint's restrictions on offset arithmetic and raises OffsetUnitCalculusError. That is the implementation path, not a mathematical claim that variance in squared temperature-difference units is invalid. Variance is invariant to additive shifts, and the cited code does not document a rationale for rejecting automatic delta-unit handling."
+    },
+    {
+      "task_id": "import-ca732085b0b4ee98c1bcb284",
+      "reference_sha256": "1568e06cb9b21d35af0f3f57ef01e51bfb9471550fb9c0b92a78b7f7e2570a94",
+      "question_sha256": "be86f216a94a29467a0238e4b10a12dfafc1872446c1920e8dd9039e77220d8a",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Both workflows are guaranteed merge requirements",
+          "verdict": "partially_supported",
+          "reason": "Independent triggers and test summary are shown; branch protection or required merge statuses are not established.",
+          "evidence": {
+            "path": ".github/workflows/ci.yml",
+            "start_line": 110,
+            "end_line": 118
+          }
+        }
+      ],
+      "material_errors": [
+        "Independent triggers and test summary are shown; branch protection or required merge statuses are not established."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Lint and CI independently run on push and pull_request (.github/workflows/lint.yml:3; ci.yml:3). Lint executes pre-commit across files, and CI runs its Python/dependency test matrix. The ci-success job depends on test-linux only (ci.yml:110-118), not lint. Requiring both before merge needs repository merge/branch-protection configuration; these workflow files alone do not guarantee it."
+    },
+    {
+      "task_id": "import-e646d396b85d04eb0e74f247",
+      "reference_sha256": "cb9b7cd45c4c6394977d072f714dcfba004c0886c21b82402edc65e86e42930a",
+      "question_sha256": "998b83f62e88801df16044f622acf62917ca635d689291bc048516d70cf24351",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "UnitRegistry composes specialized registries",
+          "verdict": "supported",
+          "reason": "Public class explicitly combines SystemRegistry, ContextRegistry and NonMultiplicativeRegistry. Architectural benefits are interpretation, not compatibility guarantees.",
+          "evidence": {
+            "path": "pint/registry.py",
+            "start_line": 2195,
+            "end_line": 2202
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-e69d2540b26614b28ac5e1a0",
+      "reference_sha256": "6e6d9162f7fb01512e5cd81f042e55788ba472f566f6f4abefc4464a25452464",
+      "question_sha256": "8599af1ce07652230f5f71e0253e8f74531ec74bb562c5eefc1f93caf35da3f1",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "_non_int_type slot initializes from input container or float and optional override",
+          "verdict": "supported",
+          "reason": "Exact slot and initialization branches match.",
+          "evidence": {
+            "path": "pint/util.py",
+            "start_line": 331,
+            "end_line": 355
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-f779fa060a438f4ed9833265",
+      "reference_sha256": "669251af4dc2918e208682485eb1ac23fe8b3322226d70da88dd3c9203b84a5f",
+      "question_sha256": "bdcdd732cdbf7d4c1aba3b5aedcd992af63be9793b866c11c53ed7f2d868d250",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Expression pipeline applies preprocessors, tokenizer and evaluation tree",
+          "verdict": "supported",
+          "reason": "parse_expression calls each stated stage and evaluates tokens through registry.",
+          "evidence": {
+            "path": "pint/registry.py",
+            "start_line": 1332,
+            "end_line": 1342
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    }
+  ]
+}

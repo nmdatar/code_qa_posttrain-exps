@@ -1,0 +1,126 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/semantic-review-0.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/PennyLaneAI--pennylane-6fae4e77ab73",
+      "original_reference_sha256": "ad3292bbb5d2c54c5f4e73a4a8624bfb118a0906d0646484e62bc4cb66ffc91f",
+      "question": "What is the inheritance hierarchy and method precedence order that PennyLane operations follow for gradient computation in the parameter-shift differentiation system?",
+      "question_sha256": "993d98f8855178c11c49a54f792f67689e4efac56f489148857b516c94c825ec",
+      "reference_answer": "Operations inherit Operation, which inherits Operator (pennylane/operation.py:1608-1624); Operator derives from abc.ABC (pennylane/operation.py:391). Recipe selection is explicit control flow, not Python method-resolution ordering: _get_operation_recipe first uses a non-None parameter grad_recipe, otherwise accesses parameter_frequencies and generates a shift rule (pennylane/gradients/parameter_shift.py:246-286). The default parameter_frequencies implementation uses generator eigenvalue differences only for single-parameter operations, and raises ParameterFrequenciesUndefinedError otherwise or when the generator is undefined (pennylane/operation.py:1739-1761). _get_operation_recipe translates that exception into OperatorPropertyUndefined.",
+      "reference_sha256": "91b4c06675dd597820a16d2d16c34e34d71cff82a32d3ffa878261233ac8d259",
+      "repository": {
+        "commit": "6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+        "family_id": "pennylaneai/pennylane",
+        "url": "https://github.com/PennyLaneAI/pennylane"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/PennyLaneAI--pennylane-6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-49ba4958e42790048ef24166"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/cekit--cekit-6b82c4adc0e2",
+      "original_reference_sha256": "7fbb5ee211c42eb0aa8bdd8298a6380f447c2e77459a954951048eef487c9404",
+      "question": "How does CEKit's descriptor override system coordinate between configuration loading, descriptor merging, and path resolution when processing override files?",
+      "question_sha256": "249f0c190e500183f4daef5897051632796cdc3c0910b96adb54f46f739070da",
+      "reference_answer": "Config.configure loads configparser configuration and applies selected CLI settings separately (cekit/config.py:16-40). Generator constructs Overrides objects using each override path's absolute parent directory, then init loads the main Image and calls apply_image_overrides (cekit/generator/base.py:45-64). Overrides inherits Image but initializes Descriptor with the override schema and prepares nested descriptors with its artifact directory (cekit/descriptor/overrides.py:9-18; cekit/descriptor/image.py:52-63). Image.apply_image_overrides processes overrides in order and explicitly replaces name, version, base and description when supplied (cekit/descriptor/image.py:176-190). Generic _merge_descriptors respects skip_merging while filling missing fields and merging nested descriptors and lists; that does not protect identity fields from explicit overrides (cekit/descriptor/base.py:140-163). tools.load_descriptor accepts inline YAML-compatible data, including JSON, or reads a file when the parsed input is a string (cekit/tools.py:29-53).",
+      "reference_sha256": "f8a89b4045353706d335988f8d35cfcf89bf338f7652325bc2386a49de5adb95",
+      "repository": {
+        "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+        "family_id": "cekit/cekit",
+        "url": "https://github.com/cekit/cekit"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/cekit--cekit-6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-3d933c0b7aa19317881b8fc2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/docker--docker-py-b2a18d7209f8",
+      "original_reference_sha256": "944dbac5e7ce7c0d9207095f2dca1562669b3185bd04143160055313a2419caa",
+      "question": "Why does docker-py implement a multi-protocol transport adapter architecture instead of using direct HTTP requests to the Docker daemon?",
+      "question_sha256": "f9f826d9ae523f1399b9e2a3ed48e44ce3c3589fb9f00bf7e4f29a0519890343",
+      "reference_answer": "APIClient inherits requests.Session and adapts how HTTP reaches the daemon (docker/api/client.py:47-60). parse_host normalizes TCP endpoints to http/https and Unix endpoints to http+unix (docker/utils/utils.py:284-300). APIClient then mounts adapters for Unix sockets, Windows named pipes and SSH; ordinary HTTP/TLS remains supported (docker/api/client.py:143-190). Unix connections use AF_UNIX (docker/transport/unixconn.py:27-37), named-pipe connections use NpipeSocket (docker/transport/npipeconn.py:18-29), and SSH carries the HTTP connection through docker system dial-stdio (docker/transport/sshconn.py:102-121). The observed benefit is a common request interface over these transports, rather than replacing HTTP itself.",
+      "reference_sha256": "6a6e6505595a3ddcdbe4e64319493d96a07beb4f1fdac3da8f5c9e30386e68a5",
+      "repository": {
+        "commit": "b2a18d7209f827d83cc33acb80aa31bf404ffd4b",
+        "family_id": "docker/docker-py",
+        "url": "https://github.com/docker/docker-py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/docker--docker-py-b2a18d7209f827d83cc33acb80aa31bf404ffd4b",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-25976163f78e3175f9ece212"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "original_reference_sha256": "bc4417f6e3f818f50eda6f26c99c53adf72b674653ff1b9e7dbb9ddd6ff79184",
+      "question": "How does a custom metaclass implementing a property affect class attribute resolution compared to standard Python class creation?",
+      "question_sha256": "55e94404a8ae75ca404f3e57d869a754be8a66dbd11c38daf1c3efa2cc8fc386",
+      "reference_answer": "The fixture defines Meta(type).values as a property returning a list, then accesses Parent.values and Child.values (tests/functional/r/regression/regression_properties_in_class_context.py:3-24). Because classes are instances of their metaclass, this property is available through class attribute access, including the subclass. This differs from an ordinary instance property declared on the class. Pylint attribute checking calls owner.getattr(node.attrname) through astroid (pylint/checkers/typecheck.py:1117-1123). Separately, _supports_protocol checks a metaclass when deciding whether a class object itself supports iteration or membership; it is not the property-resolution implementation (pylint/checkers/utils.py:1266-1283). Despite stale comments in the fixture, expected diagnostics report only Child2.a_method at lines 42-43, not Child.values (tests/functional/r/regression/regression_properties_in_class_context.txt:1-2).",
+      "reference_sha256": "854ee1f8387c644e70750a30869234ad147b39f630c7e76a36c87321c250f69c",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-0393a4ef848d1cf8eaf51897"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/qiboteam--qibo-2f98679c4a73",
+      "original_reference_sha256": "7a9e2887d685e4c77cfb9616fdd34676d3d55c80ca4cf22197fbf1a78e0044c6",
+      "question": "What is the statistical sampling architecture that ensures reproducible probabilistic measurements across different computational backends in Qibo?",
+      "question_sha256": "256ec98ab6421c22c8f9cb08a8f6b5c640a45b85651c9fff323dcd4b8ca7611f",
+      "reference_answer": "Qibo exposes backend-specific seeding and sampling contracts (src/qibo/backends/abstract.py:253-261,289-292). NumPy seeds its RNG and samples with random.choice; its sample_frequencies normalizes probabilities and accumulates batches through self.sample_shots (src/qibo/backends/numpy.py:515-556). TensorflowBackend inherits NumpyBackend but overrides sampling with tf.random.categorical (src/qibo/backends/tensorflow.py:164-174,267-271). SHOT_BATCH_SIZE defaults to 2**18 (src/qibo/config.py:27-28). GlobalBackend selects and caches the default backend, and permits replacement (src/qibo/backends/__init__.py:41-85). CircuitResult delegates to that result's backend for shots or frequencies (src/qibo/states.py:113-116,183-194). These are common interfaces with backend-specific RNGs; they do not establish identical seeded outcomes across different backends.",
+      "reference_sha256": "fa3e4eadbe16b35a6e241453b219bd3ddae2c5dc2117b345ec16ba7625a36a94",
+      "repository": {
+        "commit": "2f98679c4a738d5a59de17eccd4712659d52a461",
+        "family_id": "qiboteam/qibo",
+        "url": "https://github.com/qiboteam/qibo"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/qiboteam--qibo-2f98679c4a738d5a59de17eccd4712659d52a461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-02c731a42afa11b8e9213924"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "original_reference_sha256": "fd310ca8c0eb4f7f4d0c4db73d09ac808de83050e62456f636923c10ea95b9c8",
+      "question": "What is the dependency resolution mechanism in _parallel_predict_regression that handles the estimator.predict method across heterogeneous base estimators with different feature selection requirements, and what internal module dependencies enable this polymorphic behavior?",
+      "question_sha256": "c6e9e36a595d2ccf3100590ad4e1818489155846ceb5d2ff91bfa7e51e17e3a3",
+      "reference_answer": "_parallel_predict_regression has no special dependency resolver: it zips estimators with their recorded feature arrays, calls estimator.predict(X[:, features], **params), and sums predictions (sklearn/ensemble/_bagging.py:257-262). Normal Bagging construction clones the configured estimator_, so differing feature subsets do not imply heterogeneous estimator classes (sklearn/ensemble/_base.py:141-151). BaggingRegressor.predict resolves optional metadata before launching Parallel/delayed jobs, passes routed estimator.predict parameters, then averages the job sums (sklearn/ensemble/_bagging.py:1436-1456). BaseEstimator supplies parameter, validation and metadata-request infrastructure, while MetaEstimatorMixin is explicitly empty; neither guarantees a predict implementation (sklearn/base.py:156-166,1126-1134). The helper relies on objects implementing predict, Python method dispatch, array indexing, and caller-prepared metadata.",
+      "reference_sha256": "a6ccc188a90e2b2c2038e458a55c5ddf84c587cb52f3a533634028c7a9851ebf",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-00c7d5eb9ea4bac8201cd1da"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "original_reference_sha256": "b079a06fef81fa645a5adeb7bc93b9a976e64f8b73bdfc1290833e911a1710c2",
+      "question": " What is the semantic distinction in the BigQuery dialect's MERGE INSERT clause segment grammar between wildcard insertion and explicit column-value insertion?",
+      "question_sha256": "a5a90fc04b24077b1f237822c7bbc385443f6b68117ed2d2960070ede2753adf",
+      "reference_answer": "At the parser level, BigQuery MergeInsertClauseSegment adds a distinct Sequence(\"INSERT\", \"ROW\") alternative. The other alternative parses INSERT with optional column-list and ValuesClauseSegment components (src/sqlfluff/dialects/dialect_bigquery.py:2680-2695). ANSI contains only that latter sequence (src/sqlfluff/dialects/dialect_ansi.py:3154-3164). OneOf selects the longest matching alternative, with first-match tie behavior (src/sqlfluff/core/parser/grammar/anyof.py:250-255; src/sqlfluff/core/parser/match_algorithms.py:140-151). Thus INSERT ROW can be recognized as a complete alternative rather than just INSERT. This grammar distinguishes syntactic forms; optional parser elements alone do not establish what a database does when VALUES is omitted.",
+      "reference_sha256": "10d47dc56cde56c6c2b24ed9c1f3c491900d4d21b102a32999b9237acb49d319",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-086304108660dbab46edcf9b"
+    }
+  ]
+}

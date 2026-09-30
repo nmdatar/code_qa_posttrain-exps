@@ -1,0 +1,143 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-038.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "1bc256c7654c4d2129e17df4633c6f5de8b2ae49fec0f7d156c71643478b12f5",
+      "question": "Where is the delegation chain through which MockResponse.getheaders() ultimately retrieves header information, and why does the implementation appear incomplete in terms of return value handling?",
+      "question_sha256": "760dd964d0d4d09a3eb71939041f77bb05fb2b405a809264f0482669727e62a5",
+      "reference_answer": "MockResponse stores supplied headers and getheaders calls self._headers.getheaders(name) without returning its result (src/requests/cookies.py:110-121). extract_cookies_to_jar supplies response._original_response.msg, then passes the wrapper to jar.extract_cookies (src/requests/cookies.py:124-137). Thus a successful delegated call discards its result and returns None; if the wrapped object lacks that method, the call raises instead. info returns the header object directly, so the cookie extraction path is not evidence that getheaders is actually used.",
+      "reference_sha256": "08e72b22a52f0872f2d70d61af5840c5ae5a3826c86d373cb0cdd99a7750bd10",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-80f76ce045575a9e5c2cea91"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "6ce87bea4a33ec1715b4d93f1b99a2ac500a24f0d6cb452fb4359506fb8e4931",
+      "question": "Why does the test_transfer_enc_removal_on_redirect method specifically verify that Transfer-Encoding and Content-Type headers are removed during redirect resolution, and what would be the security or protocol implications if these headers persisted through a POST-to-GET redirect transition?",
+      "question_sha256": "f9d320ea2b22b13fe1b120c7621f053d0abbdb96271007f298de6241dd4b9a77",
+      "reference_answer": "The test starts with a generator-backed POST, producing Transfer-Encoding, and simulates a 302 redirect (tests/test_requests.py:327-341). Requests converts applicable redirect methods to GET (src/requests/sessions.py:333-353), and for statuses other than 307/308 clears the body and its Content-Length, Content-Type, and Transfer-Encoding headers (src/requests/sessions.py:221-232). Keeping old framing headers after dropping the body could mislead downstream parsers about the transmitted message. This is consistency of the rewritten request, not a blanket prohibition on GET bodies or proof of a specific security exploit.",
+      "reference_sha256": "e9728facf8c181327ff940ae97a50e565b9de84563dadfe9f91ec99907af2326",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-860809fc71bc5535bfa6c36a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "9e3b229f9a1a4a2734d44c805d8f49e6199b62eb7e6c4c59e2d5ead0bdff3d73",
+      "question": "How should the TLSServer class refactor its SSL context initialization and mutual TLS configuration to separate certificate loading concerns from verification mode setup, and what would be the architectural implications of extracting this logic into a dedicated SSLContextBuilder component?",
+      "question_sha256": "407bcefdef6d4320d692dc84130d3a845b0c3c7896825acf8473f9d24048255e",
+      "reference_answer": "TLSServer currently creates a server SSLContext, loads its certificate/key, and conditionally sets CERT_OPTIONAL and CA trust before wrapping the socket (tests/testserver/server.py:159-176). A proposed SSLContextBuilder can accept those configuration values, create the context, separately load server credentials and client trust/verification settings, then return the configured context. TLSServer would retain socket lifecycle ownership and consume that result. This creates an independently testable configuration boundary but adds an abstraction worth using only if reuse or policy complexity justifies it. Preserve CERT_OPTIONAL in a behavior-preserving refactor; requiring a client certificate is a separate policy change.",
+      "reference_sha256": "71bd8ee34985d57bcb4e98a60bb12993205de3c9ac1728774d1e87c8007d9e3c",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-8ed00ecf9c50f52fe8c7d8fd"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "528dd71863354e23ead04f25b420235eed91c1ff0070aa85bcaf46e0be24a7c4",
+      "question": "Why does the `prepare()` method enforce a strict ordering where `prepare_auth()` must be called after `prepare_body()` and `prepare_hooks()` must be called after `prepare_auth()`, rather than allowing these steps to be reordered or parallelized?",
+      "question_sha256": "1752fe210dc9413a9fc686d20fc9dc0e6176a0e315509d06ecd890be39c73081",
+      "reference_answer": "prepare builds method, URL, headers, cookies, and body before auth so authenticators such as OAuth see a prepared request; auth can modify it and content length is recomputed (src/requests/models.py:366-377,597-608). User hooks are prepared after auth, explicitly because authenticators may add hooks. register_hook appends or extends the event list (src/requests/models.py:207-216), so this order places authenticator hooks before subsequently registered user hooks; merely reversing it does not inherently erase hooks. These stateful dependent steps are unsuitable for arbitrary parallelization.",
+      "reference_sha256": "847cd9cb9eb4b6c4447a3ccd91a9dca2f7dd073f468dcb2f2e3590730cd4a7c7",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-8f3b3367fe7626a04434b5a1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "2330d0c979d01af0c510428971db0bab4418cdbb8faeb411a78266faba7c06fa",
+      "question": "Why does the `prepare_body()` method raise `NotImplementedError` when both streaming data and files are provided, rather than attempting to merge or serialize them into a single multipart request?",
+      "question_sha256": "24bfac5257394edc6e0e27b8a92a05dbf32ec36441cd529687f16f50aa42f1fd",
+      "reference_answer": "prepare_body takes a streaming data object as the whole body and explicitly rejects simultaneous files (src/requests/models.py:517-555). The alternative file path uses _encode_files, which reads file objects and assembles multipart data (src/requests/models.py:185-203). Requests does not implement an encoder combining those paths here. Supporting it would require defining how streamed input maps to multipart parts and a suitable encoder, potentially streaming; the limitation is this implementation, not a fundamental prohibition on streaming multipart.",
+      "reference_sha256": "af63b19a284cd2f5f5822aef259f98a68ca76fce68e105c30d5d81435f3eac91",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-a136b5b7d111041c2be44e91"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "3ab3e837aba8ee63b8c9530b91920202fe13c1ff9588529d5bf9c92ceb3b5d52",
+      "question": "What is the impact of removing the `merge_cookies` function calls on the authentication flow when a session has both pre-configured cookies and request-specific cookies that need to be transmitted together?",
+      "question_sha256": "4cf75043846521994aaac548897c3ace1ac7c2079219d95f060a23e071202325",
+      "reference_answer": "prepare_request converts request cookies to a CookieJar, then merges session cookies and request cookies into a fresh jar (src/requests/sessions.py:467-476). CookieJar merging uses update or set_cookie; the separate dictionary branch uses overwrite=False (src/requests/cookies.py:542-561). Removing the merge without equivalent replacement can omit cookies required jointly by the server and thereby break cookie-based authentication; exact effects depend on which source remains. Redirects also merge session cookies before regenerating the Cookie header (src/requests/sessions.py:234-242). Cookie matching rules still determine which cookies are transmitted.",
+      "reference_sha256": "6409068ece782d3b8e3d3f6d68b5a1dad2fe613c2010a6d704890f809920ab33",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-aaeb63954dae3a661c8a99b0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "d56dc64f2bf20a2177e9be47cfbfb38f1b25a8f8469f823da4a64da6afa8aa91",
+      "question": "Why does the repeated invocation of key.lower() across __setitem__, __getitem__, and __delitem__ impact performance when CaseInsensitiveDict is used with high-frequency lookups on large datasets, and what optimization strategy could reduce this computational overhead?",
+      "question_sha256": "6e906223fd0f6d1090995baad64d3874f7120b5217c4a330447494b40a73efa2",
+      "reference_answer": "CaseInsensitiveDict lowercases the supplied key on set/get/delete and stores the lowercase key alongside the original casing and value (src/requests/structures.py:46-55). That adds work proportional to key processing on each operation, but the source does not establish significant performance degradation. Profile the workload first. For repeated access in an internal hot path, a carefully designed normalized-key lookup interface could reuse a normalized key; a bounded normalization cache is another tradeoff, adding lookup and memory costs. Preserve case-insensitive public semantics and original-key iteration behavior.",
+      "reference_sha256": "dd2aa6b3d546f638622d60c56116f023f054285abd358fd820523e5d4c8d822f",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-af0bea45befe058b4862c1c4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "08b1b260bf7bcaa188b4ba5ffa41647634ad68295dd0bb7a49fb005e47958a13",
+      "question": "How should the exception hierarchy in the requests library implement version validation logic to detect and handle mismatched dependency versions at runtime without breaking backward compatibility?",
+      "question_sha256": "6b4d903086e218da45d868c5f9210985d67cc8acfb556d423bae2421c444a27d",
+      "reference_answer": "Validation belongs in check_compatibility rather than exception classes. It parses versions and checks urllib3 major >=1 and, for major 1, minor >=21; despite its comment it does not check the 1.21 patch value. It checks chardet in [3.0.2,6.0.0) or charset_normalizer in [2.0.0,4.0.0) (src/requests/__init__.py:58-90). Import-time code converts AssertionError and ValueError into RequestsDependencyWarning (src/requests/__init__.py:107-119), a RequestsWarning subclass (src/requests/exceptions.py:142-151). This normally permits execution while reporting incompatibility; warning filters can turn warnings into errors, and asserts are disabled under optimized Python.",
+      "reference_sha256": "ad30913120fc037791a459e14033328276aa84fdc6625aea299948030bf1f26f",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-b348a53f091aeaf41581e3f4"
+    }
+  ]
+}

@@ -1,0 +1,490 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 163,
+            "file_sha256": "33604784129b509f04d81d901317d57fc35b00ae1916126d98a45e9416590e1e",
+            "path": "lib/matplotlib/backends/registry.py",
+            "start_line": 128
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the bootstrap logic that initializes the matplotlib_inline.backend_inline module located, and how does it determine whether to use the 'inline' backend identifier versus the full module path based on IPython version compatibility?",
+      "question_sha256": "e9370f9292a1bf8b0f048905425c4c47b76a1ee6a0a3f6a68cbf3c736c95610b",
+      "reference_answer": "The backend registry initialization logic is located in the `_read_entry_points()` method of the `BackendRegistry` class in `lib/matplotlib/backends/registry.py` (lines 128-163). This method handles the bootstrap logic for initializing external backend modules.\n\nThe logic does not directly check IPython version to determine which identifier format to use. Instead, it works as follows:\n\n1. **Entry Point Reading**: The method first reads entry points from packages that self-advertise as Matplotlib backends using `importlib.metadata.entry_points(group=\"matplotlib.backend\")` (line 136).\n\n2. **Backward Compatibility Creation**: If the `matplotlib_inline` package is installed but too old (version < 0.1.7) to include entry points, the `backward_compatible_entry_points()` helper function (lines 142-151) manually creates an entry point. It checks the package version using `importlib.metadata.version()` and `_parse_to_version_info()`, and if the version is below the threshold `(0, 1, 7)`, it adds an entry with name `\"inline\"` pointing to `\"matplotlib_inline.backend_inline\"` (lines 154-157).\n\n3. **Entry Point Storage**: The `_validate_and_store_entry_points()` method (lines 165-184) stores these entries in the `_name_to_module` mapping, converting the entry point name to a module path format: `\"inline\"` \u2192 `\"module://matplotlib_inline.backend_inline\"` (line 182).\n\n4. **Identifier Normalization**: When a backend identifier is validated in `is_valid_backend()` (lines 202-248), there's a backwards compatibility mapping (lines 229-233) that converts the full module path format to the shortened form:\n   ```python\n   backwards_compat = {\n       \"module://ipympl.backend_nbagg\": \"widget\",\n       \"module://matplotlib_inline.backend_inline\": \"inline\",\n   }\n   ```\n\nThe actual choice of which identifier format IPython uses (shortened `\"inline\"` vs full `\"module://matplotlib_inline.backend_inline\"`) is made by IPython itself based on its version (IPython >= 8.24 uses `\"inline\"`, older versions use the full module path). Matplotlib's registry accepts both forms and normalizes them through the backwards compatibility mapping, ensuring compatibility regardless of which format IPython provides.\n\nThe bootstrap logic ensures that even old versions of `matplotlib_inline` (without entry points) can be used by manually creating the entry point registration, while the normalization logic ensures both identifier formats resolve to the same backend module.",
+      "reference_sha256": "c6cc3893525851f976f62c9c28279ab919e0497faf6841121c1438f2aa0fdc6a",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-8993b4bacfe092b77bd92be9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "7c8dd57c46ca90f2a4390b9df55f87fe2e4e85dabeb0ae18797afbe56d875b40",
+            "kind": "file_reference",
+            "line_count": 1116,
+            "path": "lib/mpl_toolkits/axisartist/axis_artist.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where does the conditional evaluation of tick visibility and orientation in _update_label determine the data flow path for computing axislabel_pad, and what is the consequence of the nested boolean condition on the major_ticks.get_tick_out() call?",
+      "question_sha256": "d0f302dd449a3d1f90eaf06204c74cd9c93a1d54513ea46ca34cf9ba3abcd75c",
+      "reference_answer": "Based on my exploration of the matplotlib repository, specifically the `AxisArtist` class in `lib/mpl_toolkits/axisartist/axis_artist.py`, the consequence of the nested boolean condition in the `_update_label` method (lines 1005-1032) is that it determines which of two computation paths is used to calculate the padding value that controls the spacing between tick labels and the axis label.\n\nThe nested boolean condition appears on lines 1010-1013:\n\n```python\nif ((self.major_ticks.get_visible()\n     and not self.major_ticks.get_tick_out())\n    or (self.minor_ticks.get_visible()\n        and not self.major_ticks.get_tick_out())):\n    axislabel_pad = self.major_ticks._ticksize\nelse:\n    axislabel_pad = 0\n```\n\n**Consequence 1: Conditional padding assignment**\nWhen the condition evaluates to `True` (either major ticks are visible and drawn inside, OR minor ticks are visible and major ticks are drawn inside), the padding value is set to the major ticks' size (`self.major_ticks._ticksize`). When the condition is `False`, the padding is set to `0`. This padding value is then assigned to `self.label._external_pad` (line 1021), which directly affects the axis label's offset radius and thus its distance from the tick labels.\n\n**Consequence 2: Data flow path selection**\nThis nested condition only executes when `self._ticklabel_add_angle != self._axislabel_add_angle` (line 1009), meaning the tick label direction differs from the axis label direction. In this case, the padding computation depends on tick visibility and orientation. When the angles are equal, a different path is taken (lines 1018-1019) that uses the maximum of the tick labels' precomputed `_axislabel_pad` values instead.\n\n**Consequence 3: Potential logic issue**\nThere appears to be a logical inconsistency in the nested condition: on line 1013, it checks `self.minor_ticks.get_visible()` but then evaluates `not self.major_ticks.get_tick_out()` instead of `not self.minor_ticks.get_tick_out()`. This means the minor ticks' visibility is checked, but the major ticks' orientation is used, which may not be the intended behavior.\n\n**Consequence 4: Impact on label positioning**\nThe computed padding value directly influences the axis label's `_external_pad` attribute, which is combined with the internal pad (converted from points to pixels) to determine the label's `_offset_radius` (see `AxisLabel.draw()` method, lines 387-388). This radius controls how far the axis label is positioned from the axis line, ensuring proper spacing when ticks are visible and oriented in specific ways.",
+      "reference_sha256": "d90f74a0ab6bef5ebe4e6dd71e0c191b5f127a859d9a8ab0fc591a1479466935",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-8deba21ecfe58c872a8456d6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "eb53ce2e0c585c0337cf0cbcbd4e76dd075ba8c2fd4f7d1ba8c68399fef71905",
+            "kind": "file_reference",
+            "line_count": 1403,
+            "path": "lib/matplotlib/tests/test_triangulation.py"
+          },
+          {
+            "file_sha256": "f247778c33486eedf00406ab2265df534229f837e48ec76e74c813f6f948c36f",
+            "kind": "file_reference",
+            "line_count": 2068,
+            "path": "src/tri/_tri.cpp"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the test_tricontourf_path function validate that the path generation algorithm correctly handles the topological distinction between simple polygons, boundary-following polygons, and polygons with holes, and what would be the consequences of the path code sequence [1, 2, 2, 2, 79] being incorrectly implemented in the underlying tricontourf rendering system?",
+      "question_sha256": "ec8ae0a7b42a83aa12d1d56f1a712bb24dd001fd3bbf47959cd1dae6b27a90b9",
+      "reference_answer": "The test function validates that the path generation algorithm correctly handles topological distinctions between different polygon configurations to ensure the renderer can correctly interpret and fill the contour regions.\n\nThe test (`test_tricontourf_path` in `lib/matplotlib/tests/test_triangulation.py`) exercises three topological cases:\n\n1. **Simple polygon inside domain** (lines 1377-1384): A closed polygon entirely within the triangulation domain, producing path codes `[1, 2, 2, 2, 79]` (MOVETO, three LINETOs, CLOSEPOLY).\n\n2. **Boundary-following polygon** (lines 1386-1393): A polygon that follows the domain boundary and extends into the interior, also producing `[1, 2, 2, 2, 79]`.\n\n3. **Polygon with outer boundary and hole** (lines 1395-1403): An outer boundary polygon containing an inner hole, producing `[1, 2, 2, 2, 79, 1, 2, 2, 2, 79]` (two separate closed polygons in one path).\n\nThe path generation is implemented in `src/tri/_tri.cpp` via `create_filled_contour()` and `contour_to_segs_and_kinds()`. As noted in the code (lines 697-699), all polygons are combined into a single path array, and the renderer determines which polygons are holes using winding rules.\n\nThe test ensures:\n- Correct path code sequences for each topological case\n- Proper polygon closure (CLOSEPOLY=79) for closed contours\n- Correct vertex sequences matching expected geometry\n- Proper separation of multiple polygons in the path (for the hole case, verified via `to_polygons()` splitting)\n\nIf the path code sequence `[1, 2, 2, 2, 79]` were incorrectly implemented, the renderer might:\n- Fail to recognize polygon boundaries, leading to incorrect filling\n- Misinterpret polygon topology, causing holes to be filled or outer boundaries to be unfilled\n- Produce rendering artifacts due to incorrect path structure\n\nThe validation is critical because the renderer relies on the correct path code structure (MOVETO to start, LINETO for segments, CLOSEPOLY to close) to apply winding rules and determine fill regions, especially for complex cases with holes.",
+      "reference_sha256": "43d3a263f18ed91e0b447dcc6ddcc47e0fd5f661cf63d4eb8caa1d8a78d4e059",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-93dbd2c63ceae301bb0818a7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1958,
+            "file_sha256": "b4b9c3ed8c666554c1817726ce0bf127628174d7ef8594a68c07d4c1560f0fdd",
+            "path": "lib/matplotlib/axis.py",
+            "start_line": 1949
+          },
+          {
+            "end_line": 524,
+            "file_sha256": "b4b9c3ed8c666554c1817726ce0bf127628174d7ef8594a68c07d4c1560f0fdd",
+            "path": "lib/matplotlib/axis.py",
+            "start_line": 508
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the matplotlib ticker module enforce architectural separation between formatter and locator responsibilities to prevent type mismatches at the API boundary?",
+      "question_sha256": "fad200aa5d5c9e9304d4dea645adf720e58dad622b4d07960ee547eed8bd5b5f",
+      "reference_answer": "The tick locating and formatting module enforces architectural separation between the tick label generation class and the tick position determination class through multiple layers of type checking at the API boundary:\n\n1. **Separate class hierarchy**: Both classes inherit from `TickHelper`, but `Formatter` and `Locator` are distinct classes with separate responsibilities. `Formatter` handles converting tick values to strings, while `Locator` determines where ticks should be placed.\n\n2. **Type checking in setter methods**: The `Axis.set_major_formatter()` and `Axis.set_minor_formatter()` methods use `_api.check_isinstance(mticker.Formatter, formatter=formatter)` to validate that only `Formatter` instances are accepted. Similarly, `Axis.set_major_locator()` and `Axis.set_minor_locator()` use `_api.check_isinstance(mticker.Locator, locator=locator)` to ensure only `Locator` instances are accepted.\n\n3. **Explicit prevention in `_set_formatter()`**: The `_set_formatter()` method (lines 1949-1958 in `lib/matplotlib/axis.py`) contains explicit logic with a comment stating: \"Don't allow any other TickHelper to avoid easy-to-make errors, like using a Locator instead of a Formatter.\" This prevents other `TickHelper` subclasses (like `Locator`) from being used as formatters.\n\n4. **Property setter validation**: The `locator` and `formatter` properties (lines 508-524 in `lib/matplotlib/axis.py`) have setters that use `isinstance()` checks to raise `TypeError` if the wrong type is assigned.\n\n5. **Runtime type enforcement**: The `_api.check_isinstance()` function raises a `TypeError` with a descriptive message if the wrong type is provided, as demonstrated in the test cases (`test_majformatter_type`, `test_minformatter_type`, `test_majlocator_type`, `test_minlocator_type`) which verify that using a `Locator` as a `Formatter` or vice versa raises `TypeError`.\n\nThis multi-layered approach ensures that formatters and locators cannot be interchanged, preventing type mismatches and maintaining clear separation of concerns at the API boundary.",
+      "reference_sha256": "eaaa7e747bb7745a597b4985cf4da8da12b4b6389d2bf9f7ffdf7e41d776bf74",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-a030935bc12b7aa9dbcb410d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 150,
+            "file_sha256": "ba76b2798a275761ca619831f5bae157bc06e50426044892cadef93c5445a708",
+            "path": "galleries/examples/text_labels_and_annotations/angle_annotation.py",
+            "start_line": 148
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the coordinate transformation pipeline in get_center_in_pixels that reconciles the semantic difference between data coordinates stored in self._xydata and the pixel coordinate system required for screen-space rendering?",
+      "question_sha256": "c3f92266163bb9f134b6fce7c1d45acfb92904f7712270038a465ba2645f96d6",
+      "reference_answer": "The coordinate transformation pipeline in `get_center_in_pixels` uses matplotlib's Axes transform `transData` to convert from data coordinates to pixel coordinates.\n\n**Implementation Details:**\n\nThe method is defined in the `AngleAnnotation` class (located in `galleries/examples/text_labels_and_annotations/angle_annotation.py`, lines 148-150):\n\n```python\ndef get_center_in_pixels(self):\n    \"\"\"return center in pixels\"\"\"\n    return self.ax.transData.transform(self._xydata)\n```\n\n**The Transformation Pipeline:**\n\n1. **Input**: `self._xydata` stores coordinates in the plot's data coordinate system (the coordinate system of the plotted data, e.g., x-axis values and y-axis values as they appear in the data).\n\n2. **Transformation**: `self.ax.transData.transform()` applies the Axes data-to-display transform. This transform:\n   - Accounts for the axes limits (xlim, ylim)\n   - Applies the axes scaling (linear, log, etc.)\n   - Converts to display coordinates (pixels) relative to the figure\n\n3. **Output**: Pixel coordinates suitable for screen-space rendering.\n\n**Context and Purpose:**\n\nThe `AngleAnnotation` class subclasses `Arc` and sets its transform to `IdentityTransform()`, meaning it operates in pixel space. The `get_center_in_pixels` method is used as a property getter for `_center` (line 170), which the Arc drawing code accesses. Each time the arc's drawing method queries `_center`, it receives the result of `get_center_in_pixels`, ensuring the arc position stays synchronized with the data coordinates even when zooming or panning.\n\nThis reconciles the semantic difference: data coordinates are in the plot's domain (e.g., (4.5, 650) in data units), while pixel coordinates are in screen space (e.g., (320, 480) in pixels). The `transData` transform bridges this gap by applying all necessary scaling, translation, and coordinate system conversions.",
+      "reference_sha256": "e9ce07b48eddf16b069ad635306e083708f3472fe1e12ea5ddea16547cbf1611",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-a0f7771e25a4b68fc3a6a2b6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 153,
+            "file_sha256": "e9bc729c3b7d89a1b997eb3ebe640d74ba8e553f5c5569afef777fc35c8d7c51",
+            "path": "lib/matplotlib/textpath.py",
+            "start_line": 153
+          },
+          {
+            "end_line": 129,
+            "file_sha256": "b7507772418395b434c87e2cc645dd4be8516381bd50e6fa1e7b88e620b7c52e",
+            "path": "src/ft2font.cpp",
+            "start_line": 128
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the _update_glyph_map_defs method scale glyph vertices by 64 before path conversion and then apply a 1/64 scale transform in the SVG output?",
+      "question_sha256": "dae977dddc885304c3e77cf03ad74d54faebd88da05f24b80646a5f2dcb86f7d",
+      "reference_answer": "The method scales glyph vertices by 64 before path conversion and applies a 1/64 scale transform in the SVG output to preserve precision and produce more compact SVG path data by working with integer coordinates.\n\n**Technical Background:**\nFreeType stores glyph coordinates in 26.6 fixed-point format (64 subpixels per pixel), which are integers. When `get_path()` is called on a FreeType font object (as seen in `textpath.py` lines 153, 194, 243), it converts these integer coordinates to floating-point pixel coordinates by dividing by 64 (as shown in `ft2font.cpp` lines 128-129, 138-139, etc.).\n\n**The Scaling Process:**\n1. **Input**: The method receives glyph vertices as floating-point pixel coordinates (already divided by 64 from FreeType's internal units)\n2. **Scale up by 64**: Line 1030 multiplies vertices by 64: `Path(vertices * 64, codes)`, converting back to FreeType's internal integer units\n3. **Path conversion**: The path is converted to SVG path string format using these integer coordinates\n4. **Scale down in SVG**: Line 1033 applies a 1/64 scale transform: `transform=_generate_transform([('scale', (1 / 64,))])` to restore the correct visual size\n\n**Why This Approach:**\n- **Precision**: Working with integer coordinates during path conversion avoids floating-point rounding errors that could accumulate and distort glyph shapes\n- **Compactness**: Integer coordinates produce shorter, more efficient SVG path strings compared to floating-point values\n- **Fidelity**: By using FreeType's original integer representation, the method preserves the exact shape as defined in the font file, ensuring accurate glyph rendering\n\nThe comment on line 1028 explicitly states: \"x64 to go back to FreeType's internal (integral) units,\" confirming that this scaling is intentional to leverage the integer precision of FreeType's coordinate system.",
+      "reference_sha256": "7fbeb7f1024fc282735d620b8b6e44fa9dfcf6d73a5c1d565a524a48b875c88d",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-a322ec379eb5deb49b538467"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1286,
+            "file_sha256": "5a414623e13c050311ad0d59b60c5a2605e472edb66d1a409169fbe253f1639a",
+            "path": "lib/matplotlib/figure.py",
+            "start_line": 1286
+          },
+          {
+            "end_line": 84,
+            "file_sha256": "9b044d875de6210fb0a63415801681fcb58a3750224135a5760f97f672e65689",
+            "path": "lib/matplotlib/layout_engine.py",
+            "start_line": 84
+          },
+          {
+            "end_line": 1347,
+            "file_sha256": "5a414623e13c050311ad0d59b60c5a2605e472edb66d1a409169fbe253f1639a",
+            "path": "lib/matplotlib/figure.py",
+            "start_line": 1347
+          },
+          {
+            "end_line": 94,
+            "file_sha256": "9b044d875de6210fb0a63415801681fcb58a3750224135a5760f97f672e65689",
+            "path": "lib/matplotlib/layout_engine.py",
+            "start_line": 94
+          },
+          {
+            "end_line": 2728,
+            "file_sha256": "5a414623e13c050311ad0d59b60c5a2605e472edb66d1a409169fbe253f1639a",
+            "path": "lib/matplotlib/figure.py",
+            "start_line": 2727
+          },
+          {
+            "end_line": 216,
+            "file_sha256": "5a414623e13c050311ad0d59b60c5a2605e472edb66d1a409169fbe253f1639a",
+            "path": "lib/matplotlib/figure.py",
+            "start_line": 216
+          },
+          {
+            "end_line": 2668,
+            "file_sha256": "5a414623e13c050311ad0d59b60c5a2605e472edb66d1a409169fbe253f1639a",
+            "path": "lib/matplotlib/figure.py",
+            "start_line": 2668
+          },
+          {
+            "end_line": 3250,
+            "file_sha256": "5a414623e13c050311ad0d59b60c5a2605e472edb66d1a409169fbe253f1639a",
+            "path": "lib/matplotlib/figure.py",
+            "start_line": 3248
+          },
+          {
+            "end_line": 65,
+            "file_sha256": "9b044d875de6210fb0a63415801681fcb58a3750224135a5760f97f672e65689",
+            "path": "lib/matplotlib/layout_engine.py",
+            "start_line": 64
+          },
+          {
+            "end_line": 95,
+            "file_sha256": "9b044d875de6210fb0a63415801681fcb58a3750224135a5760f97f672e65689",
+            "path": "lib/matplotlib/layout_engine.py",
+            "start_line": 78
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What are the cascading side effects that occur when a LayoutEngine subclass fails to properly initialize the _colorbar_gridspec and _adjust_compatible class attributes before the colorbar_gridspec and adjust_compatible properties are accessed during figure rendering?",
+      "question_sha256": "b80888a87ce887d36d79c476418094e6202bf7c48e2b0b952576fbdd5fb9ae5b",
+      "reference_answer": "When a LayoutEngine subclass fails to initialize `_colorbar_gridspec` and `_adjust_compatible` (leaving them as `None`), accessing the corresponding properties raises `NotImplementedError` at multiple points in the figure lifecycle, causing cascading failures:\n\n1. **Colorbar creation failure** (`figure.py:1286`): During `Figure.colorbar()` calls, the code accesses `colorbar_gridspec` to decide between gridspec-based (`make_axes_gridspec`) and standard (`make_axes`) colorbar creation. If `_colorbar_gridspec` is `None`, the property raises `NotImplementedError` (from `layout_engine.py:84`), crashing colorbar creation.\n\n2. **Subplot adjustment failure** (`figure.py:1347`): When `Figure.subplots_adjust()` is called, it checks `adjust_compatible` to determine if the operation is allowed. If `_adjust_compatible` is `None`, the property raises `NotImplementedError` (from `layout_engine.py:94`), preventing subplot adjustments.\n\n3. **Layout engine switching failure** (`figure.py:2727-2728`): When switching layout engines (e.g., setting to 'none'), the code creates a `PlaceHolderLayoutEngine` that requires both `adjust_compatible` and `colorbar_gridspec` values from the current engine. If either property raises `NotImplementedError`, the engine switch fails, leaving the figure in an inconsistent state.\n\n4. **X-axis label alignment failure** (`figure.py:216`): During x-label alignment operations, the code checks `adjust_compatible` to decide whether to call `subplots_adjust`. If the property raises `NotImplementedError`, the alignment process fails.\n\n5. **Layout engine compatibility check failure** (`figure.py:2668`): When checking if a new layout engine is compatible with an existing one (to prevent incompatible switches when colorbars exist), the code accesses `colorbar_gridspec`. If it raises `NotImplementedError`, the compatibility check fails, potentially allowing incompatible engine switches that could break existing colorbars.\n\n6. **Cascading propagation**: These failures propagate upward because:\n   - Colorbar creation is often part of figure setup workflows\n   - `subplots_adjust` may be called automatically during rendering\n   - Layout engine operations are interwoven with figure drawing (`figure.py:3248-3250` shows `execute()` is called during `draw()`)\n   - One failure can prevent subsequent operations, breaking entire figure creation/rendering pipelines\n\nThe base `LayoutEngine` class (`layout_engine.py:64-65`) initializes both attributes to `None` as placeholders, expecting subclasses to override them. The properties (`layout_engine.py:78-95`) explicitly check for `None` and raise `NotImplementedError` to enforce proper subclass implementation, making uninitialized attributes a hard failure rather than a silent bug.",
+      "reference_sha256": "c5a0bab416e8bd61dbd6f90834f6fe14070115d63ffd035b30d5f050ff17970b",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-a42f31c1342a9ba178a03431"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "1dc1b0fdd2cb6b803bdac1d033133c26a76a1db5fdcc01a505d9e306c5398d18",
+            "kind": "file_reference",
+            "line_count": 2842,
+            "path": "lib/matplotlib/_mathtext.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "self.c",
+            "reason": "not_tracked",
+            "reference": "self.c",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "Why does the ParserState class use a property decorator for the font attribute instead of direct attribute access, and how does this design choice enable the coupling between font and font_class state management?",
+      "question_sha256": "57be125c0b0029ab2dc2a08b44b9df792b8cda8a55cd4cde9a3b9f63440dca91",
+      "reference_answer": "The parser state class (`ParserState` in `lib/matplotlib/_mathtext.py`) uses a property decorator for the `font` attribute instead of direct attribute access to automatically synchronize the `font_class` attribute when standard font names are set.\n\nImplementation details:\n\nThe `font` property is defined with both a getter and setter (lines 1766-1774):\n\n```python\n@property\ndef font(self) -> str:\n    return self._font\n\n@font.setter\ndef font(self, name: str) -> None:\n    if name in ('rm', 'it', 'bf', 'bfit'):\n        self.font_class = name\n    self._font = name\n```\n\nThe setter checks if the font name is one of the standard font classifications ('rm' for roman, 'it' for italic, 'bf' for boldface, 'bfit' for bold italic). When a match is found, it automatically updates `font_class` to match the font name (line 1773). This ensures that `font` and `font_class` remain synchronized for these standard font types.\n\nWhy this design is necessary:\n\n1. **Consistency requirement**: Both `font` and `font_class` are used together when retrieving font metrics. For example, in the `Char` class's `_update_metrics` method (line 1098), both values are passed to `get_metrics()`:\n   ```python\n   metrics = self.fontset.get_metrics(\n       self.font, self.font_class, self.c, self.fontsize, self.dpi)\n   ```\n\n2. **Automatic synchronization**: Without the property setter, code that sets `state.font = 'rm'` (as seen in multiple places, e.g., line 2211) would require manual updates to `font_class`, creating opportunities for inconsistency.\n\n3. **Encapsulation**: The property pattern hides the synchronization logic behind a simple assignment interface, making the API cleaner and less error-prone.\n\nThe property decorator enables this coupling by intercepting assignments to `font` and executing the synchronization logic transparently, ensuring that whenever standard font names are set, the corresponding `font_class` is automatically updated to maintain consistency throughout the mathtext parsing process.",
+      "reference_sha256": "6836971ade254022c880885f1f4e8c426964bbe36a495b56c993c86b13e96a49",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-a4f671a8d170db8bd6760b6e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 496,
+            "file_sha256": "04f1d1f21dcc93cf8cada638a996c20931e1ffa828b9c065c14bf688ddc56fe1",
+            "path": "lib/matplotlib/image.py",
+            "start_line": 496
+          },
+          {
+            "end_line": 860,
+            "file_sha256": "79280d6b2df4e465fa4d5a2bb9860bded559ca1fc7409be0ef59f953f0a92ab3",
+            "path": "lib/matplotlib/artist.py",
+            "start_line": 860
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "899b0cfbd638be878ab4a3ff225638018657362da7b864f10d26654d17479a94",
+            "kind": "file_reference",
+            "line_count": 703,
+            "path": "lib/matplotlib/colorizer.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the exception handling overhead in the get_alpha method's try-except block impact performance when called repeatedly in tight rendering loops, and what optimization strategy would minimize this overhead while preserving the fallback behavior?",
+      "question_sha256": "f73cb1aeeaf6119918e623f64eb12753706d82c8cc3f2c656afc6ca30fadd54b",
+      "reference_answer": "The exception handling in the alpha retrieval method of the colorizer interface base class impacts performance during repeated image rendering operations due to the overhead of Python's exception handling mechanism, even when no exception is raised.\n\nThe method is defined in `lib/matplotlib/colorizer.py` in the `_ColorizerInterface` class (lines 393-397):\n\n```python\ndef get_alpha(self):\n    try:\n        return super().get_alpha()\n    except AttributeError:\n        return 1\n```\n\nThis method is called during image rendering operations, specifically within the `make_image()` method of image classes (e.g., `_ImageBase` in `lib/matplotlib/image.py` at lines 496 and 509). Since `make_image()` is invoked for each image during rendering, and can be called repeatedly in animation or interactive scenarios, the cumulative overhead becomes significant.\n\nThe performance impact occurs because:\n\n1. **Exception handling setup overhead**: Python's try-except blocks have inherent overhead, even when no exception is raised. The interpreter must set up exception handling frames and maintain state for potential exceptions.\n\n2. **Method resolution overhead**: The `super().get_alpha()` call involves method resolution order (MRO) lookup, which adds overhead even before the actual method call.\n\n3. **Frequency of calls**: In rendering scenarios, `get_alpha()` can be called multiple times per image (e.g., once for resampled alpha at line 496, and again for post-processing at line 509), and this multiplies across all images in a figure.\n\n4. **Hot path execution**: This code executes in the \"hot path\" of rendering - the critical performance-sensitive code that runs frequently. Even small overheads accumulate significantly in such contexts.\n\nThe fallback behavior (returning 1 when `AttributeError` is raised) is necessary because `_ColorizerInterface` is a mixin class that may be used in inheritance hierarchies where the parent class might not always have a `get_alpha()` method. However, in the typical case where `ColorizingArtist` inherits from both `_ColorizerInterface` and `artist.Artist`, and `artist.Artist` does have `get_alpha()` (line 860 in `artist.py`), the exception is never actually raised, making the exception handling overhead unnecessary in the common case.\n\nThe performance impact is most noticeable when rendering many images, during animations with frequent redraws, or in interactive applications where rendering occurs repeatedly in response to user interactions or data updates.",
+      "reference_sha256": "4c95a2728255ce8eff316c0be1dd04c592639a61fb75b2c834c9a37b0d1b342f",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-af0ae4ee30f11b34dfeebcd3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 579,
+            "file_sha256": "3e733846187ca3daf248bf3f614f900c8726e95148d519240ae048b371a5f8e4",
+            "path": "lib/matplotlib/tests/test_transforms.py",
+            "start_line": 579
+          },
+          {
+            "end_line": 598,
+            "file_sha256": "3e733846187ca3daf248bf3f614f900c8726e95148d519240ae048b371a5f8e4",
+            "path": "lib/matplotlib/tests/test_transforms.py",
+            "start_line": 579
+          },
+          {
+            "end_line": 613,
+            "file_sha256": "3e733846187ca3daf248bf3f614f900c8726e95148d519240ae048b371a5f8e4",
+            "path": "lib/matplotlib/tests/test_transforms.py",
+            "start_line": 608
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "3e733846187ca3daf248bf3f614f900c8726e95148d519240ae048b371a5f8e4",
+            "kind": "file_reference",
+            "line_count": 1124,
+            "path": "lib/matplotlib/tests/test_transforms.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the NonAffineForTest class defined that is instantiated in the setup_method of TestBasicTransform?",
+      "question_sha256": "ea3ff184818321085267e5d7a8f31c8db944bb6e1deab69060345c72c64772f5",
+      "reference_answer": "The test helper class that simulates non-affine transform behavior is defined in the same file where it is instantiated, specifically in `lib/matplotlib/tests/test_transforms.py` at line 579.\n\nThe class definition appears as:\n\n```579:598:lib/matplotlib/tests/test_transforms.py\nclass NonAffineForTest(mtransforms.Transform):\n    \"\"\"\n    A class which looks like a non affine transform, but does whatever\n    the given transform does (even if it is affine). This is very useful\n    for testing NonAffine behaviour with a simple Affine transform.\n\n    \"\"\"\n    is_affine = False\n    output_dims = 2\n    input_dims = 2\n\n    def __init__(self, real_trans, *args, **kwargs):\n        self.real_trans = real_trans\n        super().__init__(*args, **kwargs)\n\n    def transform_non_affine(self, values):\n        return self.real_trans.transform(values)\n\n    def transform_path_non_affine(self, path):\n        return self.real_trans.transform_path(path)\n```\n\nThis class is instantiated in the `setup_method` of the `TestBasicTransform` test class, which is defined in the same file at line 601. The instantiation occurs at lines 608, 610, and 612 within the `setup_method` (which starts at line 602):\n\n```608:613:lib/matplotlib/tests/test_transforms.py\n        self.tn1 = NonAffineForTest(mtransforms.Affine2D().translate(1, 2),\n                                    shorthand_name='tn1')\n        self.tn2 = NonAffineForTest(mtransforms.Affine2D().translate(1, 2),\n                                    shorthand_name='tn2')\n        self.tn3 = NonAffineForTest(mtransforms.Affine2D().translate(1, 2),\n                                    shorthand_name='tn3')\n```\n\nBoth the class definition and its instantiation are located in the same test file: `lib/matplotlib/tests/test_transforms.py`, with the class defined 22 lines before the test class that uses it.",
+      "reference_sha256": "c041fa2cca3142f874e059632c2efe51505463df0dfda7cc485343b2a6110eed",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-bd12b4bba6477ccf397da3df"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 221,
+            "file_sha256": "b51b3e21a7cf8f140c6a03aa170c33f867733577e3596a5be30cc268dded4820",
+            "path": "lib/mpl_toolkits/axisartist/grid_finder.py",
+            "start_line": 193
+          },
+          {
+            "end_line": 1073,
+            "file_sha256": "7c8dd57c46ca90f2a4390b9df55f87fe2e4e85dabeb0ae18797afbe56d875b40",
+            "path": "lib/mpl_toolkits/axisartist/axis_artist.py",
+            "start_line": 1073
+          },
+          {
+            "end_line": 110,
+            "file_sha256": "694eb90a78fdbc42729430c5a5ab9820820985a4058350465734ae2bace2eeca",
+            "path": "lib/mpl_toolkits/axisartist/grid_helper_curvelinear.py",
+            "start_line": 110
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "694eb90a78fdbc42729430c5a5ab9820820985a4058350465734ae2bace2eeca",
+            "kind": "file_reference",
+            "line_count": 352,
+            "path": "lib/mpl_toolkits/axisartist/grid_helper_curvelinear.py"
+          },
+          {
+            "file_sha256": "7c8dd57c46ca90f2a4390b9df55f87fe2e4e85dabeb0ae18797afbe56d875b40",
+            "kind": "file_reference",
+            "line_count": 1116,
+            "path": "lib/mpl_toolkits/axisartist/axis_artist.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What are the cascading effects that would occur in the axis rendering pipeline if modifications to the GridHelperCurveLinear's grid information structure propagate through FixedAxisArtistHelper's tick iteration logic?",
+      "question_sha256": "8c2f378bb26a9bd77a744f5891842392adf5c20db74459f60b1c700f5fe06614",
+      "reference_answer": "Cascading effects when modifications to the grid data dictionary in the curvilinear helper propagate through the tick iteration method in the fixed-axis helper:\n\n1. Direct tick data propagation: In `grid_helper_curvelinear.py`, `FixedAxisArtistHelper.get_tick_iterators()` (lines 115-134) directly accesses `self.grid_helper._grid_info[[\"lon\", \"lat\"][nth_coord]]` and iterates through `gi[\"ticks\"][side]`. Changes to `_grid_info` immediately affect what ticks are yielded.\n\n2. Tick rendering impact: The axis rendering pipeline in `axis_artist.py` calls `get_tick_iterators()` during `_update_ticks()` (line 938), which processes the yielded ticks to set locations, angles, and labels for `major_ticks` and `major_ticklabels` (lines 940-948). Modifications to the grid data dictionary therefore directly affect which ticks are drawn and their positions.\n\n3. Label propagation: The grid data dictionary contains pre-formatted labels in `\"lon_labels\"` and `\"lat_labels\"` (populated in `grid_finder.py` lines 193-221). Changes to these propagate through the tick iteration, affecting displayed tick labels.\n\n4. Coordinate-dependent effects: The tick iteration logic selects coordinate-specific data (`[\"lon\", \"lat\"][nth_coord]`) and side-specific ticks (`gi[\"ticks\"][side]`). Modifications to the grid data structure can affect different axes differently depending on which coordinate and side are being rendered.\n\n5. Rendering pipeline synchronization: The rendering pipeline calls `update_lim()` on the helper (line 1073 in `axis_artist.py`), which triggers `grid_helper.update_lim()` (line 110 in `grid_helper_curvelinear.py`), ensuring the grid data dictionary is refreshed before tick iteration. If modifications occur between `update_lim()` and `get_tick_iterators()`, stale or inconsistent data may be used.\n\n6. Multiple axis dependencies: Since multiple `FixedAxisArtistHelper` instances can share the same `GridHelperCurveLinear` instance, modifications to the shared `_grid_info` dictionary affect all dependent axes simultaneously, creating cascading effects across the entire plot.\n\nThe tight coupling between the grid data dictionary structure and the tick iteration logic means any structural changes (e.g., key names, data format, or organization) would require corresponding changes in the iteration method to maintain functionality.\n</start_of_answer>",
+      "reference_sha256": "af3df2d946b7f44c83118bc3ba095273c79a0c1d5176227d06390e3e3a020ad0",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-c083e2386ac62f7220b91ad0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 719,
+            "file_sha256": "1dc1b0fdd2cb6b803bdac1d033133c26a76a1db5fdcc01a505d9e306c5398d18",
+            "path": "lib/matplotlib/_mathtext.py",
+            "start_line": 719
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the glyph lookup control flow in DejaVuSerifFonts traverse the fallback chain from the _fontmap dictionary through DejaVuFonts parent class to ultimately reach StixSerif when a glyph is not found?",
+      "question_sha256": "08a274c0b23b95628cb5036a2afa017cec667084699f2768e2a2fd903d4ca8b5",
+      "reference_answer": "The glyph lookup control flow in the DejaVu serif font handling class traverses the fallback chain through the following path:\n\n1. **Initial lookup in DejaVuSerifFonts**: The class defines a `_fontmap` dictionary (at line 719 in `./lib/matplotlib/_mathtext.py`) that maps font style keys ('rm', 'it', 'bf', etc.) to DejaVu Serif font names.\n\n2. **DejaVuFonts._get_glyph method** (line 696): When a glyph lookup is requested, the method first checks for the prime symbol (line 699), then checks the display font ('ex') (lines 704-708), and finally calls `super()._get_glyph()` (line 710), which invokes the parent class method.\n\n3. **UnicodeFonts._get_glyph method** (line 601): This is the parent class method that performs the actual glyph lookup. It:\n   - Converts the symbol to a Unicode index (line 604)\n   - Maps virtual fonts if needed (line 611)\n   - Attempts to retrieve the font using `_get_font()` (line 627), which uses the `fontmap` (populated from `_fontmap` during initialization)\n   - Checks if the glyph exists in the font using `font.get_char_index(uniindex)` (line 634)\n   - Sets `found_symbol = True` if the glyph index is non-zero (line 636)\n\n4. **Fallback to StixFonts** (line 638-644): If `found_symbol` remains `False` after the lookup attempt, the code checks if `self._fallback_font` exists (line 639). For DejaVuSerifFonts instances, this fallback font is set to `StixFonts` during initialization in `DejaVuFonts.__init__` (line 678). The fallback is then invoked by calling `self._fallback_font._get_glyph(fontname, font_class, sym)` (line 644), which delegates to the STIX serif font handling class.\n\nThe key connection points are:\n- The `_fontmap` dictionary is used during `DejaVuFonts.__init__` (lines 684-690) to populate the `fontmap` attribute, which is then used by `_get_font()` to retrieve actual font files.\n- The fallback font (`StixFonts`) is instantiated and assigned to `self._fallback_font` in `DejaVuFonts.__init__` (line 678) when the instance is a `DejaVuSerifFonts`.\n- The fallback chain is traversed in `UnicodeFonts._get_glyph` at line 644, where it calls the fallback font's `_get_glyph` method when the primary lookup fails.",
+      "reference_sha256": "6c9cdb42282d850bed3abb4de1ba6eb88f78253a772b5d1f5a0c60ed21bb241c",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-caef4a7fc0ec85d7abd2326f"
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-067.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "963a6c83c99cf690919a165dbaf368e91749b5870f088052dbb323dd4bb2fdc5",
+      "question": "Where would the source code analysis process determine whether a function with no parameters, calls, or control flow statements serves as an actual execution component or merely a documentation-only element in the module's code processing workflow?",
+      "question_sha256": "ae6ca1c1fcd79b01da3f3f5e7bc78e0812a7f1f9107ab5fe5a5616551d5c79d8",
+      "reference_answer": "There is no such execution-versus-documentation classification here. ModuleAnalyzer.analyze extracts comments, annotations, overloads and definition tags (sphinx/pycode/__init__.py:136-160). viewcode has_tag records the documenting page in used[fullname], not whether a function executes (sphinx/ext/viewcode.py:120-147). An empty function cannot be classified as documentation-only from those records.",
+      "reference_sha256": "76a33300e40b0079c359b45e659290a633b0d48cbd4c5d9233145c990b4a68ca",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-8a1b4bc29f4fbb3746430985"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "480217ecedac31f5942969c6aab9caf284efc8a0522efa9f9e9c372aa41741fa",
+      "question": "What is the interaction mechanism between the conditional logic that checks the object type attribute in the index text generation method and the translation system that produces semantically different index entries for class-like objects in the Python documentation domain?",
+      "question_sha256": "c7afaae2f94d1fdea5d6e9f775458b01dd4c04ce4d27f5c60ede5842173651c0",
+      "reference_answer": "PyClasslike.get_index_text branches on objtype: classes use translated built-in/module-context templates, exceptions return the bare name, and other types return an empty string (sphinx/domains/python/__init__.py:216-224). The translation proxy resolves gettext in __str__ (sphinx/locale/__init__.py:33-38); its __mod__ invokes that during percent interpolation (70-71). Thus get_index_text already returns the formatted string, rather than deferring translation until index insertion.",
+      "reference_sha256": "8ffe7f17a397ea9b7c6d9877c710e800315b59ada2308dd9e97c4dd459396dc1",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-8fadaa46ebcbc01e44c5e1a0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "e37683572622b2274c3e443e270b7c71459ceb59dc43308cedd2800bbdcdb12f",
+      "question": "Why would repeated calls to the reStructuredText parsing function that performs full document transformation cycles and multiple recursive tree validation assertions impact test execution performance when scaling across hundreds of similar domain parsing scenarios?",
+      "question_sha256": "cf6b123c768b369eea1febf23bc91d828ca533fce5b1a17bc55566e5b9df5ba3",
+      "reference_answer": "Each testing parse call creates an RSTParser and calls _parse_str_to_doctree with registry transforms (sphinx/testing/restructuredtext.py:14-46). That helper creates a document and transformer, parses the text and applies reader, supplied and parser transforms (sphinx/util/docutils.py:837-896). assert_node recursively checks the supplied shape and attributes (sphinx/testing/util.py:31-75). These are candidate repeated costs; the code alone does not establish a bottleneck or quantify slowdown. Profile representative tests before reusing parsed trees, since parsing and transforms mutate document/environment state.",
+      "reference_sha256": "b7dce4e52a0c69c4601aa7bd8f9c3b017510127146140ca385a858593726c85e",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-9802de50f1c951e1213e045a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "918117281d7a49c2c39116108fcf6b35f990e8be0460726dd42ffd0845b00904",
+      "question": "Why does the custom LaTeX node class that wraps literal blocks with captions and inherits from the docutils container node class cause performance degradation during document traversal when the container's node visitation mechanism performs redundant type checking on every child node?",
+      "question_sha256": "1967ffc06b0de3342b63e9addc55e381b538d202f35bf417ba05b83a4b670625",
+      "reference_answer": "captioned_literal_block is a container subclass (sphinx/builders/latex/nodes.py:8-11). Dispatch searches the MRO but stops at the first matching visitor (sphinx/util/docutils.py:772-786); LaTeX supplies direct visit/depart handlers (sphinx/writers/latex.py:2200-2204). The source does not establish a performance decline from repeated fallback lookups. Additional wrapper nodes entail traversal work, but any material slowdown needs measurement.",
+      "reference_sha256": "7dd2000eda79b7135d2664e6ceb8aae3e3cd222b49d56dc6e396eb1189e603f9",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-acf27031026a9e7b6bdfe2ac"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "b0fdfedb12c9f56524068216d6eb9829ea67fe96617d128bca9ad75f8f1a6836",
+      "question": "How does the identifier caching dictionary in the EPUB builder's generation method interact with environment pickling to ensure consistent identifier assignment across build runs while maintaining thread safety?",
+      "question_sha256": "deb294c3ffd748b5b72e7b62d212e4473eba50d3d082b3d24d41cd212de88339",
+      "reference_answer": "make_id caches names within the builder and generates epub-N on a miss; init resets the cache (sphinx/builders/_epub_base.py:165-190). Environment pickling copies state and restores it, but does not persist the builder cache or promise stable filename-to-ID assignment across runs (sphinx/environment/__init__.py:241-253). Preserved counters would advance rather than regenerate previous values. The claim that parallel processing is disabled is false: StandaloneHTMLBuilder sets allow_parallel=True (sphinx/builders/html/__init__.py:110-119). make_id itself has no lock, so these snippets provide no general concurrent-access guarantee.",
+      "reference_sha256": "5ddc1e21527608de8f9a03896f01e04aa304a296f71423564150bd056facf14b",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-aeb7dd01a07689a657eedb9c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "7d1c735ac307113629ab272f664290d30923f3bc816b0fa354a7b516d9a0101c",
+      "question": "How should the mechanism that resolves parameter type annotations in docstrings be refactored to remove duplicate parsing when multiple type field tags describe the same type for keyword-only arguments?",
+      "question_sha256": "48c9e00d5458206a852794148e9546f2cc5f575330fb1038eb05980bdf7ab1ce",
+      "reference_answer": "First distinguish alias handling from repeated parsing. Napoleon registers paramtype and kwtype for its keyword field (sphinx/ext/napoleon/__init__.py:352-360). DocFieldTransformer resolves each tag through typemap, then stores content under types[typedesc.name][fieldarg]; repeated keys overwrite rather than retain two types (sphinx/util/docfields.py:387-448). The cited fixture tests separate arguments, not duplicate tags on one argument (tests/roots/test-ext-napoleon-paramtype/pkg/foo.py:4-28). If profiling establishes duplicate work, normalize aliases to that existing logical key and optionally skip identical content while preserving defined conflict precedence. A check at this stage cannot avoid initial reStructuredText parsing because field nodes already exist.",
+      "reference_sha256": "59f3d8ad110371912f25049c95a53f6b320536561f6d4df1a697a445f3eacead",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-c12184a1bcbb300cb7b99a7b"
+    }
+  ]
+}

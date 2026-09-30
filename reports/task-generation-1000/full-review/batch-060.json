@@ -1,0 +1,274 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-03c353ad6fa3ffc08d120bf1",
+      "reference_sha256": "09423f3eb4b61b94e9ed22701af8715a335dcfc0f1151a8653cf161a35b3cd4b",
+      "question_sha256": "1ca419eee2f4d14fa6b2fcb92c4d5901d7e8b6fc1c46f44636ac504f6a6e6f16",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "BaseSVC delegates probability to libsvm and log to log(proba)",
+          "verdict": "supported",
+          "reason": "Prediction methods and parameter passing directly inspected.",
+          "evidence": {
+            "path": "sklearn/svm/_base.py",
+            "start_line": 847,
+            "end_line": 938
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-111271e1beeaffda07e7e679",
+      "reference_sha256": "5b305e0d5da9979f968faa908b9c2465513cce2053521e5ae24a8f8f930110a5",
+      "question_sha256": "3719937f008dfb08e737e8b69aff7445c4744dcf5ec1516ac34429e592e230fc",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Embedding estimators transformed before plot helper",
+          "verdict": "supported",
+          "reason": "Imports and fit_transform loop feed projections into plot_embedding.",
+          "evidence": {
+            "path": "examples/manifold/plot_lle_digits.py",
+            "start_line": 159,
+            "end_line": 176
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-13e632d561c0b1740b2074fa",
+      "reference_sha256": "89e0f8fa079692fbef85a2d40d7f6a4c688ed97acc52b4403c230e56b09d5aab",
+      "question_sha256": "dcec51daa2f42ec53a69c6e8bab6409812feff003d9b038d86b7d2291ad732bf",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Final estimator missing request always causes unrouted TypeError",
+          "verdict": "contradicted",
+          "reason": "Routing considers all objects; unset request produces a separate unrequested-metadata path.",
+          "evidence": {
+            "path": "sklearn/utils/_metadata_requests.py",
+            "start_line": 461,
+            "end_line": 474
+          }
+        }
+      ],
+      "material_errors": [
+        "Routing considers all objects; unset request produces a separate unrequested-metadata path."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Pipeline routing validates metadata against the routing graph, not just the final estimator. validate_metadata rejects names routed to no object (sklearn/utils/_metadata_requests.py:1110-1124). At a consumer, True forwards a requested value, False ignores it, and None records a supplied value as unrequested for an error (lines 461-474). Intermediate steps may request sample_weight even when the final estimator does not. Explicit requests avoid silently passing metadata to the wrong consumer; missing support and an unset request are distinct cases."
+    },
+    {
+      "task_id": "import-18f1bdc95f3006c4e6746b8f",
+      "reference_sha256": "e7233a5448f01f0f219a733ef71077652af357fec3fd79e9acca59717cf3e34b",
+      "question_sha256": "7c271ab27957bcea36b6fdf51c888e454bbb1c33d190cf896941eaf4ca52df15",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Array function name chooses return or error",
+          "verdict": "supported",
+          "reason": "Exact name check and TypeError directly visible.",
+          "evidence": {
+            "path": "sklearn/utils/estimator_checks.py",
+            "start_line": 951,
+            "end_line": 954
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-1ac88ef029f81440cbfd6431",
+      "reference_sha256": "1fe17c335103f2ac3d2c68e86608a10c41feeb3ccec734e5151634e2370dd585",
+      "question_sha256": "6078f55972ad0bf46843864fe4eeb5115713b8b3dc44c6c0aeff46526d01253c",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Shrinkage modifies deviations then reconstructs centroids",
+          "verdict": "supported",
+          "reason": "Sign/subtract/clip/reapply and same scale inverse explicitly implemented.",
+          "evidence": {
+            "path": "sklearn/neighbors/_nearest_centroid.py",
+            "start_line": 252,
+            "end_line": 272
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-1af9fb0fba15575c4a366234",
+      "reference_sha256": "eebcdce5d3fcb0b23c3f196bdc5a20e5cf21d9bbccb264d877c9d5e250495e70",
+      "question_sha256": "1f6d2e05e974d2b3ebd48de0c5c849ae2fdc8688aec3113b8dd3f7b71b8934ff",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Squaring is only valid for euclidean distances",
+          "verdict": "partially_supported",
+          "reason": "Availability rule correct, mathematical justification falsely says other distances cannot be squared.",
+          "evidence": {
+            "path": "sklearn/neighbors/_nearest_centroid.py",
+            "start_line": 337,
+            "end_line": 350
+          }
+        }
+      ],
+      "material_errors": [
+        "Availability rule correct, mathematical justification falsely says other distances cannot be squared."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "NearestCentroid wraps decision_function, predict_proba and predict_log_proba with available_if(_check_euclidean_metric); the predicate checks metric == \"euclidean\" (sklearn/neighbors/_nearest_centroid.py:337-350). The descriptor raises AttributeError when the predicate fails, so hasattr on a Manhattan-configured instance is false (sklearn/utils/_available_if.py:27-44). This makes availability metric-dependent. The discriminant implementation is designed for Euclidean scoring; squaring a non-Euclidean distance is mathematically possible but does not establish the same model."
+    },
+    {
+      "task_id": "import-1ba513c05f25d8f0d106a05c",
+      "reference_sha256": "e7dca4fbe0423228799f5e1d9fef2c157b05043d80cef447cd7c5e7a425f9cc5",
+      "question_sha256": "7966ceb13259e03e8b2f9421388e5d98e9e7b7615040ce836e59d6522818626a",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "BaseEstimator._validate_params checks skip flag",
+          "verdict": "partially_supported",
+          "reason": "Guard belongs to calling decorator; direct _validate_params unconditionally calls validator.",
+          "evidence": {
+            "path": "sklearn/base.py",
+            "start_line": 463,
+            "end_line": 475
+          }
+        }
+      ],
+      "material_errors": [
+        "Guard belongs to calling decorator; direct _validate_params unconditionally calls validator."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The \"cv_object\" constraint expands to _CVObjects, whose predicate accepts any of its integer>=2, split/get_n_splits, iterable-not-string, or None alternatives (sklearn/utils/_param_validation.py:735-744). validate_parameter_constraints accepts a parameter when one constraint passes and otherwise raises InvalidParameterError. BaseEstimator._validate_params directly delegates to that validator (sklearn/base.py:463-475); _fit_context supplies the skip-validation and fitted-partial_fit guards before calling it (lines 1351-1359). Thus the boolean is consumed by validation rather than returned as the fit result."
+    },
+    {
+      "task_id": "import-1c055f43bc6d8dc15a443d12",
+      "reference_sha256": "2578cd0b61858491ae1fac6b7beb3fe0516053a046d3778da69a2044cb6ce548",
+      "question_sha256": "98e1ea15089224b44739aecbee824e4b3ac4eb165340d7c856034c5b36982fc3",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Explicit solver override violates validation default contract",
+          "verdict": "contradicted",
+          "reason": "Defaults apply only when not overridden; solver-specific validation is intentional specialization.",
+          "evidence": {
+            "path": "sklearn/linear_model/_logistic.py",
+            "start_line": 1249,
+            "end_line": 1257
+          }
+        }
+      ],
+      "material_errors": [
+        "Defaults apply only when not overridden; solver-specific validation is intentional specialization."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "There is no mismatch with a default argument contract: LogisticRegression.fit explicitly supplies accept_large_sparse=solver not in [\"liblinear\", \"sag\", \"saga\"] to validate_data (sklearn/linear_model/_logistic.py:1249-1257). Those solvers therefore reject unsupported large sparse indices, while the other paths allow them. A validator default of True does not promise that every estimator using the validator accepts 64-bit indices."
+    },
+    {
+      "task_id": "import-1fe68f4454e2cf101c9e166f",
+      "reference_sha256": "b8fef82a0a3ccf23f13bbbe44449d2fd60517a64cbe370f55efadff8cfb7e920",
+      "question_sha256": "64f55657f31acc9f28aa9857f24a8a789f716ce8dd2983e3e2a54a1c44d76a7f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Estimator display path delegates after response extraction",
+          "verdict": "supported",
+          "reason": "RocCurveDisplay passes extracted score and options to from_predictions.",
+          "evidence": {
+            "path": "sklearn/metrics/_plot/roc_curve.py",
+            "start_line": 427,
+            "end_line": 449
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-2516a52c8fbb9da2afca507a",
+      "reference_sha256": "50e0047c8a30fdf869939338beb0f35c0f79f38454614b2b887eeffe0d0b8bbf",
+      "question_sha256": "ef3c7f99f61a4d70ac025f65dfabcda2da1b67b88c4b92ccb9257dc290d4a1ac",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Metric and sparsity select mean or specialized median",
+          "verdict": "supported",
+          "reason": "Shared centroid array and sparse/dense median branches explicit.",
+          "evidence": {
+            "path": "sklearn/neighbors/_nearest_centroid.py",
+            "start_line": 215,
+            "end_line": 233
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-2b68938f4832c48ae2956b42",
+      "reference_sha256": "723619c85f619b6d26b5d68a59b656f9e8199896bf88675ad3ad7257303d3a54",
+      "question_sha256": "ad86ca0a8372a29f65c64035e4649d038a74a9cb9e8ad88772461db021df9c59",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Exception handling is significant bulk-recovery bottleneck",
+          "verdict": "partially_supported",
+          "reason": "Source establishes retry exclusion and extra fallback call, not measured overhead or cascading failures.",
+          "evidence": {
+            "path": "sklearn/datasets/_openml.py",
+            "start_line": 97,
+            "end_line": 113
+          }
+        }
+      ],
+      "material_errors": [
+        "Source establishes retry exclusion and extra fallback call, not measured overhead or cascading failures."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "HTTP 412 is treated as an OpenML application error, so the network retry wrapper immediately re-raises it rather than sleeping and retrying (sklearn/datasets/_openml.py:97-113). The JSON API helper converts it to OpenMLError (lines 246-255). Name/version lookup can then try a deactivated-dataset URL (lines 337-350), adding another request when the fallback is needed. These are concrete control-flow and network-cost implications; the code provides no measurement that Python exception overhead is significant at scale and does not establish cascading failure behavior."
+    },
+    {
+      "task_id": "import-2fa42694820c172f327e517b",
+      "reference_sha256": "1d41d39f0c51e397508f2779079f14a7911fff66d9dd4f23c800106d3bc79867",
+      "question_sha256": "deb8a440a36a8c378817a30552dc9a73909b4fdd0baf0f3b59d320f4159b3030",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Tuple wrapper transforms first item and preserves remaining values",
+          "verdict": "supported",
+          "reason": "Wrapper and namedtuple _make explicit.",
+          "evidence": {
+            "path": "sklearn/utils/_set_output.py",
+            "start_line": 311,
+            "end_line": 329
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    }
+  ]
+}

@@ -1,0 +1,274 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-05efdeacba8b181cce5faa64",
+      "reference_sha256": "4058b45099919968299450974a987c8d96dee4f77fd50dd934a4f60d7785beb1",
+      "question_sha256": "d765124ac1be5e92d922298f9de596f90587b122facd09c2779f0aad3190a3c8",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Generator would avoid creating templater items and partial lookup work",
+          "verdict": "partially_supported",
+          "reason": "Classes already exist; consumer fully constructs dictionary, so lazy early-stop claim false on this path.",
+          "evidence": {
+            "path": "src/sqlfluff/core/config/fluffconfig.py",
+            "start_line": 442,
+            "end_line": 447
+          }
+        }
+      ],
+      "material_errors": [
+        "Classes already exist; consumer fully constructs dictionary, so lazy early-stop claim false on this path."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "get_templaters consumes core_templaters into a list, allocating a container of references to existing templater classes, not creating the classes themselves (src/sqlfluff/core/plugin/lib.py:24-28). Returning a generator could defer enumeration, but get_templater_class fully consumes hook results into a name-to-class dictionary anyway (src/sqlfluff/core/config/fluffconfig.py:442-447). Therefore this call path would not gain early termination when looking up one name. The practical memory/performance significance of a four-entry list is not established."
+    },
+    {
+      "task_id": "import-0bf96393934c3bf7b8f86373",
+      "reference_sha256": "a5c54be905ea32850939f5c36dc888522a8b97589fb6c3dd01d7ec7fb5e0530a",
+      "question_sha256": "51a4254b946f4e80fe0d2531a68a64a7c59dec5052125e037683983cdc0291e4",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Standalone header proves architectural failure",
+          "verdict": "partially_supported",
+          "reason": "Different dispatch paths visible; nonempty header unaffected by empty filter and concurrency/redirection fault not demonstrated.",
+          "evidence": {
+            "path": "src/sqlfluff/cli/formatters.py",
+            "start_line": 62,
+            "end_line": 78
+          }
+        }
+      ],
+      "material_errors": [
+        "Different dispatch paths visible; nonempty header unaffected by empty filter and concurrency/redirection fault not demonstrated."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "format_linting_result_header uses StringIO only to construct and return a header string (src/sqlfluff/cli/formatters.py:62-66). OutputStreamFormatter additionally owns output delivery: _dispatch filters empty messages and writes to its OutputStream (lines 111-118). String construction and destination management are distinct responsibilities. A caller using click.echo bypasses that managed stream, but the nonempty header would not be suppressed by _filter_empty, and this alone does not establish a concurrency or redirection bug."
+    },
+    {
+      "task_id": "import-0fefd75f2ce0dc24c243e662",
+      "reference_sha256": "6d1ef62f86b8a93f1d5765df333f5b9225b54ed6682080f4a672a068e7c3a8b3",
+      "question_sha256": "6e47602939232ba7c87ae8398a31c70307c2e2bbf3bffc41b4a73af9c8e64a89",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Parser produces wholly dialect-agnostic tree",
+          "verdict": "partially_supported",
+          "reason": "Common BaseSegment interface does not erase dialect-specific classes/grammar; rules also get dialect.",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/parser.py",
+            "start_line": 24,
+            "end_line": 55
+          }
+        }
+      ],
+      "material_errors": [
+        "Common BaseSegment interface does not erase dialect-specific classes/grammar; rules also get dialect."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Linter separates dialect-configured parsing from rule traversal. Parser selects the configured dialect\u2019s root segment, builds a parse context, and calls root_parse to obtain a BaseSegment tree (src/sqlfluff/core/parser/parser.py:24-55). Rules consume the common segment interface and receive dialect context. This decouples rule orchestration from grammar execution without making the tree or every rule semantically dialect-independent."
+    },
+    {
+      "task_id": "import-1f304e15b38676509094206d",
+      "reference_sha256": "f77052f5b8d4a0a48fe3625e21ade79e54393dc73da12e8544f77e1698af3b6f",
+      "question_sha256": "380b6666455d7b86ecc0efc35992e2244099427911a17392cd3a890cc25d1347",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Value-table function helper partitions aliases",
+          "verdict": "supported",
+          "reason": "Dialect set lookup and standalone/table branches explicit.",
+          "evidence": {
+            "path": "src/sqlfluff/utils/analysis/select.py",
+            "start_line": 149,
+            "end_line": 179
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-20c7e039705d85ba8ca6746e",
+      "reference_sha256": "3d03d9958e8184f8edbd7dfd9501624d37cbb0f213863bf530de0f993463c77e",
+      "question_sha256": "b54fc57bab6d4ddac145aa153d9baa901a435a9178e1bb6757c144fcaed69d21",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "BigQuery source-unmatched grammar allows update/delete",
+          "verdict": "supported",
+          "reason": "Sequence exactly matches described tokens and optional condition.",
+          "evidence": {
+            "path": "src/sqlfluff/dialects/dialect_bigquery.py",
+            "start_line": 2654,
+            "end_line": 2677
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-43c7ff8e4743c2fe25176be1",
+      "reference_sha256": "b2e7109e5f2736ce9a00816929f6f414af900f6fa43bc6ffa74c992d85e1451b",
+      "question_sha256": "979330b374b8016543d1cb4b2c82294f3a966418452a89b10a7b3b0b9a91eea1",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Later conversion types wrap prior edits",
+          "verdict": "supported",
+          "reason": "Truthy guard and sequential outer wrappers explicit.",
+          "evidence": {
+            "path": "src/sqlfluff/rules/convention/CV11.py",
+            "start_line": 130,
+            "end_line": 162
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-4472dde973e9af984b747b45",
+      "reference_sha256": "384079432a4f4fd0a35d4b8cb83e2856b7e77ae3a52621389aee48d378e115bd",
+      "question_sha256": "d65c4813792025282676c31ea43249e656354c7bfb734916bd5fecc0e4577df1",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Anything chooses greedy terminators from local/context",
+          "verdict": "supported",
+          "reason": "reset guard and greedy delegation explicit.",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/grammar/base.py",
+            "start_line": 453,
+            "end_line": 485
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-48c9abe300bb647d3146eed0",
+      "reference_sha256": "63eaeecd852a431a52271dbc0aaeca09b1c0d8fe150182398de4c1a713336ba5",
+      "question_sha256": "e7d2149934530dc7149a8ab33785b6cc5089b602870d016ba2f911e913688d32",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "TSQL JSON external file grammar location",
+          "verdict": "supported",
+          "reason": "Delimited format type and optional compression directly inspected.",
+          "evidence": {
+            "path": "src/sqlfluff/dialects/dialect_tsql.py",
+            "start_line": 6326,
+            "end_line": 6346
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-4aede424b126a86b3331f326",
+      "reference_sha256": "48cfa3392f92baa8ef7488e63010590a9988a897db9b25847aaf79f02fabd6db",
+      "question_sha256": "288baf9a5480f026b882c9c72fa102bd4d297297b048960b15344c1dc6fa3c11",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Dialect helper checks errors and recursive type/count/instance",
+          "verdict": "supported",
+          "reason": "Assertions directly match stated central validation.",
+          "evidence": {
+            "path": "test/dialects/conftest.py",
+            "start_line": 101,
+            "end_line": 115
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-4ea75585a10684810083d7e8",
+      "reference_sha256": "0caf475d598e606cc78764af9bd2a6c6844ad250f6698bc32e4cc1e9d235c394",
+      "question_sha256": "fb5d4ecbbd4bfae5898e7bced6facaef61196d669ebef03692aae2d3e694ea29",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Allowed characters accumulate in local set",
+          "verdict": "supported",
+          "reason": "Configured characters followed by dialect-specific additions and join.",
+          "evidence": {
+            "path": "src/sqlfluff/rules/references/RF05.py",
+            "start_line": 58,
+            "end_line": 69
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-52d3d31460a797c62480ea42",
+      "reference_sha256": "c0ef745ab101a290c110135d3a7a6fba3fb19ba87ea4009ff9ede820f7ce97f6",
+      "question_sha256": "e03009e2f537af1c2bb186b61666fa33937ca7770cc1ced2221805969169412c",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Longest match ranks clean before unclean",
+          "verdict": "contradicted",
+          "reason": "is_better_than only compares length; no cleanliness preference.",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/match_result.py",
+            "start_line": 111,
+            "end_line": 113
+          }
+        }
+      ],
+      "material_errors": [
+        "is_better_than only compares length; no cleanliness preference."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "longest_match prunes options, uses cached or fresh matches, returns immediately for a complete match, otherwise retains a strictly longer result; equal lengths preserve the earlier option (src/sqlfluff/core/parser/match_algorithms.py:190-246). A following terminator can stop further search (lines 248-274). MatchResult.is_better_than compares only length (src/sqlfluff/core/parser/match_result.py:111-113), so the proposed clean/unclean ranking is not implemented."
+    },
+    {
+      "task_id": "import-54b08cf47a74aa61472a3894",
+      "reference_sha256": "66995df8da8856e853a49f2026585439411bde5a32cee9972c717f6053803969",
+      "question_sha256": "071344d77fe7b59d23ca7a10579396e223f917b0008c855493c0aeb00b4ff1eb",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Entire parser simply rejects input without UnparsableSegment",
+          "verdict": "partially_supported",
+          "reason": "Strict clause match can fail empty, but surrounding recovery can mark input unparsable.",
+          "evidence": {
+            "path": "src/sqlfluff/dialects/dialect_bigquery.py",
+            "start_line": 1331,
+            "end_line": 1346
+          }
+        }
+      ],
+      "material_errors": [
+        "Strict clause match can fail empty, but surrounding recovery can mark input unparsable."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "ReplaceClauseSegment requires REPLACE followed by bracketed, delimited expression AS identifier sequences (src/sqlfluff/dialects/dialect_bigquery.py:1331-1346). In STRICT sequence mode, a required element failure returns an empty match; strict bracket matching also rejects unmatched remaining content (src/sqlfluff/core/parser/grammar/sequence.py:248-251,544-558). Thus malformed pairs can cause this clause match to fail. That local failure does not guarantee no UnparsableSegment in the overall parse: surrounding greedy/recovery grammars can represent rejected input as unparsable."
+    }
+  ]
+}

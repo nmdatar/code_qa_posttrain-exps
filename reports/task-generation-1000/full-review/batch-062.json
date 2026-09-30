@@ -1,0 +1,271 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-a0f1095757c3d175a7faa82e",
+      "reference_sha256": "973fdbb837dfd58a8226fbf5627dfe8567fab1bebafb49435d221ee69a792739",
+      "question_sha256": "6191b5218394c61ca651b142fe10d738ed43c625b7dafbbe72c5f9cdb89b665a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Scorer cache local to scoring invocation",
+          "verdict": "supported",
+          "reason": "Caches response by method; __call__131 creates fresh cache, _use_cache178-197 detects repeated methods. Memory retention is invocation-local, no cross-fold cache.",
+          "evidence": {
+            "path": "sklearn/metrics/_scorer.py",
+            "start_line": 90,
+            "end_line": 100
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-a547458bbe75b9aa72f098bd",
+      "reference_sha256": "2aa204516af2ae71afeef2285a742258abcb1519f39a319f8052fdc686780571",
+      "question_sha256": "c989507e892acddc9f3316349b05080abde5b2931d27b254838c008caa3c1861",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Tfidf dtype validation directly converts parameter",
+          "verdict": "partially_supported",
+          "reason": "_check_params warns only and does not mutate dtype; conversion happens downstream, and unsupported count dtypes need not universally succeed.",
+          "evidence": {
+            "path": "sklearn/feature_extraction/text.py",
+            "start_line": 2051,
+            "end_line": 2057
+          }
+        }
+      ],
+      "material_errors": [
+        "_check_params warns only and does not mutate dtype; conversion happens downstream, and unsupported count dtypes need not universally succeed."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "Raw text input has no NumPy matrix dtype to propagate. TfidfVectorizer's dtype controls count construction, while _check_params warns for values outside FLOAT_DTYPES without assigning a replacement dtype (sklearn/feature_extraction/text.py:2051-2057). TfidfTransformer selects float32/64 dtype for IDF computations, otherwise float64 (sklearn/feature_extraction/text.py:1664-1674), and its transformation uses floating-point validation. Numeric matrix dtype is then preserved by row splitting, rather than controlled by a train_test_split dtype argument. Do not interpret the warning as a guarantee that every arbitrary dtype succeeds or as a mutation of the estimator parameter."
+    },
+    {
+      "task_id": "import-a7ece8e0f62b048d799ecf9a",
+      "reference_sha256": "648c9369bc2c0c1d13ebaed8f39672b45edb42453a9994f1f05d7fc8afb9b65d",
+      "question_sha256": "ce41097ffaf8fffc9c6aa4df7b93f21f4362c21e0c7245a626d59b271223f494",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Identity spline coefficients extract basis",
+          "verdict": "supported",
+          "reason": "Comment states purpose; identity built then periodic coefficients extended; construct_fast evaluates basis outputs.",
+          "evidence": {
+            "path": "sklearn/preprocessing/_polynomial.py",
+            "start_line": 981,
+            "end_line": 995
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-baaecee5df6e1a5cefa7b49c",
+      "reference_sha256": "9333e205867740850a40b67bf4a2ff24939ac47427700401e0e23295ea2f85e2",
+      "question_sha256": "b00092039a1945b34a09390fecc2309b2f3761d7e5a0629540132ac92c9b1378",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Shuffle split template hook",
+          "verdict": "supported",
+          "reason": "split validates indexability and yields hook pairs; base hook generates bounded permutation partitions. Subclasses must yield compatible train/test sample indices and handle their own specialized constraints.",
+          "evidence": {
+            "path": "sklearn/model_selection/_split.py",
+            "start_line": 1926,
+            "end_line": 1946
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-bc6e066b0f545dd5ef6b541f",
+      "reference_sha256": "782dac789c11660ea5e89655a41f4cfb76a0419f3cf5d43841736cf960e321d4",
+      "question_sha256": "2ac4fa5a031bde8745bffaf459cbc37b6a935ca4f553374e47b97a6f50fb223d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Power transform delegates standardization",
+          "verdict": "supported",
+          "reason": "StandardScaler fitted or fit-transformed according to force_transform, stored for later transform. Hypothetical changed scaler contract could break equivalence.",
+          "evidence": {
+            "path": "sklearn/preprocessing/_data.py",
+            "start_line": 3415,
+            "end_line": 3422
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-c68f39f20250e33312857f14",
+      "reference_sha256": "a47207458f8ee865c829ea3c5b466fda38131b549a546fdc76011e619d4efd0e",
+      "question_sha256": "1dc75e482b8a4dd351405f17e5daaa082ff669ddada775528db2171da2fbf56e",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "MeanShift dtype test compares both APIs",
+          "verdict": "supported",
+          "reason": "Same cast input used and both output center dtypes asserted. This establishes tested global dtype cases rather than all possible numeric dtypes.",
+          "evidence": {
+            "path": "sklearn/cluster/tests/test_mean_shift.py",
+            "start_line": 58,
+            "end_line": 78
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-ccae99e0aa76d46d37542b3b",
+      "reference_sha256": "85af07e21de091e1d3e26e3713fee9b805cfe4df9b3092a2c3ee554e4b943120",
+      "question_sha256": "cd502eb2c0033ac8cf908f76a1c44d23080f0a9e4ece400e34b2b0d90df08da4",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "VisualBlock constructor validates matching lengths",
+          "verdict": "unsupported",
+          "reason": "Constructor fills missing names/details; no length validation. _get_visual_block catches errors and falls back, omitted by reference.",
+          "evidence": {
+            "path": "sklearn/utils/_repr_html/estimator.py",
+            "start_line": 89,
+            "end_line": 102
+          }
+        }
+      ],
+      "material_errors": [
+        "Constructor fills missing names/details; no length validation. _get_visual_block catches errors and falls back, omitted by reference."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "_get_visual_block delegates to an estimator's _sk_visual_block_ and falls back to a single block if it raises (sklearn/utils/_repr_html/estimator.py:225-234). FeatureUnion unpacks transformer_list into names/transformers and constructs a parallel block (sklearn/pipeline.py:2082-2084). _VisualBlock supplies tuples of None when names or details are omitted; it does not validate supplied sequence lengths (sklearn/utils/_repr_html/estimator.py:89-102). Unpacking errors are not comprehensive structural validation, and malformed metadata can fall back rather than be validated as claimed."
+    },
+    {
+      "task_id": "import-d228e1f4f574f11e50b471a8",
+      "reference_sha256": "54ed7dee12202dfdef9b79f9b02358170fc11b8c018110331cb10bf1e920c982",
+      "question_sha256": "3661bda93aba2af80d1bcaa292fb5bb9b3e4de2ed91c341543e05a65b1b03ba1",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Periodic knot spacing wraps base interval",
+          "verdict": "supported",
+          "reason": "Periodic wraps spacing by period, nonperiodic extends endpoint spacings, and periodic coefficients duplicate first degree rows. Source comments support design rationale.",
+          "evidence": {
+            "path": "sklearn/preprocessing/_polynomial.py",
+            "start_line": 938,
+            "end_line": 986
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-d3235e795cfc423d31b310d4",
+      "reference_sha256": "e9ea847ad51c5df3333283a4cc69f8a1a83e58924f701a6336ae1dfb941f90f3",
+      "question_sha256": "394c07b7a2982566e94f615b2267a0b71af20af355f49d412742d305eb319cfd",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "First-call max_features validation enforces constant feature space",
+          "verdict": "partially_supported",
+          "reason": "Validation timing is correct, but skipping later validation does not itself enforce feature consistency across batches.",
+          "evidence": {
+            "path": "sklearn/feature_selection/_from_model.py",
+            "start_line": 437,
+            "end_line": 440
+          }
+        }
+      ],
+      "material_errors": [
+        "Validation timing is correct, but skipping later validation does not itself enforce feature consistency across batches."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "partial_fit calls _check_max_features only before estimator_ exists (sklearn/feature_selection/_from_model.py:437-440). That helper evaluates a callable if supplied, checks an integral value between zero and current feature count, and stores max_features_ (sklearn/feature_selection/_from_model.py:309-325). Invalid initial settings therefore fail during incremental initialization, which may never be followed by fit. Later calls reuse that initialized constraint; omitting a later check does not itself enforce unchanged feature count, which must be handled elsewhere, such as the underlying estimator."
+    },
+    {
+      "task_id": "import-d59f6bfa3b41610d63b32965",
+      "reference_sha256": "fe9dd6e25c135cc1b3223b93d436a745da6e5918a9981436129cb221c86dfc59",
+      "question_sha256": "67b9f3e4bf6e0b8ea539d60820bb107815b5c36b78abb7dd51d3b04846c2b36f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Ridge solver selection branch",
+          "verdict": "supported",
+          "reason": "Positive permits auto/lbfgs, sparse-intercept branch selects allowed solver/default sparse_cg. Actual auto resolution occurs later; literal immediate lbfgs selection is shorthand.",
+          "evidence": {
+            "path": "sklearn/linear_model/_ridge.py",
+            "start_line": 932,
+            "end_line": 962
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-d7b7d55534fc6cd8353bdb09",
+      "reference_sha256": "f5c8886e707104bbe9649dbb2a4745e0bae6e578c451ad80f23c674005d1e948",
+      "question_sha256": "e9eb2d7ed9564a08971b543d10bfffcbcf35466584717df64875be66848f825f",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Absolute-sum convergence dilutes large local changes",
+          "verdict": "unsupported",
+          "reason": "Unnormalized sum cannot dilute a large change through many small ones; comparative max norm cost is unsupported.",
+          "evidence": {
+            "path": "sklearn/semi_supervised/_label_propagation.py",
+            "start_line": 302,
+            "end_line": 328
+          }
+        }
+      ],
+      "material_errors": [
+        "Unnormalized sum cannot dilute a large change through many small ones; comparative max norm cost is unsupported."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The fit loop stops when the sum of absolute changes across all samples/classes is below tol (sklearn/semi_supervised/_label_propagation.py:302-304). This is an unnormalized aggregate L1 criterion: many small changes accumulate, and a large local change cannot be diluted by adding near-zero changes. Computing it takes work proportional to the distribution array size; the source does not establish that max-norm alternatives are slower. Larger tolerance can stop earlier with more residual change; smaller tolerance may require more iterations, capped by max_iter and a convergence warning (sklearn/semi_supervised/_label_propagation.py:323-328)."
+    },
+    {
+      "task_id": "import-e0480d0a51490867c584706a",
+      "reference_sha256": "198b89d627db724d5f7d9d253d986964b266e00a2bb5e3e5f5a5d352ee938a50",
+      "question_sha256": "61096993ff153e10a0bcb5726469f7601a79e5e89074e8beb1b4389f099f3d15",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Pipeline inverse availability requires every active step",
+          "verdict": "supported",
+          "reason": "available_if checks all iterated transformers; toy Transf and NoInvTransf both identity-transform while only Transf has inverse.",
+          "evidence": {
+            "path": "sklearn/pipeline.py",
+            "start_line": 1093,
+            "end_line": 1100
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    }
+  ]
+}

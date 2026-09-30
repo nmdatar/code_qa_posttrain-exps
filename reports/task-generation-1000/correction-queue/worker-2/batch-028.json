@@ -1,0 +1,75 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-028.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/mkdocs--mkdocs-74d3191e419b",
+      "original_reference_sha256": "b0fc23bc28ba9706cf44234cb63f4d5c3f6e5474c07191b7df365faa3dd8cbae",
+      "question": "Why does MkDocs navigation system fail to scale efficiently when rendering deep hierarchical site structures with many nested sections?",
+      "question_sha256": "adfe1ab8114dc85c173ebc23a8d2c98a3a6a35735458e489b57b74c737c279dd",
+      "reference_answer": "The pinned navigation generator creates top-level pages or headers with direct page children and rejects configuration entries beyond its supported tuple lengths (mkdocs/nav.py:197-241). walk_pages follows next_page once per page and updates active/context state (44-64). With the generated structure\u2019s bounded ancestor depth, this is linear in page count for those operations. Deep hierarchy support is a structural limitation here; the source does not demonstrate quadratic traversal or measured rendering failure.",
+      "reference_sha256": "a855dcefe35efcfde18a7c42c6369edf566d1bf15dcfd99fd0073ff9ffe2a60c",
+      "repository": {
+        "commit": "74d3191e419b7cb79fe66f700119ead3365f70d0",
+        "family_id": "mkdocs/mkdocs",
+        "url": "https://github.com/mkdocs/mkdocs"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/mkdocs--mkdocs-74d3191e419b7cb79fe66f700119ead3365f70d0",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-305c458fcdca03858feccc88"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/mkdocs--mkdocs-74d3191e419b",
+      "original_reference_sha256": "eead85f11bb001e0abf6edb7e71ae9fea26a7bb4e61b0545a79de05618f757bd",
+      "question": "Why does mkdocs' configuration file discovery mechanism fail to scale efficiently when processing documentation sites with large numbers of files?",
+      "question_sha256": "cea7612c66aa468bcac25598a48f48f045e9d103e31afe462741f4b137d820b9",
+      "reference_answer": "validate_config walks docs_dir and sorts each directory\u2019s filenames even when pages/extra_css/extra_javascript are already supplied; discovered lists are only assigned for None values (mkdocs/config.py:113-142). This repeated filesystem and filename-processing work can grow with site size and is a candidate for optimization. The code does not establish a measured bottleneck or a general maximum usable site size.",
+      "reference_sha256": "ce9cc734093c7ca627bcb06f4de74955a749ff4bed297cbae1cbc76e66a50442",
+      "repository": {
+        "commit": "74d3191e419b7cb79fe66f700119ead3365f70d0",
+        "family_id": "mkdocs/mkdocs",
+        "url": "https://github.com/mkdocs/mkdocs"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/mkdocs--mkdocs-74d3191e419b7cb79fe66f700119ead3365f70d0",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-541ca7fd1b492e9f5907fdd9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/mkdocs--mkdocs-74d3191e419b",
+      "original_reference_sha256": "edba427dc3348872aa86d8a0897a945fff289a00857e4ec73a5f8b8b2be8ab8e",
+      "question": "Why does mkdocs implement a dual-constraint dependency management system with different Markdown version requirements between setup.py and requirements.txt?",
+      "question_sha256": "b594a852f63511bdd37b0b6787968822dcf96115e2a4a6696e541387fe94d11f",
+      "reference_answer": "setup.py selects Markdown>=2.3.1,<2.5 on Python 2.6 and >=2.3.1 otherwise (setup.py:10-23). requirements.txt requires Markdown>=2.5, and tox includes that file for its test environments, including py26 (tox.ini:2-12). These constraints conflict for Python 2.6; the repository does not show a rule making setup.py automatically override or ignore requirements.txt. They should not be described as a reliably coordinated dual-constraint solution.",
+      "reference_sha256": "555a54cbbff80296e665ab6edc4e3421010de85e152c03827c5d849d811245b4",
+      "repository": {
+        "commit": "74d3191e419b7cb79fe66f700119ead3365f70d0",
+        "family_id": "mkdocs/mkdocs",
+        "url": "https://github.com/mkdocs/mkdocs"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/mkdocs--mkdocs-74d3191e419b7cb79fe66f700119ead3365f70d0",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-93d76cc7835d29839157f2fb"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/mkdocs--mkdocs-74d3191e419b",
+      "original_reference_sha256": "a5e14ab254bfc845d318f382e9b061b114856a8c0172a804386a1f3fb8177dcf",
+      "question": "Why does MkDocs implement a multi-layered path normalization and validation system across config.py, utils.py, and relative_path_ext.py rather than centralizing all path handling in a single module?",
+      "question_sha256": "9fc4a706a20f0617a0f75be026a29dcf326c4150f7e7c1597bf68b84698ba3a9",
+      "reference_answer": "Path handling is divided by responsibility: config.py checks docs/site directory relationships (104-111), utils.normalise_path converts NT separators to POSIX form (219-227), and relative_path_ext.path_to_url uses supplied navigation context to validate and rewrite content links (54-88). This explains the current separation of concerns. It does not prove centralization would necessarily create circular imports; passing context explicitly remains possible.",
+      "reference_sha256": "40fdac1a27fea66dd6094f9f91077fc26ddee4e044c81da7576f4fe7177e8797",
+      "repository": {
+        "commit": "74d3191e419b7cb79fe66f700119ead3365f70d0",
+        "family_id": "mkdocs/mkdocs",
+        "url": "https://github.com/mkdocs/mkdocs"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/mkdocs--mkdocs-74d3191e419b7cb79fe66f700119ead3365f70d0",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-b986885d44dc9d7c66e6b565"
+    }
+  ]
+}

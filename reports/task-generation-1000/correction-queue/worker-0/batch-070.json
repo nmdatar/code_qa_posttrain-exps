@@ -1,0 +1,58 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-070.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "original_reference_sha256": "3aa7bc7ecda1981893feb449dec02e305796cc486251d63d24dcf72d90d51456",
+      "question": "Why does the test function that validates SQL rule fixes use a three-phase sequence of linting, fixing, and linting again instead of testing components independently?",
+      "question_sha256": "d6743cbdb4cb9cceaebce5fc02e26480bbfdf346c648ce2a3d0f40d2947671f1",
+      "reference_answer": "generic_roundtrip_test invokes lint with selected rules and expects exit 1, invokes fix and expects 0, then lints the modified file with the same rules and expects 0 (test/rules/std_roundtrip_test.py:15-46). This integration test verifies detection, persisted correction and subsequent compliance for that fixture and rule selection. It does not independently prove a second fix leaves bytes unchanged or that unrelated rules are satisfied.",
+      "reference_sha256": "1492560283e81e4425da1e90a39e70f7ccae051952ec404bf84ae09326f4caed",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-62534c445cb3c79b509c2a5d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "original_reference_sha256": "cc4c86a839f0325e2d17e36364e97deffea748e884c2d80dbdfdb9b88b7bd52c",
+      "question": "Why does the method that dispatches dialect warnings integrate with the CLI formatter's output routing mechanism to ensure warnings are properly formatted and routed?",
+      "question_sha256": "403b4adaa0636cc70d22af211666e6feefa254e67b5f84dc51622d68ce7c0790",
+      "reference_answer": "dispatch_dialect_warning calls format_dialect_warning then _dispatch (src/sqlfluff/cli/formatters.py:216-218). The former creates and colorizes the warning (596-604); the latter sends nonempty text to the configured output stream (111-118). This shares formatting and destination handling. _filter_empty filters whitespace-only messages, not verbosity, and this dispatcher has no verbosity condition.",
+      "reference_sha256": "2047cb4e31352ed89470f6055735b7e223abd62d650fa208e1f9d8e4e9b12a88",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-64756e21e714396edadc9f40"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "original_reference_sha256": "0b928d071f1796710cd7d280f70105b4d09a8e17c1fa931c72c8931b06ad4464",
+      "question": "Why is the occurrence sorting method implemented as a static method within the Python format string templating class rather than as a standalone utility function?",
+      "question_sha256": "5b8506e5c958530d6353bb452b27547c4fa6b48b3408f2d9111503173c087546",
+      "reference_answer": "_sorted_occurrence_tuples is a static helper that expands occurrence lists and sorts by position then text (src/sqlfluff/core/templaters/python.py:453-462). _slice_template calls it through cls (464-477), which groups it with templater operations and permits subclass replacement through that lookup. It needs no instance state. These are observable consequences, not documented reasons excluding a standalone helper; a helper in the same module would not require an import.",
+      "reference_sha256": "3a1ea30b35d0088458b0b5ebafddb93c575fe438254ce5c5e71cffe6ef86bf98",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-7dec6dd59552d0a40765e7aa"
+    }
+  ]
+}

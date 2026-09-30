@@ -1,0 +1,317 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-94620d5fb20f2de7beb24daa",
+      "reference_sha256": "5a746cc7d07ad5b726e3234cfd023ffe43d6a5dea623f061a0d7b42c10a84258",
+      "question_sha256": "dc982ef9c77fc0878ed96c709424dde84f7158f51a8afe29ed1f15555968281e",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Introspection identifies creation provenance",
+          "verdict": "unsupported",
+          "reason": "Query tests catalog dependencies, not whether a user manually created a sequence.",
+          "evidence": {
+            "path": "django/db/backends/postgresql/introspection.py",
+            "start_line": 129,
+            "end_line": 153
+          }
+        },
+        {
+          "claim": "Oracle falls back to AutoField metadata",
+          "verdict": "supported",
+          "reason": "Identity catalog returns name; fallback returns table/column without inspecting manual sequence existence.",
+          "evidence": {
+            "path": "django/db/backends/oracle/introspection.py",
+            "start_line": 219,
+            "end_line": 253
+          }
+        }
+      ],
+      "material_errors": [
+        "Ownership/dependency is not creation provenance; Oracle fallback does not detect arbitrary manually created sequences."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "Oracle get_sequences first queries identity primary-key metadata and returns its sequence name; without a row it returns table/column information for an AutoField from table_fields, for backward compatibility (django/db/backends/oracle/introspection.py:219-253). PostgreSQL queries sequence dependencies on table columns (django/db/backends/postgresql/introspection.py:129-153). Neither is a general manual-versus-automatic creation detector; PostgreSQL checks linkage rather than provenance."
+    },
+    {
+      "task_id": "import-9849d0d3f477df75b60eba14",
+      "reference_sha256": "1707f3edd0a669d0d87c30bbd1d9abb264784a9e8006c98876f8ab586255603a",
+      "question_sha256": "86da2ca268122eaa597e7399a7d3d1564c866372302ccfb70056343aad39dbf6",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Query.add_q is patched directly for deferred filtering test",
+          "verdict": "supported",
+          "reason": "Preprocesses _add_q and updates where/joins; test patches Query.add_q and checks one call at tests/prefetch_related/tests.py:354-369.",
+          "evidence": {
+            "path": "django/db/models/sql/query.py",
+            "start_line": 1649,
+            "end_line": 1670
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-99763edafd9e0fa7471f6ea5",
+      "reference_sha256": "699e6fe3f1e2aacce2069a3a6f066f4e4a74e59d768cde352c3d2b7ea63eed45",
+      "question_sha256": "e24856a95f8a2373d9c71f7d45d848e5906b2cacdb2928bf9317f2ba08a07809",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "str Enum means .value is optional in f-string output",
+          "verdict": "unsupported",
+          "reason": "Code explicitly uses .value; str/Enum formatting does not guarantee the raw symbol as claimed.",
+          "evidence": {
+            "path": "django/db/migrations/operations/base.py",
+            "start_line": 112,
+            "end_line": 117
+          }
+        }
+      ],
+      "material_errors": [
+        "Incorrect f-string equivalence and unsupported blanket YAML serialization claim."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "OperationCategory combines string-compatible values with named enum members (django/db/migrations/operations/base.py:7-13). Members compare as their underlying strings while retaining enum identity. The actual migration display path explicitly reads category.value, or MIXED.value, to prefix describe() (112-117). This supports consistent symbolic labels; it does not imply that arbitrary string formatting or serializers treat a str/Enum member exactly like its raw value."
+    },
+    {
+      "task_id": "import-9a5a10dd72fcb2146da22387",
+      "reference_sha256": "0c15f9ea9bec5d022446fcb8f75ae779add6fc18e8af3811130d901f6dfd694e",
+      "question_sha256": "1edfece7417d00c87eeb593dccef397dfcf77aff3bfb8ecc337681547b4f4fff",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Loader resolves internal/external graph dependencies",
+          "verdict": "supported",
+          "reason": "Handles special keys and reverse run_before edges.",
+          "evidence": {
+            "path": "django/db/migrations/loader.py",
+            "start_line": 170,
+            "end_line": 221
+          }
+        },
+        {
+          "claim": "Graph validates missing nodes and orders parents first",
+          "verdict": "supported",
+          "reason": "Dummy nodes raise; iterative DFS appends after parent visits; cycle check at 269-292.",
+          "evidence": {
+            "path": "django/db/migrations/graph.py",
+            "start_line": 196,
+            "end_line": 238
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-9c6f94f3be7d78bfa44b0e50",
+      "reference_sha256": "e97391c5010ecc57fd8d228e595e684de4f64e5e638d5ac546f412d70698c1e5",
+      "question_sha256": "0bb9c86c5daf899c6f005fce8afa486c141849a0720086463205ec4f07f7ef34",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Model check selects restrictive eligible database limit",
+          "verdict": "supported",
+          "reason": "Router filter and backend length/truncation checks precede E018; called from check at 1677-1681.",
+          "evidence": {
+            "path": "django/db/models/base.py",
+            "start_line": 2304,
+            "end_line": 2352
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-a05c01466b12dfd85c07b4da",
+      "reference_sha256": "77c376d6a6db059607a5c73e00326594005fcfa97c7ff348634f2ffdda2e944f",
+      "question_sha256": "b5ae8efa8a22982bf6a9d18c06e8fa8994820e3fa63c9c11872d527939a22a54",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "None explicitly clears cloned select_related state",
+          "verdict": "supported",
+          "reason": "Documented clearing branch after _chain; ignoring None would retain cloned state.",
+          "evidence": {
+            "path": "django/db/models/query.py",
+            "start_line": 1623,
+            "end_line": 1645
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-a1ccbdb06697a722f98578e4",
+      "reference_sha256": "994661c780d85a2fda8cefe12adb277d3cfa063f1b282beff642e132834d9792",
+      "question_sha256": "9a6a6e7fcf66577284aae8d561164f387ec98b4ec4d474bafbf98ae31b2f344e",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Many fields imply proven bottleneck and O(n*m) overall cost",
+          "verdict": "unsupported",
+          "reason": "Serializer sorts kwargs and recursively serializes values; simple complexity omits those costs and no benchmark establishes bottleneck.",
+          "evidence": {
+            "path": "django/db/migrations/serializer.py",
+            "start_line": 98,
+            "end_line": 119
+          }
+        },
+        {
+          "claim": "Deconstruction iterates attributes and normalizes paths",
+          "verdict": "supported",
+          "reason": "Real repeated work; recursive comparison is at autodetector.py:74-110.",
+          "evidence": {
+            "path": "django/db/models/fields/__init__.py",
+            "start_line": 636,
+            "end_line": 664
+          }
+        }
+      ],
+      "material_errors": [
+        "Unsupported bottleneck claim and oversimplified complexity."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "Field.deconstruct loops over a fixed set of possible attributes and normalizes its import path (django/db/models/fields/__init__.py:636-664). MigrationAutodetector.deep_deconstruct recursively processes returned arguments for comparisons (django/db/migrations/autodetector.py:74-110), and serialization sorts and serializes kwargs (django/db/migrations/serializer.py:98-119). More fields and nested arguments therefore entail more work, but these sources do not establish a measured bottleneck or a universal O(n*m) runtime."
+    },
+    {
+      "task_id": "import-a27886834018044ff816c7d4",
+      "reference_sha256": "d22b25afbd93c1b75f53cb60544e5c5ae5b9cc8687ca53edc6a2e3fcb610a28a",
+      "question_sha256": "92d932b0996a8078a7ff544de2d8adb71b80c767bfcb9729b45e30a7d7635a47",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "reverse requires prior HTTP request and other tests",
+          "verdict": "contradicted",
+          "reason": "Falls back to settings.ROOT_URLCONF when no thread-local URLconf exists.",
+          "evidence": {
+            "path": "django/urls/resolvers.py",
+            "start_line": 108,
+            "end_line": 111
+          }
+        }
+      ],
+      "material_errors": [
+        "False request initialization and test-order dependency; resolve_url does not accept an unresolved bare name as a URL."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "test_named overrides LOGIN_REDIRECT_URL to password_reset and expects /password_reset/ after login (tests/auth_tests/test_views.py:1024-1040). It needs a URLconf with that name; reverse obtains a resolver, and get_resolver falls back to settings.ROOT_URLCONF when no URLconf override exists (django/urls/base.py:38-40; django/urls/resolvers.py:108-111). No preceding test or HTTP request is needed to initialize reverse. resolve_url retries literal URLs only under its fallback rules and reraises for unresolved bare names (django/shortcuts.py:182-191)."
+    },
+    {
+      "task_id": "import-a45e93524537e67d48e5fcc7",
+      "reference_sha256": "ba5ac744716a2cc6bc5113f90725144211acb5fcd65e861d22a23c4123a6c80b",
+      "question_sha256": "f06cbfd1be76e45573c21bd5ff4f702d40fef1f83176aa86f1e16d4ee81740b1",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "SillyModel deleted after referenced Tribble",
+          "verdict": "contradicted",
+          "reason": "Non-null cascade records parent dependency on child; sort deletes dependency first.",
+          "evidence": {
+            "path": "django/db/models/deletion.py",
+            "start_line": 116,
+            "end_line": 145
+          }
+        }
+      ],
+      "material_errors": [
+        "Final stated deletion order is reversed; eligible cascades may use fast-delete path instead of recursive object collection."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "silly_tribble is a non-null ForeignKey to migrations.Tribble with CASCADE (tests/migrations/migrations_test_apps/unmigrated_app/models.py:4-7). Collector discovers reverse relations and either schedules eligible related querysets for fast deletion or invokes CASCADE, which recursively collects dependents (django/db/models/deletion.py:22-31,309-363). Non-null relationships record deletion dependencies (116-145); sort orders dependencies first (413-439). Related SillyModel rows are removed before the referenced Tribble, within the deletion transaction, not afterward."
+    },
+    {
+      "task_id": "import-a7208c74b034957e4b6f4784",
+      "reference_sha256": "da1f11bb567cb3177fb1765c3b07f515c0c6ae8fe3324862e11d8c413463990b",
+      "question_sha256": "424e2047790622c49e8a204fa684720fb841448706ac7b6f31e69dfd9f8f2d02",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Render state gates iteration and content access",
+          "verdict": "supported",
+          "reason": "render materializes once and runs callbacks; setter marks rendered; both getters/iterator raise before materialization.",
+          "evidence": {
+            "path": "django/template/response.py",
+            "start_line": 105,
+            "end_line": 144
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-ab79b580dc1d6a4a8e7d9d52",
+      "reference_sha256": "6a4142d3695325f3e64a8b02781099bf2dc824a0943e760f77785c364fd928ae",
+      "question_sha256": "f03f5df7f6d887605f064965c041b314acd57dfcf0a713689df00566a762be6a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Abstract base and concrete URL method follow ordinary inheritance",
+          "verdict": "supported",
+          "reason": "Base abstract model has no URL method; UrlArticle defines one.",
+          "evidence": {
+            "path": "tests/view_tests/models.py",
+            "start_line": 15,
+            "end_line": 41
+          }
+        },
+        {
+          "claim": "Generic editing redirects via get_absolute_url fallback",
+          "verdict": "supported",
+          "reason": "Uses success_url first, else instance method, converts AttributeError to configuration error.",
+          "evidence": {
+            "path": "django/views/generic/edit.py",
+            "start_line": 117,
+            "end_line": 129
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-aeae9cb64c2e88cd16433625",
+      "reference_sha256": "f4836594ffbcf64029c73f864f0e469f86266bb8d44803aeed844668dc2ec31b",
+      "question_sha256": "a0bb54ebe5ffc4b0cd76f36a19e58df2c7d54a2b33f327737901a534e43677d5",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "messages eliminates redundant traversal",
+          "verdict": "unsupported",
+          "reason": "It reuses formatting code but dict construction plus sum traverses and concatenates lists; not a traversal optimization.",
+          "evidence": {
+            "path": "django/core/exceptions.py",
+            "start_line": 192,
+            "end_line": 215
+          }
+        }
+      ],
+      "material_errors": [
+        "Conflates avoiding duplicate implementation with avoiding redundant traversal."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "ValidationError.messages reuses __iter__ to present consistent formatted messages: list(self) for list errors and sum(dict(self).values(), []) for field dictionaries (django/core/exceptions.py:192-215). __iter__ applies parameters and converts messages to strings. This centralizes formatting logic, but the dictionary case still constructs intermediate lists/dictionary and concatenates lists; it does not guarantee minimal traversal or copying."
+    }
+  ]
+}

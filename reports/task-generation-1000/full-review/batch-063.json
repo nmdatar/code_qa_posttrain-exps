@@ -1,0 +1,247 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-e3922d09de456a389e48d130",
+      "reference_sha256": "1a50dedf4414c8ccc32cc13f3b1df68ec5ba7d7aaaef74c02a62f05e5f632dd9",
+      "question_sha256": "f8202c44d1172720ea068c7277a0cb91b109240cb0b4edaa0730dff26c11d352",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "LOF caches three attributes and answer explains predict versus score",
+          "verdict": "partially_supported",
+          "reason": "Neighbor indices are local, not an instance attribute; reference does not address control-flow distinction.",
+          "evidence": {
+            "path": "sklearn/neighbors/_lof.py",
+            "start_line": 290,
+            "end_line": 309
+          }
+        }
+      ],
+      "material_errors": [
+        "Neighbor indices are local, not an instance attribute; reference does not address control-flow distinction."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "fit stores _distances_fit_X_ and _lrd, but _neighbors_indices_fit_X_ is a local variable, not self._neighbors_indices_fit_X_ (sklearn/neighbors/_lof.py:290-309). Query score_samples performs query-neighbor search and computes density ratios using cached training distances and densities (lines 475-518). predict routes supplied X through decision_function and thresholds at zero; the internal _predict(None) uses cached negative_outlier_factor_ against offset_ (lines 363-390). Caching reuses training quantities, while score_samples returns continuous scores and prediction returns labels."
+    },
+    {
+      "task_id": "import-e583913bede853b178c4f963",
+      "reference_sha256": "987846ac8df895622cb9d0788f8064146f866762dea7655b38556e1263d811e2",
+      "question_sha256": "f07ba44926629888424655a2c1c4ef357182d97dd233d714af4136d145761c49",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Fresh restart recomputes W with final H",
+          "verdict": "supported",
+          "reason": "Same _solve_W called at fit end and transform, fixed initialization visible.",
+          "evidence": {
+            "path": "sklearn/decomposition/_nmf.py",
+            "start_line": 2299,
+            "end_line": 2300
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-ec6773e300e48385e55ada1d",
+      "reference_sha256": "203b5508eefa9e618001e8787a1f5bb97cc52193d7bdbb57e646fa412117ae9e",
+      "question_sha256": "d7e8da1a7244d8c74b7f20bc5a45b62ce8aef08ca3d0630fbdc369ede87c6100",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Benchmark uses combined transformer estimator infrastructure",
+          "verdict": "supported",
+          "reason": "Inheritance and dataset/estimator/scorer methods confirmed.",
+          "evidence": {
+            "path": "asv_benchmarks/benchmarks/decomposition.py",
+            "start_line": 32,
+            "end_line": 64
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-ed5acf5cd60b245c5176209d",
+      "reference_sha256": "562fb3e25c089eff759eaf233896403194d2f3410d3c6dd338c00cb133d6cbf9",
+      "question_sha256": "22bab5ff629743ef704a2151b0d380942c88311b593deed55cfe9ac90bacb8d3",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Auto response preference is probability then decision function",
+          "verdict": "supported",
+          "reason": "Explicit list substitution before response extraction.",
+          "evidence": {
+            "path": "sklearn/utils/_response.py",
+            "start_line": 308,
+            "end_line": 317
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-f0b02694091900c5a86c7d2d",
+      "reference_sha256": "75c23f1f0077c5b51710dcd5c1cd213c3a7a34cfce467eef4fa156f53a0f40ce",
+      "question_sha256": "cdfadce13dad6aabe95c9f8c4d11b88d14e77dc7e7fddcfde6dc4df492c62ed6",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "No duplication and all validation external",
+          "verdict": "partially_supported",
+          "reason": "Both methods duplicate mathematical formulas; transform validates sample interval itself.",
+          "evidence": {
+            "path": "sklearn/kernel_approximation.py",
+            "start_line": 717,
+            "end_line": 745
+          }
+        }
+      ],
+      "material_errors": [
+        "Both methods duplicate mathematical formulas; transform validates sample interval itself."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "AdditiveChi2Sampler.transform validates array format and non-negativity with validate_data, chooses/defaults sample_interval, and dispatches on sparsity (sklearn/kernel_approximation.py:717-745). _transform_dense and _transform_sparse separately implement the same feature-map formulas with dense arrays versus CSR storage (lines 778-833). This separates coordination from representation-specific arithmetic, but does duplicate core formulas and does not delegate all parameter checks externally."
+    },
+    {
+      "task_id": "import-f4c97e8c10c43fbdd5c928cf",
+      "reference_sha256": "1aa9e4ce1910edf7131a8b5b84fb7c3b0b3a61b5025c96ae7b50cf4bb3f8d428",
+      "question_sha256": "8d7838409195555d21b6fdc34091086c9d4c0a52926c45a43f42cffce4ff1345",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Inverse permutation aligns score columns with relabeled classes",
+          "verdict": "supported",
+          "reason": "Inverse construction and paired transformation verified.",
+          "evidence": {
+            "path": "sklearn/metrics/tests/test_common.py",
+            "start_line": 1843,
+            "end_line": 1864
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-f63a91060c9b4476e6c3796c",
+      "reference_sha256": "8585d2165faf412f117c67ad0aeb96cba31353866650363ccc5cc38061f54a50",
+      "question_sha256": "02a28898a8b0c80767d72bc4352c9725787f66fa00a521f8da9417417c5292aa",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Byte-swapped dtypes test nonnative endianness",
+          "verdict": "supported",
+          "reason": "Four dtype variants passed to check helper.",
+          "evidence": {
+            "path": "sklearn/tree/tests/test_tree.py",
+            "start_line": 2201,
+            "end_line": 2216
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-f8e03464345a73f88e553a17",
+      "reference_sha256": "6072cd1b580d2ff0f9e9cdfa97c46811d890dc8ddff39a428350070cc3b511ce",
+      "question_sha256": "7f6128c0b4f24716a80c793fbb50b6176178972e6f96d0677328d567f11b46c6",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Normalizer stateless row normalization requires no learned statistics",
+          "verdict": "supported",
+          "reason": "Transform normalizes rows and tags requires_fit=False; fit validates data.",
+          "evidence": {
+            "path": "sklearn/preprocessing/_data.py",
+            "start_line": 2169,
+            "end_line": 2200
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-ff63c98045e66a3835ea35b8",
+      "reference_sha256": "4b761a0c82a4c5aa7af160798904f0a4b954b983f36301010256d8bbf92fc8dd",
+      "question_sha256": "b9f66d90929bb98386ad8248fc8590f5c902793707163de53537116811e1b968",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "LRD helper reused for training and query density",
+          "verdict": "supported",
+          "reason": "Helper accepts query distances but uses cached training kth-neighbor distances.",
+          "evidence": {
+            "path": "sklearn/neighbors/_lof.py",
+            "start_line": 493,
+            "end_line": 518
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-ff895b1270303ee54b633df1",
+      "reference_sha256": "dd9554fb3dd5b04dc4f5bce267cd78a3ab362c66427955c6bcb32835005a69b3",
+      "question_sha256": "bb7748ddd9c06c3d7d72382585d9d2d808e27e2a2f8e43480a04fa6fc299791c",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "PSD warnings conditional while numerical correction still applies",
+          "verdict": "supported",
+          "reason": "Warning guard is separate from zeroing negatives/small positives.",
+          "evidence": {
+            "path": "sklearn/utils/validation.py",
+            "start_line": 2114,
+            "end_line": 2140
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-fff2787180a82fce7846e89b",
+      "reference_sha256": "1f99ece36fa6c9675b5717c84ce0bc34c62440dfae76d24c857c79a3308ba433",
+      "question_sha256": "f00c18dc0f9772d00795249d028e68128c50e8bbd0bec7eeac6f43724393e6fa",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Category scanning considers all possible groupings",
+          "verdict": "partially_supported",
+          "reason": "Sorted directional prefix scans are not all subsets; low-support missing bin may be excluded.",
+          "evidence": {
+            "path": "sklearn/ensemble/_hist_gradient_boosting/splitting.pyx",
+            "start_line": 967,
+            "end_line": 1007
+          }
+        }
+      ],
+      "material_errors": [
+        "Sorted directional prefix scans are not all subsets; low-support missing bin may be excluded."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "For a categorical feature, the splitter includes the missing bin as a category only if its support passes the threshold (sklearn/ensemble/_hist_gradient_boosting/splitting.pyx:967-983). It scans prefixes from both ends of a sorted category ordering, not every possible subset (lines 995-1007). The selected categories are recorded in left_cat_bitset; when missing values are present, missing_go_to_left is determined by membership of missing_values_bin_idx in that bitset (lines 1072-1084). Thus a selected missing bin goes left, otherwise right. Numerical splitting has separate missing-direction logic."
+    }
+  ]
+}

@@ -1,0 +1,221 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-1966c4ed643617951d3f3400",
+      "reference_sha256": "c7e6d0b1afd40296139bc759fe8b10e3d1160f8bc8f778da65bcf92e3e152eed",
+      "question_sha256": "b8af82352ba95017e7aedb23188b892511c089bc8bbc7ff9b27f4abf53a7e3a5",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Legend builds one entry per category",
+          "verdict": "supported",
+          "reason": "Static path creates per-category Line2D; interactive loop at explore.py:890-902 builds li elements.",
+          "evidence": {
+            "path": "geopandas/plotting.py",
+            "start_line": 910,
+            "end_line": 946
+          }
+        },
+        {
+          "claim": "Legend necessarily dominates and rendering complexity is O(n)",
+          "verdict": "unsupported",
+          "reason": "Loop shows entry growth, not downstream browser/layout complexity or benchmark dominance.",
+          "evidence": {
+            "path": "geopandas/explore.py",
+            "start_line": 890,
+            "end_line": 902
+          }
+        }
+      ],
+      "material_errors": [
+        "Unmeasured performance dominance and end-to-end complexity presented as fact."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "Static legends create a Line2D handle per category (geopandas/plotting.py:910-946); interactive legends append an HTML list item per category (geopandas/explore.py:890-902). Neither shown loop limits category count. More categories therefore produce more objects/HTML and larger legends, a plausible source of overhead. Whether legend work dominates geometry rendering and the exact runtime scaling require measurement."
+    },
+    {
+      "task_id": "import-2e972d2e3cde7129e37212b6",
+      "reference_sha256": "48b5d6aafa6e71af6f0275523a3ffed8ee7be3f2efd8fb675cbb47c6f0620b25",
+      "question_sha256": "ce4f7ff724a06a6f501efbfd22f55a152d05f4e98a333add7adbb6b3b597d20b",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "_query resolves provider string and instantiates class",
+          "verdict": "supported",
+          "reason": "get_geocoder_for_service at 133-134, constructor at 136, geocode/reverse at 140-143.",
+          "evidence": {
+            "path": "geopandas/tools/geocoding.py",
+            "start_line": 121,
+            "end_line": 146
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-3309f037e45dac0838651c29",
+      "reference_sha256": "a3e8dae5a4f0e0b048e9a7165415c386d057b80a907899cec940d3d46de12cd9",
+      "question_sha256": "2b47e2254d5cb3f18fc776c196528d890538d5280be2e275eb26491a7ca00c53",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Categorical colors calculated in explore before legend rendering",
+          "verdict": "supported",
+          "reason": "Named maps use _colormap_helper in this revision, custom maps and lists handled separately; all produce legend_colors.",
+          "evidence": {
+            "path": "geopandas/explore.py",
+            "start_line": 441,
+            "end_line": 467
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-685a6003896e8843746f4ae6",
+      "reference_sha256": "495bfbd64259a601b26b1670de568d41e8b61f7a778d548427a72804fee41fca",
+      "question_sha256": "6d80d61b66ee5dd0d4454c55c35a48e10dc07705aa8b37c17768e17836c174e2",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Pandas comparison protocol forces Python loops",
+          "verdict": "unsupported",
+          "reason": "Implementation chooses scalar operator comprehension; code does not imply protocol forbids vectorized implementation.",
+          "evidence": {
+            "path": "geopandas/array.py",
+            "start_line": 1662,
+            "end_line": 1687
+          }
+        }
+      ],
+      "material_errors": [
+        "Unsupported necessity of Python loops and incorrect statement that both operands first convert to object arrays."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "GeometryArray._binop broadcasts scalar right operands, defers pandas containers with NotImplemented, checks lengths and applies the operator pairwise using a Python comprehension (geopandas/array.py:1662-1687). Spatial methods instead call vectorized Shapely through _binary_method (688-699). This is the implementation split in this revision; it does not establish that pandas requires Python loops or prohibits equivalent vectorization. Equality operators must preserve their scalar equality semantics, which differ from topological predicates."
+    },
+    {
+      "task_id": "import-83c7982eff348d996687a28c",
+      "reference_sha256": "91e30f19afe382bc44b1fc36a762e17ab04fc4bc17d994ff6cd8e0a48529b485",
+      "question_sha256": "7e22321956954e5611df4a3af58cafa12abe8feed2b4afdac3f2537c209b3c21",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Explicit Range bytes=0-1 probe and status/exception fallback",
+          "verdict": "contradicted",
+          "reason": "Actual code opens URL without Range header and checks only Accept-Ranges equals bytes.",
+          "evidence": {
+            "path": "geopandas/io/file.py",
+            "start_line": 282,
+            "end_line": 291
+          }
+        }
+      ],
+      "material_errors": [
+        "Invented probe header, 206 check and exception fallback."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "_read_file opens detected URLs with urllib.request.urlopen(filename), then checks response.headers.get(\"Accept-Ranges\") == \"bytes\" (geopandas/io/file.py:282-291). If not, it reads the response into memory and sets from_bytes=True; otherwise the original URL is retained for the selected engine. This revision does not send a bytes=0-1 probe or catch connection exceptions as a fallback."
+    },
+    {
+      "task_id": "import-89ee261aef574400411cc2b6",
+      "reference_sha256": "2385c5bea89365bdedbc0a9886330fd5a73f3c7a64b514955f96d13763270eb3",
+      "question_sha256": "b190dc632e5e60573af2c63461153275e52161a32988fba1d7f14fcc1f10a58f",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Caller conversion options are forwarded to Table.to_pandas",
+          "verdict": "contradicted",
+          "reason": "Call has no arguments, so claimed types_mapper/integer_object_nulls control surface is absent.",
+          "evidence": {
+            "path": "geopandas/io/arrow.py",
+            "start_line": 526,
+            "end_line": 527
+          }
+        }
+      ],
+      "material_errors": [
+        "Unsupported public option forwarding advice."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "The Arrow conversion separates geometry columns and calls table_attr.to_pandas() without conversion keyword arguments (geopandas/io/arrow.py:526-527), then reconstructs geometry columns. Nongeometry dtype conversion therefore follows PyArrow defaults in this pinned implementation. This code does not forward types_mapper or integer_object_nulls to to_pandas, so those cannot be assumed to work as GeoPandas read_parquet options."
+    },
+    {
+      "task_id": "import-8bd8d955ab21428398dda7c2",
+      "reference_sha256": "cf3fdc226371a18f7e4555ccbf774decb14723fbd652b8b28f5a573a68b15388",
+      "question_sha256": "3ed8566d6b0545f191fc07c14ae4d01ea94993b477c8bc8d8996504a9b0f6049",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "_MAP_KWARGS lists direct map options and removes them from remaining kwargs",
+          "verdict": "supported",
+          "reason": "Merges recognized kwargs with map_kwds and calls folium.Map; explicit constructor parameters also affect map, so list is not exclusive gate for all configuration.",
+          "evidence": {
+            "path": "geopandas/explore.py",
+            "start_line": 360,
+            "end_line": 411
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-da439129d2082bbaebc50bc2",
+      "reference_sha256": "f93981136ed2e96f450b772cb6c91b8151e39002627abae3eb41dd147c64619a",
+      "question_sha256": "1e5757d30016e35520e0f53fb3f04774ff478aa59f1a8f0a42ccb2a55ce0946d",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "explore directly calls GeoDataFrame.to_json",
+          "verdict": "contradicted",
+          "reason": "It accesses __geo_interface__ and passes a FeatureCollection to folium.GeoJson.",
+          "evidence": {
+            "path": "geopandas/explore.py",
+            "start_line": 647,
+            "end_line": 669
+          }
+        }
+      ],
+      "material_errors": [
+        "Wrong serialization call path and unsupported assertion Folium/Leaflet only consume GeoJSON; no demonstrated CPU profile."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "_explore eagerly obtains a FeatureCollection through the filtered frame\u2019s __geo_interface__, loops over feature properties to escape template braces, and passes the result with styling, tooltip and popup callbacks to folium.GeoJson (geopandas/explore.py:647-669). Larger feature/property payloads and repeated layers increase preparation and map content. These are plausible costs, but the source does not measure high CPU usage or prove which stage dominates; it does not call GeoDataFrame.to_json here."
+    },
+    {
+      "task_id": "import-ef28faecac5ec2a021a296dd",
+      "reference_sha256": "1de0979f1b3ee43799ae3c0d57fc0ddb2b793fbc88b17d51e079570b5c7c0dca",
+      "question_sha256": "bd23e21d6c36b9628c450c1f0742c4ce943105dceeea4890d090c0855827cda3",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Static defaults tab10, interactive tab20",
+          "verdict": "supported",
+          "reason": "Static categorical None branch uses tab10; explore.py:441-444 uses tab20 for falsey cmap.",
+          "evidence": {
+            "path": "geopandas/plotting.py",
+            "start_line": 790,
+            "end_line": 792
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

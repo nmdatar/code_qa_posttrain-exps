@@ -1,0 +1,277 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-a2cbfd4b9a61a1d0baf2a087",
+      "reference_sha256": "4c6fa3fb200e9c846788548ee9d0183e6e8d1e951b687eb672683264cb7ecbd8",
+      "question_sha256": "e704d06347fdd1e56394106bdb56e04f1fed0c234258ea4582a881bad6e95d8e",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Render style converted to css prop",
+          "verdict": "supported",
+          "reason": "_get_style converts emotion style; _render updates props at line972.",
+          "evidence": {
+            "path": "reflex/components/component.py",
+            "start_line": 1201,
+            "end_line": 1214
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-a8ce2b719b0e88532d6755fd",
+      "reference_sha256": "e9eae37eb85d1a04484e66e9761bb56272306b805629d4e97ac36051007c97ed",
+      "question_sha256": "a3cf150cd45015efc965bb77d116a1061d2568f6b26d91fb6d6c4ced7e0d8013",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Redis serializes during retrieval",
+          "verdict": "partially_supported",
+          "reason": "Retrieval deserializes, suppresses schema mismatch and creates replacement; memory persistence retains live objects.",
+          "evidence": {
+            "path": "reflex/istate/manager/redis.py",
+            "start_line": 229,
+            "end_line": 240
+          }
+        }
+      ],
+      "material_errors": [
+        "Retrieval deserializes, suppresses schema mismatch and creates replacement; memory persistence retains live objects."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Changing the app state manager selects persistence behavior. Memory manager get/set retain live BaseState objects (reflex/istate/manager/memory.py:29-60). Disk serializes touched substates (reflex/istate/manager/disk.py:198-200); Redis also serializes touched state on set (reflex/istate/manager/redis.py:336-337). Redis retrieval deserializes bytes and recreates state on a schema mismatch (lines 229-240). Thus tests using persistent managers exercise a persistence serialization cycle that memory storage does not; this does not mean all other framework serialization disappears with memory storage."
+    },
+    {
+      "task_id": "import-ab775e75b5173b9102d26f5b",
+      "reference_sha256": "0afd18ec64341e95f890755c02adb63197309cf39966a294906f961a2a5c05cd",
+      "question_sha256": "a232dc9b47a928f2d9e9e48a70012840a8e89b38f5308081d26a609cf1c62651",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Typed keyboard data becomes key and modifier Vars",
+          "verdict": "supported",
+          "reason": "key_event explicitly maps camelCase modifier fields to KeyInputInfo fields.",
+          "evidence": {
+            "path": "reflex/event.py",
+            "start_line": 671,
+            "end_line": 692
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-b1e8c2de4831f28e545d953f",
+      "reference_sha256": "df146c23bce6ebcf13b53add78af62532c841533d3c897ae83610175b56f2257",
+      "question_sha256": "444dcc92f2fb7d67c37e54f266dbef5b86d0d61a01cc9ea0fde5a026862e06ea",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "EventHandler bound on instance access",
+          "verdict": "supported",
+          "reason": "event_handlers lookup uses partial or background wrapper.",
+          "evidence": {
+            "path": "reflex/state.py",
+            "start_line": 1336,
+            "end_line": 1346
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-bd99c9e90b968d8b907f3a7a",
+      "reference_sha256": "8f27062b9cabe43d739b08a5e2f9ca12c66c365790470f27d98fa222c301fde0",
+      "question_sha256": "b52ed78e208e82fbe6d89a1f0f7387a92e1daef8b68bfa01f3616849c5bb31ca",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Fragment key is required to rerun hook",
+          "verdict": "partially_supported",
+          "reason": "Source states different Fragment for different targets, but hook-remount necessity overclaims generated ownership and effect behavior.",
+          "evidence": {
+            "path": "reflex/components/core/clipboard.py",
+            "start_line": 57,
+            "end_line": 60
+          }
+        }
+      ],
+      "material_errors": [
+        "Source states different Fragment for different targets, but hook-remount necessity overclaims generated ownership and effect behavior."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Clipboard._render removes the targets prop from the Fragment and uses self.targets as its key; the comment explicitly says this ensures a different Fragment whenever targets differ (reflex/components/core/clipboard.py:57-60). Targets are separately passed to usePasteHandler in generated hook code (lines 74-92). The key controls React identity of the rendered Fragment while the hook handles listener attachment; these lines alone do not prove a parent hook must remount or that effect reruns depend solely on this key."
+    },
+    {
+      "task_id": "import-c05ebc7f9443ab6925cff508",
+      "reference_sha256": "1ba547a0165d472857909099a91c012ec42774a5843c8eacde0fc2e6d1917fba",
+      "question_sha256": "3c20a64033ca4a014547baa79f355a9b65f2d3605d956200cfc75717346be7ff",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Internal-first ensures React hook consistency",
+          "verdict": "partially_supported",
+          "reason": "Bucketing supports ordering/dependencies, but alone cannot guarantee hook consistency or establish all listed hook categories.",
+          "evidence": {
+            "path": "reflex/compiler/templates.py",
+            "start_line": 20,
+            "end_line": 50
+          }
+        }
+      ],
+      "material_errors": [
+        "Bucketing supports ordering/dependencies, but alone cannot guarantee hook consistency or establish all listed hook categories."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "_sort_hooks partitions hooks into INTERNAL, PRE_TRIGGER and POST_TRIGGER lists and returns them in that order; missing metadata defaults to PRE_TRIGGER (reflex/compiler/templates.py:20-50). This lets templates place infrastructure before code that depends on it and user hooks around trigger setup. It is an ordering mechanism, not by itself a guarantee of all React hook rules or proof of undocumented architectural intent."
+    },
+    {
+      "task_id": "import-c6ec8dbe4a5bc192ccc8c9de",
+      "reference_sha256": "a02491daa2104b90f50f9377f368b93876c820eedd82d551e449acb76e01d65c",
+      "question_sha256": "df95567160f98e2167de7d1447305c7f8bf4a83c4f6143a57d28a13e00d33b48",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Style combination merges VarData",
+          "verdict": "supported",
+          "reason": "update and union explicitly merge metadata through VarData.merge.",
+          "evidence": {
+            "path": "reflex/style.py",
+            "start_line": 264,
+            "end_line": 318
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-c8437fe8534e7917400d1752",
+      "reference_sha256": "c283d3320f724825e5f84f8e32e3f0c7d1ca231e6f78b3ffb6fe174ee8b97db2",
+      "question_sha256": "9b5e83bc95c714f4d52e6b534f99bee23b19450e3d88635a50b835727785d17a",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "State validation error always propagates to app handler",
+          "verdict": "contradicted",
+          "reason": "Question ambiguous; get_state explicitly catches ValueError to select Redis fallback, not universal event-error path.",
+          "evidence": {
+            "path": "reflex/state.py",
+            "start_line": 1608,
+            "end_line": 1615
+          }
+        }
+      ],
+      "material_errors": [
+        "Question ambiguous; get_state explicitly catches ValueError to select Redis fallback, not universal event-error path."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "For BaseState.get_state, the immediate branch is the try/except around _get_state_from_cache: a ValueError falls through to _get_state_from_redis (reflex/state.py:1608-1615). Both cache and Redis helpers can raise StateMismatchError on an unexpected state type (lines 1570-1594). Schema validation on persisted Redis data has a different branch: StateSchemaMismatchError is suppressed and a new state is constructed (reflex/istate/manager/redis.py:229-240). The question must specify which validation error and call context before asserting a single propagation path."
+    },
+    {
+      "task_id": "import-ca67e65958271860bc9d65d9",
+      "reference_sha256": "c9a09aad16219b683b5f5d3b1b5677ae6a4ecd75cad34f60a6cba184d2eb1e2d",
+      "question_sha256": "41b45cc3fcfb2de4f5ad5b103891ece7d2ff045d3d3fda82bfd1302ef64928f6",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Hide when detached removes DOM and disables collision behavior",
+          "verdict": "partially_supported",
+          "reason": "Wrapper promises hiding, not DOM removal or stopping collision calculations.",
+          "evidence": {
+            "path": "reflex/components/radix/themes/components/dropdown_menu.py",
+            "start_line": 190,
+            "end_line": 200
+          }
+        }
+      ],
+      "material_errors": [
+        "Wrapper promises hiding, not DOM removal or stopping collision calculations."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "For submenu content, avoid_collisions permits overriding preferred positioning to avoid boundary edges; collision_padding sets the inset at which collision detection occurs. hide_when_detached requests hiding when the trigger is fully occluded (reflex/components/radix/themes/components/dropdown_menu.py:190-200). The wrapper does not establish DOM removal or that collision calculation only runs while partially visible; sticky is a separate setting for that positioning policy."
+    },
+    {
+      "task_id": "import-d071a7cff0ec3332e1937b8b",
+      "reference_sha256": "6c7704fabdba083fea70bc1cbaa8b72c9640ecd53973efd15005afc500fe55d5",
+      "question_sha256": "dc2d41df893cbd63801834de6c7c5f6b257499b3615c1e8d209c549256346c6c",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Granian selection yields uniquely stronger isolation and fixed CPU workers",
+          "verdict": "contradicted",
+          "reason": "Selection reads boolean value not mere set; workers depend on Redis and both production servers support workers.",
+          "evidence": {
+            "path": "reflex/utils/exec.py",
+            "start_line": 296,
+            "end_line": 310
+          }
+        }
+      ],
+      "material_errors": [
+        "Selection reads boolean value not mere set; workers depend on Redis and both production servers support workers."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "should_use_granian honors the parsed REFLEX_USE_GRANIAN value when set; otherwise missing uvicorn or gunicorn selects Granian (reflex/utils/exec.py:296-310). Production Granian defaults GRANIAN_WORKERS through _get_backend_workers unless explicitly supplied (lines 678-679), which delegates to processes.get_num_workers; without Redis it returns one (reflex/utils/processes.py:36-46). The Uvicorn production route also uses a worker-capable server (reflex/utils/exec.py:598 onward). Process isolation and memory duplication follow worker configuration; the code does not support a blanket Granian-versus-Uvicorn strong/weak isolation or measured overhead contrast."
+    },
+    {
+      "task_id": "import-d3550fc0f2e05680e713d9b0",
+      "reference_sha256": "5c3954a8b520eab04c16effa4a55799227dd6b8155b5aab3b314c21c9d0c6afe",
+      "question_sha256": "27f6003a0b64c989064687a04ca603d5cd510648337be61150fc2d9af5fe96ee",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Distinct popover primitive tags share trigger base",
+          "verdict": "supported",
+          "reason": "Open and close wrappers have separate tags and descriptive semantics.",
+          "evidence": {
+            "path": "reflex/components/radix/themes/components/popover.py",
+            "start_line": 94,
+            "end_line": 97
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-d5482e3243c286a73a53dca7",
+      "reference_sha256": "c5d2554b082397122cd578ea4786e334a9943deeab5796e3eda8d16f2ff2024c",
+      "question_sha256": "73964cd461edcfefe7a29d5991aba2ba4e7cdd30c6b9f2ced6b57a27af500b66",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Whitespace environment values considered unset",
+          "verdict": "supported",
+          "reason": "getenv and is_set strip for meaningful content.",
+          "evidence": {
+            "path": "reflex/environment.py",
+            "start_line": 330,
+            "end_line": 347
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    }
+  ]
+}

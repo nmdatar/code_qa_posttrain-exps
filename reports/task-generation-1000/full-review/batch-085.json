@@ -1,0 +1,238 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-8cf10c0c4a274c5334fe19a0",
+      "reference_sha256": "93d7d1a171d0610ea3c3899ebb74c17549f439e81510755bd26e2b76cc3697d8",
+      "question_sha256": "a49146c88878af69744eff7a13857726e9f82fdc4039829ac8c4dcf9841e25e5",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Validation/application separation guarantees safety and is a universal quadratic bottleneck",
+          "verdict": "partially_supported",
+          "reason": "apply invokes validate, but force explicitly bypasses dependence analysis. The per-variable write/access pair loop is not proof of a measured whole-program bottleneck or a universal complexity in loop count.",
+          "evidence": {
+            "path": "src/psyclone/psyir/transformations/parallel_loop_trans.py",
+            "start_line": 298,
+            "end_line": 323
+          }
+        }
+      ],
+      "material_errors": [
+        "apply invokes validate, but force explicitly bypasses dependence analysis. The per-variable write/access pair loop is not proof of a measured whole-program bottleneck or a universal complexity in loop count."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "ParallelLoopTrans.apply first calls validate before wrapping a loop with directives, allowing legality checks and diagnostics to be considered separately from application. Options include forcing parallelization or ignoring selected dependencies, so validation is not an unconditional safety guarantee (src/psyclone/psyir/transformations/parallel_loop_trans.py:298-323). DependencyTools compares each write with other accesses for a variable, at up to W*A pair checks, and can stop at an unsafe variable (src/psyclone/psyir/tools/dependency_tools.py:649-665,817-863). Large access sets and symbolic tests can increase analysis cost; these sources do not establish measured scalability or quadratic cost in the number of loops."
+    },
+    {
+      "task_id": "import-7453d326f08b9fc6b3c6253b",
+      "reference_sha256": "6fd22b786a4ecc6bff7854f9d8754b7ffa15b6c2a59b89fbb3cfd9297dcbafce",
+      "question_sha256": "e46e743ecedddeda94bb1f9f38127b1826bac89b9dd8d1c32dc3b6135accdf9a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Intrinsic transformations share algorithms through subclass-specific hooks",
+          "verdict": "supported",
+          "reason": "The common apply algorithm builds loops then calls _loop_body; intrinsic classes provide operation-specific initialization and reduction behavior. Template Method is an apt interpretation, not necessarily an explicitly named pattern.",
+          "evidence": {
+            "path": "src/psyclone/psyir/transformations/intrinsics/array_reduction_base_trans.py",
+            "start_line": 294,
+            "end_line": 345
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-584a3d79de6cd1988916e143",
+      "reference_sha256": "e5b55d4dffe8f9b92ef78a423e520b69859da5fd1a0d1ded18803e03754957d8",
+      "question_sha256": "e64501b0fb548e32c07168b666df1dcbab3bee6141dad84d0529a5af277e0f14",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "All seven workflows upload Codecov and support skip-ci filtering",
+          "verdict": "partially_supported",
+          "reason": "The seven workflows exist but the coverage upload belongs to the main testing job, not every workflow. linkcheck and repository synchronization lack the claimed universal filter/integration.",
+          "evidence": {
+            "path": ".github/workflows/python-package.yml",
+            "start_line": 106,
+            "end_line": 167
+          }
+        }
+      ],
+      "material_errors": [
+        "The seven workflows exist but the coverage upload belongs to the main testing job, not every workflow. linkcheck and repository synchronization lack the claimed universal filter/integration."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The main python-package workflow builds documentation and runs tests, lint, examples and tutorials across its configured Python matrix, uploading coverage from the test job (.github/workflows/python-package.yml:56-167). compilation.yml runs compiler-heavy examples/tutorials and tests on mirror-only self-hosted runners; lfric_test.yml, nemo_tests.yml and nemo_v5_tests.yml provide domain integration jobs (.github/workflows/compilation.yml:64-134; .github/workflows/lfric_test.yml:39-79; .github/workflows/nemo_tests.yml:39-101; .github/workflows/nemo_v5_tests.yml:39-78). linkcheck.yml runs Linkspector for pull requests, while repo-sync.yml pushes public-repository changes to the mirror (.github/workflows/linkcheck.yml:1-16; .github/workflows/repo-sync.yml:38-87). Coverage uploads and explicit skip-ci checks are job-specific, not common to all seven workflows."
+    },
+    {
+      "task_id": "import-8c644074cd4e2351d243b4a1",
+      "reference_sha256": "676d77e655fd175a53582376a42fbcb80e382a2ca8b069e31ffcdfe643ef98a0",
+      "question_sha256": "f879c67ea55d899008604c07212e1fb819c704a9f44753cf719982305a612a74",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Nested-loop dependency analysis grows exponentially with depth and is a demonstrated bottleneck",
+          "verdict": "unsupported",
+          "reason": "Variable counts do not inherently grow exponentially with nesting depth. The static pair loop supports W*A work per variable, not the reference's broad exponential and measured-bottleneck claims.",
+          "evidence": {
+            "path": "src/psyclone/psyir/tools/dependency_tools.py",
+            "start_line": 817,
+            "end_line": 863
+          }
+        }
+      ],
+      "material_errors": [
+        "Variable counts do not inherently grow exponentially with nesting depth. The static pair loop supports W*A work per variable, not the reference's broad exponential and measured-bottleneck claims."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "Potential cost comes from collecting loop access information and checking variables, with array analysis comparing each write against other accesses (src/psyclone/psyir/tools/dependency_tools.py:649-665,817-863). Read-only arrays bypass pair checks, and the default analysis returns after the first unsafe variable. Privatisation checks locality and references following the loop (src/psyclone/psyir/transformations/parallel_loop_trans.py:84-119). Large access sets and difficult symbolic subscripts can make this work expensive, but nesting depth alone does not establish exponential growth or prove a runtime bottleneck. Profiling representative kernels is needed for that claim."
+    },
+    {
+      "task_id": "import-06d894f19682e481afe2f89d",
+      "reference_sha256": "9898010de1adf88f6bb051fe498410079ea094dda21124e1478018b9cc2efdc0",
+      "question_sha256": "6c5201f2018ac7e192e4b92b2966d92f94afacef2c390eb87f82a625d02b106a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Adjoint comparisons use spacing-scaled differences and shared logging wrappers",
+          "verdict": "supported",
+          "reason": "The generator computes abs(var1-var2)/SPACING(max(abs(var1),abs(var2))) and compares against the tagged tolerance; LFRic reuses it with its logging wrapper. This checks the test relation, not a proof of every adjoint input.",
+          "evidence": {
+            "path": "src/psyclone/psyad/domain/common/adjoint_utils.py",
+            "start_line": 124,
+            "end_line": 190
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-e90581de25fdc24433dd62f2",
+      "reference_sha256": "8748759ab10d97da6848ba403dd580e8ce5c480c513de44afcee61a772f44bc4",
+      "question_sha256": "2034656d84d9933190af05976b026b8fe12cee241fa28b67820b7b82dc51edea",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Recursive make forces serialization regardless of -j and differing flags cause parallel conflicts",
+          "verdict": "unsupported",
+          "reason": "Distinct prerequisite targets can be scheduled in parallel and recursive MAKE is not inherently serial. Separate compiler flag values alone do not demonstrate shared-output conflicts; the cited NEMO recipe has no compilation.",
+          "evidence": {
+            "path": "examples/top_level.mk",
+            "start_line": 49,
+            "end_line": 75
+          }
+        }
+      ],
+      "material_errors": [
+        "Distinct prerequisite targets can be scheduled in parallel and recursive MAKE is not inherently serial. Separate compiler flag values alone do not demonstrate shared-output conflicts; the cited NEMO recipe has no compilation."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The cited files do not establish general failure to scale under make -j. examples/top_level.mk declares separate example targets and invokes recursive MAKE for each, allowing make to schedule independent prerequisites (examples/top_level.mk:49-75). The NEMO eg1 transform recipe runs several commands in sequence but explicitly has no compilation target implementation (examples/nemo/eg1/Makefile:40-50). LFRic eg17 records main_alg.f90 as depending on main_psy.f90, whose recipe generates both files (examples/lfric/eg17/full_example/Makefile:85-90). Serial recipe steps or missing dependencies may warrant specific investigation, but neither recursive make nor differing local F90FLAGS proves the asserted global serialization or race failures."
+    },
+    {
+      "task_id": "import-7a27d85aae27e3df1afac2c6",
+      "reference_sha256": "5fc0dd25c88287d29e0e4ea9d6008a905b6658997cc8a8ba50ae48f7466dc083",
+      "question_sha256": "8a952db90d9edd9898b495589b84419715893d833bf7f71bdf9f38d22abad222",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Flat dictionary storage requires linear searches and implies depth-times-table complexity",
+          "verdict": "unsupported",
+          "reason": "A dict does not force linear key lookup. The claimed complexity and incorrect matches are not established by recursive traversal or name normalization; symbol lookup is explicitly scope-aware.",
+          "evidence": {
+            "path": "src/psyclone/core/variables_access_info.py",
+            "start_line": 51,
+            "end_line": 90
+          }
+        }
+      ],
+      "material_errors": [
+        "A dict does not force linear key lookup. The claimed complexity and incorrect matches are not established by recursive traversal or name normalization; symbol lookup is explicitly scope-aware."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "Node.reference_accesses defaults to visiting each child, so collecting accesses requires traversal of the selected subtree (src/psyclone/psyir/nodes/node.py:1484-1493). VariablesAccessInfo maps signatures to access information in a dictionary; that fact does not imply linear key searches or O(depth*symbols) analysis (src/psyclone/core/variables_access_info.py:51-90). SymbolTable.lookup obtains scope-limited symbols and uses a normalized-name dictionary key (src/psyclone/psyir/symbols/symbol_table.py:950-965). Repeated analyses and large trees can add cost, but the asserted poor scalability and scope-confusion failure require a concrete workload or counterexample, not these implementation facts alone."
+    },
+    {
+      "task_id": "import-123ecdad968e7ea36e4a5f6a",
+      "reference_sha256": "96156de10a2a4c682c651211623e2de3115ffc1e035bad4479a8f3eff89cfd6f",
+      "question_sha256": "c26fd2f15ae600c5bf589de1d765c2b8fb11b13a29e6cc286775d4f7cf1c9912",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "ACC update uses DependencyTools and places synchronization directly beside every device region",
+          "verdict": "partially_supported",
+          "reason": "Actual entry is CallTreeUtils.get_in_out_parameters; written variables are also inputs conservatively. Placement is around host blocks and may move outward/coalesce, not invariably immediately beside a device region.",
+          "evidence": {
+            "path": "src/psyclone/psyir/transformations/acc_update_trans.py",
+            "start_line": 240,
+            "end_line": 324
+          }
+        }
+      ],
+      "material_errors": [
+        "Actual entry is CallTreeUtils.get_in_out_parameters; written variables are also inputs conservatively. Placement is around host blocks and may move outward/coalesce, not invariably immediately beside a device region."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "ACCUpdateTrans identifies contiguous host-code blocks outside ACC kernels/parallel regions, treating potentially computing calls as boundaries and recursing into host loops/conditions (src/psyclone/psyir/transformations/acc_update_trans.py:177-223). It obtains read/write signatures through CallTreeUtils.get_in_out_parameters, adds outputs to inputs to protect partially written arrays, and treats CodeBlock references conservatively as both. Host inputs require host updates and outputs device updates. It then checks textual and loop-carried synchronization needs and moves updates toward outer schedules where safe, aiming to avoid loop-internal transfers and merge neighboring directives (same file:240-324). This is conservative data-use analysis, not simply a mandatory update immediately before/after each device region."
+    },
+    {
+      "task_id": "import-37e12ac8abaadb8d3c8400ef",
+      "reference_sha256": "4c8d15a89ec033363fd5d7e75cae1ee60a91f66e797d5b2414cd84f37d25c3ac",
+      "question_sha256": "6b35af731863ac7d274f8c51647a0aec8f288f1c48fec1ebcbe30d943aaca4a1",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Four direct and five indirect production ParallelLoopTrans subclasses form the listed hierarchy",
+          "verdict": "supported",
+          "reason": "Class declarations confirm OMPParallelLoopTrans and its two domain subclasses, plus orphan-loop subclasses; OMPLoopTrans, OMPTaskTrans, OMPTaskloopTrans and ACCLoopTrans directly derive from the base. Test-only ParaTrans is not a production concrete transformation.",
+          "evidence": {
+            "path": "src/psyclone/transformations.py",
+            "start_line": 712,
+            "end_line": 876
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-a38d8c6a4c053daff0d79957",
+      "reference_sha256": "a4d0310c9aa5fef3554babb69cf742b67c3ddf52b5f3b3a291d18916218d0966",
+      "question_sha256": "598145427b519a34a3fc217f033d52d57e657f344fff76d96189c3246347549f",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Nested import scans prove prohibitive scalability and Signature parsing overhead",
+          "verdict": "partially_supported",
+          "reason": "Container/symbol/scope scanning is real but filters and early returns matter, and no measured performance or causal Signature overhead is supplied. Nested ContainerSymbols are skipped, not recursively resolved here.",
+          "evidence": {
+            "path": "src/psyclone/psyir/symbols/symbol_table.py",
+            "start_line": 1616,
+            "end_line": 1694
+          }
+        }
+      ],
+      "material_errors": [
+        "Container/symbol/scope scanning is real but filters and early returns matter, and no measured performance or causal Signature overhead is supplied. Nested ContainerSymbols are skipped, not recursively resolved here."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "resolve_imports scans selected containers, their public non-container symbols, and descendant ScopingNodes; matching unresolved symbols can trigger additional reference walks (src/psyclone/psyir/symbols/symbol_table.py:1616-1694). A coarse scan count can grow with containers times symbols times scopes, with extra work in matching branches. Wildcard imports copy missing public symbols into the local table, while symbol_target filters and can return early (same file:1644-1648,1696-1760). These are potential scaling costs, not evidence that all large inputs are prohibitively slow. Nested ContainerSymbols are explicitly skipped here, and string-based access tracking is not demonstrated to be the bottleneck."
+    }
+  ]
+}

@@ -1,0 +1,488 @@
+{
+  "schema_version": "1.0",
+  "assessment_kind": "advisory_question_only_control",
+  "official_evaluation": false,
+  "method": {
+    "sample_count_per_task": 1,
+    "context": "fresh context; exact public prompt",
+    "model_version": null,
+    "tools_available_to_control": false,
+    "tool_enabled_counterpart": null,
+    "grading": "Agent semantic comparison against finalized private required claims and independently reviewed references; not official evaluation.",
+    "deductions_excluded": [
+      "absent repository citations",
+      "unexecuted verification",
+      "clearly expressed uncertainty accompanying a correct substantive prediction"
+    ],
+    "runtime_execution_by_grader": false,
+    "reference_verification_context": "Root reports all 49 reference claims independently supported and 18 assertion executions passing across two runs; this assessment did not reexecute them."
+  },
+  "references": {
+    "manifest": "examples/dataset_sources/generation-batch-v2.json",
+    "inputs": "reports/task-generation/question-only-inputs.json",
+    "answers": "reports/task-generation/question-only-answers.json",
+    "independent_reviews": [
+      "reports/task-generation/pydantic-independent-review.json",
+      "reports/task-generation/query-independent-review.json",
+      "reports/task-generation/sqlalchemy-independent-review.json"
+    ]
+  },
+  "tasks": [
+    {
+      "task_id": "pydantic-typed-extras-runtime-policy",
+      "reference_spec": "examples/dataset_sources/pydantic-generation-v2.json",
+      "prompt_sha256": "0f74f1b57fb767d70f890e7909c27a4ad06025a46fefd5c4880c529f8ecddb0a",
+      "prompt_hash_check": "Exact final prompt bytes and recomputed input hash match both recorded input and answer hashes.",
+      "claims": [
+        {
+          "id": "typed-extra-schema",
+          "verdict": "supported",
+          "reason": "Matches coercion and separate key/value failures; location uncertainty does not contradict the correct prediction.",
+          "answer_evidence_paraphrase": "count=1, foo=2; long raises string_too_long at (long,), foo=bad raises int_parsing at (foo,)."
+        },
+        {
+          "id": "extra-field-special",
+          "verdict": "supported",
+          "reason": "Correctly separates special storage from ordinary fields.",
+          "answer_evidence_paraphrase": "Bag ordinary field is count; __pydantic_extra__ is a special extra-storage annotation, not an ordinary model field."
+        },
+        {
+          "id": "call-policy-controls",
+          "verdict": "supported",
+          "reason": "All three call-policy outcomes and forwarding mechanism agree.",
+          "answer_evidence_paraphrase": "strict produces int_type at foo; ignore drops long/bad; forbid produces extra_forbidden at foo; model_validate forwards strict/extra."
+        },
+        {
+          "id": "schema-not-rebuilt",
+          "verdict": "supported",
+          "reason": "Recovers compiled-policy versus runtime-policy boundary.",
+          "answer_evidence_paraphrase": "Ignore class schema did not generate extras key/value schema; runtime allow accepts long=bad unchanged."
+        },
+        {
+          "id": "storage-vs-serialization",
+          "verdict": "supported",
+          "reason": "Explicitly distinguishes stored data, attribute access and compiled serialization.",
+          "answer_evidence_paraphrase": "__pydantic_extra__={long:bad}, .long=bad, but model_dump()={count:1}; override does not rebuild serializer."
+        }
+      ],
+      "definite_critical_misconceptions": [],
+      "uncertainty_notes": [
+        "Exact error location for constrained extra keys may include a key-location marker at this pinned core version.",
+        "Runtime-allowed extras on an ignore-configured model and their serializer omission are revision-dependent predictions."
+      ],
+      "dominant_finding": "Recovers typed extras, runtime-policy/schema separation and stored-but-omitted serialization.",
+      "control_recovered_core_behavior": true,
+      "collection_recommendation": "retain_as_development",
+      "formal_hardness_label": null
+    },
+    {
+      "task_id": "pydantic-factory-data-signature-order",
+      "reference_spec": "examples/dataset_sources/pydantic-generation-v2.json",
+      "prompt_sha256": "5a1c8ebc5d8984b17cab8a678bcd9e477b3d0d91cfa61744eefd3238e9cd92b5",
+      "prompt_hash_check": "Exact final prompt bytes and recomputed input hash match both recorded input and answer hashes.",
+      "claims": [
+        {
+          "id": "validated-data-input",
+          "verdict": "supported",
+          "reason": "Factory receives previously validated data in both constructions.",
+          "answer_evidence_paraphrase": "Derived and Checked call derive with {a:3}, with integer a."
+        },
+        {
+          "id": "default-result-validation",
+          "verdict": "supported",
+          "reason": "Correctly distinguishes output types and opt-in validation.",
+          "answer_evidence_paraphrase": "Derived b is str 6; Checked validate_default=True produces int 6."
+        },
+        {
+          "id": "signature-sensitive",
+          "verdict": "supported",
+          "reason": "Exact positional-capable, required, single-parameter condition is recovered.",
+          "answer_evidence_paraphrase": "Exactly one positional-only or positional-or-keyword parameter with no default; optional(data=None) runs without data and returns 99."
+        },
+        {
+          "id": "failure-skips-factory",
+          "verdict": "supported",
+          "reason": "Both errors and absence of invocation are correct.",
+          "answer_evidence_paraphrase": "Invalid a gives int_parsing at a and default_factory_not_called at b; calls stays length N."
+        },
+        {
+          "id": "explicit-value-skips-default",
+          "verdict": "supported",
+          "reason": "Correctly bypasses factory for provided input.",
+          "answer_evidence_paraphrase": "Explicit b=8 succeeds as integer 8; calls remains length N."
+        },
+        {
+          "id": "field-order-boundary",
+          "verdict": "supported",
+          "reason": "Correctly models sequential availability and propagated exception.",
+          "answer_evidence_paraphrase": "Reordered derive gets {}, appends it, and raises KeyError(a); raw a is not available early."
+        }
+      ],
+      "definite_critical_misconceptions": [],
+      "uncertainty_notes": [
+        "The pinned core's handling and error reporting when preceding field validation fails is not verified."
+      ],
+      "dominant_finding": "Recovers validated factory input, signature detection, default validation, failure skipping and field order.",
+      "control_recovered_core_behavior": true,
+      "collection_recommendation": "retain_as_development",
+      "formal_hardness_label": null
+    },
+    {
+      "task_id": "pydantic-alias-choice-unused-inputs",
+      "reference_spec": "examples/dataset_sources/pydantic-generation-v2.json",
+      "prompt_sha256": "3d2dfcc86ef048495ac59c4aa1a469eed5176c5f02f55a07bca898fed29e8428",
+      "prompt_hash_check": "Exact final prompt bytes and recomputed input hash match both recorded input and answer hashes.",
+      "claims": [
+        {
+          "id": "precedence-unused",
+          "verdict": "supported",
+          "reason": "Precedence and unused-input errors both agree.",
+          "answer_evidence_paraphrase": "legacy selects value=1; payload and value are extra_forbidden; ignore returns value=1."
+        },
+        {
+          "id": "path-name-fallback",
+          "verdict": "supported",
+          "reason": "All three fallback cases match.",
+          "answer_evidence_paraphrase": "Payload-only gives 2, name-only 3, empty payload with ignore falls through to value=3."
+        },
+        {
+          "id": "invalid-present-not-fallback",
+          "verdict": "supported",
+          "reason": "Correctly distinguishes missing input from invalid selected input.",
+          "answer_evidence_paraphrase": "legacy=bad produces int_parsing at legacy and does not try later payload."
+        },
+        {
+          "id": "runtime-name-selection",
+          "verdict": "supported",
+          "reason": "Correct call-time name selection.",
+          "answer_evidence_paraphrase": "by_alias=False, by_name=True, extra=ignore returns value=3 from all keys."
+        },
+        {
+          "id": "serializer-separate",
+          "verdict": "supported",
+          "reason": "Separates input and output aliases, including errors.",
+          "answer_evidence_paraphrase": "Normal dump {value:1}, alias dump {out:1}; out-only input gives missing at legacy and extra_forbidden at out."
+        },
+        {
+          "id": "entrypoint-guard",
+          "verdict": "supported",
+          "reason": "Recovers explicit-argument Python guard despite class configuration.",
+          "answer_evidence_paraphrase": "by_alias=False with omitted by_name raises PydanticUserError; guard tests by_name is not True before core validation."
+        }
+      ],
+      "definite_critical_misconceptions": [],
+      "uncertainty_notes": [
+        "The explicit by_alias=False entry guard and first-alias missing error location are predictions for this revision."
+      ],
+      "dominant_finding": "Recovers alias precedence, unused inputs, invalid-present behavior, separate output aliases and explicit runtime guard.",
+      "control_recovered_core_behavior": true,
+      "collection_recommendation": "retain_as_development",
+      "formal_hardness_label": null
+    },
+    {
+      "task_id": "tanstack-signal-consumption-unsubscribe",
+      "reference_spec": "examples/dataset_sources/tanstack-query-generation-v2-reviewed.json",
+      "prompt_sha256": "6f057e63dbae1a774d641e46e264a0f2ca86c3f2cb347b701aaf3e6aa939abce",
+      "prompt_hash_check": "Exact final prompt bytes and recomputed input hash match both recorded input and answer hashes.",
+      "claims": [
+        {
+          "id": "signal-getter",
+          "verdict": "supported",
+          "reason": "Correct getter-side consumption mechanism without transport cooperation.",
+          "answer_evidence_paraphrase": "Reading and saving context.signal marks consumed even if the promise does nothing with it."
+        },
+        {
+          "id": "unobserved-unconsumed",
+          "verdict": "supported",
+          "reason": "Correct active unconsumed branch.",
+          "answer_evidence_paraphrase": "Last observer removal calls cancelRetry, leaves seed/success/fetching, and current attempt continues."
+        },
+        {
+          "id": "unobserved-consumed",
+          "verdict": "supported",
+          "reason": "Correct consumed cancellation and restoration.",
+          "answer_evidence_paraphrase": "cancel({revert:true}) aborts saved signal and restores seed/success/idle."
+        },
+        {
+          "id": "late-resolution",
+          "verdict": "supported",
+          "reason": "Correctly separates underlying promise from retryer settlement.",
+          "answer_evidence_paraphrase": "Late remote updates unconsumed cache; consumed case keeps seed because settled retryer ignores later resolution."
+        },
+        {
+          "id": "scoped-results",
+          "verdict": "supported",
+          "reason": "Both result triples and invocation counts match scoped fixture.",
+          "answer_evidence_paraphrase": "Each queryFn runs once; final A remote/success/idle and B seed/success/idle."
+        }
+      ],
+      "definite_critical_misconceptions": [],
+      "uncertainty_notes": [
+        "Answer labels its outcomes as predictions; no definite contrary assertion."
+      ],
+      "dominant_finding": "Recovers signal-read consumption, observer cancellation and divergent late cache results.",
+      "control_recovered_core_behavior": true,
+      "collection_recommendation": "retain_as_development",
+      "formal_hardness_label": null
+    },
+    {
+      "task_id": "tanstack-manual-cache-edit-cancel-revert",
+      "reference_spec": "examples/dataset_sources/tanstack-query-generation-v2-reviewed.json",
+      "prompt_sha256": "11dd831d366680f6429dead16af5393c53410d294c10a587aba718344ccefa16",
+      "prompt_hash_check": "Exact final prompt bytes and recomputed input hash match both recorded input and answer hashes.",
+      "claims": [
+        {
+          "id": "default-revert",
+          "verdict": "supported",
+          "reason": "Recognizes default reversion and separate cancellation API boundary.",
+          "answer_evidence_paraphrase": "cancelQueries uses revert:true by default and normally resolves after swallowing cancellation errors."
+        },
+        {
+          "id": "manual-update-fetch-status",
+          "verdict": "supported",
+          "reason": "Correct manual-update forwarding and ongoing fetch.",
+          "answer_evidence_paraphrase": "setQueryData uses Query.setData(manual:true); edited data remains success/fetching, as do other pending runs."
+        },
+        {
+          "id": "revert-checkpoint",
+          "verdict": "supported",
+          "reason": "Recovers revision-specific checkpoint refresh.",
+          "answer_evidence_paraphrase": "Manual setQueryData updates cancellation restoration snapshot; B restores edited/success/idle, A seed/success/idle."
+        },
+        {
+          "id": "raw-state-counterfactual",
+          "verdict": "supported",
+          "reason": "Correctly distinguishes raw visible-state patch from checkpoint change.",
+          "answer_evidence_paraphrase": "Direct setState leaves saved snapshot at seed; C changes visible data to edited then restores seed."
+        },
+        {
+          "id": "promise-and-late-result",
+          "verdict": "supported",
+          "reason": "All original-promise values and late-settlement outcomes match.",
+          "answer_evidence_paraphrase": "Original fetchQuery fulfills seed, edited, seed in A/B/C; late deferred completion leaves corresponding success/idle state."
+        }
+      ],
+      "definite_critical_misconceptions": [],
+      "uncertainty_notes": [
+        "Public fetch-promise fulfillment on revert cancellation is revision-sensitive and unverified.",
+        "Updating the saved revert snapshot on manual setData is revision-sensitive and unverified."
+      ],
+      "dominant_finding": "Recovers manual versus raw-state cancellation checkpoints and original fetch promise fulfillment.",
+      "control_recovered_core_behavior": true,
+      "collection_recommendation": "retain_as_development",
+      "formal_hardness_label": null
+    },
+    {
+      "task_id": "tanstack-inflight-options-retry-capture",
+      "reference_spec": "examples/dataset_sources/tanstack-query-generation-v2-reviewed.json",
+      "prompt_sha256": "4cdb38caaf7205e85c8ba014fbedae20fb290090398b47b846a89d5862fc6145",
+      "prompt_hash_check": "Exact final prompt bytes and recomputed input hash match both recorded input and answer hashes.",
+      "claims": [
+        {
+          "id": "observer-propagation",
+          "verdict": "supported",
+          "reason": "Correct propagation even without a subscription.",
+          "answer_evidence_paraphrase": "observer.setOptions updates same cached Query; retry becomes false and current queryFn/delay become newFn/newDelay."
+        },
+        {
+          "id": "dedup-before-options",
+          "verdict": "supported",
+          "reason": "Correct early-return boundary prevents option replacement.",
+          "answer_evidence_paraphrase": "Duplicate fetch deduplicates before applying supplied options; duplicateFn never runs and cached retry stays false."
+        },
+        {
+          "id": "captured-retry-policy",
+          "verdict": "supported",
+          "reason": "Correctly separates captured retry policy from mutable Query options.",
+          "answer_evidence_paraphrase": "Initial retryer retains retry:1 and oldDelay; rejecting oldFn triggers one retry and oldDelay once."
+        },
+        {
+          "id": "dynamic-query-function",
+          "verdict": "supported",
+          "reason": "Recovers dynamic query-function lookup during captured-policy retry.",
+          "answer_evidence_paraphrase": "Retry closure looks up current queryFn, calls newFn; first and duplicate both fulfill new-result, with log old,new."
+        },
+        {
+          "id": "fresh-fetch-and-delay-side-effect",
+          "verdict": "supported",
+          "reason": "Fresh retry:false failure and delay side effect both match.",
+          "answer_evidence_paraphrase": "Fresh newFn rejects new-failure without retry; total log old,new,new, oldDelays=1,newDelays=1 because delay is calculated first."
+        }
+      ],
+      "definite_critical_misconceptions": [],
+      "uncertainty_notes": [
+        "Delay callback execution on the retry:false failure assumes delay calculation precedes the retry eligibility test."
+      ],
+      "dominant_finding": "Recovers mutable options versus captured retry policy, dynamic function lookup and delay callback side effect.",
+      "control_recovered_core_behavior": true,
+      "collection_recommendation": "retain_as_development",
+      "formal_hardness_label": null
+    },
+    {
+      "task_id": "sqlalchemy-savepoint-preflush-state",
+      "reference_spec": "examples/dataset_sources/sqlalchemy-generation-v2-reviewed.json",
+      "prompt_sha256": "be545b6ddb43cf767a0e00c2d750c6c8889a22e89528601e5c414b0557f56dac",
+      "prompt_hash_check": "Exact final prompt bytes and recomputed input hash match both recorded input and answer hashes.",
+      "claims": [
+        {
+          "id": "unconditional-preflush",
+          "verdict": "supported",
+          "reason": "Correct unconditional pre-boundary flush.",
+          "answer_evidence_paraphrase": "begin_nested flushes pending outer work despite autoflush=False and no_autoflush; item 3 is persistent when it returns."
+        },
+        {
+          "id": "outer-state-survives",
+          "verdict": "supported",
+          "reason": "Correct surviving values before and after outer commit.",
+          "answer_evidence_paraphrase": "Rows after nested rollback and commit are (1,outer),(2,two),(3,pre); item 1 reloads outer."
+        },
+        {
+          "id": "selective-expiration",
+          "verdict": "supported",
+          "reason": "Correct selective expiration and persistence transitions.",
+          "answer_evidence_paraphrase": "Item 1 expires, item 2 stays unexpired, item 3 stays unexpired/persistent, item 4 becomes transient."
+        },
+        {
+          "id": "nested-only-rollback",
+          "verdict": "supported",
+          "reason": "Correctly preserves enclosing transaction usability.",
+          "answer_evidence_paraphrase": "Outer transaction remains active and Session.is_active true; subsequent commit keeps the three rows."
+        },
+        {
+          "id": "preflush-failure",
+          "verdict": "supported",
+          "reason": "Recovers failed outer preflush and required Session recovery.",
+          "answer_evidence_paraphrase": "Duplicate causes IntegrityError before nested boundary; no nested transaction, inactive Session requires rollback; duplicate transient, loaded originals expired, final seed rows and item 1=one."
+        }
+      ],
+      "definite_critical_misconceptions": [],
+      "uncertainty_notes": [
+        "Exact post-flush-failure bookkeeping before explicit rollback and SAVEPOINT emission timing are unverified at the pinned revision."
+      ],
+      "dominant_finding": "Recovers unconditional preflush, selective nested restoration and failed outer-preflush recovery.",
+      "control_recovered_core_behavior": true,
+      "collection_recommendation": "retain_as_development",
+      "formal_hardness_label": null
+    },
+    {
+      "task_id": "sqlalchemy-json-joinedload-uniquing",
+      "reference_spec": "examples/dataset_sources/sqlalchemy-generation-v2-reviewed.json",
+      "prompt_sha256": "c900bf55021450759f32b156e298ca39500ce8bd49a2a75947f83005acaaaeaa",
+      "prompt_hash_check": "Exact final prompt bytes and recomputed input hash match both recorded input and answer hashes.",
+      "claims": [
+        {
+          "id": "multiplicity",
+          "verdict": "supported",
+          "reason": "Correct SQL multiplicity, legacy row count and identity reuse.",
+          "answer_evidence_paraphrase": "Independent joinedload join yields four SQL rows; legacy returns x=1 twice and x=2 twice with one Parent identity."
+        },
+        {
+          "id": "mandatory-unique",
+          "verdict": "supported",
+          "reason": "Correct collection eager-load consumption guard.",
+          "answer_evidence_paraphrase": "Modern result without unique raises InvalidRequestError requiring unique()."
+        },
+        {
+          "id": "json-modern-error",
+          "verdict": "supported",
+          "reason": "Correct explicit JSON scalar uniqueness failure.",
+          "answer_evidence_paraphrase": "Default unique raises InvalidRequestError for non-hashable JSON; entity filtering still uses identity."
+        },
+        {
+          "id": "legacy-identity-fallback",
+          "verdict": "supported",
+          "reason": "Mechanism recovered despite uncertainty about internal option name.",
+          "answer_evidence_paraphrase": "Legacy requests automatic uniquing with identity fallback; separately decoded equal dictionaries remain distinct."
+        },
+        {
+          "id": "custom-key-semantics",
+          "verdict": "supported",
+          "reason": "Correct full versus lossy custom-key semantics.",
+          "answer_evidence_paraphrase": "Parent id plus normalized payload returns two rows x=1,x=2; parent-only returns x=1 and loses x=2."
+        },
+        {
+          "id": "entity-only-control",
+          "verdict": "supported",
+          "reason": "Correct entity-only result scope.",
+          "answer_evidence_paraphrase": "Entity-only unique/scalars returns one Parent with two children; JSON attributes elsewhere in graph are not uniqueness keys."
+        }
+      ],
+      "definite_critical_misconceptions": [],
+      "uncertainty_notes": [
+        "Answer qualifies legacy four-row behavior and the exact legacy option name as unverified, while predicting the correct mechanism and outcomes."
+      ],
+      "dominant_finding": "Recovers four-row legacy identity fallback, modern errors and semantically complete custom uniqueness.",
+      "control_recovered_core_behavior": true,
+      "collection_recommendation": "retain_as_development",
+      "formal_hardness_label": null
+    },
+    {
+      "task_id": "sqlalchemy-none-default-json-matrix",
+      "reference_spec": "examples/dataset_sources/sqlalchemy-generation-v2-reviewed.json",
+      "prompt_sha256": "c86873335e4c171bfae5d2a0eab232d24cd0c0c12048c32d2107fb4a152457f9",
+      "prompt_hash_check": "Exact final prompt bytes and recomputed input hash match both recorded input and answer hashes.",
+      "claims": [
+        {
+          "id": "omitted-defaults",
+          "verdict": "supported",
+          "reason": "Correct omission semantics for all column types.",
+          "answer_evidence_paraphrase": "Omitted id=1 gets all fallback defaults; omission remains omission even for evaluates_none."
+        },
+        {
+          "id": "plain-versus-significant",
+          "verdict": "supported",
+          "reason": "Correct explicit None versus default distinction.",
+          "answer_evidence_paraphrase": "ORM id=2 plain becomes fallback, significant binds SQL NULL because explicit None is significant."
+        },
+        {
+          "id": "json-none-flags",
+          "verdict": "supported",
+          "reason": "Correct composition of ORM omission with JSON binding flags.",
+          "answer_evidence_paraphrase": "id=2 none_as_null=False stores JSON text null; none_as_null=True omits None so JSON fallback default wins."
+        },
+        {
+          "id": "explicit-null-bypass",
+          "verdict": "supported",
+          "reason": "Correct explicit SQL expression bypass.",
+          "answer_evidence_paraphrase": "id=3 null() emits SQL NULL in every column, overriding defaults and bypassing JSON serialization."
+        },
+        {
+          "id": "core-explicit-none",
+          "verdict": "supported",
+          "reason": "Correct Core contrast and raw storage.",
+          "answer_evidence_paraphrase": "id=4 explicit Core None includes every value: both strings and none_as_null=True SQL NULL; other JSON text null."
+        },
+        {
+          "id": "decoded-is-ambiguous",
+          "verdict": "supported",
+          "reason": "Correctly explains information lost by decoding.",
+          "answer_evidence_paraphrase": "ids 3 and 4 decode to None in every column despite different json_value storage; result processor maps SQL NULL and JSON null to Python None."
+        }
+      ],
+      "definite_critical_misconceptions": [],
+      "uncertainty_notes": [
+        "Answer labels its outcomes as predictions; no definite contrary assertion."
+      ],
+      "dominant_finding": "Recovers raw and decoded matrices and ORM omission versus Core binding.",
+      "control_recovered_core_behavior": true,
+      "collection_recommendation": "retain_as_development",
+      "formal_hardness_label": null
+    }
+  ],
+  "summary": {
+    "tasks": 9,
+    "required_claims": 49,
+    "verdict_counts": {
+      "supported": 49,
+      "partial": 0,
+      "contradicted": 0,
+      "not_addressed": 0
+    },
+    "all_prompt_hashes_match": true,
+    "tasks_recovering_core_behavior": 9,
+    "definite_critical_misconceptions": 0,
+    "collection_recommendation": "retain_as_development",
+    "rationale": "This sample predicts every required substantive outcome and mechanism. Retain as development diagnostics; none earns difficulty or source-dependence claims from this control. This result does not show a tool benefit, estimate general model success, or establish contamination. Multiple model-identified blind samples and a matched tool-enabled comparison are needed before prioritizing on measured difficulty.",
+    "formal_hardness_labels_assigned": false
+  }
+}

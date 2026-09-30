@@ -1,0 +1,271 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-86af6df9e0aec46c0c8b4ab7",
+      "reference_sha256": "26b282dcdd03b4667556e1ca0268d7ef8f1e29fb020dd381757a2835b51e491d",
+      "question_sha256": "6b568f667ced94d87d6f9217e6cbc5752172c85e8caf702fc81b4e3f46e9e9e1",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Exception usage pipeline dependencies",
+          "verdict": "supported",
+          "reason": "Stack tracks nested handler names; uncertainty code1124-1134 and unused special case2845-2849 substantiate possible affected stages. Cascades depend on proposed change, not every sibling edit.",
+          "evidence": {
+            "path": "pylint/checkers/variables.py",
+            "start_line": 1675,
+            "end_line": 1694
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-8a21e83c420ca7de27c9d4eb",
+      "reference_sha256": "4b487f56386078b4cd883187bd0892c784947084ae2ab26e7b9949bd51379ca3",
+      "question_sha256": "0449fe3e0ecc35e5776cb4e3d9a28f1e0143b7d3f807f2be2b26c1fa8ccd79c6",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Formatter validation preserves arbitrary callers",
+          "verdict": "partially_supported",
+          "reason": "Warnings and restrictive annotations are not automatically backward compatible; Union with Any adds no restriction. Proposal needs preserve existing duck typing and branch precedence.",
+          "evidence": {
+            "path": "pylint/utils/utils.py",
+            "start_line": 275,
+            "end_line": 293
+          }
+        }
+      ],
+      "material_errors": [
+        "Warnings and restrictive annotations are not automatically backward compatible; Union with Any adds no restriction. Proposal needs preserve existing duck typing and branch precedence."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "Keep the existing Any input boundary and string fallback while narrowing types inside helpers. Preserve py_version precedence, recursive sequence formatting, dict formatting, match/pattern duck typing, yn truthiness, and whitespace quoting (pylint/utils/utils.py:275-293). Add an opt-in validator or validation at configuration parsing boundaries rather than rejecting arbitrary objects in the formatter. Narrow OptionDict fields and add overloads where useful, but a union containing Any does not enforce validation. New warnings also alter behavior under warnings-as-errors, so avoid enabling them by default if strict compatibility is required."
+    },
+    {
+      "task_id": "import-91513317ac2f27c08a69449a",
+      "reference_sha256": "377b6b3f87eceefc638c28115e52fcd5fdd701086ca016ddd17f4f6bb6ff50d9",
+      "question_sha256": "45831b25887e3a806da15c353a7c60d2c386602c2f4b1b52b0ee8c08080922ae",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Explicit dotted init checks immediate ancestors",
+          "verdict": "supported",
+          "reason": "Inference resolves class; direct ancestors validated after to_call lookup; super patterns bypass this check. Runtime direct call is distinct from cooperative MRO traversal.",
+          "evidence": {
+            "path": "pylint/checkers/classes/class_checker.py",
+            "start_line": 2261,
+            "end_line": 2288
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-994d9447e1017b59169f8976",
+      "reference_sha256": "2f4a0e48677372fb4bc23aaf3b073506f7f19db021b64aaaa2ae06390c797fbe",
+      "question_sha256": "f95030704de6b4e61f02e8793aa810f8b19091c902a0379bbc4fe3cbfbcd5f21",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Getnewargs_ex runtime memory premise",
+          "verdict": "unsupported",
+          "reason": "Reference first disclaims runtime evidence then invents GC/fragmentation causation and incorrectly places getnewargs_ex invocation during unpickling.",
+          "evidence": {
+            "path": "pylint/checkers/classes/special_methods_checker.py",
+            "start_line": 374,
+            "end_line": 403
+          }
+        }
+      ],
+      "material_errors": [
+        "Reference first disclaims runtime evidence then invents GC/fragmentation causation and incorrectly places getnewargs_ex invocation during unpickling."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "This repository does not establish the claimed GC or heap-fragmentation effect. SpecialMethodsChecker statically validates that the inferred __getnewargs_ex__ result is a two-element tuple whose elements are tuple and dict when inferable (pylint/checkers/classes/special_methods_checker.py:374-403). It neither measures allocations nor runs reconstruction workloads. The returned arguments describe later reconstruction; the reference's claim that each unpickling calls this method is incorrect. Runtime memory behavior would require a separate measured workload and cannot be inferred from this lint check."
+    },
+    {
+      "task_id": "import-a46f6d512ea50e905597fe19",
+      "reference_sha256": "01e1e2235870fe54c03a2a98f18f2ecce2cba643ebcd048c2039bc83b89fff1f",
+      "question_sha256": "96c739a65b6ad5e41009173a46a3e8a55df740ed4b3bb106050ebce0d7160e58",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Non-slotted ancestor and __dict__ exemptions",
+          "verdict": "supported",
+          "reason": "Returns for unavailable slots or non-slotted ancestor excluding Generic/object; __dict__ permits otherwise non-slot assignments.",
+          "evidence": {
+            "path": "pylint/checkers/classes/class_checker.py",
+            "start_line": 1794,
+            "end_line": 1813
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-ac791a2632040cfe3bd3203b",
+      "reference_sha256": "fca0a81f5cac5f2d10e8605bd401d90915db17afdee8cc1e67593f062851cb76",
+      "question_sha256": "f0687f5fa48ef50bbfb00987acc45152158f4746b57c460588c44f512570527d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Yield reads prior assigned value",
+          "verdict": "supported",
+          "reason": "Assignment182 precedes yield184; no statements follow. Checker119 onward inspects last-statement condition to exempt no-cleanup case.",
+          "evidence": {
+            "path": "tests/functional/c/contextmanager_generator_missing_cleanup.py",
+            "start_line": 180,
+            "end_line": 184
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-aeee82d6ae99e6f31875f273",
+      "reference_sha256": "007b6ae55e121a2b339dc2d157176c8645e5613d58a9fafed456a8d8a5d6f4bd",
+      "question_sha256": "0c1320f614de8b3422c6348bfb882d43bf1cb45565c47025453f0404dd5765dc",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Docstring type documentation checks",
+          "verdict": "supported",
+          "reason": "Combines doc types and signature annotation names, subtracts exempt parameters, and emits missing type documentation. It does not require signature annotation specifically.",
+          "evidence": {
+            "path": "pylint/extensions/docparams.py",
+            "start_line": 577,
+            "end_line": 625
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-b58cc28fd96964f1ca2b0f39",
+      "reference_sha256": "040ad76b2083bd13f5a5d15e156e364709796eb198c7b275a27e27ec9d256119",
+      "question_sha256": "3cc1ee259a949840f48418194c0a19dd4a7e4a6c42acab250995a618bdc9e4bf",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Separate fixme regex construction and compilation",
+          "verdict": "supported",
+          "reason": "Three constructed patterns compiled re.I; extraction proposal is feasible. Lazy compilation is optional and would require preserving initialization/configuration behavior.",
+          "evidence": {
+            "path": "pylint/checkers/misc.py",
+            "start_line": 104,
+            "end_line": 123
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-b6580d8dd346d6ba320ab8d5",
+      "reference_sha256": "da062cbd0d6d3720c700371089261b876399852b20e100defc12bde073744bd3",
+      "question_sha256": "5796810153a3462583374f4bc43e459f8af7b3605c1301b5f36909eff86e228f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Ellipsis class/function branch shared",
+          "verdict": "supported",
+          "reason": "Both node types share isinstance and doc-node condition, followed by body-length alternative.",
+          "evidence": {
+            "path": "pylint/checkers/ellipsis_checker.py",
+            "start_line": 43,
+            "end_line": 54
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-b8b2ff405066d0b29d909b7d",
+      "reference_sha256": "88d9a87f51f468ac7318c5f7b05c368562345130fdec8efe92db7193fe448783",
+      "question_sha256": "be82512f41f17392401e6ff6bafcb220698065bc40ebf43e44cbbcfaf0b8d165",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Underscore attribute cannot be accessed externally",
+          "verdict": "partially_supported",
+          "reason": "Single underscore is a convention, not enforced private access; property computes double value and naming checker treats it as attr.",
+          "evidence": {
+            "path": "tests/functional/n/name/name_preset_snake_case.py",
+            "start_line": 13,
+            "end_line": 19
+          }
+        }
+      ],
+      "material_errors": [
+        "Single underscore is a convention, not enforced private access; property computes double value and naming checker treats it as attr."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The property my_public_x exposes twice the stored _my_secret_x through attribute syntax (tests/functional/n/name/name_preset_snake_case.py:13-19). This gives a stable accessor where computation can change, but the leading underscore only signals non-public intent; callers can still access that attribute directly. Pylint recognizes property decorators and validates their names as attributes (pylint/checkers/base/name_checker/checker.py:124-139)."
+    },
+    {
+      "task_id": "import-ba0d7851c915dd194a1d19ae",
+      "reference_sha256": "bcfca2ced9bcbd4542f06c50de9740b37341f945791e4c7f3d85a764a0c4dfe4",
+      "question_sha256": "c7848ed7b09e23efb2391837b5f55b005a28478f0ca8d3e6c69c290a17951677",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Private-import lazy annotation flag",
+          "verdict": "supported",
+          "reason": "Only nonempty candidates and false flag trigger root scan then true; subsequent calls reuse mapping initialized33-38. Scope is checker instance in shown implementation.",
+          "evidence": {
+            "path": "pylint/extensions/private_import.py",
+            "start_line": 114,
+            "end_line": 132
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-bbdf63b62e82327064fb12b5",
+      "reference_sha256": "3ab9977be576cf604d323110a90d0ea956805555390aeb83427bbd25f810d86d",
+      "question_sha256": "201394e312d3b78dd6fa1120fe2279f082ac92a303c7b2e42fb67a21cc3dd61b",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Class and metaclass override independence",
+          "verdict": "partially_supported",
+          "reason": "Metaclass __iter__ makes class iterable; a normal subclass instance __iter__ does not override class-object iteration. Reference blurs the levels and calls regular metaclass method a classmethod.",
+          "evidence": {
+            "path": "tests/functional/s/slots_checks.py",
+            "start_line": 96,
+            "end_line": 104
+          }
+        }
+      ],
+      "material_errors": [
+        "Metaclass __iter__ makes class iterable; a normal subclass instance __iter__ does not override class-object iteration. Reference blurs the levels and calls regular metaclass method a classmethod."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The example defines an ordinary __iter__(cls) method on Metaclass(type), making IterableClass itself iterable (tests/functional/s/slots_checks.py:96-104). Keep metaclass construction in __new__/__init__ and class-object iteration in metaclass __iter__. To override class-object iteration or construction, subclass the metaclass and override the relevant method, using cooperative super where appropriate. A class using that metaclass can independently define instance __iter__, but that changes iteration of its instances, not iteration of the class object. This distinction is necessary for independent overrides."
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-035.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "original_reference_sha256": "3230d477a5152c5a8d87eb137bd0671bad639ae58b365cfb7b23492b15c702d7",
+      "question": "Where in the error handler resolution method does the lookup sequence traverse blueprint scopes then HTTP status codes then exception class method resolution order?",
+      "question_sha256": "ec9235c1b33b5bf22e3b70b10711bc9cc581843620df236c085720d8b3b2872e",
+      "reference_answer": "The lookup is in src/flask/sansio/app.py:823-846. Its order is status code (then None), blueprint scopes (then application scope), then exception MRO. The question reverses the outer two loops. The first matching handler wins. Registration stores a handler by resolved code and class (src/flask/sansio/scaffold.py:653-654); a 404 registration and NotFound registration are not independent priority levels.",
+      "reference_sha256": "f07a0829fba951df856624cbabbc94209ad7c57106ee60c24ec07c2a63843bc5",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-dee784cda1141aca2941bca5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "original_reference_sha256": "74f6517f872d51ceadf2bf5acc2b6ad6f709458d8d8bb94cff02b7b04721c203",
+      "question": "What is the dependency chain in the test function that verifies subdomain routing through configuration, route registration, and request context creation?",
+      "question_sha256": "f4fe89cf78f9fb9606a235414d2f8aebc6c3a959220ba6ed858fe4acb343e0b7",
+      "reference_answer": "test_blueprint_with_subdomain enables subdomain_matching, configures SERVER_NAME=example.com:1234 and APPLICATION_ROOT=/foo, registers company with subdomain xxx and its / route, then creates test_request_context(\"/\", subdomain=\"xxx\"). It verifies the URL before entering the context and the blueprint after entering, then verifies the same URL through the test client (tests/test_testing.py:117-138). Context push performs matching after opening the session (src/flask/ctx.py:380-394). request.blueprint derives the blueprint name from the matched endpoint (src/flask/wrappers.py:161-178).",
+      "reference_sha256": "e14445e81ca01ee78b7501f07f3a6485fb65db22f73134463350c2bc1face784",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-dfccc70e3617e5d08cde95ed"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "original_reference_sha256": "76748c88a48ac95007cfe77a1241d58cea3d33129f1da08fd40fba94d64ac7ba",
+      "question": "Why does repeated invocation of the method that instantiates cryptographic serializers within the session persistence handler create a performance bottleneck under high-concurrency conditions?",
+      "question_sha256": "e3901d925eebd9bbda860fb5b13740a7804f9cfe3d091c93a350d808ced8b7fd",
+      "reference_answer": "The premise is not established by this source. get_signing_serializer builds a key list from current configuration and constructs URLSafeTimedSerializer (src/flask/sessions.py:317-335). save_session calls it when writing a cookie, after the should_set_cookie guard (src/flask/sessions.py:383-387). Repeated allocation may have cost, but the code does not demonstrate that construction performs expensive cryptographic work or causes a high-concurrency bottleneck. Benchmark before optimizing; any cache must account for changes to keys and serializer settings.",
+      "reference_sha256": "4b0161feab6127f5852d98e99d08894ea0d1f862f56434f2015d88822c20f6f3",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e3142892c90740145751e1c7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "original_reference_sha256": "f785133f28c95c9747e15010b9ea7ff8593b4cedfca50e48e0a8ebd42309271f",
+      "question": "Why would performance degradation occur if the custom template filter registration mechanism used in blueprint test cases were repeated across multiple distinct blueprint objects during application startup?",
+      "question_sha256": "3be115fadd7d305107b0ae5804f621d25d0dc314bcd9d9091f9e00bac5c14d70",
+      "reference_answer": "Distinct blueprint objects registered under unique names each count as a first registration (src/flask/sansio/blueprints.py:302-321). record_once runs each such callback (src/flask/sansio/blueprints.py:233-244), and the filter callback assigns into the shared Jinja filter dictionary (src/flask/sansio/blueprints.py:461-475). Repeated same-key registrations therefore overwrite the filter and add startup work. Duplicate registration names instead raise ValueError. These operations do not by themselves establish significant performance degradation; that requires measurement.",
+      "reference_sha256": "344f730a64959f24bbad8bcec97af904bfc83c27efa08d2a0f17c2f6600e9370",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-ebf43e16c9d7e714408632f7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "original_reference_sha256": "da855fa32626d264a4b550bdeb3126c7ab78fb4b29a81f304c20e6177578a5d6",
+      "question": "What architectural decisions are reflected by the dual inheritance from both AssertionError and UnicodeError in the debug-mode exception class for unexpected unicode or binary data regarding separation between validation failures and encoding issues in Flask's layered architecture?",
+      "question_sha256": "86040176e6294f738ef41f221241df1a22829cf7494aab35d43ac59f6f73e98f",
+      "reference_answer": "UnexpectedUnicodeError inherits AssertionError and UnicodeError; its docstring states a goal of better reporting for unexpected Unicode or binary data (src/flask/debughelpers.py:17-20). It can therefore be caught as either base category. This unifies categorization rather than proving separate validation and encoding layers. Flask selects a single first matching handler by code, scope, and MRO (src/flask/sansio/app.py:831-845); both handler paths do not automatically receive the exception. The declaration alone does not establish a debug-only execution path.",
+      "reference_sha256": "8c006dba83421d365151c08f674502627bfac1df08a6558ad666c55f04f2221f",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-f9a9324d4d417a121b8defc7"
+    }
+  ]
+}

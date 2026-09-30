@@ -1,0 +1,364 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-8bbd6b6d2f0243327dfae960",
+      "reference_sha256": "63fb0c289f293320c799127cd0cfe902366e9e7e04777f27969dbd4b296da3fd",
+      "question_sha256": "d942bc4392eae39b0b403271cb3ab14371bf3ae2662c1cca85ac620016c0e39f",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Runner delegates invocation while supplying an app-loading object",
+          "verdict": "supported",
+          "reason": "FlaskCliRunner is the Flask subclass of CliRunner, stores the same app, and delegates; no process or side-effect isolation guarantee is implemented here.",
+          "evidence": {
+            "path": "src/flask/testing.py",
+            "start_line": 265,
+            "end_line": 298
+          }
+        }
+      ],
+      "material_errors": [
+        "Misidentifies FlaskCliRunner as the base runner and overstates isolation as preventing side effects between runs."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "FlaskCliRunner subclasses Click CliRunner, stores the supplied Flask app, defaults the command to app.cli, and supplies ScriptInfo(create_app=lambda: self.app) unless obj was supplied (src/flask/testing.py:265-298). ScriptInfo.load_app calls that callback and caches the app (src/flask/cli.py:333-372). The runner delegates actual invocation and testing-environment management to Click; this does not promise process isolation or prevent arbitrary app-state side effects."
+    },
+    {
+      "task_id": "import-95eed9e6fa66f96180165c51",
+      "reference_sha256": "c462744eb5460844ba8fbb4efa3f248729c5b955b91be64d6e9f4c871e5b1cff",
+      "question_sha256": "96214d964c080f5f9d6c3d182619c66d0cea35a07f98ab3da94df039739aace6",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Hash lookup is delayed until wrapper invocation",
+          "verdict": "supported",
+          "reason": "The wrapper accesses hashlib.sha1 only in its body; serializer construction receives the function, not its result.",
+          "evidence": {
+            "path": "src/flask/sessions.py",
+            "start_line": 290,
+            "end_line": 335
+          }
+        }
+      ],
+      "material_errors": [
+        "Incorrectly asserts serializer construction necessarily calls the digest wrapper."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "_lazy_sha1 accesses hashlib.sha1 inside the function body, so defining the function and assigning it as digest_method does not resolve SHA-1 during import. The docstring explicitly allows developers on FIPS builds to configure another digest before the wrapper is used (src/flask/sessions.py:290-307). get_signing_serializer passes the callable through signer_kwargs; the Flask code does not invoke it at serializer construction (src/flask/sessions.py:317-335)."
+    },
+    {
+      "task_id": "import-9871e93f4251108030a47bb6",
+      "reference_sha256": "58c93368f78d3a47405483e9897d415ce91bc5d2ad2dfb09665448f37e310e14",
+      "question_sha256": "e10ffd89e0654a6cee9f6ae13b4e1d04854c37bbe533619d8f8b23d4f2828866",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "PassDict preserves keys and tags values",
+          "verdict": "supported",
+          "reason": "The comprehension leaves keys unchanged; it does not stringify arbitrary key objects.",
+          "evidence": {
+            "path": "src/flask/json/tag.py",
+            "start_line": 119,
+            "end_line": 130
+          }
+        }
+      ],
+      "material_errors": [
+        "Claims all Python dictionary keys are converted and preserve sufficient type information."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "PassDict.to_json leaves each key k unchanged and calls serializer.tag(v) for each value. Its comment states the reason: JSON objects may only have string keys (src/flask/json/tag.py:125-128). Tagged representations can preserve supported non-JSON value types, but this code supplies no key-type preservation or arbitrary-key conversion."
+    },
+    {
+      "task_id": "import-9a63abff5e099a311b325447",
+      "reference_sha256": "351dffde3f110808d4d2f8c2094a578732144be2cacbeaad9ea9e32254a3a821",
+      "question_sha256": "9d54b9537a344df5ec48a69627b05d107ca1cf4655cad4c982cdc22922f56716",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Callback tracks dictionary mutation, not concurrent consistency",
+          "verdict": "supported",
+          "reason": "Nested mutations require manually setting modified.",
+          "evidence": {
+            "path": "src/flask/sessions.py",
+            "start_line": 61,
+            "end_line": 82
+          }
+        },
+        {
+          "claim": "Concurrent save ordering is unspecified",
+          "verdict": "supported",
+          "reason": "Explicit documentation contradicts synchronization guarantee.",
+          "evidence": {
+            "path": "src/flask/sessions.py",
+            "start_line": 141,
+            "end_line": 146
+          }
+        }
+      ],
+      "material_errors": [
+        "False concurrency guarantee and claim all mutations are detected."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "It does not ensure consistency across concurrent requests. SecureCookieSession registers a callback that sets modified and accessed when its dictionary changes; nested mutable values require setting modified manually (src/flask/sessions.py:61-82). SessionInterface explicitly says concurrent requests may open and save in unspecified order (src/flask/sessions.py:141-146). The flag tracks a request session change; it is not a lock, merge mechanism, or cross-request consistency protocol."
+    },
+    {
+      "task_id": "import-a0217123c989a3104b83a176",
+      "reference_sha256": "6235fbca456c2ead81dbb85d9476282220bdad4a4727d82a146d2aa80b7fdb85",
+      "question_sha256": "5ad3a4c2d0887aec8bb31abd720a80e8fcc4d516e42255f2a3a01331520a1753",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Context binding selects an AppContext-owned namespace",
+          "verdict": "supported",
+          "reason": "An instance is allocated per AppContext, and push binds that same object; no cloning or lock is provided.",
+          "evidence": {
+            "path": "src/flask/ctx.py",
+            "start_line": 245,
+            "end_line": 265
+          }
+        },
+        {
+          "claim": "g is a proxy to context .g",
+          "verdict": "supported",
+          "reason": "Context lookup provides locality, not protection for a shared object.",
+          "evidence": {
+            "path": "src/flask/globals.py",
+            "start_line": 24,
+            "end_line": 33
+          }
+        }
+      ],
+      "material_errors": [
+        "Overstates ContextVar as guaranteeing a new namespace per thread/task and thread-safe shared object access."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "_AppCtxGlobals is a plain namespace backed by __dict__ (src/flask/ctx.py:29-65). Each newly created AppContext creates a g object; push binds that AppContext with _cv_app.set(self), and pop restores the preceding binding (src/flask/ctx.py:245-265). The g LocalProxy resolves the current binding\u2019s g attribute (src/flask/globals.py:24-33). Separately created and bound AppContexts therefore isolate namespaces. This does not make a shared AppContext or shared mutable values thread-safe or automatically clone them for every task."
+    },
+    {
+      "task_id": "import-a69662943caec60bbf09edf1",
+      "reference_sha256": "850e4cb8bc3284c8c6d542ca6481b2aa1dd9c2f96f289c625159b314c3040931",
+      "question_sha256": "5da201e65dc9816a309f22d74b6998cb7b724e60c1e93ba00fbb4fb7e0d69493",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Streaming wrapper pushes captured context and closes iterator",
+          "verdict": "supported",
+          "reason": "Sentinel advances generator inside with ctx; finally closes wrapped iterator.",
+          "evidence": {
+            "path": "src/flask/helpers.py",
+            "start_line": 108,
+            "end_line": 136
+          }
+        },
+        {
+          "claim": "Tests check request access and custom close",
+          "verdict": "supported",
+          "reason": "Generator and decorator forms preserve request/session access, close is asserted.",
+          "evidence": {
+            "path": "tests/test_helpers.py",
+            "start_line": 236,
+            "end_line": 307
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-b540725ea9fddfe637d314c8",
+      "reference_sha256": "e66e3034191d5bf34597f0a57f3813937f92f0c020890815639cc8c4a75452f8",
+      "question_sha256": "d7314a672ea29a80dd50bef80c1b111aac790783de2192c1fc06a0ce74b32dd2",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Bytes are base64 encoded and decoded under a dedicated tag",
+          "verdict": "supported",
+          "reason": "bytes check, ASCII base64 encoding, and b64decode form the reversible conversion.",
+          "evidence": {
+            "path": "src/flask/json/tag.py",
+            "start_line": 159,
+            "end_line": 170
+          }
+        },
+        {
+          "claim": "Registered tag is decoded recursively",
+          "verdict": "supported",
+          "reason": "Single-key tagged dictionary dispatches to to_python after nested scanning.",
+          "evidence": {
+            "path": "src/flask/json/tag.py",
+            "start_line": 297,
+            "end_line": 327
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-b92cfba25135f714fce94cbd",
+      "reference_sha256": "e2ff13740956e1f853bf05f92ef1e4292ef04a5d8611149ed05181fe66f625fc",
+      "question_sha256": "a0f90e8c17a7d982c0a570e34818f2ca43b9c7bc178345a28f15ed6d074118e3",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Registration flag blocks subsequent setup",
+          "verdict": "supported",
+          "reason": "Guard raises with explicit inconsistent-changes rationale.",
+          "evidence": {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 213,
+            "end_line": 230
+          }
+        },
+        {
+          "claim": "Registration sets flag before deferred callbacks",
+          "verdict": "supported",
+          "reason": "Supports ordering; atomic in prose should mean completed setup, not transactional rollback.",
+          "evidence": {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 316,
+            "end_line": 335
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-ba389356544f865148a12b55",
+      "reference_sha256": "81c3d9bb4c4b2d6245e4279970deb05d057cc5707e5133506535393e0f06554c",
+      "question_sha256": "789d787ba25ebd9443c1ef45ab5c9fe6c4724864434c53e07de003eb3f9a0500",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Propagation defaults to debug/testing and otherwise handles 500",
+          "verdict": "supported",
+          "reason": "Explicit config wins; true re-raises, otherwise logs, wraps, finds handler and finalizes.",
+          "evidence": {
+            "path": "src/flask/app.py",
+            "start_line": 839,
+            "end_line": 862
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-c9d3485b1416d609af691803",
+      "reference_sha256": "369488d28105b3f3ba0fe52919ad0f7254f1ffc8471cc4f05aed54f7b8ddca2e",
+      "question_sha256": "e00ed5294389aa78dc72b7173f82fe31a1852c29fac7996fe8ea111316ad4147",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Text encoding is passed to open, binary ignores it",
+          "verdict": "supported",
+          "reason": "Mode whitelist validates reading only; encoding delegated to builtin open.",
+          "evidence": {
+            "path": "src/flask/app.py",
+            "start_line": 330,
+            "end_line": 361
+          }
+        },
+        {
+          "claim": "Encoding test writes and reads using matching encoding",
+          "verdict": "supported",
+          "reason": "UTF-8 and UTF-16LE parameterization verifies text decoding.",
+          "evidence": {
+            "path": "tests/test_helpers.py",
+            "start_line": 354,
+            "end_line": 360
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-cd3072c75efc38e52187803f",
+      "reference_sha256": "dcc411f8449265f8a4843c12c24cdd14d2c540ac2019c1040f493d32333378f3",
+      "question_sha256": "fa7cca6ead96e85db1daff714af47cb8f1eb233e7455bce69f10ebb329471810",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Blueprint filter registration writes app Jinja filter mapping",
+          "verdict": "supported",
+          "reason": "Deferred register_template mutates shared app environment and uses record_once.",
+          "evidence": {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 461,
+            "end_line": 475
+          }
+        },
+        {
+          "claim": "Once registration checks first registration on app",
+          "verdict": "supported",
+          "reason": "Wrapper tests state.first_registration.",
+          "evidence": {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 233,
+            "end_line": 242
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-d1e1515af4b6ee998c532e51",
+      "reference_sha256": "89a66a6f0fbfc27a4b36db2f7a4c1c0c494fe40b2d66088ce10a8e0f46e52ea2",
+      "question_sha256": "e71f164c2f182994694cb07854deced911e6764c16afecb2f41dc1708e8b8eb7",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Blueprint URL rule is stored as a deferred callback",
+          "verdict": "supported",
+          "reason": "Records lambda to invoke setup-state add_url_rule.",
+          "evidence": {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 413,
+            "end_line": 441
+          }
+        },
+        {
+          "claim": "Registration invokes callbacks on setup state",
+          "verdict": "supported",
+          "reason": "Creates state then iterates deferred functions.",
+          "evidence": {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 319,
+            "end_line": 335
+          }
+        },
+        {
+          "claim": "Setup state forwards prefixed rule and endpoint to app",
+          "verdict": "supported",
+          "reason": "Applies URL prefix, subdomain and defaults before app registration.",
+          "evidence": {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 87,
+            "end_line": 116
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

@@ -1,0 +1,211 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-76323dd02cea0964008b7263",
+      "reference_sha256": "9c99beefae014c0ba56a6350d89d39ff2d1157aaabcf88d2d150c2dba0ebb9de",
+      "question_sha256": "76a2e9073c3fb35420d2ad7f1831ac94e148d243c2b5505e377b96f38877c4e7",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Registry discovery methods are factories with controlled type-safe access",
+          "verdict": "partially_supported",
+          "reason": "get_tracked_annotations returns the mutable global list directly, and these methods are access/reset helpers, not factories or a type-safety barrier.",
+          "evidence": {
+            "path": "pybryt/annotations/annotation.py",
+            "start_line": 70,
+            "end_line": 117
+          }
+        }
+      ],
+      "material_errors": [
+        "get_tracked_annotations returns the mutable global list directly, and these methods are access/reset helpers, not factories or a type-safety barrier."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Annotation._track adds instances to the module-level tracked list unless tracking is disabled or a name limit is reached; it removes tracked children for composite annotations (pybryt/annotations/annotation.py:70-96). get_tracked_annotations returns that same list and reset clears list, name indices and counter (98-117). Annotation subclasses share an abstract interface, but the registry itself is a mutable instance collection, not a validated type registry or factory."
+    },
+    {
+      "task_id": "import-78f981947157f3fc68935c03",
+      "reference_sha256": "2e8936e73afb174257d0b8640bee6dbfb0b3abc8855f14eec07bb873f02544b9",
+      "question_sha256": "45b59b266f73dc17509870ef8b58880d6bab7ad719670e7f36935d823f29afe7",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Queue is drained in input order after joins",
+          "verdict": "partially_supported",
+          "reason": "Queue is drained in arrival order into a dict; only returned list is reordered. Unbounded process count supports overhead risk, not measured scaling failure.",
+          "evidence": {
+            "path": "pybryt/student.py",
+            "start_line": 278,
+            "end_line": 306
+          }
+        }
+      ],
+      "material_errors": [
+        "Queue is drained in arrival order into a dict; only returned list is reordered. Unbounded process count supports overhead risk, not measured scaling failure."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "generate_student_impls starts one Process per input, joins every process, then drains a Queue into a dictionary and reconstructs input order (pybryt/student.py:278-306). There is no bounded worker pool or streaming consumption here. Process startup and simultaneous footprints can add overhead; joining producers before draining results can also be problematic for large queued payloads. The code alone does not quantify throughput degradation."
+    },
+    {
+      "task_id": "import-8297bff783c0488a6594d31f",
+      "reference_sha256": "1802017d7f3918c04419e552177fca4112a5ab207966f666c17edbe2b780f1b4",
+      "question_sha256": "7f170d6ba529c21adbb52050f4b45b89104310d93cee38a045a308747c81ab70",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Complexity checks fit step deltas and select lowest residual with EPS",
+          "verdict": "supported",
+          "reason": "Matching named records populate n-to-step mapping; candidate loop selects by EPS improvement.",
+          "evidence": {
+            "path": "pybryt/annotations/complexity/annotation.py",
+            "start_line": 97,
+            "end_line": 115
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-83110e323c2efed311cc105b",
+      "reference_sha256": "a84bec4d577a8f6e6279d0e7d488e101446208a25a285373844a6db78fec7213",
+      "question_sha256": "cd4c86234c0ba871fc274ea1111e9b7698c668131178c9aedd02ed6fa9154434",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Context collects traced values then wraps footprint and evaluates references",
+          "verdict": "supported",
+          "reason": "Enter starts tracing and exit turns it off then creates StudentImplementation and calls check.",
+          "evidence": {
+            "path": "pybryt/student.py",
+            "start_line": 412,
+            "end_line": 439
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-b19e6dd8d190c5f455e0e65a",
+      "reference_sha256": "d01503ae12ec8ef8d67f9678660dc0cce46c30dac4e5542a301c6585ca14864c",
+      "question_sha256": "49276bfcde9a9df2d1f198b95fcf23456e1f61a998590c8d38d4b26a7bbda934",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Complexity analysis is limited to six templates and guarantees stable classification",
+          "verdict": "contradicted",
+          "reason": "Additional complexity classes explicitly participate; pedagogical motivation and universal stability are unsupported.",
+          "evidence": {
+            "path": "pybryt/annotations/complexity/annotation.py",
+            "start_line": 97,
+            "end_line": 115
+          }
+        }
+      ],
+      "material_errors": [
+        "Additional complexity classes explicitly participate; pedagogical motivation and universal stability are unsupported."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Built-in classes transform input sizes/step counts and use numpy.linalg.lstsq, returning residual or infinity for unusable fits (pybryt/annotations/complexity/complexities.py:51-82). TimeComplexity.check compares built-ins plus addl_complexities, inserting a custom asserted class when necessary, and preserves the first fit within EPS (annotation.py:97-115). This avoids training data, but source does not prove an ML design comparison, universal stability, or inability to add complexity models."
+    },
+    {
+      "task_id": "import-b1a8fbb5372b5ed05356b362",
+      "reference_sha256": "e709b7d047a68f431c21e658b160fd428e2a081c5378871def330ce37657e7a3",
+      "question_sha256": "979c97a433d5d51d1492e6b96cfc57ee5585e936f935db3509e0ae75d108aa38",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Parallel handoff precedes tracing at Process.start",
+          "verdict": "supported",
+          "reason": "Worker constructs StudentImplementation, parent starts processes and receives queue results.",
+          "evidence": {
+            "path": "pybryt/student.py",
+            "start_line": 278,
+            "end_line": 304
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-c1f636928cc169ea4d36c6d6",
+      "reference_sha256": "386fc0c98ac36c4abc4ed72b95013eb770278999b0f0ea935342608983308d34",
+      "question_sha256": "f54733a49a6cbf7c760967c4b6c5915ad8d56ac0ba22c0722a46ceb5a9215e40",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "TimeComplexity.check is best-fit selector and complexities.run computes residual",
+          "verdict": "supported",
+          "reason": "Candidate loop and least-squares implementation support location and step-count semantics.",
+          "evidence": {
+            "path": "pybryt/annotations/complexity/annotation.py",
+            "start_line": 100,
+            "end_line": 115
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-db220c52daf5914fdb8abda0",
+      "reference_sha256": "10042481f15c72f57610203dd45d45a141e4ba7c6c8628207932bf414a27f360",
+      "question_sha256": "fa32953bbdad0e3df383e815531a75dd158e3a63c49848801755c76e7a0c1c25",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "All notebook failures preserve footprint collection",
+          "verdict": "partially_supported",
+          "reason": "allow_errors handles cell errors, but preprocessing or missing output file can still abort; context always disables tracing.",
+          "evidence": {
+            "path": "pybryt/execution/__init__.py",
+            "start_line": 81,
+            "end_line": 97
+          }
+        }
+      ],
+      "material_errors": [
+        "allow_errors handles cell errors, but preprocessing or missing output file can still abort; context always disables tracing."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Notebook execution uses ExecutePreprocessor(allow_errors=True), then reads the generated footprint file and removes it (pybryt/execution/__init__.py:81-97). Thus ordinary cell error outputs can coexist with a partial footprint, but timeout/kernel/preprocessing or missing-file failures are not universally recovered here. The check context manager always turns tracing off on exit and creates a report only without an exception or with report_on_error enabled (pybryt/student.py:423-439)."
+    },
+    {
+      "task_id": "import-ef55d75e39a9a07a52dc1a39",
+      "reference_sha256": "547032fad75a3ef772f6172b7ab391f1981d88346ac603b2e546fe534bd92e88",
+      "question_sha256": "753ea9d032667a3ddbb0137fa97b7c2d73ad8aa6ca628d561a059301850614a7",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Set tolerance branch reliably reduces paired isclose results",
+          "verdict": "partially_supported",
+          "reason": "Code passes a generator directly to np.array before all(), so stated intended comparison should not be claimed verified numeric reduction.",
+          "evidence": {
+            "path": "pybryt/annotations/value.py",
+            "start_line": 279,
+            "end_line": 288
+          }
+        }
+      ],
+      "material_errors": [
+        "Code passes a generator directly to np.array before all(), so stated intended comparison should not be claimed verified numeric reduction."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Value.check_values_equal honors a custom equivalence function, then checks iterable/shape compatibility and uses scalar/array tolerance bounds or numpy.allclose for numeric iterables (pybryt/annotations/value.py:224-288). Other values use equality; iterable results are reduced, with paired pandas missing values treated equal (290-304). The set branch sorts/pairs values but constructs np.array from a generator (283-286), so its correctness should be reviewed rather than asserting it reliably checks every paired tolerance."
+    }
+  ]
+}

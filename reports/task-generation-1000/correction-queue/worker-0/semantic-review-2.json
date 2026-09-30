@@ -1,0 +1,160 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/semantic-review-2.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/bridgecrewio--checkov-c2091482f54d",
+      "original_reference_sha256": "199c09a602770ad1abe2102c5d44dea3f74773ed3056b9aab863bc0c23a1fc49",
+      "question": "What are the core components and structure of Checkov's documentation system architecture?",
+      "question_sha256": "15ee2c62f48a1905d2361f8508bc6f7cf633ba3ec0a003b3cacc581470841785",
+      "reference_answer": "Checkov uses a Jekyll-style documentation site configured with remote_theme: bridgecrewio/checkov-theme and search_enabled: false (docs/_config.yml:1-10). Numbered documentation sections and YAML front matter organize the content; resource-scans.md uses layout, title and nav_order (docs/3.Scans/resource-scans.md:1-7). checkov/common/util/docs_generator.py:5-37 collects check metadata from Terraform, CloudFormation and Kubernetes registries and renders a table. The version-bump workflow regenerates that page with the generator (.github/workflows/build.yml:38-62). docs/search.html:15 loads Lunr, although search is disabled by configuration. BaseCheck declares identifying and categorization fields but no guideline URL field (checkov/common/checks/base_check.py:7-19); this alone does not establish why the architecture was chosen.",
+      "reference_sha256": "71810ca8227b862ad0bab504410851bb1e917ac1acc803380787b9ef758d9b82",
+      "repository": {
+        "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+        "family_id": "bridgecrewio/checkov",
+        "url": "https://github.com/bridgecrewio/checkov"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/bridgecrewio--checkov-c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-1bd73f2caf250c79536f4328"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/fitbenchmarking--fitbenchmarking-df465dc1b60d",
+      "original_reference_sha256": "da0ba9e7f1c3f6c043632d054b6607984462c6b60d2569dd0b38697786576dd6",
+      "question": "Why does the runtime limit enforcement mechanism become inefficient when scaling to benchmarks with many fitting problems and minimizers?",
+      "question_sha256": "ee3aef720218ff542fa02e6a5aa74324c05d4131d4fa7416acb92460e06497d3",
+      "reference_answer": "The source shows potential cumulative overhead, not a demonstrated scaling bottleneck. Benchmark combinations span problems, starts, software, minimizers, Jacobians and Hessians (fitbenchmarking/core/fitting_benchmarking.py:40-49). Each eval_model calls check_elapsed_time (fitbenchmarking/parsing/fitting_problem.py:126-143), which reads the clock while the timer is active and compares cumulative elapsed time against max_runtime (fitbenchmarking/utils/timer.py:50-61). BaseController.execute brackets fit with start/stop (fitbenchmarking/controllers/base_controller.py:207-214), while Bumps also checks through an abort callback (fitbenchmarking/controllers/bumps_controller.py:126-145). More fit evaluations imply more checks, but profiling would be needed to establish their cost relative to fitting. The resets at fitting_benchmarking.py:577-578 and 610-611 protect completed results and clear timer state after exception handling; the source does not show they are redundant.",
+      "reference_sha256": "da610e858a8e19fcb24769dd10e7a19009976814378338a9431877518ccc76fa",
+      "repository": {
+        "commit": "df465dc1b60d580dfb885ee9d03866c25988566f",
+        "family_id": "fitbenchmarking/fitbenchmarking",
+        "url": "https://github.com/fitbenchmarking/fitbenchmarking"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/fitbenchmarking--fitbenchmarking-df465dc1b60d580dfb885ee9d03866c25988566f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-241e31f0666e9c2890e9eb8f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/getsentry--responses-3e029949c8f3",
+      "original_reference_sha256": "05474d2ccf97fbf8a25318237a374ac9788087ce6c7fc0527807030853fc370c",
+      "question": "How does the responses library handle type stub distribution in its package configuration to ensure mypy compatibility for matcher functions?",
+      "question_sha256": "ba4e0eb9ad718cc24806c1130c6ac22988068c2bdd842fd9e7a93d02e6b21335",
+      "reference_answer": "setup.py:77-78 explicitly includes py.typed and __init__.pyi and sets include_package_data=True. MANIFEST.in:3 additionally includes **/*.pyi, covering responses/matchers.pyi, whose matcher functions return Callable[..., Any] (responses/matchers.pyi:13-19). The PEP 561 marker advertises package typing, and the stub supplies matcher signatures. The explicit package_data list alone does not prove that a wheel omits matchers.pyi: include_package_data enables manifest-listed package data to participate in packaging. Inspect the actual distribution to establish omission or a mypy failure; neither is demonstrated by this source configuration.",
+      "reference_sha256": "23104c8c8869bd2ab4c2ef461cb48e6ca26ef376cb3def64e0e0d360fd51af2f",
+      "repository": {
+        "commit": "3e029949c8f3c1b3b2b48f9e437fedd7cf27746d",
+        "family_id": "getsentry/responses",
+        "url": "https://github.com/getsentry/responses"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/getsentry--responses-3e029949c8f3c1b3b2b48f9e437fedd7cf27746d",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-1858f3ada8c0a29a6f8c0877"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/mwaskom--seaborn-3d3d715989d1",
+      "original_reference_sha256": "9d1d7e8209541f48df6595ca3b5ffc6259e0e56562d31f727cdeefbe4e00c218",
+      "question": "Why does seaborn's GroupBy implementation create performance bottlenecks when processing large datasets with multiple categorical grouping variables?",
+      "question_sha256": "337786a7ca2a2ea43b22f8b6b657b2975c70b022e975a6748b381d4260b5c68f",
+      "reference_answer": "For multiple present grouping variables, GroupBy._get_groups constructs pd.MultiIndex.from_product from their level orders (seaborn/_core/groupby.py:49-70). If their cardinalities are k1 through km, that index has product(ki) entries even when few combinations occur. agg groups with observed=True but then reindexes to this complete index, adding rows for absent combinations (groupby.py:79-100). apply also constructs the index and iterates its combinations (groupby.py:105-126). This can add substantial work and memory for sparse high-cardinality inputs. Plot.pair additionally stores separate statistical outputs per coordinate pair (seaborn/_core/plot.py:1234-1238; seaborn/_core/data.py:64-69), but the source alone does not quantify copying or establish that this is the dominant bottleneck.",
+      "reference_sha256": "7c8182c653042dcbd5a4efeef8508bc4aa76f0880343222d9af96f93115ecbbe",
+      "repository": {
+        "commit": "3d3d715989d1a9cecc2b08fb23c695b6bb686754",
+        "family_id": "mwaskom/seaborn",
+        "url": "https://github.com/mwaskom/seaborn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/mwaskom--seaborn-3d3d715989d1a9cecc2b08fb23c695b6bb686754",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-0d0fc175b21a3af99a3fa5ff"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "original_reference_sha256": "d7a728edac48b9cec5cecdf2390904c6620a4619cfc3528bb4f80fe84b3c1e04",
+      "question": "How does the type-safe dictionary structure used as a view function return type annotation decouple JSON response serialization from HTTP status representation to maintain type safety?",
+      "question_sha256": "11576063885655d9ecce2ae5dac8a30c30608b82b7df662469cff8b40e38fdba",
+      "reference_answer": "Flask permits TypedDict annotations by including Mapping[str, Any] in ResponseValue, explicitly noting that runtime accepts dict (src/flask/typing.py:11-23). StatusJSON defines a payload field status: str and the route returns {\"status\": \"ok\"} (tests/type_check/typing_route.py:41-47). make_response unpacks optional status and headers from tuples (src/flask/app.py:1190-1207), serializes dict/list bodies through self.json.response (1230-1231), and then assigns HTTP status separately (1259-1263). TypedDict therefore describes the JSON body for static checking; it does not set HTTP status or provide runtime schema validation. ResponseReturnValue separately types tuple metadata (src/flask/typing.py:35-40).",
+      "reference_sha256": "5a41599a3270ad4e432b30af2882f2b622e8112f163034760e6481b016f03b07",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-06919193f30b63440265fcad"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/python-pillow--Pillow-c4325c805e59",
+      "original_reference_sha256": "aaf69f96167a2c488b5bd16cf75757c1763e63c79fe6d7df54881f77e29c29fc",
+      "question": "Where are the security tokens and API keys (TIDELIFT_API_KEY, CODECOV_ORG_TOKEN) defined and referenced across Pillow's multi-workflow GitHub Actions CI system?",
+      "question_sha256": "9112e7fbcce0e55191794a389707db20f23a47a1c79bcf76b8dfc66fab2a2e86",
+      "reference_answer": "The repository references TIDELIFT_API_KEY through ${{ secrets.TIDELIFT_API_KEY }} in the Tidelift workflow (.github/workflows/tidelift.yml:23-28). Its value and external GitHub secret definition are not stored in these source files. No CODECOV_ORG_TOKEN reference appears in this snapshot. Codecov uploads use codecov/codecov-action in .github/workflows/test-docker.yml:79, test-cygwin.yml:95 and test-windows.yml:171, while test.yml:107 and test-mingw.yml:75 invoke the bash uploader through curl. .ci/after_success.sh:4 installs codecov, and codecov.yml:9 disables comments. Other workflows reference secrets.GITHUB_TOKEN (release-drafter.yml:18; stale.yml:21). Source configuration alone does not establish external token availability or successful uploads.",
+      "reference_sha256": "fd44e617e9d7b925d53bc9b994017cb7a487427af0d21d2e2ad43848005e86d3",
+      "repository": {
+        "commit": "c4325c805e5909f0bf7201ce1f259bc34a1a49e0",
+        "family_id": "python-pillow/pillow",
+        "url": "https://github.com/python-pillow/Pillow"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/python-pillow--Pillow-c4325c805e5909f0bf7201ce1f259bc34a1a49e0",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-15a6f06f0687b4b3272302c0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "0727992d4bbed21cb9dda687f43d2dd768cb348fdef1b63efbe08ee5dde8c88f",
+      "question": "What implicit contract does the empty test class with no methods or attributes establish for the automatic documentation generation system that processes Python objects and creates summary tables?",
+      "question_sha256": "72ce2b8a067a5fc72af7451a15e37210658733b6a080f8544e176fa502b3b2b0",
+      "reference_answer": "The PublicBar fixture has a docstring and pass, and the module-all test asserts that it appears in generated autosummary output (tests/roots/test-ext-autosummary-module_all/autosummary_dummy_package_all/autosummary_dummy_module.py:7-10; tests/test_extensions/test_ext_autosummary.py:859-866). This supports the narrow contract that a class need not define explicit methods to be listed. It does not mean its introspected member lists are empty: class handling uses dir(obj), tracks inherited members and includes __init__ in public methods (sphinx/ext/autosummary/generate.py:396-415; 485-517). The class template always emits autoclass and automethod __init__, with conditional method/attribute summaries (sphinx/ext/autosummary/templates/autosummary/class.rst:1-28). Module __all__ behavior is controlled separately by autosummary_ignore_module_all (generate.py:271-290).",
+      "reference_sha256": "0292f878412825cd94e522c52f109a32da542daba9be36f77b6a00146eef49ed",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-08a3d3a9ac5c0d79f7e14bc2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "original_reference_sha256": "8d7cc1f3f44c22441e6f8b68f22bca6811f53328d8c2479f7e2f527fb1b3699a",
+      "question": "Why does repeatedly instantiating the segment class that parses structured data type definitions during parsing of deeply nested structured data type definitions impact memory allocation and garbage collection overhead compared to reusing the shared grammar definition object?",
+      "question_sha256": "322fff7184c45208abd7a4207f830b057e3b08b481b48a93165a2105cb4d5134",
+      "reference_answer": "SQLFluff already reuses grammar definitions: dialect.ref returns a library element, and Ref.match delegates to it (src/sqlfluff/core/dialects/base.py:285-299; src/sqlfluff/core/parser/grammar/base.py:407-427). Matching returns MatchResult and can reuse a segment of the required class (src/sqlfluff/core/parser/segments/base.py:618-645). Later MatchResult.apply recursively builds the selected tree and constructs matched classes (src/sqlfluff/core/parser/match_result.py:193-200,257-282), using from_result_segments (segments/base.py:1233-1239). Each new node stores its own children, UUID, marker and parent/cache state (segments/base.py:194-212), so more nested nodes imply additional objects and initialization work. Grammar objects cannot directly replace these occurrence-specific nodes. Additional GC cost is plausible but unmeasured; the source does not establish a bottleneck, and construction is already deferred until apply.",
+      "reference_sha256": "709e0a7eec68e8f2bf8f23fffa834d79e3ecc1a20686e7ed192d00099d498d15",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-054283390a7ca05883b3c10e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "7e78d3ee8994e6ab04848e1e47a82c7789d902efcaa969c124ad598297691ece",
+      "question": "Where does the apparent_encoding method's control flow handle the absence of the chardet library, and what data path does self.content follow when chardet detection fails versus succeeds?",
+      "question_sha256": "bb8572ebeae9a247ad7a7cd34cecba68317ad941b8b3107ea7bc0bc6a6a3858e",
+      "reference_answer": "Response.apparent_encoding checks chardet is not None at src/requests/models.py:792. compat._resolve_char_detection first tries chardet then charset_normalizer (src/requests/compat.py:30-42). If neither is available, apparent_encoding returns utf-8 without accessing self.content (models.py:794-797). With a detector, it evaluates self.content and returns detect(...)[\"encoding\"] (792-793). content returns cached bytes or lazily consumes iter_content into bytes, with special error/None cases (890-907). A detector returning encoding=None produces None here; a detector exception propagates. Neither case is converted to utf-8 by apparent_encoding, so missing-library fallback and detection failure are different control-flow cases.",
+      "reference_sha256": "d65c0a70ee6cc6e32d0a4ab0f49b1c9ed9362f986c3b1c60c78c7ed2ea4d8fda",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-0d5da92978dc996d9ff1e090"
+    }
+  ]
+}

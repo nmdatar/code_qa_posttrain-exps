@@ -1,0 +1,122 @@
+{
+  "status": "author_probes_passed_independent_review_pending",
+  "repository": {
+    "url": "https://github.com/TanStack/query",
+    "commit": "fd96529f3e0b748874be4655516caecc5d6a0521",
+    "family_id": "tanstack-query",
+    "license": "MIT",
+    "license_path": "LICENSE"
+  },
+  "environment_reused": "im-laOoTR2oIVBe3vGjZ05rP4",
+  "human_reviewed": false,
+  "training_export_allowed": false,
+  "tasks": [
+    {
+      "id": "tanstack-signal-consumption-unsubscribe",
+      "mechanism": "signal getter plus observer cancellation",
+      "author_probe": {
+        "stdout": "[{\"consume\":false,\"calls\":1,\"afterUnsubscribe\":{\"data\":\"seed\",\"fetchStatus\":\"fetching\",\"aborted\":null},\"final\":{\"data\":\"remote\",\"fetchStatus\":\"idle\",\"status\":\"success\"}},{\"consume\":true,\"calls\":1,\"afterUnsubscribe\":{\"data\":\"seed\",\"fetchStatus\":\"idle\",\"aborted\":true},\"final\":{\"data\":\"seed\",\"fetchStatus\":\"idle\",\"status\":\"success\"}}]\n",
+        "stderr": "",
+        "exit_code": 0,
+        "timed_out": false,
+        "truncated": false,
+        "duration_seconds": 0.093698597,
+        "sandbox_id": "sb-F5y9YpmR25HdnjGdUbXgwj",
+        "provisioning_and_run_seconds": 1.8420287079643458
+      },
+      "required_claims": 5
+    },
+    {
+      "id": "tanstack-manual-cache-edit-cancel-revert",
+      "mechanism": "manual update rollback checkpoint versus raw state",
+      "author_probe": {
+        "stdout": "[{\"edit\":\"none\",\"before\":{\"data\":\"seed\",\"fetchStatus\":\"fetching\"},\"value\":\"seed\",\"after\":{\"data\":\"seed\",\"fetchStatus\":\"idle\",\"status\":\"success\"}},{\"edit\":\"manual\",\"before\":{\"data\":\"edited\",\"fetchStatus\":\"fetching\"},\"value\":\"edited\",\"after\":{\"data\":\"edited\",\"fetchStatus\":\"idle\",\"status\":\"success\"}},{\"edit\":\"raw-state\",\"before\":{\"data\":\"edited\",\"fetchStatus\":\"fetching\"},\"value\":\"seed\",\"after\":{\"data\":\"seed\",\"fetchStatus\":\"idle\",\"status\":\"success\"}}]\n",
+        "stderr": "",
+        "exit_code": 0,
+        "timed_out": false,
+        "truncated": false,
+        "duration_seconds": 0.202567159,
+        "sandbox_id": "sb-j8fj37CMvNMhZBpMJ5Wdbv",
+        "provisioning_and_run_seconds": 2.6440712499897927
+      },
+      "required_claims": 5
+    },
+    {
+      "id": "tanstack-inflight-options-retry-capture",
+      "mechanism": "captured retry options versus live queryFn plus deduplication",
+      "author_probe": {
+        "stdout": "{\"calls\":[\"old\",\"new\",\"new\"],\"oldDelays\":1,\"newDelays\":1,\"cachedRetry\":false,\"values\":[\"new-result\",\"new-result\"],\"freshError\":\"new-failure\"}\n",
+        "stderr": "",
+        "exit_code": 0,
+        "timed_out": false,
+        "truncated": false,
+        "duration_seconds": 0.101585733,
+        "sandbox_id": "sb-j1iJG5U5O06tWyRXe722R8",
+        "provisioning_and_run_seconds": 1.7936608749441803
+      },
+      "required_claims": 5
+    }
+  ],
+  "optimizations": [
+    "Reused pinned repository and exact environment recipe/budgets; no dependency install or image build.",
+    "Generated three mechanism-distinct tasks per inspected repository, amortizing source navigation.",
+    "Used deterministic deferred promises rather than sleeps or network calls.",
+    "Bundled counterfactual cases into one probe per task; each executes in about 0.1-0.2 seconds excluding provisioning.",
+    "Filtered out hydration/staleTime rephrasings and kept independent cancellation/state/options mechanisms."
+  ],
+  "duplicate_screening": {
+    "compared_to": "existing TQ-02 hydration/freshness task and among these three tasks",
+    "finding": "Different decision paths and observables; first two share cancellation machinery but test signal-triggered lifecycle versus rollback checkpoint semantics.",
+    "cross_benchmark_semantic_audit": "pending"
+  },
+  "source_basis": {
+    "query_tests": "packages/query-core/src/__tests__/query.test.tsx:287-347 corroborates signal-consumption branch",
+    "TQ-01": "Historical React task not copied; current core scenario generated after source tracing and execution."
+  },
+  "quality_findings": [
+    "Author initially expected newDelay to be unused under retry:false; actual probe and retryer.ts:199-215 showed delay calculation precedes eligibility. Corrected private claim before publication.",
+    "Prompt includes sufficient operation order, initial values, defaults and deferred settlement to reproduce.",
+    "Expected answers generated from source reasoning and verified against observed outputs; independent reference review required to reduce shared-author errors."
+  ],
+  "limitations": [
+    "Only author probes so far; not independently solved/reviewed in this report.",
+    "No formal difficulty claim until question-only control.",
+    "Family remains development-only, human review false, no training export.",
+    "Provenance URLs identify source code; generated prompts are not attributed as quotations or user reports."
+  ],
+  "expected_outcome_derivation": [
+    {
+      "task_id": "tanstack-signal-consumption-unsubscribe",
+      "basis": "query.ts signal getter marks consumption; removeObserver chooses cancel(revert) versus cancelRetry; onCancel restores revert state; settled retryer ignores later resolution. Expected seed/idle versus remote/idle was reasoned from these branches before execution."
+    },
+    {
+      "task_id": "tanstack-manual-cache-edit-cancel-revert",
+      "basis": "setQueryData passes manual:true; manual success stores newState as revert checkpoint; raw setState only merges state. Expected edited to survive only the manual branch, with cancelled fetch resolving checkpoint data, was reasoned from source before execution."
+    },
+    {
+      "task_id": "tanstack-inflight-options-retry-capture",
+      "basis": "setOptions updates Query, dedup returns before new config, retry config captures old options while fetchFn resolves current queryFn. Expected old/new/new call sequence and new-result dedup values reasoned before probe; one callback count corrected after source reinspection."
+    }
+  ],
+  "corrections": [
+    {
+      "stage": "author_probe_before_spec_publication",
+      "initial_expectation": "newDelay callback count 0 because the fresh fetch sets retry:false",
+      "observed": "newDelay callback count 1; newFn is still invoked only once in fresh fetch",
+      "resolution": "Inspected retryer.ts:199-215: delay callback executes before shouldRetry check. Gold now requires count 1 and distinguishes callback evaluation from an actual scheduled retry. No failing production verification was hidden; first exploratory observation retained in author_probe."
+    }
+  ],
+  "measurement": {
+    "probes": 3,
+    "passed": 3,
+    "execution_seconds": 0.397851489,
+    "provisioning_and_run_seconds": 6.279760832898319,
+    "model_tokens": null,
+    "model_cost": null,
+    "total_author_wall_time": null,
+    "total_author_probe_attempts": 3,
+    "preliminary_probe_attempts": 3,
+    "post_publication_author_probe_attempts": 0,
+    "counting_note": "Exactly one exploratory Modal execution per task; no additional author probe runs. Root official verification runs tracked separately."
+  }
+}

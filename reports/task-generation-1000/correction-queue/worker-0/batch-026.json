@@ -1,0 +1,126 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-026.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "original_reference_sha256": "b444f9f0c016ec7ba391739b134f13f022f799e187a4639c1ea2000bc87e56e2",
+      "question": "Why would using a singleton pattern versus repeatedly instantiating the _Unset class throughout matplotlib's codebase impact memory overhead in scenarios with thousands of default parameter checks?",
+      "question_sha256": "ce86676739c099912a4ef8f444656ff3d69717d98d54d10ab3d6498076bcdb3c",
+      "reference_answer": "The module creates one shared UNSET sentinel (lib/matplotlib/_api/__init__.py:30-35). Reusing it avoids separate sentinel allocations and supplies a common identity for distinguishing omitted arguments from explicit None. However, def foo(arg=_Unset()) creates its default once at function definition, not once per call. Thousands of checks therefore do not imply thousands of new objects; only explicit per-call construction would create that allocation pattern.",
+      "reference_sha256": "6b6f65316db98640e33782e3af13bf2d88f6c9cc84eb3c90daedd6bdd1a7024b",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-d1ac8a8041fcf21ed9326cc4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "original_reference_sha256": "3495b6f9ff779c2f894031e393d0678440532bac574661c5de90fed3c854722f",
+      "question": "How does the Legend class implement a multi-layered validation strategy to handle conflicting parameters like title_fontsize and title_fontproperties, and what design pattern could be applied to generalize this validation logic across similar parameter conflicts?",
+      "question_sha256": "1da576c8e5eb4c7c6a37e9ec2d4046bbcdfc48119a9da713f01b42da2b81a5d6",
+      "reference_answer": "Legend rejects simultaneous non-None title_fontsize/title_fontproperties, normalizes properties and applies size fallback before set_title (lib/matplotlib/legend.py:555-571). A reusable normalization helper with an explicit mutually-exclusive-parameters check could generalize this while preserving parameter-specific precedence. Do not automatically apply that rule to regular prop/fontsize: existing code gives prop precedence instead of rejecting both (lib/matplotlib/legend.py:429-434).",
+      "reference_sha256": "4a2505adb165038709c259bc945911835f26c060d801314e0a6f010a0d2328f3",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-d21d4d665ec323728c21f7cc"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "original_reference_sha256": "81b99ef5ee54e0cd9b2c8a2782f99f596c62a38f9e776e33613b5ba39221280f",
+      "question": "What is the semantic contract established by the LaTeX preamble configuration in test_font_bitstream_charter between the text rendering pipeline and the PDF backend's glyph subsetting mechanism?",
+      "question_sha256": "6f4af02098220bda49dcb3b00ca5371c2a2063b6d0461e2413d15c760f0d6b38",
+      "reference_answer": "The test selects charter, T1 font encoding and UTF-8 input for accented text and ligatures (lib/matplotlib/tests/test_backend_pdf.py:470-479). PDF draw_tex writes bytes([glyph]) and tracks chr(glyph) (lib/matplotlib/backends/backend_pdf.py:2293-2299); tracking stores ord values (lib/matplotlib/backends/_backend_pdf_ps.py:109-113). These are font encoding indices, not decoded original Unicode characters. Embedding applies the map-file encoding before subsetting by tracked indices (lib/matplotlib/backends/backend_pdf.py:1018-1030; lib/matplotlib/_type1font.py:840-850).",
+      "reference_sha256": "411124bcebb7dc6e0947795e0e5917ef2b17951ad393cc3eee95961748905feb",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-dad0d5035ff9e67ef150d1d8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "original_reference_sha256": "587246a76f3ea2ee2397de9c920f0ed09642600ac10a7d74691ea38d24d0cd16",
+      "question": "What is the architectural pattern of StreamMask's trajectory recording and rollback mechanism that decouples the concerns of spatial discretization from streamline collision detection, and what architectural implications does this separation have for handling concurrent or adaptive trajectory generation?",
+      "question_sha256": "b65f95f37b3bed0ee423d6168fde5c3b6811fb9b6b797d7a9af293bebb519023",
+      "reference_answer": "StreamMask uses _traj as an undo log: entering an unoccupied cell records it and immediately marks _mask; undo clears logged cells (lib/matplotlib/streamplot.py:453-478). This supports serial rejection of a tentative trajectory. It is not a concurrency-safe transaction: one shared trajectory list/current position and mutable mask would require per-trajectory ownership and synchronization for concurrent generation. Adaptive changes to mask resolution would also need to preserve or remap recorded cell indices; the existing fixed-density grid does not provide that mechanism (lib/matplotlib/streamplot.py:437-448).",
+      "reference_sha256": "2fbcc0a929caab365ce2691157d865160718e786c808c996ab1e34d69f8f931f",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-dc384d10f392758f98771746"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "original_reference_sha256": "b355343ea6bf489def4e696b9034f3493f8e69a0919a2ce176440ad7ce2551db",
+      "question": "What is the architectural separation enforced by the TestLogLocator test suite between the tick locator's core logarithmic computation logic and its integration with matplotlib's axis scaling system, particularly when handling edge cases like polar projections and shared axes?",
+      "question_sha256": "5fab1194df361b0f543e49bf572e57d60be7ab37c9d6c1bb144af57052bf1603",
+      "reference_answer": "LogLocator.__call__ gets the axis view interval and delegates to tick_values (lib/matplotlib/ticker.py:2401-2404). tick_values can operate without an axis for valid explicit bounds, using nine automatic ticks, but is not purely axis-independent: attached axes provide tick space and a replacement minimum positive value (lib/matplotlib/ticker.py:2414-2427). nonsingular also considers shared axes minimum positive values (lib/matplotlib/ticker.py:2547-2564). Standalone versus axes tests exercise both uses; they do not enforce a strict pure-core/integration boundary.",
+      "reference_sha256": "b8c59db54a1a9340aa476302e24cfdc10f1079d6b7c96bf286334d722f973444",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-f24c5d73a319fbd681b7e092"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "original_reference_sha256": "ede6a11f7b686d637eb6be6f9fc286746239d2b3b49b74c46236e61c60ff7200",
+      "question": "Where in the codebase are the lower-level helper functions that test_pdflatex delegates to for configuring the PGF backend and rendering the test figure?",
+      "question_sha256": "bf4bc848790dc85cf7eeacef042ff4c5885a7d3f1da451cdffe64981c89eee9d",
+      "reference_answer": "test_pdflatex sets pgf.texsystem=pdflatex, font options and preamble via mpl.rcParams.update, then calls create_figure in the same test module (lib/matplotlib/tests/test_backend_pgf.py:103-110). That helper builds lines, markers, filled paths and text (lib/matplotlib/tests/test_backend_pgf.py:49-77). The image_comparison decorator then saves/compares output; PGF rendering and TeX compilation are implemented deeper in FigureCanvasPgf, including _print_pgf_to_fh and print_pdf in lib/matplotlib/backends/backend_pgf.py.",
+      "reference_sha256": "183d32d40d4d871f4a317609f538d68c95747b56f52888d1d900a4713243aa31",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-fee4ece64bcde6a3a67c6001"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "original_reference_sha256": "c79fa6aed4afd0a1ae390603780c6dd2ca11fc02a13de4d52ae5a5e7ab21959b",
+      "question": "Where is the logic that determines how ticklabel offsets are calculated based on vertical and horizontal alignment properties, and which methods invoke this calculation during the rendering pipeline?",
+      "question_sha256": "b63336bf860805a79a4d82ed7bb81169eacf47c54ad83cdd4c66fef3ee8d6af4",
+      "reference_answer": "Text._get_layout computes alignment-dependent offsetx/offsety, including xtick/ytick rotation modes (lib/matplotlib/text.py:360,454-508). Text.get_window_extent invokes _get_layout to obtain its bounding box (lib/matplotlib/text.py:984-986). Axis._get_ticklabel_bboxes calls visible labels get_window_extent (lib/matplotlib/axis.py:1333-1338), and axis drawing/layout operations use that helper. The calculation is therefore reached through get_window_extent but is not defined inside it.",
+      "reference_sha256": "4a44ef04ba8af1460e4a893ddf833ba492afc92c7956f2967584e3ebc6ad7e08",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-ff92be4e5f68ed7fd1bd2c84"
+    }
+  ]
+}

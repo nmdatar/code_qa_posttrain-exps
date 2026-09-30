@@ -1,0 +1,109 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 1,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-000.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/PennyLaneAI--pennylane-6fae4e77ab73",
+      "original_reference_sha256": "40aacdd622806afd12794b79f52d3824cad07c675c564a5ed0e65c04c5d8c729",
+      "question": "Where is the ValueError raised when attempting to serialize unsupported operations like MidMeasureMP to OpenQASM format?",
+      "question_sha256": "2e015bb714e0deb8b74af09b2806f134914bff24063fb35a289d65051dbc4d23",
+      "reference_answer": "QuantumScript.to_openqasm raises ValueError(\"Operation {op.name} not supported by the QASM serializer\") in pennylane/tape/qscript.py:1113-1118 when OPENQASM_GATES[op.name] fails. This lookup occurs after depth-two expansion with a stop predicate for supported gate names (1106-1111), so an initially unlisted operation can succeed if decomposed into supported gates.",
+      "reference_sha256": "adf6ba22e00ae63d8adfb52449d35d875b3c44eeb4ef07ac73b96f95d9f9d251",
+      "repository": {
+        "commit": "6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+        "family_id": "pennylaneai/pennylane",
+        "url": "https://github.com/PennyLaneAI/pennylane"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/PennyLaneAI--pennylane-6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-73f308b613654741593e4884"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/PennyLaneAI--pennylane-6fae4e77ab73",
+      "original_reference_sha256": "c8b61ee54a408421370e5112930dc645b60459f49b8964ad9354a5b277dabea8",
+      "question": "Where does the gradient method selection logic dispatch control flow to different differentiation implementations when computing gradients for quantum circuits with mixed parameter types?",
+      "question_sha256": "11e038df5f977cdb202b6b948216954e0687976b58912a38d16e7f246eeb693a",
+      "reference_answer": "For mixed analytic and finite-difference parameters, param_shift in pennylane/gradients/parameter_shift.py:1015-1047 calls gradient_analysis_and_validation, builds a map with choose_grad_methods, sends F parameters to fallback_fn and A parameters to variance or expectation parameter-shift routines, then combines their results at 1079-1101. Non-differentiable parameters raise in gradient_transform.py:158-168; they do not automatically use numerical fallback. QNode._validate_parameter_shift selects qubit/qutrit versus CV transforms (qnode.py:811-825).",
+      "reference_sha256": "5a0d070d8f21060ce09f012866f48e356295998e1033e539ab9516d4a0046209",
+      "repository": {
+        "commit": "6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+        "family_id": "pennylaneai/pennylane",
+        "url": "https://github.com/PennyLaneAI/pennylane"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/PennyLaneAI--pennylane-6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-871c8cadb652aef41ef2c0c8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/PennyLaneAI--pennylane-6fae4e77ab73",
+      "original_reference_sha256": "27350d961fd14dbb1d8b17b5dfb6c53e6a7d6f41744d6d7ac3314d302ae465b5",
+      "question": "Where is the coordination between Fourier coefficient computation and visualization rendering implemented when displaying spectrum analysis plots?",
+      "question_sha256": "87538a9ce3eb8294e592e308490a769ea256f053fdbadc2adeeb30501c6f1a12",
+      "reference_answer": "Coordination is explicit at the caller: compute coefficients using pennylane.fourier.coefficients, then pass them and Matplotlib axes to a visualization function. The example in pennylane/fourier/visualize.py:168-178 demonstrates this. _validate_coefficients (33-80) normalizes lists and checks dimensions and odd coefficient-axis lengths; it does not verify numerical stability or element finiteness. The Fourier package exports computation functions at __init__.py:17-21.",
+      "reference_sha256": "4c5379cf215d4ce30698850b004a0c90640c76de88a19ca5f909db08fb013af0",
+      "repository": {
+        "commit": "6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+        "family_id": "pennylaneai/pennylane",
+        "url": "https://github.com/PennyLaneAI/pennylane"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/PennyLaneAI--pennylane-6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-b2d83fd2d402f086620f371d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/PennyLaneAI--pennylane-6fae4e77ab73",
+      "original_reference_sha256": "d0c78ec886a45f07c6e070dd227a1b02eb377fd341d00c57b0e808e4d552cc54",
+      "question": "What is the inheritance hierarchy and execution method relationships between different mid-circuit measurement (MCM) execution strategies in PennyLane's measurement system?",
+      "question_sha256": "4a6c560f2f20a7a0ac637130d87f53aeda757d1a462227b97e5e1d5b03448696",
+      "reference_answer": "MidMeasureMP directly inherits MeasurementProcess (pennylane/measurements/mid_measure.py:113-131). measure constructs one and returns a MeasurementValue (104-107); these are not separate execution-strategy subclasses. In qnode.py:899-905, a tape containing MidMeasureMP is selected for deferred measurement when the device is experimental or a legacy device lacks supports_mid_measure. Thus the legacy capability flag does not alone describe all devices in this revision.",
+      "reference_sha256": "c2fc20e9366c319b58103fb518f0ea679d0faedc75d9d18fba15dbcdf742092f",
+      "repository": {
+        "commit": "6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+        "family_id": "pennylaneai/pennylane",
+        "url": "https://github.com/PennyLaneAI/pennylane"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/PennyLaneAI--pennylane-6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-c4a7b40d8b998551d9bdd79b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/PennyLaneAI--pennylane-6fae4e77ab73",
+      "original_reference_sha256": "a09b6c6fd23b16699e28afb18cbc858b49fceb4806fe75bbddbe23194c90be2f",
+      "question": "Where does operator metadata flow through the serialization pipeline when converting between PennyLane operators and HDF5 storage format?",
+      "question_sha256": "df92c32f403c2b8ce44413e538eeda41dcbb6b1a4f6bf0fe4a15044a9a5ac80c",
+      "reference_answer": "DatasetOperator._ops_to_hdf5 stores class names in op_class_names and ordinary-operator wire JSON in op_wire_labels alongside op.data (pennylane/data/attributes/operator/operator.py:199-225). Tensor and Hamiltonian components recurse into subgroups; Hamiltonians also store coefficients. _hdf5_to_ops resolves names through _supported_ops_dict, recursively rebuilds composites, and passes loaded parameters and decoded wires to ordinary constructors (229-268). Only supported operator types and serializable wire labels are accepted (_wires.py:35-57).",
+      "reference_sha256": "486cad9bda05cc391a635d17f7ce93646069ece99d4994871ffdf6a82c0953af",
+      "repository": {
+        "commit": "6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+        "family_id": "pennylaneai/pennylane",
+        "url": "https://github.com/PennyLaneAI/pennylane"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/PennyLaneAI--pennylane-6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-c586977613eb773cac977b32"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/PennyLaneAI--pennylane-6fae4e77ab73",
+      "original_reference_sha256": "1fb0a49d607861e21afcb33c11c525aaf6e59bda478b10652c8a950a93674287",
+      "question": "What mechanism does PennyLane use to ensure that Fourier-series reconstructions of quantum expectation values remain numerically stable when rendered through its visualization utilities?",
+      "question_sha256": "d3da7f3b5c1ca6af48a2487251f811af003f134109f1e14272fd764a265cbc3d",
+      "reference_answer": "There is no guarantee that visualization renders only numerically stable reconstructions. _reconstruct_equ uses a ratio of sinc functions in a Dirichlet-kernel reconstruction (pennylane/fourier/reconstruct.py:59-84). _reconstruct_gen warns if the coefficient matrix condition number exceeds 1e8, then still solves it (155-169). Visualization validation checks list/array type, dimensionality, and odd coefficient-axis sizes (pennylane/fourier/visualize.py:33-80); those structural checks do not establish numerical stability.",
+      "reference_sha256": "8be8cb5ea4cc8213eba2d5f89328cfaa231725ebefa715acda2034eae113f222",
+      "repository": {
+        "commit": "6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+        "family_id": "pennylaneai/pennylane",
+        "url": "https://github.com/PennyLaneAI/pennylane"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/PennyLaneAI--pennylane-6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-f83191bb378dbedf06e68027"
+    }
+  ]
+}

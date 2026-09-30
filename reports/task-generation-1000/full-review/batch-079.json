@@ -1,0 +1,368 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-9d0221def4ca7d5d5181c821",
+      "reference_sha256": "28d64d68db92e29022f7a61009b525732b557cccb28acdc6bd3a88f9ff3317e2",
+      "question_sha256": "96e528477ba8e7b9e970574a9cf46db189cb7d050c9693fc3a7b2ef4eaebcb9d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Direct property bypasses named lookup",
+          "verdict": "supported",
+          "reason": "set indexes second arg while pdf named first.",
+          "evidence": {
+            "path": "sympy/stats/joint_rv_types.py",
+            "start_line": 88,
+            "end_line": 95
+          }
+        },
+        {
+          "claim": "Mixin lookup",
+          "verdict": "supported",
+          "reason": "Maps argnames to args; two-arg usage contract not enforced arity.",
+          "evidence": {
+            "path": "sympy/stats/rv.py",
+            "start_line": 1586,
+            "end_line": 1594
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-9f57a9f5e2784a78f4971602",
+      "reference_sha256": "6718e8d652c0c153e7ffc46c8fefd499786d800165f4c6f98c0e9a73ce8dfc82",
+      "question_sha256": "870efd43a5420d66048b4d53ee1928bd30607d9ed9ed4c98d05f182b5dba502a",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Factory delegation is architectural impossibility",
+          "verdict": "unsupported",
+          "reason": "Factory directly returns concrete array, not prohibition on instantiation.",
+          "evidence": {
+            "path": "sympy/tensor/array/ndim_array.py",
+            "start_line": 142,
+            "end_line": 147
+          }
+        }
+      ],
+      "material_errors": [
+        "Invented impossibility and dense-performance rationale."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "NDimArray.__new__ is a convenience factory returning ImmutableDenseNDimArray(iterable, shape, **kwargs), while the base __getitem__ leaves storage access to subclasses (sympy/tensor/array/ndim_array.py:142-147). Thus calling NDimArray does create a concrete array. Delegation supplies a default representation; the source does not establish that another initializer is impossible or that dense storage is universally faster."
+    },
+    {
+      "task_id": "import-a7acedd96acb00285642ade2",
+      "reference_sha256": "5e364150eaa336bed19bc777f757a81a3003bc2b670b234339db4dbddcd824b4",
+      "question_sha256": "c2a6346c4d4068a15a9365b036d2a7d3d296a3894963f15fa3f6a05d83fcdcb6",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Compilation exception and cleanup",
+          "verdict": "supported",
+          "reason": "CalledProcessError translated to CodeWrapError with merged output; finally restores path/cwd and cleans temporary directory.",
+          "evidence": {
+            "path": "sympy/utilities/autowrap.py",
+            "start_line": 150,
+            "end_line": 189
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-a9565567dee2e1a2827ac5fb",
+      "reference_sha256": "2a110349632ef82637932f896bae78433008fac28a610949ad2b89e4d7370231",
+      "question_sha256": "0019b6aad8071de4e6058b5caff60182ac0f0028bc842a4c125eecb4c2741ea0",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Symbolic relational bool rejection",
+          "verdict": "supported",
+          "reason": "Raises TypeError instead of assigning unknown truth; chained comparison truth-testing explains effect, final operand need not itself be coerced.",
+          "evidence": {
+            "path": "sympy/core/relational.py",
+            "start_line": 526,
+            "end_line": 531
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-aae1c9c95db1dde20fb6d88f",
+      "reference_sha256": "1359c7e6c6d8b2e02489d2b7f3935a473ec6df0901429d49904299ed61cbfeb8",
+      "question_sha256": "cf3d4e70266d08ffb0bf764ca484603c31e4d40e9c2dade8b1465fbc39d982ce",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Operand-independent index structure",
+          "verdict": "contradicted",
+          "reason": "Tracks explicit operand and overall index positions.",
+          "evidence": {
+            "path": "sympy/tensor/tensor.py",
+            "start_line": 3492,
+            "end_line": 3536
+          }
+        },
+        {
+          "claim": "Product extraction preserves free-position order",
+          "verdict": "supported",
+          "reason": "Sorts free indices by position then contracts arrays.",
+          "evidence": {
+            "path": "sympy/tensor/tensor.py",
+            "start_line": 4178,
+            "end_line": 4186
+          }
+        }
+      ],
+      "material_errors": [
+        "No blanket operand-permutation invariance; confuses addition alignment and symmetry with product array axis order."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "TensMul._extract_data collects operand arrays, computes dummy contractions and sorts free indices by their positions before contraction (sympy/tensor/tensor.py:4178-4186). _indices_to_free_dum tracks operand and overall index positions explicitly (3492-3536). Therefore arbitrary operand reorderings do not automatically produce identically ordered arrays. For mathematically equivalent expressions, compare arrays using an explicit common free-index order via replace_with_arrays(..., indices), whose contract controls output axes (2279-2292); commutation and symmetry assumptions must also hold."
+    },
+    {
+      "task_id": "import-ac25b94e0cc9358260e3bd66",
+      "reference_sha256": "80bd701f7921337583c0eb5f633fdcca22260a6f816a852bb1d05eca96794f54",
+      "question_sha256": "485f57540180fbc6fc74e9c332832fe388963501a9cb20497a3e4bce838a7d60",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Pattern matcher location",
+          "verdict": "supported",
+          "reason": "Builds subclass pattern, collects equation, matches and verifies.",
+          "evidence": {
+            "path": "sympy/solvers/ode/single.py",
+            "start_line": 303,
+            "end_line": 322
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-ac2d6bb073610ff000951cad",
+      "reference_sha256": "8e576bae2e969150997533c2a51f4d3877620576fa368c9e8a507772e2df5927",
+      "question_sha256": "43e6143d938d1f1dff2cff9c3d1e5056d1373f72f14aba955c0c78fa99e26192",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Base dynamic bracket lookup",
+          "verdict": "supported",
+          "reason": "getattr uses instance class hierarchy.",
+          "evidence": {
+            "path": "sympy/physics/secondquant.py",
+            "start_line": 966,
+            "end_line": 976
+          }
+        },
+        {
+          "claim": "Ket formatting attributes",
+          "verdict": "supported",
+          "reason": "Defines text and latex bracket constants.",
+          "evidence": {
+            "path": "sympy/physics/secondquant.py",
+            "start_line": 1232,
+            "end_line": 1239
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-ba89bd3daaa09457e6d808d9",
+      "reference_sha256": "7ecf75880089584ffcd1238880a4c52405c349c89d7e866693bf40b05fa0a2eb",
+      "question_sha256": "f04bba659bc33cabada8e42625afe11061a63efae2771e1b5c958a6db2356d9b",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Independent exptrigsimp unavailable",
+          "verdict": "contradicted",
+          "reason": "Standalone public function already exists.",
+          "evidence": {
+            "path": "sympy/simplify/trigsimp.py",
+            "start_line": 571,
+            "end_line": 596
+          }
+        },
+        {
+          "claim": "Imaginary unit guard",
+          "verdict": "supported",
+          "reason": "Rejects candidate introducing I when input lacked it.",
+          "evidence": {
+            "path": "sympy/simplify/trigsimp.py",
+            "start_line": 650,
+            "end_line": 662
+          }
+        },
+        {
+          "claim": "Independent tests exist",
+          "verdict": "supported",
+          "reason": "Direct tests include imaginary-unit transformations.",
+          "evidence": {
+            "path": "sympy/simplify/tests/test_trigsimp.py",
+            "start_line": 384,
+            "end_line": 403
+          }
+        }
+      ],
+      "material_errors": [
+        "Invents need for isolation interface and misreads I guard."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "No new simplify flag is needed for independent tests: exptrigsimp is already a standalone public function (sympy/simplify/trigsimp.py:571-596), and direct tests include cos(x) +/- I*sin(x) cases (sympy/simplify/tests/test_trigsimp.py:384-403). Test it directly to avoid simplify\u2019s earlier normalization stage. Its final guard rejects a rewritten result that introduces I when the input lacked it (sympy/simplify/trigsimp.py:659-662). Any optional-stage refactor would be a separate design proposal, not required by the current API."
+    },
+    {
+      "task_id": "import-bac26a4bba005d9f25926fb9",
+      "reference_sha256": "7e7ed1c789f4e5759fb204c7cc5e47c2be5176ca526ff80d2b9b29185c13a768",
+      "question_sha256": "c4c57aa981875c86ec214a8e0642cf367eead2eb4e6d260102bb7df0ab23d345",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Dependent/independent homogeneous checks",
+          "verdict": "supported",
+          "reason": "Same non-None orders plus nonzero substitution.",
+          "evidence": {
+            "path": "sympy/solvers/ode/single.py",
+            "start_line": 1510,
+            "end_line": 1523
+          }
+        },
+        {
+          "claim": "Reciprocal and combined checks",
+          "verdict": "supported",
+          "reason": "Reciprocal substitution check likewise.",
+          "evidence": {
+            "path": "sympy/solvers/ode/single.py",
+            "start_line": 1637,
+            "end_line": 1650
+          }
+        },
+        {
+          "claim": "Best requires both",
+          "verdict": "supported",
+          "reason": "Combines verifiers with and.",
+          "evidence": {
+            "path": "sympy/solvers/ode/single.py",
+            "start_line": 1714,
+            "end_line": 1716
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-c71607bd928c058ccf5779d5",
+      "reference_sha256": "7613849656bea06676078a75bd73420310c5d7303f3cd4c7b353f49b53fa137a",
+      "question_sha256": "c02c67c2b2807c94dad2807fa4e923fa6e92c405c0f9e6c088900c504b7c3592",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Deprecation test scopes call",
+          "verdict": "supported",
+          "reason": "Calls deprecated helper in warning context; does not assert exact returned path.",
+          "evidence": {
+            "path": "sympy/utilities/tests/test_misc.py",
+            "start_line": 146,
+            "end_line": 148
+          }
+        },
+        {
+          "claim": "Policy requires isolated deprecated behavior",
+          "verdict": "supported",
+          "reason": "Test suite rejects warnings outside designated context; only-place language is policy, not exhaustive usage proof.",
+          "evidence": {
+            "path": "doc/src/contributing/deprecations.md",
+            "start_line": 322,
+            "end_line": 328
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-c7e0b91a508183c211c50610",
+      "reference_sha256": "04c2be9e9c9989bd8ee7146db7cf62f49286b39953c1e4f46edb463e6e48d281",
+      "question_sha256": "18a22839b12e181a63936492865b441ceeda324c0abca68b83c7803e31775467",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Rigid and particle contributions",
+          "verdict": "supported",
+          "reason": "Rigid translational and rotational terms; particle translational terms.",
+          "evidence": {
+            "path": "sympy/physics/mechanics/kane.py",
+            "start_line": 480,
+            "end_line": 510
+          }
+        },
+        {
+          "claim": "Dependent speed projection",
+          "verdict": "supported",
+          "reason": "Ars transpose projects fr_star, MM and nonMM separately.",
+          "evidence": {
+            "path": "sympy/physics/mechanics/kane.py",
+            "start_line": 511,
+            "end_line": 534
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-d57e939d0d4e04794ef5bc23",
+      "reference_sha256": "0c34662469c580a4762fa90e7876a5ea1fba16bbd5cea88a9497624f24ff96a1",
+      "question_sha256": "2d34b371f7da198001a2631648f70a4656733c87d4c793d43a746a7af816b59e",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Callback passed to new matrix",
+          "verdict": "supported",
+          "reason": "Each operation computes transformed entries from old self.",
+          "evidence": {
+            "path": "sympy/matrices/matrices.py",
+            "start_line": 211,
+            "end_line": 232
+          }
+        },
+        {
+          "claim": "Callable materialization",
+          "verdict": "supported",
+          "reason": "Loops all entries during construction; lazy refers only to callback handoff, not persistent lazy matrix.",
+          "evidence": {
+            "path": "sympy/matrices/matrixbase.py",
+            "start_line": 4345,
+            "end_line": 4360
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

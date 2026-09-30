@@ -1,0 +1,722 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/ethereum--web3.py-305b3c30812f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 208,
+            "file_sha256": "035714b75b31eb4530679c9dd0d4fed8f0433a3136e7c4b8e738b55bb2f9f924",
+            "path": "web3/_utils/contracts.py",
+            "start_line": 144
+          },
+          {
+            "end_line": 168,
+            "file_sha256": "035714b75b31eb4530679c9dd0d4fed8f0433a3136e7c4b8e738b55bb2f9f924",
+            "path": "web3/_utils/contracts.py",
+            "start_line": 164
+          },
+          {
+            "end_line": 103,
+            "file_sha256": "10a4c7eba78cd2608310f2f8cc38cf81143bbd90699b5630207a194ffa7934e0",
+            "path": "web3/_utils/abi.py",
+            "start_line": 95
+          },
+          {
+            "end_line": 165,
+            "file_sha256": "10a4c7eba78cd2608310f2f8cc38cf81143bbd90699b5630207a194ffa7934e0",
+            "path": "web3/_utils/abi.py",
+            "start_line": 162
+          },
+          {
+            "end_line": 356,
+            "file_sha256": "10a4c7eba78cd2608310f2f8cc38cf81143bbd90699b5630207a194ffa7934e0",
+            "path": "web3/_utils/abi.py",
+            "start_line": 344
+          },
+          {
+            "end_line": 380,
+            "file_sha256": "10a4c7eba78cd2608310f2f8cc38cf81143bbd90699b5630207a194ffa7934e0",
+            "path": "web3/_utils/abi.py",
+            "start_line": 359
+          },
+          {
+            "end_line": 171,
+            "file_sha256": "035714b75b31eb4530679c9dd0d4fed8f0433a3136e7c4b8e738b55bb2f9f924",
+            "path": "web3/_utils/contracts.py",
+            "start_line": 170
+          },
+          {
+            "end_line": 690,
+            "file_sha256": "10a4c7eba78cd2608310f2f8cc38cf81143bbd90699b5630207a194ffa7934e0",
+            "path": "web3/_utils/abi.py",
+            "start_line": 682
+          },
+          {
+            "end_line": 208,
+            "file_sha256": "035714b75b31eb4530679c9dd0d4fed8f0433a3136e7c4b8e738b55bb2f9f924",
+            "path": "web3/_utils/contracts.py",
+            "start_line": 172
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "Web3.py",
+            "reason": "not_tracked",
+            "reference": "Web3.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "How does web3.py resolve function calls when multiple contract functions share the same name but have different parameter signatures?",
+      "question_sha256": "0f47d18096917dc882d0619a530a9a10afc7d6501726d147fd0477937428c9a2",
+      "reference_answer": "Web3.py resolves ambiguous function calls through a three-stage filtering pipeline implemented in the find_matching_fn_abi function (web3/_utils/contracts.py: line 144\u2013208). The resolution process leverages eth_utils.toolz.pipe to sequentially apply three partial functions (web3/_utils/contracts.py: line 164\u2013168):\n\n1. Name Filtering: It uses filter_by_name (web3/_utils/abi.py: line 95\u2013103) to identify functions matching the target name, explicitly excluding special types like \"fallback\", \"constructor\", and \"receive\".\n2. Argument Count Filtering: It applies filter_by_argument_count (web3/_utils/abi.py: line 162\u2013165) to retain only those functions where the input length matches the total number of provided arguments.\n3. Encodability Filtering: It uses filter_by_encodability (web3/_utils/abi.py: line 344\u2013356), which calls check_if_arguments_can_be_encoded (web3/_utils/abi.py: line 359\u2013380) to verify if the provided arguments can be successfully encoded against the candidate function's parameter types using the ABI codec.\n\nIf a single match remains, it is returned (web3/_utils/contracts.py: line 170\u2013171). If ambiguity persists (multiple matches), the system calculates diagnostic information\u2014including signatures generated via abi_to_signature (web3/_utils/abi.py: line 682\u2013690)\u2014and raises a Web3ValidationError indicating \"Ambiguous argument encoding\" (web3/_utils/contracts.py: line 172\u2013208).",
+      "reference_sha256": "5f016386dc077e289b5337fd702128969d4644e84d4d03c04b1bdac979ae671a",
+      "repository": {
+        "commit": "305b3c30812f516dce33537ec054a9c6c64a3603",
+        "family_id": "ethereum/web3.py",
+        "url": "https://github.com/ethereum/web3.py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/ethereum--web3.py-305b3c30812f516dce33537ec054a9c6c64a3603",
+      "task_id": "import-8af532747c865c94110a9943"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/ethereum--web3.py-305b3c30812f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 55,
+            "file_sha256": "bb08b8034e201433d98681050d4bb7f491ac863743e9a4feaf429e2caa34a56c",
+            "path": "web3/eth/base_eth.py",
+            "start_line": 55
+          },
+          {
+            "end_line": 101,
+            "file_sha256": "09460b7dd69b36085e35839e2b8e890ebbdcbcd11118dcb10d3730625e8c4994",
+            "path": "web3/_utils/rpc_abi.py",
+            "start_line": 101
+          },
+          {
+            "end_line": 137,
+            "file_sha256": "09460b7dd69b36085e35839e2b8e890ebbdcbcd11118dcb10d3730625e8c4994",
+            "path": "web3/_utils/rpc_abi.py",
+            "start_line": 137
+          },
+          {
+            "end_line": 307,
+            "file_sha256": "2156cf7140eb8e3f1eda4a0322268bea19d53648ed84fb20614848fbf51132a5",
+            "path": "web3/_utils/module_testing/eth_module.py",
+            "start_line": 271
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "a736df8e90b6027823b86426fefa45104cc2dfdb05b45d6d2a07d29e8d9c8f65",
+            "kind": "file_reference",
+            "line_count": 1304,
+            "path": "docs/web3.eth.rst"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "Web3.py",
+            "reason": "not_tracked",
+            "reference": "Web3.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "What architecture does web3.py use to implement EIP-712 typed data signing with domain separator validation for authentication message standards?",
+      "question_sha256": "c33b82ed27e37ca0b303df2f65c57dde13077e2637a5f48b4fbb0af053f84701",
+      "reference_answer": "Web3.py implements EIP-712 typed data signing through a delegation architecture rather than native implementation. The primary interface is through the direct exposure of eth_account.Account at w3.eth.account (web3/eth/base_eth.py: line 55), which provides complete access to EIP-712 functionality including domain separator validation. Web3.py also defines RPC method endpoints for eth_signTypedData (web3/_utils/rpc_abi.py: line 101) and personal_signTypedData (web3/_utils/rpc_abi.py: line 137) with appropriate ABI specifications. However, as noted in the documentation, eth_signTypedData is not currently supported by any major client including Besu, Erigon, Geth, or Nethermind (docs/web3.eth.rst). The recommended approach for EIP-712 authentication message standards is therefore to use eth_account directly through w3.eth.account. Test examples verify this structure with explicit definitions of domain, types (including EIP712Domain), primaryType, and message fields (web3/_utils/module_testing/eth_module.py: line 271\u2013307), demonstrating support for complex nested type definitions like Person and Mail structs.",
+      "reference_sha256": "bdb2243d99ef7a733d286a7ddb0701522ab6adef7cfc18e5d8ce6fdb6babd260",
+      "repository": {
+        "commit": "305b3c30812f516dce33537ec054a9c6c64a3603",
+        "family_id": "ethereum/web3.py",
+        "url": "https://github.com/ethereum/web3.py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/ethereum--web3.py-305b3c30812f516dce33537ec054a9c6c64a3603",
+      "task_id": "import-f148ffd42684f22f2be2db0d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/ethereum--web3.py-305b3c30812f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 437,
+            "file_sha256": "b29ee1bafebd76094e64c8092758ef0f671f4ea58b70775bc0ee090c1f96c21f",
+            "path": "web3/main.py",
+            "start_line": 437
+          },
+          {
+            "end_line": 446,
+            "file_sha256": "b29ee1bafebd76094e64c8092758ef0f671f4ea58b70775bc0ee090c1f96c21f",
+            "path": "web3/main.py",
+            "start_line": 440
+          },
+          {
+            "end_line": 121,
+            "file_sha256": "fac0baf80eb8336abcc7015cf0c0708911482c2cee8e516d21cdd3b5d433085e",
+            "path": "web3/manager.py",
+            "start_line": 96
+          },
+          {
+            "end_line": 147,
+            "file_sha256": "fac0baf80eb8336abcc7015cf0c0708911482c2cee8e516d21cdd3b5d433085e",
+            "path": "web3/manager.py",
+            "start_line": 134
+          },
+          {
+            "end_line": 75,
+            "file_sha256": "8c1f41d26b411dd23f9e3128bfdd8bae6ee7e67010792e7cd0cd88c3e28d2826",
+            "path": "web3/providers/base.py",
+            "start_line": 57
+          },
+          {
+            "end_line": 98,
+            "file_sha256": "c375c0f2586e7e9fed7060aaa1c4708b60c3b7c8f77e3d21a191a4d1d7c5d2ed",
+            "path": "web3/providers/rpc.py",
+            "start_line": 85
+          },
+          {
+            "end_line": 107,
+            "file_sha256": "d83d92b8e4c21b86bcdef4d9376d5437bcc996035395030c8d16d4265dafdb08",
+            "path": "web3/middleware/__init__.py",
+            "start_line": 94
+          },
+          {
+            "end_line": 73,
+            "file_sha256": "d2f8c8a035aae307a32dd07d05071149c3f608de9035c0da872433b3b51e8cc4",
+            "path": "web3/module.py",
+            "start_line": 53
+          },
+          {
+            "end_line": 208,
+            "file_sha256": "3f0647e62ead8323079d937d3f338c6fbfc7dc05a936e9cf330a61bc44ee6527",
+            "path": "web3/method.py",
+            "start_line": 199
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "Web3.py",
+            "reason": "not_tracked",
+            "reference": "Web3.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "What are the core architectural layers and their execution order in web3.py's request processing pipeline when making RPC calls to Ethereum providers?",
+      "question_sha256": "287ebb95ba6b079d88620e971ffa640f60f265fa86a6eb631b7b7ab6e73414ac",
+      "reference_answer": "Web3.py implements a four-layer request processing architecture that handles RPC calls to Ethereum providers through a well-defined pipeline. The Web3 Entry Layer consists of the main Web3 class that initializes with a RequestManager instance, coordinating provider and middleware components (web3/main.py: line 437). The class attaches specialized modules like Eth, Net, and Geth during initialization (web3/main.py: line 440\u2013446). The RequestManager Layer serves as the central coordinator, managing a middleware_onion structure and routing requests through the processing pipeline (web3/manager.py: line 96\u2013121). It maintains default middleware chains including gas_price_strategy, name_to_address, attrdict, validation, abi, and buffered_gas_estimate middleware (web3/manager.py: line 134\u2013147). The Provider Layer consists of BaseProvider and its concrete implementations like HTTPProvider, IPCProvider, and WebsocketProvider (web3/providers/base.py: line 57\u201375, web3/providers/rpc.py: line 85\u201398). Providers combine outer middlewares from the RequestManager with their own provider-specific middlewares using the combine_middlewares function (web3/middleware/__init__.py: line 94\u2013107). The Module API Layer exposes domain-specific functionality through modules like Eth, Net, and Geth, which use Method objects to define RPC calls with parameter processing and response formatting (web3/module.py: line 53\u201373, web3/method.py: line 199\u2013208). Requests flow from Module methods through the Method.process_params pipeline to RequestManager.request_blocking, then through the middleware chain to the Provider's make_request method for network communication. Responses follow the reverse path, passing through middleware transformations before being formatted and returned to the caller.",
+      "reference_sha256": "8527be103ccb012e05cbdb0eee27bf8daaa9739558d075f1558d7d08a1e53819",
+      "repository": {
+        "commit": "305b3c30812f516dce33537ec054a9c6c64a3603",
+        "family_id": "ethereum/web3.py",
+        "url": "https://github.com/ethereum/web3.py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/ethereum--web3.py-305b3c30812f516dce33537ec054a9c6c64a3603",
+      "task_id": "import-fe4ba61d4f9cc7a2482c7985"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/ethereum--web3.py-305b3c30812f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 90,
+            "file_sha256": "8c1f41d26b411dd23f9e3128bfdd8bae6ee7e67010792e7cd0cd88c3e28d2826",
+            "path": "web3/providers/base.py",
+            "start_line": 36
+          },
+          {
+            "end_line": 88,
+            "file_sha256": "355075428481d5b9ca42ebf2e862b4c403b323eb9f3ff1711064ae3a52e3400e",
+            "path": "web3/providers/eth_tester/main.py",
+            "start_line": 84
+          },
+          {
+            "end_line": 49,
+            "file_sha256": "c375c0f2586e7e9fed7060aaa1c4708b60c3b7c8f77e3d21a191a4d1d7c5d2ed",
+            "path": "web3/providers/rpc.py",
+            "start_line": 49
+          },
+          {
+            "end_line": 149,
+            "file_sha256": "5fc9416feb382a5f88a636c90abbe8ec1d30e835e48189ffb6251e1c335b545a",
+            "path": "web3/providers/ipc.py",
+            "start_line": 149
+          },
+          {
+            "end_line": 147,
+            "file_sha256": "fac0baf80eb8336abcc7015cf0c0708911482c2cee8e516d21cdd3b5d433085e",
+            "path": "web3/manager.py",
+            "start_line": 134
+          },
+          {
+            "end_line": 107,
+            "file_sha256": "d83d92b8e4c21b86bcdef4d9376d5437bcc996035395030c8d16d4265dafdb08",
+            "path": "web3/middleware/__init__.py",
+            "start_line": 94
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "4da3b6b8ea9a70423acc54a9bc0d965f75f9b371900e25bf0dfe77ef34f96bfc",
+            "kind": "file_reference",
+            "line_count": 126,
+            "path": "conftest.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "web3.py",
+            "reason": "not_tracked",
+            "reference": "web3.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "How does the middleware composition system configure and apply different middleware stacks across provider types (EthereumTesterProvider vs RPC/IPC providers) in the web3.py testing framework?",
+      "question_sha256": "03e99e756c3d77656cce30ccc43476b9d28405374a01d84688eaf5064328d7c0",
+      "reference_answer": "The middleware composition system in web3.py operates through a multi-layered architecture that combines provider-specific middleware with Web3-level defaults. The BaseProvider class (web3/providers/base.py: line 36\u201390) defines the core middleware management interface through a _middlewares tuple and provides the request_func method that combines outer middlewares with provider-specific ones. EthereumTesterProvider defines a specialized stack consisting of attrdict_middleware, default_transaction_fields_middleware, and ethereum_tester_middleware (web3/providers/eth_tester/main.py: line 84\u201388). These middleware handle test-specific concerns: attrdict_middleware converts dictionary responses to AttributeDict objects for convenient attribute access, default_transaction_fields_middleware automatically fills missing transaction fields like 'from' addresses using available accounts, and ethereum_tester_middleware handles request/response formatting for compatibility with the eth-tester backend. In contrast, RPC providers like HTTPProvider include only http_retry_request_middleware for network resilience (web3/providers/rpc.py: line 49), while IPC providers inherit the empty middleware stack from BaseProvider (web3/providers/ipc.py: line 149). The RequestManager class orchestrates this composition by providing default middleware stacks when none are specified (web3/manager.py: line 134\u2013147) and using the combine_middlewares function to create the final request processing pipeline through functional composition (web3/middleware/__init__.py: line 94\u2013107). The testing framework leverages this system through fixtures like the w3() fixture in conftest.py, which instantiates Web3 with EthereumTesterProvider, automatically inheriting its test-optimized middleware stack to ensure consistent test environments with appropriate mocking and eth-tester integration.",
+      "reference_sha256": "a3faa57d603639ee3ad91493f2a244227a33b1018ac4de816b003239860eba9b",
+      "repository": {
+        "commit": "305b3c30812f516dce33537ec054a9c6c64a3603",
+        "family_id": "ethereum/web3.py",
+        "url": "https://github.com/ethereum/web3.py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/ethereum--web3.py-305b3c30812f516dce33537ec054a9c6c64a3603",
+      "task_id": "import-6e10c4f13afd089a82dd9b95"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/ethereum--web3.py-305b3c30812f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 222,
+            "file_sha256": "09460b7dd69b36085e35839e2b8e890ebbdcbcd11118dcb10d3730625e8c4994",
+            "path": "web3/_utils/rpc_abi.py",
+            "start_line": 188
+          },
+          {
+            "end_line": 111,
+            "file_sha256": "0615347e30b8b39689d036045c6f216269c15e722cb4ac79acf9fd6d8ee7ada4",
+            "path": "web3/middleware/formatting.py",
+            "start_line": 68
+          },
+          {
+            "end_line": 11,
+            "file_sha256": "52d99937c62aa6b038d4b35e4659083ab98abcceb7fb869215e6065cc0cb1741",
+            "path": "web3/middleware/abi.py",
+            "start_line": 9
+          },
+          {
+            "end_line": 102,
+            "file_sha256": "0615347e30b8b39689d036045c6f216269c15e722cb4ac79acf9fd6d8ee7ada4",
+            "path": "web3/middleware/formatting.py",
+            "start_line": 100
+          },
+          {
+            "end_line": 200,
+            "file_sha256": "36357877f3340fbb1308c51f91c334c825ad0a85190f6ed33ac6b0f7f9332bdb",
+            "path": "web3/_utils/normalizers.py",
+            "start_line": 136
+          },
+          {
+            "end_line": 145,
+            "file_sha256": "fac0baf80eb8336abcc7015cf0c0708911482c2cee8e516d21cdd3b5d433085e",
+            "path": "web3/manager.py",
+            "start_line": 145
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 256,
+            "line_count": 255,
+            "path": "web3/_utils/rpc_abi.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "web3/_utils/rpc_abi.py",
+            "resolved_path": "web3/_utils/rpc_abi.py",
+            "start_line": 242
+          }
+        ]
+      },
+      "question": "How does the middleware request processing pipeline implement ABI parameter formatting for Ethereum RPC method calls?",
+      "question_sha256": "b19b946f2fa64f6895be3f42a4ff348b869061e75c7e47e5c972be7a5e6007ae",
+      "reference_answer": "The middleware request processing pipeline implements ABI parameter formatting through a systematic three-stage process. First, the ABI_REQUEST_FORMATTERS are constructed by applying STANDARD_NORMALIZERS (abi_bytes_to_hex, abi_int_to_hex, abi_string_to_hex, and abi_address_to_hex) to RPC_ABIS method definitions using the abi_request_formatters function (web3/_utils/rpc_abi.py: line 242\u2013256). The RPC_ABIS mapping (web3/_utils/rpc_abi.py: line 188\u2013222) defines the expected parameter types for each Ethereum RPC method, such as transaction parameters requiring address, uint, and bytes types. Second, these formatters are integrated into the middleware stack through construct_formatting_middleware (web3/middleware/formatting.py: line 68\u2013111), which creates the abi_middleware that intercepts and processes RPC requests (web3/middleware/abi.py: line 9\u201311). Third, during request processing, the middleware checks if the RPC method has an associated formatter and applies it to convert Python parameters to the appropriate hex-encoded blockchain formats (web3/middleware/formatting.py: line 100\u2013102). Each normalizer function (web3/_utils/normalizers.py: line 136\u2013200) handles specific type conversions, such as converting bytes to hex strings, integers to hex format, and addresses to checksummed hex format. The abi_middleware operates as part of the default middleware stack (web3/manager.py: line 145), ensuring that all RPC method calls receive proper ABI-compliant parameter formatting before being sent to the Ethereum provider.",
+      "reference_sha256": "e3bf9a9fc9b08db61a767d2120cb1397073476f20d4ae4e56ecb538c31cd5143",
+      "repository": {
+        "commit": "305b3c30812f516dce33537ec054a9c6c64a3603",
+        "family_id": "ethereum/web3.py",
+        "url": "https://github.com/ethereum/web3.py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/ethereum--web3.py-305b3c30812f516dce33537ec054a9c6c64a3603",
+      "task_id": "import-228dfe7017bcbef5e6cfbe5f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/ethereum--web3.py-305b3c30812f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 124,
+            "file_sha256": "d83d92b8e4c21b86bcdef4d9376d5437bcc996035395030c8d16d4265dafdb08",
+            "path": "web3/middleware/__init__.py",
+            "start_line": 110
+          },
+          {
+            "end_line": 63,
+            "file_sha256": "b33d329a7d6f9423c4dd6fc22ecb44a15bb32278ec4240d792c449b1a9a315b0",
+            "path": "web3/middleware/async_cache.py",
+            "start_line": 63
+          },
+          {
+            "end_line": 21,
+            "file_sha256": "65b1adfeb23f7e771bab81316c521a890089697a5b0fcb8ba008a9c02cdc97b4",
+            "path": "web3/_utils/async_caching.py",
+            "start_line": 13
+          },
+          {
+            "end_line": 121,
+            "file_sha256": "f9d4bffb69e18368ce038df63f4c37525dcd508b28f2b4e5e2e1941a8d17070d",
+            "path": "web3/providers/auto.py",
+            "start_line": 117
+          },
+          {
+            "end_line": 95,
+            "file_sha256": "f9d4bffb69e18368ce038df63f4c37525dcd508b28f2b4e5e2e1941a8d17070d",
+            "path": "web3/providers/auto.py",
+            "start_line": 91
+          },
+          {
+            "end_line": 172,
+            "file_sha256": "89998aeaec6ccea65a8815995b3a60106b5401516efa3dfe0179e587d0d202ed",
+            "path": "web3/middleware/exception_retry_request.py",
+            "start_line": 165
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the AsyncHTTPProvider's middleware pipeline architecture create performance bottlenecks under high-concurrency request loads?",
+      "question_sha256": "300de762088e21bed6e61b837a6f9b0ca5a9ceb6fec121404e2b7b0f6a92d7bc",
+      "reference_answer": "The AsyncHTTPProvider's middleware pipeline architecture creates performance bottlenecks under high-concurrency loads due to three fundamental architectural issues that violate async concurrency principles. First, the sequential middleware processing architecture (web3/middleware/__init__.py: line 110\u2013124) forces each request to traverse the entire NamedElementOnion middleware stack sequentially. The async_combine_middlewares function processes middlewares in reverse order, creating a chain where each middleware must complete before the next can execute, leading to cumulative latency that scales with the number of middlewares. Second, the async_cache middleware (web3/middleware/async_cache.py: line 63, line 84\u201385) uses threading.Lock for cache operations, forcing serialization across concurrent requests. The async_lock implementation (web3/_utils/async_caching.py: line 13\u201321) requires async requests to wait for ThreadPoolExecutor execution to acquire threading locks, defeating asyncio's concurrency benefits and creating a global serialization point for all cache writes. Third, the AutoProvider's sequential discovery pattern (web3/providers/auto.py: line 117\u2013121) iterates through potential providers one by one until finding a connected one. When network failures occur (web3/providers/auto.py: line 91\u201395), it rescans all connection options with use_cache=False, amplifying latency during network instability. Additionally, the default async_http_retry_request_middleware (web3/middleware/exception_retry_request.py: line 165\u2013172) compounds these issues with exponential backoff retries that further serialize request processing. These patterns transform what should be concurrent async operations into effectively synchronous bottlenecks that severely limit throughput under high-concurrency scenarios.",
+      "reference_sha256": "a7b642610e6340af422c38314830bb6c566857bd27da06d8cc5cf2c79e54e393",
+      "repository": {
+        "commit": "305b3c30812f516dce33537ec054a9c6c64a3603",
+        "family_id": "ethereum/web3.py",
+        "url": "https://github.com/ethereum/web3.py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/ethereum--web3.py-305b3c30812f516dce33537ec054a9c6c64a3603",
+      "task_id": "import-086985ef9320324683f46757"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/ethereum--web3.py-305b3c30812f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 86,
+            "file_sha256": "14b4eee12e9b66717bf7c7a62ff202b9796d8a2de7aee4fa610f4b4b4bcf45ce",
+            "path": "setup.py",
+            "start_line": 70
+          },
+          {
+            "end_line": 20,
+            "file_sha256": "14b4eee12e9b66717bf7c7a62ff202b9796d8a2de7aee4fa610f4b4b4bcf45ce",
+            "path": "setup.py",
+            "start_line": 12
+          },
+          {
+            "end_line": 198,
+            "file_sha256": "b7835f2df17e067cb31d1925b3a1a4d5a29cc5fd900b96e38f2ced4a47dc6050",
+            "path": "web3/middleware/cache.py",
+            "start_line": 198
+          },
+          {
+            "end_line": 3000,
+            "file_sha256": "aaecfc8246c0f6c8f73648c68df8ea1ffaea693873aaeed47731a1ef822f31f7",
+            "path": "docs/releases.rst",
+            "start_line": 3000
+          },
+          {
+            "end_line": 36,
+            "file_sha256": "5211dae63ee9ce6d80a667a38eb0855ef65c59e8e91f4f7c0bc49db4703644b0",
+            "path": "tox.ini",
+            "start_line": 35
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "Web3.py",
+            "reason": "not_tracked",
+            "reference": "Web3.py",
+            "start_line": null
+          },
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "web3.py",
+            "reason": "not_tracked",
+            "reference": "web3.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "Why does web3.py implement a tiered dependency pinning strategy with both minimal and upper bounds for core dependencies like hexbytes, websockets, and lru-dict while using exact pinning for development tools?",
+      "question_sha256": "fefb9568cf9096741e2b9e061be973d12166ff25a0a35f1be77fb04ca4e69a2a",
+      "reference_answer": "Web3.py implements a strategic tiered dependency pinning approach that serves different compatibility and stability needs across runtime and development contexts. For core runtime dependencies, the library uses minimal version bounds (setup.py: line 70\u201386) such as hexbytes>=0.1.0, websockets>=10.0.0, and lru-dict>=1.1.6. This minimal pinning strategy maximizes ecosystem compatibility by allowing downstream users to install compatible newer versions without conflicts, which is critical for a foundational library like web3.py that many other Ethereum packages depend on. The decision to avoid upper bounds was reinforced by historical commits like c041c893, which explicitly dropped typing-extensions upper pinning to prevent version conflicts. In contrast, development dependencies employ exact pinning for specific tools like flake8==3.8.3 and types-protobuf==3.19.13 (setup.py: line 12\u201320) to ensure reproducible builds and consistent CI/CD behavior across all development environments. The lru-dict dependency is particularly important as it powers performance-critical caching middleware (web3/middleware/cache.py: line 198, 371), where consistent behavior is essential, yet the minimal bound >=1.1.6 allows for performance improvements in newer versions. This dependency also replaced the GPL-licensed pylru library for full MIT license compliance (docs/releases.rst: line 3000), demonstrating how dependency choices serve both technical and legal requirements. The tox configuration (tox.ini: line 35\u201336) reinforces this strategy by installing development dependencies as a unified bundle while maintaining the flexibility for runtime dependencies.",
+      "reference_sha256": "73ef78779f10c2204d47162a8f868e634a7bdbbbe1528468f1086a7d91b9c2a3",
+      "repository": {
+        "commit": "305b3c30812f516dce33537ec054a9c6c64a3603",
+        "family_id": "ethereum/web3.py",
+        "url": "https://github.com/ethereum/web3.py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/ethereum--web3.py-305b3c30812f516dce33537ec054a9c6c64a3603",
+      "task_id": "import-bbb612bb21eac73528cb7405"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/ethereum--web3.py-305b3c30812f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 47,
+            "file_sha256": "5fc9416feb382a5f88a636c90abbe8ec1d30e835e48189ffb6251e1c335b545a",
+            "path": "web3/providers/ipc.py",
+            "start_line": 35
+          },
+          {
+            "end_line": 114,
+            "file_sha256": "5fc9416feb382a5f88a636c90abbe8ec1d30e835e48189ffb6251e1c335b545a",
+            "path": "web3/providers/ipc.py",
+            "start_line": 89
+          },
+          {
+            "end_line": 170,
+            "file_sha256": "5fc9416feb382a5f88a636c90abbe8ec1d30e835e48189ffb6251e1c335b545a",
+            "path": "web3/providers/ipc.py",
+            "start_line": 149
+          },
+          {
+            "end_line": 69,
+            "file_sha256": "f9d4bffb69e18368ce038df63f4c37525dcd508b28f2b4e5e2e1941a8d17070d",
+            "path": "web3/providers/auto.py",
+            "start_line": 63
+          },
+          {
+            "end_line": 123,
+            "file_sha256": "f9d4bffb69e18368ce038df63f4c37525dcd508b28f2b4e5e2e1941a8d17070d",
+            "path": "web3/providers/auto.py",
+            "start_line": 113
+          },
+          {
+            "end_line": 111,
+            "file_sha256": "fac0baf80eb8336abcc7015cf0c0708911482c2cee8e516d21cdd3b5d433085e",
+            "path": "web3/manager.py",
+            "start_line": 108
+          },
+          {
+            "end_line": 133,
+            "file_sha256": "8c1f41d26b411dd23f9e3128bfdd8bae6ee7e67010792e7cd0cd88c3e28d2826",
+            "path": "web3/providers/base.py",
+            "start_line": 111
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "web3.py",
+            "reason": "not_tracked",
+            "reference": "web3.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "Where is the AF_UNIX socket path validation logic implemented that generates 'AF_UNIX path too long' errors in the IPC provider system?",
+      "question_sha256": "b6a173a4daae62a47b741bbbbb1fb0615a84bfa6eb99813f166d543b6fcc7231",
+      "reference_answer": "The AF_UNIX socket path validation that generates 'AF_UNIX path too long' errors is not explicitly implemented in web3.py code, but rather occurs at the operating system level during socket connection. The error originates in the get_ipc_socket() function (web3/providers/ipc.py: line 35\u201347) where socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) creates a Unix domain socket and sock.connect(ipc_path) attempts the connection at line 45. When the path exceeds the system limit (typically 108 characters on Unix systems), the OS raises an OSError with the message 'AF_UNIX path too long'. The IPC path itself is constructed by get_default_ipc_path() (web3/providers/ipc.py: line 89\u2013114) using platform-specific logic for macOS, Linux, FreeBSD, and Windows. This function is invoked during IPCProvider initialization (web3/providers/ipc.py: line 149\u2013170) when no explicit path is provided. The AutoProvider class (web3/providers/auto.py: line 63\u201369) includes IPCProvider in its default_providers list and attempts initialization through _get_active_provider() (web3/providers/auto.py: line 113\u2013123). The RequestManager (web3/manager.py: line 108\u2013111) uses AutoProvider as the default when no provider is specified. When the path length error occurs, it manifests as an OSError that gets caught by the JSONBaseProvider.is_connected() method (web3/providers/base.py: line 111\u2013133), which handles OSErrors during connection attempts by either returning False or raising a ProviderConnectionError with traceback details.",
+      "reference_sha256": "3cbf3ef15dcef54e67156628f2aaf8597f3e25cd546b7a854f1395229b7126bb",
+      "repository": {
+        "commit": "305b3c30812f516dce33537ec054a9c6c64a3603",
+        "family_id": "ethereum/web3.py",
+        "url": "https://github.com/ethereum/web3.py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/ethereum--web3.py-305b3c30812f516dce33537ec054a9c6c64a3603",
+      "task_id": "import-02c6c5cc4b784ea0532e687c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/ethereum--web3.py-305b3c30812f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 419,
+            "file_sha256": "b29ee1bafebd76094e64c8092758ef0f671f4ea58b70775bc0ee090c1f96c21f",
+            "path": "web3/main.py",
+            "start_line": 358
+          },
+          {
+            "end_line": 99,
+            "file_sha256": "9606a9a25a3abb61cd1dd49871aa59ff56eb0c01c822ea3b17d0d4c644728528",
+            "path": "web3/providers/async_rpc.py",
+            "start_line": 46
+          },
+          {
+            "end_line": 68,
+            "file_sha256": "9606a9a25a3abb61cd1dd49871aa59ff56eb0c01c822ea3b17d0d4c644728528",
+            "path": "web3/providers/async_rpc.py",
+            "start_line": 67
+          },
+          {
+            "end_line": 207,
+            "file_sha256": "80ffc8099ae50d910798a744891cc232eda0027de3b824f20a29b13ee86d29f0",
+            "path": "web3/_utils/request.py",
+            "start_line": 133
+          },
+          {
+            "end_line": 263,
+            "file_sha256": "80ffc8099ae50d910798a744891cc232eda0027de3b824f20a29b13ee86d29f0",
+            "path": "web3/_utils/request.py",
+            "start_line": 252
+          },
+          {
+            "end_line": 82,
+            "file_sha256": "4bcbfc1c3d81dd8b5f7568a7a0592225322ee23edc5862e2006dce840bdef571",
+            "path": "web3/providers/websocket.py",
+            "start_line": 60
+          },
+          {
+            "end_line": 82,
+            "file_sha256": "4bcbfc1c3d81dd8b5f7568a7a0592225322ee23edc5862e2006dce840bdef571",
+            "path": "web3/providers/websocket.py",
+            "start_line": 66
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the async context management and resource cleanup logic implemented for AsyncWeb3 instances and their underlying provider sessions?",
+      "question_sha256": "b73fb28117b37f7ef00a34f0bd8b7e7f366334c9c2625b310580a775c39671e5",
+      "reference_answer": "The async context management and resource cleanup logic for AsyncWeb3 instances is implemented across multiple layers without a unified context manager at the top level. AsyncWeb3 itself (web3/main.py: line 358\u2013419) does not implement __aenter__ or __aexit__ methods, leaving context management responsibilities to its underlying providers. The AsyncHTTPProvider (web3/providers/async_rpc.py: line 46\u201399) delegates session management to a cache_async_session method (web3/providers/async_rpc.py: line 67\u201368) which calls the centralized async_cache_and_return_session function. This function (web3/_utils/request.py: line 133\u2013207) implements sophisticated resource management using aiohttp ClientSession instances stored in a SimpleCache with thread-safe access via async_lock. The cleanup mechanism employs timer-based eviction where sessions are automatically closed after DEFAULT_TIMEOUT plus a buffer period through the _async_close_evicted_sessions function (web3/_utils/request.py: line 252\u2013263), which creates a new event loop in a separate thread to properly close evicted sessions. Additionally, the system handles stale sessions by detecting closed sessions or closed event loops and replacing them with fresh ClientSession instances. In contrast, the WebsocketProvider takes a different approach by implementing explicit async context management through the PersistentWebSocket class (web3/providers/websocket.py: line 60\u201382), which provides __aenter__ and __aexit__ methods (web3/providers/websocket.py: line 66\u201382) to manage websocket connection lifecycle directly, ensuring proper cleanup on exceptions by closing the websocket connection and resetting the internal state.",
+      "reference_sha256": "83f8ceb3fca63268777131721a21011299d1c40848d22fabc93ab1dfc8693525",
+      "repository": {
+        "commit": "305b3c30812f516dce33537ec054a9c6c64a3603",
+        "family_id": "ethereum/web3.py",
+        "url": "https://github.com/ethereum/web3.py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/ethereum--web3.py-305b3c30812f516dce33537ec054a9c6c64a3603",
+      "task_id": "import-8fc8904e927b10aae810619e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/ethereum--web3.py-305b3c30812f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 67,
+            "file_sha256": "c375c0f2586e7e9fed7060aaa1c4708b60c3b7c8f77e3d21a191a4d1d7c5d2ed",
+            "path": "web3/providers/rpc.py",
+            "start_line": 51
+          },
+          {
+            "end_line": 65,
+            "file_sha256": "9606a9a25a3abb61cd1dd49871aa59ff56eb0c01c822ea3b17d0d4c644728528",
+            "path": "web3/providers/async_rpc.py",
+            "start_line": 53
+          },
+          {
+            "end_line": 83,
+            "file_sha256": "c375c0f2586e7e9fed7060aaa1c4708b60c3b7c8f77e3d21a191a4d1d7c5d2ed",
+            "path": "web3/providers/rpc.py",
+            "start_line": 73
+          },
+          {
+            "end_line": 84,
+            "file_sha256": "9606a9a25a3abb61cd1dd49871aa59ff56eb0c01c822ea3b17d0d4c644728528",
+            "path": "web3/providers/async_rpc.py",
+            "start_line": 74
+          },
+          {
+            "end_line": 127,
+            "file_sha256": "89998aeaec6ccea65a8815995b3a60106b5401516efa3dfe0179e587d0d202ed",
+            "path": "web3/middleware/exception_retry_request.py",
+            "start_line": 127
+          },
+          {
+            "end_line": 165,
+            "file_sha256": "89998aeaec6ccea65a8815995b3a60106b5401516efa3dfe0179e587d0d202ed",
+            "path": "web3/middleware/exception_retry_request.py",
+            "start_line": 165
+          },
+          {
+            "end_line": 49,
+            "file_sha256": "c375c0f2586e7e9fed7060aaa1c4708b60c3b7c8f77e3d21a191a4d1d7c5d2ed",
+            "path": "web3/providers/rpc.py",
+            "start_line": 49
+          },
+          {
+            "end_line": 51,
+            "file_sha256": "9606a9a25a3abb61cd1dd49871aa59ff56eb0c01c822ea3b17d0d4c644728528",
+            "path": "web3/providers/async_rpc.py",
+            "start_line": 51
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the authentication credential flow integrate with the retry middleware system when connecting to cloud blockchain providers like AWS Managed Blockchain?",
+      "question_sha256": "5fc8d8eda7c7c61a72136944e92459978461d7950e98e24a00d2eb467b57330a",
+      "reference_answer": "The authentication credential flow integrates with the retry middleware system through three key architectural layers. First, during provider initialization, both HTTPProvider (web3/providers/rpc.py: line 51\u201367) and AsyncHTTPProvider (web3/providers/async_rpc.py: line 53\u201365) accept a request_kwargs parameter that contains authentication headers, tokens, or other credential data, which is stored in the provider's _request_kwargs attribute. Second, the get_request_headers() and get_request_kwargs() methods (web3/providers/rpc.py: line 73\u201383, web3/providers/async_rpc.py: line 74\u201384) merge authentication headers with default headers, ensuring that all authentication context is properly included in outgoing requests. The get_request_kwargs() method specifically checks if headers are already present in request_kwargs and yields the result of get_request_headers() if not, creating a unified authentication context. Third, the retry middleware operates at the make_request level, where both http_retry_request_middleware (web3/middleware/exception_retry_request.py: line 127) for synchronous operations and async_http_retry_request_middleware (web3/middleware/exception_retry_request.py: line 165) for asynchronous operations are configured as default middleware (web3/providers/rpc.py: line 49, web3/providers/async_rpc.py: line 51). These middleware functions wrap the make_request method and preserve the complete authentication context during retry attempts by calling the same make_request function that includes get_request_kwargs(). This architecture ensures that when network failures occur during connections to cloud blockchain providers like AWS Managed Blockchain, the retry attempts maintain all authentication credentials including custom headers, auth tokens, and other security context without requiring re-authentication or credential reconstruction.",
+      "reference_sha256": "0d4abca5b717277a54a9d48f19413f0aec859fbbb7531ed418a71467a9450ffa",
+      "repository": {
+        "commit": "305b3c30812f516dce33537ec054a9c6c64a3603",
+        "family_id": "ethereum/web3.py",
+        "url": "https://github.com/ethereum/web3.py"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/ethereum--web3.py-305b3c30812f516dce33537ec054a9c6c64a3603",
+      "task_id": "import-497e8b0fa73f92992db09da6"
+    }
+  ]
+}

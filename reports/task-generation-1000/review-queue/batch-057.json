@@ -1,0 +1,314 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "0565dad039816155ae78111dd9f153152edd7d9736d699c285a064097d7944bc",
+            "kind": "file_reference",
+            "line_count": 2909,
+            "path": "reflex/components/component.py"
+          },
+          {
+            "file_sha256": "ab9672735e942d8f71c3d08a3cf6b0927ac15c870d35d6922c02d702075c9b68",
+            "kind": "file_reference",
+            "line_count": 416,
+            "path": "reflex/style.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where in the Reflex codebase is the style dictionary returned by a progress indicator root component's styling method ultimately merged into the component's rendered output?",
+      "question_sha256": "e704d06347fdd1e56394106bdb56e04f1fed0c234258ea4582a881bad6e95d8e",
+      "reference_answer": "The style dictionary returned by ProgressRoot.add_style is ultimately merged into the component's rendered output in reflex/components/component.py within the Component._render method, where props.update(self._get_style()) is called, and the _get_style method converts the accumulated styles to emotion CSS-in-JS format via format_as_emotion from reflex/style.py.",
+      "reference_sha256": "4c6fa3fb200e9c846788548ee9d0183e6e8d1e951b687eb672683264cb7ecbd8",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-a2cbfd4b9a61a1d0baf2a087"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the effect of assigning a custom client state persistence manager to the test application fixture on the framework's state serialization during test execution?",
+      "question_sha256": "a3cf150cd45015efc965bb77d116a1061d2568f6b26d91fb6d6c4ced7e0d8013",
+      "reference_answer": "Assigning a custom StateManager to a mock app controls state serialization behavior through three mechanisms:\n1. Serialization Strategy: StateManagerMemory bypasses serialization entirely, keeping states as live objects. StateManagerDisk and StateManagerRedis trigger BaseState._serialize() for persistence.\n2. Serialization Triggers: Memory managers never serialize. Disk managers serialize only when substates are \"touched\" (modified) via _get_was_touched(). Redis managers serialize during both persistence and retrieval with schema validation.\n3. Persistence Targets: The core _serialize() method (pickle/dill fallback) remains identical, but disk managers write to filesystem while Redis managers handle network operations and lock expiration.\nThe StateManager assignment determines whether test states experience the full serialization/deserialization cycle that production applications encounter.",
+      "reference_sha256": "e9eae37eb85d1a04484e66e9761bb56272306b805629d4e97ac36051007c97ed",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-a8ce2b719b0e88532d6755fd"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the keyboard event data structure enable mapping of browser keyboard events to the framework's event specifications?",
+      "question_sha256": "a232dc9b47a928f2d9e9e48a70012840a8e89b38f5308081d26a609cf1c62651",
+      "reference_answer": "The JavascriptKeyboardEvent class enables mapping by providing a Python dataclass interface that mirrors JavaScript's KeyboardEvent API with properties (key, altKey, ctrlKey, metaKey, shiftKey). The key_event() function transforms these objects into Reflex's internal format, extracting the key and modifier states into Var objects and KeyInputInfo structures for backend processing. This creates a typed bridge between browser keyboard events and Python state methods through the EventSpec system.",
+      "reference_sha256": "0afd18ec64341e95f890755c02adb63197309cf39966a294906f961a2a5c05cd",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-ab775e75b5173b9102d26f5b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does Reflex transform event handler wrapper class attributes into bound functions that operate on state instance fields during state initialization?",
+      "question_sha256": "444dcc92f2fb7d67c37e54f266dbef5b86d0d61a01cc9ea0fde5a026862e06ea",
+      "reference_answer": "Reflex transforms EventHandler class attributes into bound functions through a two-stage mechanism:\nClass initialization (__init_subclass__): During state subclass creation, Reflex identifies callable methods (non-private, with __code__ attribute, not already EventHandler instances) and wraps each in an EventHandler dataclass via _create_event_handler. The EventHandler stores the original function (fn) and state's full name, then replaces the original method as a class attribute.\nInstance access (__getattribute__): When accessing an event handler on a state instance, __getattribute__ intercepts the lookup. If the name exists in the event_handlers dictionary, it retrieves the EventHandler and dynamically binds it using functools.partial(handler.fn, self) for regular handlers or _no_chain_background_task wrapper for background tasks. This creates a bound callable with the state instance pre-filled as the first parameter.\nThis allows EventHandler class attributes to serve dual purposes: serializable metadata for frontend routing and instance-bound methods for backend execution.",
+      "reference_sha256": "df146c23bce6ebcf13b53add78af62532c841533d3c897ae83610175b56f2257",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-b1e8c2de4831f28e545d953f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the rendering method of the paste event handling component replace the property containing element identifiers for event listener attachment with a key derived from that property?",
+      "question_sha256": "b52ed78e208e82fbe6d89a1f0f7387a92e1daef8b68bfa01f3616849c5bb31ca",
+      "reference_answer": "The Clipboard component uses tag.remove_props(\"targets\").add_props(key=self.targets) to force React Fragment re-creation when targets change. Since usePasteHandler hook registers event listeners on specific DOM elements via useEffect, React needs to remount the component to re-run the hook with new targets. Using self.targets as the Fragment key ensures each unique target set creates a distinct component instance, preventing stale event listeners and ensuring proper paste event registration on updated elements.",
+      "reference_sha256": "8f27062b9cabe43d739b08a5e2f9ca12c66c365790470f27d98fa222c301fde0",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-bd99c9e90b968d8b907f3a7a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the design constraint prioritize framework infrastructure hooks before other hook categories in the code generation process for the hook ordering function?",
+      "question_sha256": "3c20a64033ca4a014547baa79f355a9b65f2d3605d956200cfc75717346be7ff",
+      "reference_answer": "The _sort_hooks function separates hooks by HookPosition enum (INTERNAL, PRE_TRIGGER, POST_TRIGGER) to ensure framework infrastructure executes first. Internal hooks include useRef for DOM references, useEffect for mount/unmount lifecycle, state variable hooks, and EventLoopContext hooks. This ordering ensures React's hook call consistency, establishes dependencies that user hooks require, and maintains framework control boundaries before user-customizable hooks execute.",
+      "reference_sha256": "1ba547a0165d472857909099a91c012ec42774a5843c8eacde0fc2e6d1917fba",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-c05ebc7f9443ab6925cff508"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "ab6619bfe172c10682f8b1ef47553741363c92c3d849d8f9452244cca18e168d",
+            "kind": "file_reference",
+            "line_count": 3711,
+            "path": "reflex/vars/base.py"
+          },
+          {
+            "file_sha256": "ab9672735e942d8f71c3d08a3cf6b0927ac15c870d35d6922c02d702075c9b68",
+            "kind": "file_reference",
+            "line_count": 416,
+            "path": "reflex/style.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where is the code that merges variable metadata when two style dictionary objects are combined?",
+      "question_sha256": "df95567160f98e2167de7d1447305c7f8bf4a83c4f6143a57d28a13e00d33b48",
+      "reference_answer": "Primary location: `reflex/vars/base.py` in the `VarData.merge()` static method.\nStyle combination locations:\n- `reflex/style.py` in `Style.update()` method.\n- `reflex/style.py` in `Style.__or__()` method.\n- `reflex/style.py` in `Style.__setitem__()` method.\n- `reflex/style.py` in the `convert()` function.\nThe `VarData.merge()` method handles merging imports, hooks, dependencies, and components from multiple VarData instances when Style objects are combined through update operations or the `|` operator.",
+      "reference_sha256": "a02491daa2104b90f50f9377f368b93876c820eedd82d551e449acb76e01d65c",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-c6ec8dbe4a5bc192ccc8c9de"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "213e08c5fa4a7efbaa29e197e9aaa3d4385f2569d1241f1d814218c5ef639cf9",
+            "kind": "file_reference",
+            "line_count": 2777,
+            "path": "reflex/state.py"
+          },
+          {
+            "file_sha256": "b371abaedde9fcbb24f48d603a111ac72323d198f422099f14ece6aa5414dc83",
+            "kind": "file_reference",
+            "line_count": 2228,
+            "path": "reflex/app.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where is the subsequent control branch determined when a state validation error is raised?",
+      "question_sha256": "9b5e83bc95c714f4d52e6b534f99bee23b19450e3d88635a50b835727785d17a",
+      "reference_answer": "Primarily in reflex/state.py at BaseState.get_state() method, which calls _get_state_from_cache() and _get_state_from_redis(). The exception propagates to the event processing pipeline in BaseState._process_event() and reflex/app.py in the process() function, where it's handled by app.backend_exception_handler().",
+      "reference_sha256": "c283d3320f724825e5f84f8e32e3f0c7d1ca231e6f78b3ffb6fe174ee8b97db2",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-c8437fe8534e7917400d1752"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the effect of setting the boundary collision prevention setting to true with a non-zero collision detection buffer zone on the positioning of the nested menu content component when the auto-hide-when-trigger-occluded setting is enabled?",
+      "question_sha256": "41b45cc3fcfb2de4f5ad5b103891ece7d2ff045d3d3fda82bfd1302ef64928f6",
+      "reference_answer": "When `avoid_collisions` is true, the submenu repositions (flips sides/adjusts alignment) to stay within viewport boundaries. `collision_padding` expands the collision detection zone, forcing content further inward from boundaries. `hide_when_detached` removes the submenu from DOM when the trigger becomes fully occluded. The interaction: collision-aware repositioning only occurs while the trigger remains partially visible; once fully hidden, the submenu disappears regardless of collision logic.",
+      "reference_sha256": "c9a09aad16219b683b5f5d3b1b5677ae6a4ecd75cad34f60a6cba184d2eb1e2d",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-ca67e65958271860bc9d65d9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the effect of conditional selection between a multi-process ASGI server with strong process isolation and a single-process asynchronous ASGI server with event loop-based concurrency in the backend server startup function on process isolation and resource allocation within the server architecture?",
+      "question_sha256": "dc2d41df893cbd63801834de6c7c5f6b257499b3615c1e8d209c549256346c6c",
+      "reference_answer": "The conditional selection between Granian and Uvicorn in `run_backend` creates distinct process isolation patterns:\nSelection Logic: `should_use_granian()` chooses Granian when `REFLEX_USE_GRANIAN` is set or uvicorn/gunicorn dependencies are missing, otherwise defaults to Uvicorn.\nProcess Isolation:\n- Granian (development): Single-process with reload capabilities. In production: Multi-process mode with `(CPU_count * 2) + 1` workers via `GRANIAN_WORKERS` environment variable.\n- Uvicorn (development): Single-process asynchronous ASGI server. In production: Uses Gunicorn with `UvicornH11Worker` on non-Windows systems, direct Uvicorn workers on Windows.\nResource Allocation: Granian provides stronger process isolation through separate OS processes per worker, enabling better CPU distribution and memory isolation. Uvicorn offers lower overhead with event loop-based concurrency but weaker isolation where crashes affect the entire server.",
+      "reference_sha256": "6c7704fabdba083fea70bc1cbaa8b72c9640ecd53973efd15005afc500fe55d5",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-d071a7cff0ec3332e1937b8b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why was the component that wraps controls for closing the popover implemented as a distinct instance of the base class for trigger components that handle actions in overlay components instead of reusing the existing component that wraps controls for opening the popover?",
+      "question_sha256": "27f6003a0b64c989064687a04ca603d5cd510648337be61150fc2d9af5fe96ee",
+      "reference_answer": "PopoverClose and PopoverTrigger map to different Radix UI primitives (Popover.Close vs Popover.Trigger) with distinct behaviors. Both inherit from RadixThemesTriggerComponent for shared event handling (wrapping children in Flex when on_click conflicts occur), but maintain semantic clarity - one opens, one closes. This follows the consistent pattern across all Radix overlay components (Dialog, AlertDialog, DropdownMenu) where separate Trigger and Close components provide type safety and prevent misuse.",
+      "reference_sha256": "5c3954a8b520eab04c16effa4a55799227dd6b8155b5aab3b314c21c9d0c6afe",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-d3550fc0f2e05680e713d9b0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "f91a558f7c8cf255f873c4fb677600017d0f57dd831c82c4b8791bc56c2ad249",
+            "kind": "file_reference",
+            "line_count": 799,
+            "path": "reflex/environment.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where in the codebase is the logic that decides if an environment variable wrapper is set, including the handling of empty and whitespace\u2011only values, implemented?",
+      "question_sha256": "73964cd461edcfefe7a29d5991aba2ba4e7cdd30c6b9f2ced6b57a27af500b66",
+      "reference_answer": "Primarily in reflex/environment.py, which defines the EnvVar class with methods is_set() and getenv() that handle empty and whitespace-only values by using .strip() to check for meaningful content. The env_var descriptor class is also in this file for environment variable field declarations.",
+      "reference_sha256": "c5d2554b082397122cd578ea4786e334a9943deeab5796e3eda8d16f2ff2024c",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-d5482e3243c286a73a53dca7"
+    }
+  ]
+}

@@ -1,0 +1,435 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 132,
+            "file_sha256": "e4238ce9d2d116ee4f71a430c09d71acbdba5416a1cef1303e08eb88ff014efd",
+            "path": "sklearn/metrics/_scorer.py",
+            "start_line": 131
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the cache lookup strategy in _cached_call affect the performance characteristics of repeated metric computations across multiple cross-validation folds, and what are the trade-offs between cache hit rates and memory overhead for large-scale datasets?",
+      "question_sha256": "6191b5218394c61ca651b142fe10d738ed43c625b7dafbbe72c5f9cdb89b665a",
+      "reference_answer": "The dictionary-based lookup mechanism in the caching function affects performance characteristics because:\n\n1. **Cache Scope and Lifetime**: The cache is created fresh for each `_MultimetricScorer.__call__` invocation (per validation split), not shared across folds. This is implemented in `sklearn/metrics/_scorer.py` at lines 131-132, where `cache = {} if self._use_cache(estimator) else None` creates a new empty dictionary for each scoring call.\n\n2. **Lookup Strategy Impact**: The lookup uses a simple dictionary key check (`if cache is not None and response_method in cache`, line 92). This O(1) lookup is fast, but the cache only benefits when multiple metrics within the same fold share the same response method (e.g., both `roc_auc` and `neg_log_loss` use `predict_proba`). The `_use_cache` method (lines 178-197) determines cache usage by checking if any response method appears more than once across scorers.\n\n3. **Performance Characteristics**:\n   - **Within-fold optimization**: When multiple metrics share a response method, the first metric computation stores the result, and subsequent metrics retrieve it from cache, avoiding redundant estimator method calls (as verified in tests like `test_multimetric_scorer_calls_method_once_classifier_no_decision`).\n   - **No cross-fold caching**: Since each fold gets a fresh cache, predictions are recomputed for each fold, meaning the cache doesn't reduce computation across folds\u2014only within a single fold's multi-metric evaluation.\n   - **Memory overhead**: The cache stores full prediction arrays (potentially large for big datasets) keyed by response method name, but this memory is released after each fold completes.\n\n4. **Trade-offs**: The current design prioritizes correctness (each fold uses its own fitted model) over cross-fold caching efficiency. The dictionary lookup is optimal for the use case (O(1) access), but the per-fold cache scope limits performance gains to scenarios with multiple metrics per fold rather than repeated computations across folds.",
+      "reference_sha256": "973fdbb837dfd58a8226fbf5627dfe8567fab1bebafb49435d221ee69a792739",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-a0f1095757c3d175a7faa82e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2770,
+            "file_sha256": "6d32c1ef68e82fa2d3d7b2fd485f727748c0603224b810307f5335a2a064bf26",
+            "path": "sklearn/model_selection/_split.py",
+            "start_line": 2770
+          },
+          {
+            "end_line": 514,
+            "file_sha256": "fcbd6e0f7823f6b50feef32ded7c133c1eff60ac2cc9c6ee173448dd7c5bd164",
+            "path": "sklearn/utils/validation.py",
+            "start_line": 514
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "ed0bd15315a1e5ff0401fd735b54699ebc75e8080ca1446c285d338df021a19b",
+            "kind": "file_reference",
+            "line_count": 625,
+            "path": "sklearn/datasets/_twenty_newsgroups.py"
+          },
+          {
+            "file_sha256": "6069dbbd085b4b47391caef72661e7849a304c2c6e55045129b01b7d48a43529",
+            "kind": "file_reference",
+            "line_count": 2146,
+            "path": "sklearn/feature_extraction/text.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What are the consequences of dtype incompatibility at each transformation stage in the dataflow dependency chain from fetch_20newsgroups through TfidfVectorizer to train_test_split, and how does this chain constrain dtype parameter propagation?",
+      "question_sha256": "c989507e892acddc9f3316349b05080abde5b2931d27b254838c008caa3c1861",
+      "reference_answer": "Based on exploration of the scikit-learn repository, the consequences of dtype incompatibility at each transformation stage in this dataflow chain are:\n\n**Stage 1: Dataset Loader \u2192 Vectorizer**\n- The dataset loader (`fetch_20newsgroups` in `sklearn/datasets/_twenty_newsgroups.py`) returns `data.data` as a list of Python strings (no numpy dtype).\n- The TF-IDF vectorizer (`TfidfVectorizer` in `sklearn/feature_extraction/text.py`) accepts iterables of strings, so there is no dtype incompatibility at this stage.\n- The vectorizer's `dtype` parameter (default `np.float64`, line 1980) controls the output dtype of the sparse matrix.\n\n**Stage 2: Vectorizer Internal Processing**\n- `TfidfVectorizer` inherits from `CountVectorizer`, which uses a `dtype` parameter (default `np.int64`, line 1183) for the count matrix.\n- The count matrix is then passed to `TfidfTransformer`, which converts to float types (line 1669): `dtype = X.dtype if X.dtype in (np.float64, np.float32) else np.float64`.\n- If `TfidfVectorizer` is initialized with a non-float dtype, it issues a warning (lines 2052-2056) and converts to `np.float64` because TF-IDF computations require floating-point types.\n- The `transform` method of `TfidfTransformer` validates input dtype (line 1714): `dtype=[np.float64, np.float32]`, accepting only these float types.\n\n**Stage 3: Vectorizer \u2192 Train-Test Split**\n- `train_test_split` (in `sklearn/model_selection/_split.py`, line 2770) uses `indexable()` (line 2916) to make arrays indexable.\n- `indexable()` preserves the dtype of input arrays (in `sklearn/utils/validation.py`, line 514) - it does not convert dtypes.\n- The function returns split arrays with the same dtype as the input (documentation at line 2827: \"output type is the same as the input type\").\n- Therefore, if the vectorizer outputs a specific dtype (e.g., `float64`), the split arrays maintain that dtype.\n\n**Consequences:**\n1. **No incompatibility at Stage 1**: Strings from the dataset loader are compatible with the vectorizer's input requirements.\n2. **Type coercion at Stage 2**: Non-float dtypes passed to `TfidfVectorizer` trigger warnings and automatic conversion to `float64`, potentially causing unexpected memory usage or precision loss if a smaller dtype (e.g., `float32`) was intended.\n3. **Dtype preservation at Stage 3**: The train-test split preserves whatever dtype the vectorizer outputs, so dtype choices made at the vectorization stage propagate unchanged through the split.\n\n**Dtype Parameter Propagation Constraints:**\n- The `dtype` parameter in `TfidfVectorizer` must be a float type (`float64` or `float32`) for TF-IDF computations.\n- This constraint is enforced by validation in `_check_params()` (lines 2052-2056), which warns and converts non-float dtypes to `float64`.\n- Once set to a float type, this dtype propagates through `train_test_split` without modification, constraining downstream operations to work with the chosen float precision.\n- The chain does not support propagating integer or other non-float dtypes through the TF-IDF transformation stage, creating a bottleneck where dtype choices are constrained to floating-point types.",
+      "reference_sha256": "2aa204516af2ae71afeef2285a742258abcb1519f39a319f8052fdc686780571",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-a547458bbe75b9aa72f098bd"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 982,
+            "file_sha256": "f1de21fcd39efdefcb15d455c9cc27e180d3df03b03093391909f99b08b179b9",
+            "path": "sklearn/preprocessing/_polynomial.py",
+            "start_line": 981
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "f1de21fcd39efdefcb15d455c9cc27e180d3df03b03093391909f99b08b179b9",
+            "kind": "file_reference",
+            "line_count": 1314,
+            "path": "sklearn/preprocessing/_polynomial.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the SplineTransformer use a diagonal coefficient matrix during fit, and how does this design choice enable the generation of the spline basis functions?",
+      "question_sha256": "ce41097ffaf8fffc9c6aa4df7b93f21f4362c21e0c7245a626d59b271223f494",
+      "reference_answer": "The preprocessing transformer that generates univariate B-spline basis functions uses an identity coefficient matrix during the fitting process because this design directly extracts the individual spline basis functions as the design matrix.\n\nIn the `fit` method of `SplineTransformer` (located in `sklearn/preprocessing/_polynomial.py`), the code creates an identity coefficient matrix using:\n\n```python\ncoef = np.eye(n_splines, dtype=np.float64)\n```\n\nThis identity matrix is then passed to `BSpline.construct_fast()` along with the computed knot positions and degree to construct BSpline objects. The code comment at lines 981-982 explicitly explains the rationale:\n\n```981:982:sklearn/preprocessing/_polynomial.py\n# With a diagonal coefficient matrix, we get back the spline basis\n# elements, i.e. the design matrix of the spline.\n```\n\nWhen an identity matrix is used as the coefficient matrix in a B-spline construction, each column of the identity matrix corresponds to one basis function. When the BSpline object is evaluated (as done in the `transform` method with calls like `spl(x)`), it returns the values of all basis functions at the given input points. This produces the design matrix where each column represents one spline basis function evaluated across all data points.\n\nThis design choice is mathematically elegant: the identity matrix ensures that each basis function is extracted independently without any linear combinations, which is exactly what's needed for feature engineering where each spline basis function becomes a separate feature column in the transformed output matrix.",
+      "reference_sha256": "648c9369bc2c0c1d13ebaed8f39672b45edb42453a9994f1f05d7fc8afb9b65d",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-a7ece8e0f62b048d799ecf9a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1928,
+            "file_sha256": "6d32c1ef68e82fa2d3d7b2fd485f727748c0603224b810307f5335a2a064bf26",
+            "path": "sklearn/model_selection/_split.py",
+            "start_line": 1896
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does BaseShuffleSplit delegate the actual index generation logic to the _iter_indices method rather than implementing it directly within the split method, and what design constraints does this separation impose on subclass implementations?",
+      "question_sha256": "b00092039a1945b34a09390fecc2309b2f3761d7e5a0629540132ac92c9b1378",
+      "reference_answer": "The base class for shuffle-based cross-validation splitters (BaseShuffleSplit) uses the Template Method pattern. The public `split()` method (lines 1896-1928 in `sklearn/model_selection/_split.py`) handles common concerns: input validation via `indexable()` and yielding train-test pairs. The protected `_iter_indices()` method (lines 1930-1946) contains the core index generation logic.\n\nThis separation enables:\n1. **Subclass customization**: Subclasses can override `_iter_indices()` to change splitting behavior without duplicating the common interface code. Examples:\n   - `GroupShuffleSplit._iter_indices()` (line 2177) handles group-based splitting and calls `super()._iter_indices()` (line 2182)\n   - `StratifiedShuffleSplit._iter_indices()` (line 2316) implements stratified splitting based on class labels\n   - `ShuffleSplit` (line 1973) inherits without overriding, using the base implementation\n\n2. **Code reuse**: The public `split()` method's validation and iteration logic is shared across all subclasses, avoiding duplication.\n\n3. **Consistent interface**: All subclasses maintain the same public interface (`split()`), while allowing customization of the core algorithm (`_iter_indices()`).\n\n4. **Separation of concerns**: Input validation and iteration control are separated from the splitting algorithm, making the code easier to maintain and extend.\n\nThis pattern mirrors `BaseCrossValidator` (line 104), which uses `_iter_test_masks()` and `_iter_test_indices()` as hooks, showing a consistent design approach across scikit-learn's cross-validation framework.",
+      "reference_sha256": "9333e205867740850a40b67bf4a2ff24939ac47427700401e0e23295ea2f85e2",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-baaecee5df6e1a5cefa7b49c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 839,
+            "file_sha256": "c2166d803ee48660996a34b9d96c8ef08d5f092beba5b561c60a36a219c240fc",
+            "path": "sklearn/base.py",
+            "start_line": 839
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "3bd5882915757e65680f45aa07edd0f65f8aa277658a714b7434eb6e619add89",
+            "kind": "file_reference",
+            "line_count": 3747,
+            "path": "sklearn/preprocessing/_data.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the impact of the dependency on StandardScaler within the _fit method on the correctness of PowerTransformer's standardization logic when standardize=True, and what would break if StandardScaler's fit_transform behavior changed?",
+      "question_sha256": "2ac4fa5a031bde8745bffaf459cbc37b6a935ca4f553374e47b97a6f50fb223d",
+      "reference_answer": "Based on my exploration of the scikit-learn repository, the dependency on StandardScaler within PowerTransformer's `_fit` method has a critical impact on correctness when `standardize=True`.\n\n**Implementation Details:**\n\nIn `sklearn/preprocessing/_data.py`, PowerTransformer's `_fit` method (lines 3380-3422) creates and uses a StandardScaler instance when `standardize=True`:\n\n```python\nif self.standardize:\n    self._scaler = StandardScaler(copy=False).set_output(transform=\"default\")\n    if force_transform:\n        X = self._scaler.fit_transform(X)\n    else:\n        self._scaler.fit(X)\n```\n\n**Impact on Correctness:**\n\n1. **Standardization Logic Delegation**: PowerTransformer delegates all standardization logic to StandardScaler. It doesn't implement its own mean/variance calculation, relying entirely on StandardScaler's implementation of zero-mean, unit-variance scaling (StandardScaler uses `z = (x - u) / s` where `u` is the mean and `s` is the standard deviation, as documented in lines 739-747).\n\n2. **Consistency Between fit() and fit_transform()**: The correctness depends on StandardScaler's `fit_transform` method (inherited from `TransformerMixin` in `sklearn/base.py`, line 839) behaving equivalently to calling `fit()` followed by `transform()`. If `fit_transform` had different behavior (e.g., different numerical precision, different handling of edge cases), PowerTransformer's output would be inconsistent between `fit().transform()` and `fit_transform()` calls.\n\n3. **State Management**: The `_scaler` attribute stores the fitted StandardScaler instance, which is later used in `transform()` (line 3449: `X = self._scaler.transform(X)`). If StandardScaler's `fit_transform` didn't properly set internal state (`mean_`, `scale_`, `var_`, etc.), subsequent `transform()` calls would fail or produce incorrect results.\n\n4. **Numerical Stability**: PowerTransformer depends on StandardScaler's handling of edge cases like constant features, NaN values, and zero variance (StandardScaler uses `_handle_zeros_in_scale` for zero variance, as seen in line 1062). Any changes to StandardScaler's numerical stability would directly affect PowerTransformer's correctness.\n\n5. **Output Format**: PowerTransformer uses `set_output(transform=\"default\")` on the StandardScaler (line 3416), meaning it depends on StandardScaler's output format handling. Changes to StandardScaler's output format would break PowerTransformer's return value expectations.\n\n**What Would Break:**\n\nIf StandardScaler's `fit_transform` behavior changed in ways that broke the `fit()` + `transform()` equivalence, PowerTransformer would produce:\n- Inconsistent results between `fit().transform()` and `fit_transform()` calls\n- Incorrect standardization in `transform()` calls after `fit()` (if state wasn't properly set)\n- Numerical errors if edge case handling changed\n- Type/format errors if output format changed\n\nThe dependency is tight and critical\u2014PowerTransformer has no fallback or alternative implementation for standardization; it's entirely dependent on StandardScaler's correctness.",
+      "reference_sha256": "782dac789c11660ea5e89655a41f4cfb76a0419f3cf5d43841736cf960e321d4",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-bc6e066b0f545dd5ef6b541f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 486,
+            "file_sha256": "72e0b00ef91642fe8293bec7099e100d2fc62ebf1772ada671047dd783263b9c",
+            "path": "sklearn/cluster/_mean_shift.py",
+            "start_line": 486
+          },
+          {
+            "end_line": 749,
+            "file_sha256": "fcbd6e0f7823f6b50feef32ded7c133c1eff60ac2cc9c6ee173448dd7c5bd164",
+            "path": "sklearn/utils/validation.py",
+            "start_line": 749
+          },
+          {
+            "end_line": 78,
+            "file_sha256": "83a9c12cd1b474f8a35024de33a49ca94a48f62ac03afead106dd4d27fab87e6",
+            "path": "sklearn/cluster/tests/test_mean_shift.py",
+            "start_line": 58
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the mechanism in the test_mean_shift function that ensures dtype consistency across both the MeanShift class instance and the standalone mean_shift function when processing the same input data with different global_dtype parameters?",
+      "question_sha256": "1dc75e482b8a4dd351405f17e5daaa082ff669ddada775528db2171da2fbf56e",
+      "reference_answer": "The mechanism that ensures dtype consistency between the estimator class and the standalone function in the clustering validation test is that both code paths use the same underlying validation mechanism through `validate_data()` and `check_array()`.\n\nWhen the test processes input data with different dtype parameters:\n\n1. **Shared validation path**: Both the estimator class's `fit()` method (line 486 in `sklearn/cluster/_mean_shift.py`) and the standalone function (lines 235-243) use `validate_data()`, which internally calls `check_array()`.\n\n2. **Dtype preservation in check_array**: The `check_array()` function (line 749 in `sklearn/utils/validation.py`) has a default parameter `dtype=\"numeric\"` (line 754). According to its documentation (lines 793-797), when `dtype=\"numeric\"`, the function preserves the input array's dtype unless the array's dtype is object. This means numeric dtypes (like float32, float64) are preserved through the validation process.\n\n3. **Standalone function implementation**: The standalone function actually creates an instance of the estimator class internally (line 235) and calls its `fit()` method (line 243), ensuring both code paths execute identical validation logic.\n\n4. **Test verification**: The test (lines 58-78 in `sklearn/cluster/tests/test_mean_shift.py`) converts input data to the specified dtype (line 62), then verifies that both the estimator's `cluster_centers_` attribute (line 69) and the standalone function's returned cluster centers (line 78) have the same dtype as the input.\n\nThis shared validation mechanism guarantees that regardless of whether the user calls the estimator class directly or uses the standalone function, the dtype of the input data is preserved in the output, ensuring consistent behavior across both interfaces.",
+      "reference_sha256": "a47207458f8ee865c829ea3c5b466fda38131b549a546fdc76011e619d4efd0e",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-c68f39f20250e33312857f14"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2084,
+            "file_sha256": "2e61b77f34eb238f13d04a75d394a70a10caa777f34dea84d48c9be55e1c5c99",
+            "path": "sklearn/pipeline.py",
+            "start_line": 2082
+          },
+          {
+            "end_line": 102,
+            "file_sha256": "545cdbaaf697509e375fddb4e91fc2ebbc8b43a5b02c9130f7fd86d6e5be1673",
+            "path": "sklearn/utils/_repr_html/estimator.py",
+            "start_line": 78
+          },
+          {
+            "end_line": 119,
+            "file_sha256": "b936ffa570cbee51f0d10d108e9b00e88931287183df7bfc72d0dd21af2c4174",
+            "path": "sklearn/utils/_repr_html/tests/test_estimator.py",
+            "start_line": 119
+          },
+          {
+            "end_line": 119,
+            "file_sha256": "b936ffa570cbee51f0d10d108e9b00e88931287183df7bfc72d0dd21af2c4174",
+            "path": "sklearn/utils/_repr_html/tests/test_estimator.py",
+            "start_line": 111
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "545cdbaaf697509e375fddb4e91fc2ebbc8b43a5b02c9130f7fd86d6e5be1673",
+            "kind": "file_reference",
+            "line_count": 497,
+            "path": "sklearn/utils/_repr_html/estimator.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does _get_visual_block implement the extraction and validation of parallel estimator metadata from a FeatureUnion's transformer_list structure?",
+      "question_sha256": "cd502eb2c0033ac8cf908f76a1c44d23080f0a9e4ece400e34b2b0d90df08da4",
+      "reference_answer": "The visual representation generator function (`_get_visual_block` in `sklearn/utils/_repr_html/estimator.py`) implements extraction and validation of parallel estimator metadata from FeatureUnion's `transformer_list` structure through the following mechanism:\n\n**Implementation Flow:**\n\n1. **Initial Check (lines 225-234)**: The function first checks if the estimator has a `_sk_visual_block_()` method. FeatureUnion implements this method, so the function delegates to it.\n\n2. **Metadata Extraction (FeatureUnion._sk_visual_block_ at lines 2082-2084 in `sklearn/pipeline.py`)**:\n   ```python\n   def _sk_visual_block_(self):\n       names, transformers = zip(*self.transformer_list)\n       return _VisualBlock(\"parallel\", transformers, names=names)\n   ```\n\n3. **Extraction Process**: \n   - The `zip(*self.transformer_list)` operation unpacks the list of (name, transformer) tuples\n   - This separates the structure into two tuples: `names` (containing transformer names) and `transformers` (containing transformer objects)\n   - For example, if `transformer_list = [(\"pca\", PCA()), (\"svd\", TruncatedSVD())]`, the zip operation produces `names = (\"pca\", \"svd\")` and `transformers = (PCA(), TruncatedSVD())`\n\n4. **Validation**:\n   - The validation is implicit through the `zip(*...)` operation: if `transformer_list` is not in the expected format (a list of 2-tuples), the unpacking will fail or produce unexpected results\n   - The `_VisualBlock` constructor (lines 78-102 in `estimator.py`) validates that when `kind=\"parallel\"`, the `names` and `estimators` parameters have matching lengths (lines 95-99), ensuring structural consistency\n\n5. **Return Value**: The method returns a `_VisualBlock` object with:\n   - `kind=\"parallel\"` (indicating parallel layout for HTML representation)\n   - `estimators` set to the tuple of transformer objects\n   - `names` set to the tuple of transformer names\n   - `name_details` defaults to `None` (as seen in test at line 119 of `test_estimator.py`)\n\n**Evidence from Tests**: The test at lines 111-119 of `sklearn/utils/_repr_html/tests/test_estimator.py` confirms this behavior:\n- For `FeatureUnion([(\"pca\", PCA()), (\"svd\", TruncatedSVD())])`, the result has `kind=\"parallel\"`, `names=(\"pca\", \"svd\")`, and `estimators` matching the transformers from `transformer_list`.\n\nThis implementation ensures that parallel estimators (like FeatureUnion's transformers) are correctly represented in HTML visualizations with their names and objects properly extracted and validated from the `transformer_list` structure.",
+      "reference_sha256": "85af07e21de091e1d3e26e3713fee9b805cfe4df9b3092a2c3ee554e4b943120",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-ccae99e0aa76d46d37542b3b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "f1de21fcd39efdefcb15d455c9cc27e180d3df03b03093391909f99b08b179b9",
+            "kind": "file_reference",
+            "line_count": 1314,
+            "path": "sklearn/preprocessing/_polynomial.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the SplineTransformer add degree number of knots both before and after the base knots during the fit process, and why does the periodic extrapolation mode require a fundamentally different knot extension strategy?",
+      "question_sha256": "3661bda93aba2af80d1bcaa292fb5bb9b3e4de2ed91c341543e05a65b1b03ba1",
+      "reference_answer": "Based on the implementation in `sklearn/preprocessing/_polynomial.py`, the transformer uses different knot extension strategies for periodic and non-periodic extrapolation modes due to the mathematical requirements of B-spline construction and the need to maintain periodicity.\n\n**General Requirement for Knot Extension:**\n\nThe transformer must add `degree` number of knots both before and after the base knots to make the spline basis complete (lines 938-939). This is a fundamental requirement of B-spline construction with `scipy.interpolate.BSpline` - to have a complete basis that can represent all polynomials of the given degree within the base interval, additional knots beyond the base interval are necessary (as noted in the docstring at line 778-779).\n\n**Non-Periodic Strategy (lines 951-979):**\n\nFor non-periodic modes, the implementation follows the advice of Eilers & Marx (1996) in \"Flexible Smoothing with B-splines and Penalties\" (referenced at line 952-953). Instead of simply repeating the first and last knot positions (which would have inferior boundary behavior), it:\n- Calculates the distance between the first two knots (`dist_min = base_knots[1] - base_knots[0]`)\n- Calculates the distance between the last two knots (`dist_max = base_knots[-1] - base_knots[-2]`)\n- Extends knots linearly using these distances: `degree` knots before the first base knot spaced by `dist_min`, and `degree` knots after the last base knot spaced by `dist_max`\n\n**Periodic Strategy (lines 940-949):**\n\nFor periodic extrapolation mode, a fundamentally different approach is required because:\n1. **Periodicity constraint**: The spacing of the first/last `degree` knots must be a continuation of the spacing of the last/first base knots to maintain smooth periodicity (lines 941-943).\n2. **Period calculation**: The period is calculated as `period = base_knots[-1] - base_knots[0]` (line 944).\n3. **Knot extension**: Instead of linear extension, knots are extended by:\n   - Taking the last `degree+1` base knots (excluding the very last one) and subtracting the period: `base_knots[-(degree + 1) : -1] - period`\n   - Taking the first `degree+1` base knots (excluding the very first one) and adding the period: `base_knots[1 : (degree + 1)] + period`\n\nThis ensures that when the spline wraps around (e.g., from hour 23 to hour 0 in cyclical time features), the function values and derivatives match smoothly at the boundaries, avoiding discontinuities that would break the periodic nature of the representation.\n\nThe different strategies are necessary because periodic splines must enforce equal function values and derivatives at the first and last knot (as documented in the class docstring at lines 651-652), which requires the extended knots to maintain the same spacing pattern as the base knots, rather than extending linearly based on boundary distances.",
+      "reference_sha256": "54ed7dee12202dfdef9b79f9b02358170fc11b8c018110331cb10bf1e920c982",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-d228e1f4f574f11e50b471a8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1,
+            "file_sha256": "6a41a81fd5fb86321b32e3420c282895ffa7441cd37495d7d3238646d3a7c21d",
+            "path": "sklearn/feature_selection/_from_model.py",
+            "start_line": 1
+          },
+          {
+            "end_line": 669,
+            "file_sha256": "a8040076fad2ed2c275e9358e77a9ec6abae328585019c8efc065054d7522949",
+            "path": "sklearn/feature_selection/tests/test_from_model.py",
+            "start_line": 658
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the semantic significance of SelectFromModel's partial_fit method enforcing max_features validation constraints differently compared to its fit method, and why does it raise validation errors during partial_fit rather than deferring validation to subsequent fit calls?",
+      "question_sha256": "394c07b7a2982566e94f615b2267a0b71af20af355f49d412742d305eb319cfd",
+      "reference_answer": "Based on my exploration of the scikit-learn repository, the semantic significance lies in the different validation timing strategies between the two fitting methods, which reflect their distinct use cases and state management approaches.\n\n**Implementation Details:**\n\nIn `sklearn/feature_selection/_from_model.py`:\n\n1. **`fit` method (line 360)**: Always calls `self._check_max_features(X)` unconditionally on every invocation. This ensures that `max_features` is validated against the current input data's feature count every time `fit` is called.\n\n2. **`partial_fit` method (lines 437-440)**: Only calls `self._check_max_features(X)` when `first_call = not hasattr(self, \"estimator_\")` is `True`, meaning validation occurs only on the first call when the estimator is being initialized.\n\n**The Validation Logic (`_check_max_features`, lines 309-325):**\nThe `_check_max_features` method validates that:\n- `max_features` is either an integer or a callable that returns an integer\n- The value is between 0 and `n_features` (the number of features in X)\n- It raises a `ValueError` via `check_scalar` if the constraint is violated (e.g., \"max_features == 10, must be <= 4\")\n\n**Semantic Significance:**\n\nThe different validation strategies reflect the semantic distinction between the two methods:\n\n1. **`fit` - Always validates**: Since `fit` is designed for one-time complete fitting, it validates `max_features` against the input data every time to ensure consistency. This is appropriate because each `fit` call is independent and should validate against its own input.\n\n2. **`partial_fit` - Validates only on first call**: The incremental fitting method validates `max_features` only during initialization (first call) because:\n   - **State consistency**: Once the estimator is initialized with a valid `max_features_` value (stored as an attribute on line 325), subsequent `partial_fit` calls should use the same constraint without re-validation, as the feature space is established.\n   - **Early error detection**: By validating on the first call rather than deferring, the method ensures that invalid configurations are caught immediately, preventing the estimator from entering an invalid state that would only be discovered later. This follows the \"fail-fast\" principle.\n   - **Incremental learning semantics**: In incremental learning scenarios, the feature space should remain constant across batches. Validating only on the first call enforces this constraint while allowing efficient processing of subsequent data batches.\n\n**Why it raises errors during `partial_fit` rather than deferring:**\n\nThe implementation raises validation errors immediately during the first `partial_fit` call (as demonstrated in `test_partial_fit_validate_max_features` at line 658 of the test file) because:\n\n1. **Immediate feedback**: Users get immediate feedback about invalid parameter configurations, preventing wasted computation on subsequent batches.\n2. **State integrity**: It prevents the estimator from being partially initialized with invalid constraints, which could lead to inconsistent behavior.\n3. **Design consistency**: This aligns with scikit-learn's general principle of validating parameters early in the fitting process, as seen in other estimators.\n\nThe test at `sklearn/feature_selection/tests/test_from_model.py:658-669` explicitly verifies that `partial_fit` raises `ValueError` when `max_features` exceeds the number of features in the input data, confirming that validation occurs during `partial_fit` rather than being deferred.",
+      "reference_sha256": "e9ea847ad51c5df3333283a4cc69f8a1a83e58924f701a6336ae1dfb941f90f3",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-d3235e795cfc423d31b310d4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 962,
+            "file_sha256": "17e0675d09ea20b16552bcffb8dad4207e0435c2e0c5fffbfb07031853aef163",
+            "path": "sklearn/linear_model/_ridge.py",
+            "start_line": 932
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the solver selection logic in _BaseRidge.fit() determine which lower-level helper functions to invoke based on the combination of sparse data, intercept fitting, and solver parameters?",
+      "question_sha256": "67b9f3e4bf6e0b8ea539d60820bb107815b5c36b78abb7dd51d3b04846c2b36f",
+      "reference_answer": "The solver selection logic in `_BaseRidge.fit()` that determines which solver-specific computation functions to invoke is located at lines 932-962 in `sklearn/linear_model/_ridge.py`.\n\nThis logic uses conditional branches based on:\n1. Positive constraint (`self.positive`): If `True`, it restricts the solver to \"lbfgs\" (lines 932-939).\n2. Sparse data with intercept (`sparse.issparse(X) and self.fit_intercept`): If both are true, it selects from \"lsqr\", \"lbfgs\", \"sag\", or \"sparse_cg\" (lines 940-960). It defaults to \"sparse_cg\" unless the user specifies \"lsqr\" or \"lbfgs\", or \"sag\" with specific conditions.\n3. Otherwise: It uses the user-specified solver (line 962).\n\nThe selected solver is then passed to `_ridge_regression()` (called at lines 978-991 or 1004-1020), which maps the solver to the corresponding computation function:\n- \"sparse_cg\" \u2192 `_solve_sparse_cg()` (line 725)\n- \"lsqr\" \u2192 `_solve_lsqr()` (line 738)\n- \"cholesky\" \u2192 `_solve_cholesky()` or `_solve_cholesky_kernel()` (lines 754, 762)\n- \"sag\"/\"saga\" \u2192 `sag_solver()` (line 778)\n- \"lbfgs\" \u2192 `_solve_lbfgs()` (line 805)\n- \"svd\" \u2192 `_solve_svd()` (line 820)\n\nThe determination happens in the conditional block (lines 932-962) within `_BaseRidge.fit()`, before calling `_ridge_regression()`.",
+      "reference_sha256": "fe9dd6e25c135cc1b3223b93d436a745da6e5918a9981436129cb221c86dfc59",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-d59f6bfa3b41610d63b32965"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 303,
+            "file_sha256": "404934cf3e0bc2ffd92fffb36aa883f9b08d71e4254a2816a8ce045f7442dfeb",
+            "path": "sklearn/semi_supervised/_label_propagation.py",
+            "start_line": 303
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the convergence detection mechanism in the `fit` method handle the trade-off between numerical precision and computational efficiency when comparing label distribution changes across iterations?",
+      "question_sha256": "e9eb2d7ed9564a08971b543d10bfffcbcf35466584717df64875be66848f825f",
+      "reference_answer": "The steady-state detection logic in the training method balances numerical precision and computational efficiency by using an L1 norm (sum of absolute differences) aggregated across all samples and classes.\n\n**Implementation Details:**\n\nThe convergence check is at line 303 in `sklearn/semi_supervised/_label_propagation.py`:\n\n```python\nif np.abs(self.label_distributions_ - l_previous).sum() < self.tol:\n```\n\n**Computational Efficiency:**\n- Uses `.sum()` to aggregate absolute differences into a single scalar\n- O(n_samples \u00d7 n_classes) per iteration\n- Avoids more expensive operations like:\n  - L2 norm (requires square root): `np.sqrt(((self.label_distributions_ - l_previous)**2).sum())`\n  - Max norm: `np.abs(self.label_distributions_ - l_previous).max()` (more sensitive to outliers)\n  - Per-sample or per-class comparisons (slower)\n\n**Numerical Precision Trade-offs:**\n- Aggregation can mask local changes: small changes across many samples can accumulate to exceed the tolerance threshold (`self.tol`, default 1e-3)\n- Large changes in a few samples may be diluted by many samples with small changes\n- The tolerance is applied to the aggregated sum, not per-sample or per-class\n\n**Context:**\nThis mechanism is used in `BaseLabelPropagation.fit()` (inherited by `LabelPropagation` and `LabelSpreading`) to detect when the iterative label propagation process reaches steady state. The algorithm updates `label_distributions_` each iteration via matrix multiplication with the graph matrix, then checks if the change from the previous iteration is below the tolerance threshold.\n\nThe default tolerance is `1e-3` (line 99-101), which balances early stopping with convergence accuracy for semi-supervised learning tasks.",
+      "reference_sha256": "f5c8886e707104bbe9649dbb2a4745e0bae6e578c451ad80f23c674005d1e948",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-d7b7d55534fc6cd8353bdb09"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 101,
+            "file_sha256": "2e617870efb40e32b9144c208c4fb3032c95e11659f5fb8a2666bc9b3c86a69b",
+            "path": "sklearn/tests/test_pipeline.py",
+            "start_line": 101
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "2e61b77f34eb238f13d04a75d394a70a10caa777f34dea84d48c9be55e1c5c99",
+            "kind": "file_reference",
+            "line_count": 2193,
+            "path": "sklearn/pipeline.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the semantic contract of the Transf class's transform and inverse_transform methods when it inherits from NoInvTransf and is used within sklearn's pipeline composition system?",
+      "question_sha256": "61096993ff153e10a0bcb5726469f7601a79e5e89074e8beb1b4389f099f3d15",
+      "reference_answer": "The semantic contract is that the pipeline exposes `inverse_transform` only if all steps support it, even if a step implements it.\n\n**Class definitions:**\n- `NoInvTransf` (defined in `sklearn/tests/test_pipeline.py` at line 101) inherits from `TransformerMixin` and `NoTrans`, implements `transform`, and does not implement `inverse_transform`.\n- `Transf` (defined at line 106) inherits from `NoInvTransf` and adds `inverse_transform`, which returns the input unchanged.\n\n**Pipeline's inverse_transform contract:**\nThe Pipeline class (`sklearn/pipeline.py`) uses `_can_inverse_transform()` (line 1093) to check if all steps support `inverse_transform`:\n\n```python\ndef _can_inverse_transform(self):\n    return all(hasattr(t, \"inverse_transform\") for _, _, t in self._iter())\n```\n\nThe `inverse_transform` method (line 1097) is conditionally exposed using `@available_if(_can_inverse_transform)`, so it is only available when all steps have `inverse_transform`.\n\n**Behavior in pipelines:**\nTests (lines 900-908) show:\n- A pipeline with `Transf()` and `NoInvTransf()` does not expose `inverse_transform` because `NoInvTransf` lacks it.\n- The pipeline's `transform` works normally since both classes implement it.\n- Even though `Transf` implements `inverse_transform`, the pipeline hides it when any step lacks it.\n\n**Semantic contract:**\n1. `transform`: Works at both the individual transformer and pipeline levels since all steps implement it.\n2. `inverse_transform`: Available on `Transf` individually, but not on the pipeline when any step (including `NoInvTransf`) lacks it. The pipeline requires all steps to support `inverse_transform` for it to be available.\n\nThis ensures that `inverse_transform` can only be called on a pipeline when every step can reverse its transformation, maintaining consistency in the sequential transformation chain.",
+      "reference_sha256": "198b89d627db724d5f7d9d253d986964b266e00a2bb5e3e5f5a5d352ee938a50",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-e0480d0a51490867c584706a"
+    }
+  ]
+}

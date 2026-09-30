@@ -1,0 +1,274 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-9970bf97035c8e666a8a5487",
+      "reference_sha256": "2d0ad0c3a48b787619f4737e6e285337658649d0041501e2d23eeac58f455162",
+      "question_sha256": "29881670195d3f378ccf672751cdf0c342ce8beab9f4de458eca316b914290ec",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "UNC normalization replaces separators and lowercases for Cygwin without drive prefix",
+          "verdict": "supported",
+          "reason": "append_prefix only matches a drive; UNC uses else branch.",
+          "evidence": {
+            "path": "conan/internal/subsystems.py",
+            "start_line": 164,
+            "end_line": 191
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-9b52f40cc49ee6339179e81f",
+      "reference_sha256": "dbcf409df9404f70a9c8f39c2e4da552549623a85f7fafe2f6ad501bc9372ddf",
+      "question_sha256": "5fecb9a79177a078893c9326f26de1537f3990897b01aafa150c9cfd03a75195",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Launcher ultimately calls Bottle.run to start serving",
+          "verdict": "supported",
+          "reason": "launch calls server.run unless force migration, and ConanServer.run calls Bottle.run.",
+          "evidence": {
+            "path": "conans/server/rest/server.py",
+            "start_line": 47,
+            "end_line": 52
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-a12fbbdbe53dec0e9b3dbecd",
+      "reference_sha256": "2345f83cca817ec720aad0f32d8b02a008b67b17d975c4228f514a4b07d7acc3",
+      "question_sha256": "e3a14b6aadaabd0e2f15f6de92b6083db9b1c9ab679034f854d5bf05a9af196c",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Proposed locking design guarantees atomic upload decisions",
+          "verdict": "contradicted",
+          "reason": "Proposed dataclass is not frozen, two dictionary writes are not atomic for unlocked readers, and cache/lock keys omit remote and force; current parallel flow splits package lists.",
+          "evidence": {
+            "path": "conan/api/subapi/upload.py",
+            "start_line": 113,
+            "end_line": 140
+          }
+        }
+      ],
+      "material_errors": [
+        "Proposed dataclass is not frozen, two dictionary writes are not atomic for unlocked readers, and cache/lock keys omit remote and force; current parallel flow splits package lists."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Current UploadUpstreamChecker decides upload/force_upload from remote revision existence: missing -> (True,False), present with force -> (True,True), otherwise (False,False) (conan/internal/api/uploader.py:39-80). The upload API parallelizes split package lists (conan/api/subapi/upload.py:131-140). For a redesign, workers should return an immutable decision keyed by remote plus exact revision and force policy, then one coordinator should publish both flags after completion. If shared mutable decisions remain, all readers and writers must use the same lock. A local lock cannot make remote existence and subsequent upload atomic; that requires server-side conditional semantics. These are design recommendations, not features demonstrated by the current checker."
+    },
+    {
+      "task_id": "import-a939417f297b866b74d477e0",
+      "reference_sha256": "de0001a25322a4261d4720e59dad19cb0a07ef8c91874789ef83c79702abfd77",
+      "question_sha256": "1905262405f219c4df831937b728d981c454f292d7ed9e0bcd8bde993c71155a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Root consumer loader branches between Python and text loading then creates a graph node",
+          "verdict": "supported",
+          "reason": "GraphAPI passes metadata to load_consumer, initializes profile and scopes options; text uses consumer_definer.",
+          "evidence": {
+            "path": "conan/api/subapi/graph.py",
+            "start_line": 20,
+            "end_line": 50
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-bbc3aefeb01e7a6f601e56ef",
+      "reference_sha256": "ea25bffebcbda4ae9e80b4cb58381f724a1b5383e779eae8e6faa20b99c038dd",
+      "question_sha256": "95147485e4b942e9c7879c68baf426264d40c1bf004aeae61b6bac34c8530890",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Wrapper intercepts every command in ecosystem and all APIs are affected",
+          "verdict": "partially_supported",
+          "reason": "The explicit interception occurs in ConanFile.run; constructing ConanApp alone does not prove behavioral impact on every operation.",
+          "evidence": {
+            "path": "conan/internal/model/conan_file.py",
+            "start_line": 378,
+            "end_line": 387
+          }
+        }
+      ],
+      "material_errors": [
+        "The explicit interception occurs in ConanFile.run; constructing ConanApp alone does not prove behavioral impact on every operation."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The direct integration points are CmdWrapper loading and wrap in conan/internal/conan_app.py:16-27, its construction and injection into ConanFileHelpers/ConanFileLoader at 74-77, and ConanFile.run at conan/internal/model/conan_file.py:378. Changes affect commands routed through ConanFile.run, including build helpers that use it. They do not establish interception of every subprocess or behavioral change in every API that constructs ConanApp."
+    },
+    {
+      "task_id": "import-c18cca257cdad6db89e0951a",
+      "reference_sha256": "33e610875fb11da3035ab9c4b5aa818da17c6e062c1edce7784909b64fd8731a",
+      "question_sha256": "69bc75907fef92fe6d372dd06318e64d2760beb4f28f16ae0daa8179a5da2a25",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "ASCII restriction is motivated by crypto, legacy systems and homoglyph security",
+          "verdict": "partially_supported",
+          "reason": "Validation proves restriction, but does not establish these rationales.",
+          "evidence": {
+            "path": "conans/server/conf/__init__.py",
+            "start_line": 191,
+            "end_line": 207
+          }
+        }
+      ],
+      "material_errors": [
+        "Validation proves restriction, but does not establish these rationales."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "ConanServerConfigParser.users validates every password from environment configuration or the users section by password.encode(\"ascii\") and raises ConanException for unsupported characters (conans/server/conf/__init__.py:191-207). This establishes an explicit supported-encoding restriction. The cited implementation does not document whether the historical reason was transport compatibility, cryptography, or another concern, so those motives should not be asserted."
+    },
+    {
+      "task_id": "import-c202c548bb9f25bffb5d5e95",
+      "reference_sha256": "717728b1066c878d30979ac8fc465c5c0288b1c6c44ab2135d50ce205221a5ae",
+      "question_sha256": "eabf27569fab022e9365c2b19d3b599446c46ad878aa1f9421c3d6ccdc43ce82",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Storage-path test verifies package output, database and cache-path command with spaces",
+          "verdict": "supported",
+          "reason": "All assertions and path_with_spaces setup are present.",
+          "evidence": {
+            "path": "test/integration/cache/storage_path_test.py",
+            "start_line": 7,
+            "end_line": 17
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-d115920ae37fe75921ace9dd",
+      "reference_sha256": "d65e750c183a088b0d0c347b176b42a385a91617f0773bd2c7085a20df5bb1e4",
+      "question_sha256": "fbd9f73cd6cf8426c8715e4254d58bc2c545a34bd873e74fa33d06b89e56d320",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "_get_dependencies aggregates contexts, validates suffix/folder and filters inactive build deps",
+          "verdict": "supported",
+          "reason": "Implementation matches context aggregation and validation branches.",
+          "evidence": {
+            "path": "conan/tools/gnu/pkgconfigdeps.py",
+            "start_line": 332,
+            "end_line": 367
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-d1736c78af5b76101bf3dbf6",
+      "reference_sha256": "06f96d2320d9531a747b6bccc0f8206472ee1c720d1794155cd011a7baa0df9a",
+      "question_sha256": "197c6a57832f8221154c34377cb4f81df677c62da2cb37b68633be0a327b6e97",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Temporary files exercise file loader isolation across colliding local imports",
+          "verdict": "supported",
+          "reason": "Static helper writes actual hierarchy; tests verify distinct IDs and functions.",
+          "evidence": {
+            "path": "test/unittests/client/conanfile_loader_test.py",
+            "start_line": 127,
+            "end_line": 175
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-d2ce02cf263d96667caca3ca",
+      "reference_sha256": "839b73c5c487823bfdfeae318a6db9593ba83589ee7230741a1d8ca41eb7f542",
+      "question_sha256": "d220982349e82f216492e8d8e3f0079bc315b5ca86b5c2b2c9b0edadd4d30cfa",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "System libraries are added to pkg-config link flags",
+          "verdict": "supported",
+          "reason": "libs plus system_libs are formatted with -l and joined with other link flags.",
+          "evidence": {
+            "path": "conan/tools/gnu/pkgconfigdeps.py",
+            "start_line": 158,
+            "end_line": 163
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-d34a76f7a3605d8ff9a5b9be",
+      "reference_sha256": "930f132127e193efb43e0ced88a3647132808124a0f46cf588d1f47bfbffd6a0",
+      "question_sha256": "34a2093762049a1469fea0bb2d0541994300dca0652be29e78be24a90552cd75",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Path operations and dictionary updates prove poor scaling and linear in entry count",
+          "verdict": "partially_supported",
+          "reason": "String lengths cannot be discarded from complexity; constant-factor bottleneck and example operation counts are not measured.",
+          "evidence": {
+            "path": "conan/tools/gnu/pkgconfigdeps.py",
+            "start_line": 107,
+            "end_line": 149
+          }
+        }
+      ],
+      "material_errors": [
+        "String lengths cannot be discarded from complexity; constant-factor bottleneck and example operation counts are not measured."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "_get_pc_variables normalizes the prefix, formats each lib/include/bin directory, merges their dictionaries, and applies custom entries (conan/tools/gnu/pkgconfigdeps.py:107-149). For d directories of bounded average path length m, this work is approximately O(d*m) plus prefix and custom-content processing, assuming ordinary dictionary operations. The three update calls add linear work in inserted entries, not a multiplicative dependency factor. Costs accumulate across calls for packages/components; this source does not establish a performance bottleneck or large measured constants."
+    },
+    {
+      "task_id": "import-d677634a8b59426b7265d1bd",
+      "reference_sha256": "cbb9c738fdbe7a4af656289dd1d643270a66ffa4e907634f520c8cd80bed438d",
+      "question_sha256": "716f3f27b076829445a3ba6d215077e5abc1a55355e580c3352433df26a16ec9",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Overrides cause quadratic behavior and hash-collision degradation",
+          "verdict": "contradicted",
+          "reason": "Builder explicitly skips override requirements in expansion and uses depth-first traversal; algebra and estimated traversal counts are unsupported.",
+          "evidence": {
+            "path": "conan/internal/graph/graph_builder.py",
+            "start_line": 47,
+            "end_line": 62
+          }
+        }
+      ],
+      "material_errors": [
+        "Builder explicitly skips override requirements in expansion and uses depth-first traversal; algebra and estimated traversal counts are unsupported."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The builder processes pending requirements depth-first and skips entries marked override (conan/internal/graph/graph_builder.py:47-62). For expanded requirements it checks downstream state, applies force/override precedence or checks version conflicts (71-98). check_downstream_exists can recurse toward dependants, while propagate_downstream updates transitive state and may scan edges (conan/internal/graph/graph.py:116-172,174-214). More edges, deeper chains and diamond reconciliation can add work, but this code and a fixed regression test do not establish the claimed quadratic bound, hash-collision pathology, or numerical traversal estimates."
+    }
+  ]
+}

@@ -1,0 +1,397 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 45,
+            "file_sha256": "1fa1680676ab12e3bb475b1b5fc41af612b88c28eef74476a8debaffed4de948",
+            "path": "sympy/codegen/numpy_nodes.py",
+            "start_line": 44
+          },
+          {
+            "end_line": 361,
+            "file_sha256": "10b3f388d2370ac278552ee651b938416c86ffde056e06427412a278c376d157",
+            "path": "sympy/codegen/tests/test_rewriting.py",
+            "start_line": 361
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "3e82f6f8cb557ae613bbe0c848695bbea5b69adefcec19967f3af057589b6af1",
+            "kind": "file_reference",
+            "line_count": 312,
+            "path": "sympy/core/sorting.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the two-argument function class that computes the logarithm of the sum of exponentiations ensure argument ordering consistency in its instance creation method?",
+      "question_sha256": "bfa6e51a3d36ec6e175a36d7ad948691cc34b30c46610c71f7ef80ad8909cc4c",
+      "reference_answer": "The two-argument function class that computes the logarithm of the sum of exponentiations ensures argument ordering consistency in its instance creation method by sorting the input arguments using `default_sort_key` before passing them to the parent `Function.__new__` method.\n\nSpecifically, in `sympy/codegen/numpy_nodes.py` (lines 44-45), the `__new__` method is implemented as:\n\n```python\ndef __new__(cls, *args):\n    return Function.__new__(cls, *sorted(args, key=default_sort_key))\n```\n\nThis sorting ensures that regardless of the order in which arguments are provided during instantiation (e.g., `logaddexp(x, y)` vs `logaddexp(y, x)`), the arguments stored in `self.args` are always in a canonical, sorted order determined by `default_sort_key`. This function (defined in `sympy/core/sorting.py`) produces a consistent ordering key based on the class type, arguments, exponents, and coefficients of SymPy expressions.\n\n**Implications for derivative computation:**\n\nThe argument ordering consistency has important implications for the `fdiff` method (the first derivative computation method). When computing derivatives, the method uses `argindex` (1-indexed) to determine which argument position to differentiate with respect to. The `fdiff` implementation (lines 47-57) handles this by conditionally swapping the assignment of variables:\n\n- When `argindex == 1`: it treats `self.args[0]` as the variable to differentiate with respect to (`wrt`) and `self.args[1]` as the other argument\n- When `argindex == 2`: it swaps them, treating `self.args[1]` as `wrt` and `self.args[0]` as the other argument\n\nThe derivative formula is `1/(1 + exp(other-wrt))`, which is mathematically correct regardless of which argument is being differentiated. Because `__new__` guarantees a consistent argument order, `fdiff` can reliably use positional indexing (`argindex`) to determine which argument to differentiate, and the conditional swapping ensures the correct variable assignment for the derivative formula.\n\nThis design ensures that `logaddexp(x, y)` and `logaddexp(y, x)` produce equivalent instances (as verified in `sympy/codegen/tests/test_rewriting.py` line 361), and derivatives computed via `fdiff` are mathematically correct regardless of the original argument order provided during instantiation.",
+      "reference_sha256": "e1288caa50f03ee77cf4a9c1165961421208c7ee692fd99e0675dee2440f0889",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-43baccb4d50122b674817ed4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 250,
+            "file_sha256": "08be67ceaae97f2f40c070d0a80865c5b4eba77b4fac6b20dce2cde9f7881aed",
+            "path": "sympy/printing/latex.py",
+            "start_line": 242
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "08be67ceaae97f2f40c070d0a80865c5b4eba77b4fac6b20dce2cde9f7881aed",
+            "kind": "file_reference",
+            "line_count": 3325,
+            "path": "sympy/printing/latex.py"
+          },
+          {
+            "file_sha256": "84a2229f6d05e0b269da5e7285243e5807a04d11d840b85c700042d7f72223e5",
+            "kind": "file_reference",
+            "line_count": 180,
+            "path": "sympy/printing/precedence.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the LaTeX rendering method for symmetric difference set operations coordinate the precedence calculation helper function with the conditional parenthesization method to ensure correct operator precedence when rendering nested expressions?",
+      "question_sha256": "695ff9e5ec46eb7a7e3988ce5cad0e1515e0bf47c6c9879a1e83b2142135c12b",
+      "reference_answer": "The LaTeX rendering method for symmetric difference set operations (`_print_SymmetricDifference` in `sympy/printing/latex.py`) coordinates these components as follows:\n\n1. **Getting parent operation precedence**: The method calls `precedence_traditional(u)` to get the precedence value of the symmetric difference operation itself. According to `sympy/printing/precedence.py`, `SymmetricDifference` has precedence value 10 (same as `PRECEDENCE['Xor']`), defined in `PRECEDENCE_TRADITIONAL`.\n\n2. **Processing each argument**: For each argument in `u.args`, the method calls `self.parenthesize(i, prec)`, passing the argument and the parent's precedence level.\n\n3. **Inside the parenthesize method** (`sympy/printing/latex.py`, lines 242-250):\n   - It calls `precedence_traditional(item)` again to get the precedence of each individual argument\n   - It compares the argument's precedence (`prec_val`) with the parent's precedence (`level`)\n   - If `prec_val < level` or (when `strict=False`) `prec_val <= level`, it wraps the argument in parentheses using `_add_parens()`, which adds `\\left(...\\right)` LaTeX delimiters\n   - Otherwise, it returns the argument's LaTeX representation without parentheses\n\n4. **Final rendering**: The parenthesized argument strings are joined with ` \\triangle ` to produce the final LaTeX output.\n\nThis coordination ensures that nested expressions with lower or equal precedence (like Union, Intersection, or other set operations) are properly parenthesized, while higher-precedence expressions (like atoms or functions) are not unnecessarily parenthesized. For example, `SymmetricDifference(Union(A, B), C)` would render as `(A \\cup B) \\triangle C` because Union has the same precedence (10) as SymmetricDifference, requiring parentheses to maintain correct mathematical meaning.",
+      "reference_sha256": "2c4adf75dd0cddca8d67c342c94fcbb4a1aa39c2074945701c1b7659e9515e54",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-43c5c9ccfb99aaff23c15f64"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2468,
+            "file_sha256": "110f6a263b6f8a3e201b5d358c1d5e3ae4ed6929af9b50dadc81d50819f5165a",
+            "path": "sympy/tensor/tensor.py",
+            "start_line": 2459
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "87507edea7a4b07f6c1f852bee034261eabfb23a467207572a19637b4ed2b5be",
+            "kind": "file_reference",
+            "line_count": 5525,
+            "path": "sympy/core/tests/test_args.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the test validation infrastructure handle abstract tensor expression objects with pre-constructor argument transformations?",
+      "question_sha256": "647bdee6232b4d724806edfff462a19fe96b255fa6258d59ad7ddd5ced5d5159",
+      "reference_answer": "The test validation infrastructure in `sympy/core/tests/test_args.py` handles abstract tensor expression objects through the `_test_args` function (lines 97-102). This function validates objects by checking two conditions:\n\n1. All arguments are Basic instances: `all(isinstance(arg, Basic) for arg in obj.args)`\n2. Object recreatability: `obj.func(*obj.args) == obj` (for objects with non-empty args)\n\nFor TensExpr specifically, the test `test_sympy__tensor__tensor__TensExpr()` (line 4744) is skipped with `@SKIP(\"abstract class\")` because TensExpr is an abstract base class. Instead, tests validate concrete implementations like TensAdd and TensMul.\n\nPre-constructor argument transformations occur in the `__new__` methods of TensAdd and TensMul:\n\n**TensAdd transformations** (lines 2459-2468 in `sympy/tensor/tensor.py`):\n- Applies `_sympify()` to convert arguments to SymPy objects\n- Flattens nested TensAdd/Add objects via `_tensAdd_flatten()` (lines 2547-2556)\n- Sorts arguments using `default_sort_key`\n\n**TensMul transformations** (lines 3437-3482):\n- Applies `_sympify()` to all arguments\n- Detects and resolves dummy index conflicts using `_dedupe_indices()` (lines 4213-4253) to rename conflicting indices\n- Flattens nested TensMul/Mul objects\n- Contracts indices via `_tensMul_contract_indices()` to handle Einstein summation\n\n**Tensor transformations** (lines 2886-2901):\n- Parses indices via `_parse_indices()` (lines 2963-2978), converting Symbol objects to TensorIndex instances\n- Builds index structure using `_IndexStructure.from_indices()`\n\nWhen `_test_args` validates these objects, it receives them after all transformations have been applied in their constructors. The validation ensures the transformed arguments are valid Basic instances and that the object can be recreated from its args, confirming compatibility with SymPy's expression tree structure.",
+      "reference_sha256": "ae2179eb242a386f771d7ff4e473b0685888c5f5ebf681c20dba1ec280def31e",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-4b460d11d949e112498c1765"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1171,
+            "file_sha256": "0e0c60c4ff41ecd4fe3351dbd7ed40c0760706f5d993f63afcca997063ec98e8",
+            "path": "sympy/diffgeom/diffgeom.py",
+            "start_line": 1171
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the differential geometry vector field commutator class determine whether to compute the result immediately versus deferring it as an unevaluated expression?",
+      "question_sha256": "9c1ab86d18f2aa32844c8c0823b7af067e74ddfe2724318112e67dd053a96700",
+      "reference_answer": "The differential geometry vector field commutator class determines whether to compute the result immediately versus deferring it as an unevaluated expression in the `__new__` method at line 1171 of `./sympy/diffgeom/diffgeom.py`.\n\nThe decision point is the conditional check `if len(coord_sys) == 1:` (line 1171), which evaluates whether both vector fields belong to the same coordinate system. This check follows the extraction of coordinate systems from both vector fields using `_find_coords()` (line 1170), which collects all coordinate systems by finding `BaseScalarField` and `BaseVectorField` atoms in each vector field expression and extracting their `_coord_sys` attributes.\n\n**Immediate computation branch** (when `len(coord_sys) == 1`):\n- Lines 1174-1175: First checks if both arguments are `BaseVectorField` instances; if so, returns `S.Zero` immediately.\n- Lines 1176-1177: Extracts basis vectors using `atoms(BaseVectorField)` for both vector fields, creating lists `bases_1` and `bases_2`.\n- Lines 1178-1179: Extracts coefficients by calling `expand().coeff(b)` for each basis vector `b` in the respective lists, creating `coeffs_1` and `coeffs_2`.\n- Lines 1180-1183: Applies basis vectors to coefficients in a nested loop: for each pair `(c1, b1)` and `(c2, b2)`, computes `c1*b1(c2)*b2 - c2*b2(c1)*b1`, where `b1(c2)` and `b2(c1)` represent the basis vector fields acting on the coefficient expressions.\n- Line 1184: Returns the computed result `res` immediately.\n\n**Deferred/unevaluated branch** (when `len(coord_sys) != 1`):\n- Lines 1185-1189: Creates and returns an unevaluated `Commutator` object by calling `super().__new__(cls, v1, v2)`, which stores the vector fields as arguments without computing the commutator result.\n\nThe coefficient extraction stage (lines 1178-1179) uses `expand().coeff(b)` to extract scalar coefficients from the expanded vector field expressions relative to each basis vector. The basis vector application stage (lines 1181-1183) applies the basis vector fields as differential operators to the coefficients, computing the commutator formula `c1*b1(c2)*b2 - c2*b2(c1)*b1` for all combinations of basis vectors and their coefficients.",
+      "reference_sha256": "f0cfa7530176526dbcd646f8e60fe69d883a8cef7d6477db320fd7f1affad145",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-54799689542b60bcbea83e9d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1116,
+            "file_sha256": "cd45f12e701d7787bd029daca88058326b9204fec3a1d1c46914768e640ffc6b",
+            "path": "sympy/functions/elementary/hyperbolic.py",
+            "start_line": 1100
+          },
+          {
+            "end_line": 423,
+            "file_sha256": "4c12596e257ea3d736b9552a9e4691b87af915d48604ea6a28ae7fd9b5a0f76b",
+            "path": "sympy/functions/elementary/tests/test_hyperbolic.py",
+            "start_line": 423
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the dependency chain between the Taylor series term computation method's use of the Bernoulli number function and the factorial function for the hyperbolic cosecant function's series expansion?",
+      "question_sha256": "2139478493bab673dfa34f9dab01252f9f603add39860dc623e411a07464cdd0",
+      "reference_answer": "The dependency chain for the hyperbolic cosecant function's (`csch`) Taylor series expansion works as follows:\n\n**Direct Dependencies:**\nThe `taylor_term` static method of the `csch` class (located in `sympy/functions/elementary/hyperbolic.py`, lines 1100-1116) directly depends on two combinatorial functions:\n\n1. **`bernoulli(n + 1)`**: Called from `sympy.functions.combinatorial.numbers.bernoulli`, which computes Bernoulli numbers using Ramanujan's formula with caching for efficiency.\n\n2. **`factorial(n + 1)`**: Called from `sympy.functions.combinatorial.factorials.factorial`, which computes factorials using the Prime-Swing algorithm for large values.\n\n**The Formula:**\nThe `taylor_term` method implements the formula:\n```python\nreturn 2 * (1 - 2**n) * bernoulli(n + 1) / factorial(n + 1) * x**n\n```\n\nThis formula generates the coefficients for odd-powered terms in the Taylor series expansion of `csch(x)`.\n\n**Call Chain:**\nThe dependency flows through the series expansion mechanism:\n- `csch(x).series()` or `csch(x)._eval_nseries()` calls\n- `taylor_term(i, arg, previous_term)` for each term `i`, which then calls\n- `bernoulli(n + 1)` and `factorial(n + 1)` to compute the coefficient\n\n**Impact on Correctness:**\nIf `bernoulli` or `factorial` produce incorrect values, the Taylor series coefficients for `csch` will be wrong. For example, the test in `test_hyperbolic.py` (line 423) verifies that `csch(x).series(x, 0, 10)` produces:\n```\n1/x - x/6 + 7*x**3/360 - 31*x**5/15120 + 127*x**7/604800 - 73*x**9/3421440 + O(x**10)\n```\n\nThese coefficients depend directly on the correctness of `bernoulli(2)`, `bernoulli(4)`, `bernoulli(6)`, etc., and the corresponding factorial values. Any errors in these combinatorial functions would propagate directly to the series expansion, making it mathematically incorrect.",
+      "reference_sha256": "7d4b1b508c827184f31505a9080e2e88c1419e79eb6d1c03743e8d6ee9e80d46",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-69165a26efdf54a3ef60289c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 220,
+            "file_sha256": "5c75a84fe26fe50c0956c18d6dfc479cd1b6b3280fcb509e47fb7acebf285283",
+            "path": "sympy/matrices/expressions/diagonal.py",
+            "start_line": 220
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the function that diagonalizes vectors instantiate the matrix expression class that converts vectors to diagonal matrices?",
+      "question_sha256": "5345feefacb602963be96222c72975b484d081ae7f92487a747b19448a032f5e",
+      "reference_answer": "The matrix expression class that converts vectors to diagonal matrices (`DiagMatrix`) is instantiated at line 220 of `./sympy/matrices/expressions/diagonal.py`, within the function that diagonalizes vectors (`diagonalize_vector`).\n\nThe instantiation occurs in the return statement:\n```python\ndef diagonalize_vector(vector):\n    return DiagMatrix(vector).doit()\n```\n\nThe instantiation immediately calls `.doit()` on the new `DiagMatrix` instance. The `doit` method (defined at lines 194-216 in the same class) evaluates and simplifies the expression. It can:\n- Return the vector directly if it's already diagonal (line 203)\n- Convert explicit matrix bases to diagonal matrices (lines 204-208)\n- Handle matrix multiplication expressions by recursively calling `doit()` on nested components (line 213)\n- Handle transpose operations (lines 214-216)\n- Return a new `DiagMatrix` instance if no simplification applies (line 216)\n\nThis creates a chain where `diagonalize_vector` creates a `DiagMatrix` instance and immediately invokes `doit()`, which may recursively create additional `DiagMatrix` instances and call `doit()` again (as seen at line 213), forming the invocation chain.",
+      "reference_sha256": "d8a76aef9ed305d7704229ed31a02241e15593addf9d86ca3130e670e6b4697e",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-7d6823707be2576b35564920"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 4055,
+            "file_sha256": "ef5f337e59709e4696c091c1cede2026dfd91c32317bef3f2fe5aa3bc22886b1",
+            "path": "sympy/core/numbers.py",
+            "start_line": 4051
+          },
+          {
+            "end_line": 3735,
+            "file_sha256": "b89db816e04df20eb2678a0b96b87cfda584c71770f3b3d310cd72a2f4866ec1",
+            "path": "sympy/polys/polytools.py",
+            "start_line": 3735
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the method that converts the Catalan constant singleton class to a multiple-precision floating-point value increase the precision parameter by ten bits before calling the fixed-precision computation function?",
+      "question_sha256": "9860d34be24f1a01f4d1e854f12edfbd105f283ae0ef05c8f6047f9dc9e6f5fa",
+      "reference_answer": "The method increases precision by ten bits as guard digits to prevent accuracy loss during rounding in the conversion and normalization steps.\n\nImplementation pattern:\n1. The method calls `mlib.catalan_fixed(prec + 10)` to compute at higher precision.\n2. It converts the integer mantissa to an mpf using `mlib.from_man_exp(v, -prec - 10)`.\n3. It normalizes back to the requested precision using `mpf_norm(rv, prec)`.\n\nWhy extra precision is needed:\n- `catalan_fixed` returns an integer mantissa that must be converted via `from_man_exp`.\n- `mpf_norm` rounds/normalizes to the target precision, which can lose precision.\n- The extra 10 bits act as guard digits to ensure the final result at `prec` is accurate after rounding.\n\nEvidence in codebase:\n- In `sympy/core/numbers.py` lines 4051-4055, the Catalan class uses this pattern with the comment `# XXX track down why this has to be increased`.\n- The same pattern appears in `EulerGamma` (lines 3999-4003) and `GoldenRatio` (lines 3862-3865), suggesting a common need for guard digits when converting from fixed-precision integer mantissas.\n- In contrast, `Pi` and `E` (lines 3805-3806, 3642-3643) use `mpf_pi(prec)` and `mpf_e(prec)`, which return mpf values directly and do not require extra precision.\n- The codebase elsewhere uses guard digits for similar reasons, e.g., in `sympy/polys/polytools.py` line 3735: \"We need to add extra precision to guard against losing accuracy.\"\n\nThe value 10 appears to be an empirically chosen guard digit count that balances accuracy and performance for these mathematical constants.",
+      "reference_sha256": "24f31cbecccf4b790664345d124bdc6d815b5e76de02db1c7db8b595e4fc788e",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-8009ef17ed6641b7c2042bbb"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 30,
+            "file_sha256": "3d11035aafd60397abdb3cdfb6de4b834a299d6cf2141b0890b29cc865d4573d",
+            "path": "sympy/polys/domains/mpelements.py",
+            "start_line": 19
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the layered abstraction established by the class that inherits from both the multiprecision floating-point type and the domain element trait that separates low-level arithmetic concerns from high-level domain semantics?",
+      "question_sha256": "19841c8b24ed8b5bad85e4d3e744ce1c616aef92a15d8dd7aeac388c9e19bbd6",
+      "reference_answer": "The layered abstraction established by `RealElement`'s dual inheritance from `_mpf` and `DomainElement` separates low-level multiprecision arithmetic concerns from high-level domain algebra semantics through a clear architectural separation:\n\n**Low-level layer (`_mpf` inheritance):**\n- Provides multiprecision floating-point arithmetic operations (addition, subtraction, multiplication, division)\n- Handles precision management and rounding modes\n- Manages the internal representation of floating-point numbers via the `_mpf_` tuple format\n- Inherits from `mpmath.ctx_mp_python._mpf`, which is part of the mpmath library's low-level numerical computation infrastructure\n\n**High-level layer (`DomainElement` inheritance):**\n- Provides domain algebra semantics through the `parent()` method, which identifies the domain (e.g., `RealField`) that the element belongs to\n- Enables integration with SymPy's domain system for polynomial computations\n- Allows the element to participate in domain operations like conversion between domains, unification, and coercion\n- Implements the trait pattern that makes the element recognizable as a domain element throughout the polys module\n\n**The abstraction in practice:**\nThe `RealElement` class (defined in `sympy/polys/domains/mpelements.py`, lines 19-30) combines both layers:\n- It inherits arithmetic operations from `_mpf` (low-level)\n- It implements `parent()` from `DomainElement` (high-level), returning `self.context._parent` to identify its domain\n- This allows `RealElement` instances to be used both as multiprecision numbers (via `_mpf` methods) and as domain elements in SymPy's polynomial domain system (via `DomainElement` interface)\n\nThis separation allows the codebase to maintain a clean boundary between numerical computation concerns (handled by mpmath) and algebraic domain concerns (handled by SymPy's domain system), while allowing `RealElement` to participate in both worlds seamlessly.",
+      "reference_sha256": "6add40be107b2d91f4bf960120e1a8ce9c89ce36991772b69ea77447719b6464",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-8537a12d6cb0b794eb77a8d5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 350,
+            "file_sha256": "933087a970ed71919540f967e76d657cde6b79d3708fa2235c9c236effc39218",
+            "path": "sympy/matrices/expressions/kronecker.py",
+            "start_line": 344
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the integration mechanism of the function that converts symbolic Kronecker products to explicit matrices within the symbolic expression hierarchy that maintains separation between symbolic and concrete computation layers?",
+      "question_sha256": "8567850ad143bf348d6d1e68521b46388c865fae53b3ac36618f4a9b1c56f368",
+      "reference_answer": "The integration mechanism uses a canonicalization rule system that applies transformation rules to KroneckerProduct expressions during evaluation.\n\n**Integration Architecture:**\n\n1. **Rule-based canonicalization**: The `explicit_kronecker_product` function is integrated as one of four rules in the `canonicalize` function (lines 344-350 in `kronecker.py`):\n   ```python\n   rules = (unpack,\n            explicit_kronecker_product,\n            flatten,\n            extract_commutative)\n   \n   canonicalize = exhaust(condition(lambda x: isinstance(x, KroneckerProduct),\n                                    do_one(*rules)))\n   ```\n\n2. **Invocation path**: When `KroneckerProduct.doit()` is called (line 226-232), it:\n   - Recursively calls `doit()` on all arguments (if `deep=True`)\n   - Wraps the result in a new `KroneckerProduct` instance\n   - Passes it to `canonicalize()`, which applies the rules including `explicit_kronecker_product`\n\n3. **Conditional conversion logic**: The `explicit_kronecker_product` function (lines 336-341) maintains separation by:\n   - Checking if all arguments are `MatrixBase` instances (concrete matrices)\n   - If yes: calling `matrix_kronecker_product()` to compute the explicit matrix result\n   - If no: returning the symbolic `KroneckerProduct` unchanged\n\n**Separation of Concerns:**\n\n- **Symbolic layer** (`KroneckerProduct` class): Handles symbolic operations like `_eval_adjoint()`, `_eval_transpose()`, `_eval_inverse()`, structural equality checks, and shape computations without performing actual matrix arithmetic.\n\n- **Concrete computation layer** (`explicit_kronecker_product` + `matrix_kronecker_product`): Performs actual matrix multiplication and construction when all operands are concrete matrices.\n\n- **Integration point**: The canonicalization system acts as the bridge, allowing symbolic expressions to remain symbolic until explicitly evaluated, while automatically converting to concrete matrices when all components are concrete. This design enables symbolic manipulation and optimization before computation, while seamlessly transitioning to concrete computation when appropriate.",
+      "reference_sha256": "2d3ea7e9b27ba58843b0e15bc8090adb46c9dc84d1dc501d83dd7ad5f42fda1c",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-8ef586137057756015b39d33"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 612,
+            "file_sha256": "a97f04931553e59d879dccfc0c987c89aaff8c1b957110c4888b7577a8dc7ab1",
+            "path": "sympy/printing/c.py",
+            "start_line": 612
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "0fbaeb002f137bab494ec485852ce68b5899a6604eaf090fe08a2a52249ad3ed",
+            "kind": "file_reference",
+            "line_count": 2351,
+            "path": "sympy/core/basic.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does repeated instantiation and code generation of pre-decrement operator objects impact code generation test suite performance across thousands of similar operator tests?",
+      "question_sha256": "8dd674c57674b1de91e111d14fdb0b03e595d8f0d93c15af431a2fb7bc451308",
+      "reference_answer": "Repeated instantiation and code generation of pre-decrement operator objects impacts performance due to:\n\n1. **Object instantiation overhead**: Each `PreDecrement(x)` call goes through `Basic.__new__` (in `sympy/core/basic.py`), which:\n   - Creates a new object instance\n   - Initializes `_mhash = None` (for lazy hash computation)\n   - Assigns `_assumptions = cls.default_assumptions`\n   - Stores `_args = args`\n\n2. **Hash computation**: On first access, `__hash__` computes `hash((type(self).__name__,) + self._hashable_content())` where `_hashable_content()` returns `self._args`. This computation happens when objects are used in sets/dicts or during equality checks.\n\n3. **Equality check overhead**: The test pattern `p.func(*p.args) == p` creates a new object and compares it. `__eq__` calls `_hashable_content()` on both objects, which returns tuples that must be compared.\n\n4. **Code generation overhead**: `ccode(p)` calls `_print_PreDecrement` (in `sympy/printing/c.py:612`), which:\n   - Accesses `expr.args` (extracting the argument)\n   - Recursively calls `self._print(arg)` to process the argument\n   - Constructs the string `'--(%s)' % self._print(arg)`\n\nWhen scaled across thousands of similar operator tests (PreIncrement, PostIncrement, PostDecrement, etc.), these per-object costs accumulate:\n- Each test creates multiple instances\n- Each instance triggers hash computation\n- Each equality check compares hashable content\n- Each code generation call processes args recursively\n\nThe overhead is multiplicative: if each test creates 2-3 objects and performs 2-3 operations per object, thousands of tests result in tens of thousands of object instantiations, hash computations, and code generation calls, leading to measurable performance degradation in the test suite.",
+      "reference_sha256": "149568433709531a7e2ceeb5d4c49d5f7a21f54fd1e0a2babb0da53a102df008",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-922429dea6833879b432a9db"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "6d9bc0db57d24cc736b102c9378028bd0b2975dce69c83415853ebf937869a6d",
+            "kind": "file_reference",
+            "line_count": 601,
+            "path": "sympy/tensor/array/ndim_array.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the array creation input handler in the base N-dimensional array class perform shape inference through recursive scanning of nested iterables rather than requiring explicit shape specification?",
+      "question_sha256": "9ae90fe9ac7ef34705802f5c1eba3fbd469aa03dfb520f09641ae0ee9bcd4d66",
+      "reference_answer": "The array creation input handler performs shape inference through recursive scanning of nested iterables to provide a convenient API that allows users to create arrays from nested Python lists without explicitly specifying the shape parameter.\n\nLooking at the implementation in `sympy/tensor/array/ndim_array.py`, the `_handle_ndarray_creation_inputs` class method (lines 216-260) checks if `shape` is `None` (line 220). When it is, and the input is an iterable (line 233), it calls `_scan_iterable_shape` (line 234) to recursively scan the nested structure and infer the dimensions.\n\nThe `_scan_iterable_shape` method (lines 197-213) recursively traverses nested iterables:\n- For non-iterable elements, it returns the element and an empty shape tuple\n- For iterables, it recursively processes each element, collects their shapes, and verifies they're consistent (line 207-208)\n- It builds the shape tuple by combining the length of the current level with the recursively determined inner shapes (line 211)\n\nThis design enables convenient array creation syntax like:\n```python\nMutableDenseNDimArray([[2, 3], [4, 5]])  # Shape (2, 2) inferred automatically\nMutableDenseNDimArray([[[1, 2], [3, 4], [5, 6]], [[7, 8], [9, 10], [11, 12]]])  # Shape (2, 3, 2) inferred\n```\n\nAs shown in the documentation examples (lines 101-107), users can create arrays directly from nested lists without needing to specify `shape=(2, 2)` or `shape=(2, 3, 2)`. The method still supports explicit shape specification when provided (line 111 shows an example with a flat list and explicit shape), giving users flexibility.\n\nThe recursive approach handles arbitrary nesting depths automatically, making the API more intuitive for users working with nested data structures, which is common in mathematical and scientific computing contexts where SymPy is used.",
+      "reference_sha256": "c395272d7db324232f660210f2d20fcc7cad6ef67550dddb93e53de269533583",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-93de04c45a26c85f844aef7b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the method that estimates transformation steps compute the distance between two hypergeometric functions while preserving their modulo-1 congruence class structure?",
+      "question_sha256": "1ccf78de2d787175532a8488763d4ddcb12e7bcd18846c58dd1e96229f1a0ebe",
+      "reference_answer": "The method that estimates transformation steps computes the distance between two hypergeometric functions while preserving their modulo-1 congruence class structure through the following process:\n\n**1. Initial Validation:**\n   - First checks if both functions have the same `gamma` value (number of negative integer upper parameters). If not, returns -1 indicating transformation is impossible (lines 559-560).\n\n**2. Modulo-1 Bucketing:**\n   - Groups parameters from both functions into \"buckets\" based on their value modulo 1 using the `_mod1` helper function (line 561-562)\n   - Creates separate buckets for upper parameters (`ap`) and lower parameters (`bq`) of both the source function (`self`) and target function (`func`)\n   - The `_mod1` function handles both numeric values (using `Mod(x, 1)`) and symbolic expressions by extracting the constant coefficient and applying modulo-1 to it (lines 85-96)\n\n**3. Congruence Class Matching:**\n   - For each modulo-1 congruence class (bucket), verifies that:\n     - The same congruence class exists in both functions\n     - Both functions have the same number of parameters in that congruence class\n   - If any mismatch is found, returns -1 (lines 567-569)\n\n**4. Distance Calculation:**\n   - Within each matching congruence class, sorts the parameters from both functions (lines 570-573)\n   - Pairs corresponding parameters (by sorted order) and computes the absolute difference between each pair\n   - Sums all these absolute differences across all parameters in all congruence classes (lines 574-575)\n   - Returns this total sum as the transformation distance estimate (line 577)\n\n**Key Design Principles:**\n   - The modulo-1 structure is preserved because parameters are only compared within the same congruence class (same `mod` value)\n   - Parameters with different modulo-1 values are never directly compared, maintaining the invariant structure\n   - The distance represents the total \"shift\" needed to transform parameters while keeping them within their respective congruence classes\n\nThis method is used in the `lookup_origin` function (line 869) to find the nearest origin formula from the knowledge base for expanding hypergeometric functions, selecting the formula with the smallest difficulty value (line 875).",
+      "reference_sha256": "03c81169d6a6246ac9d8870301cca7df52511cbf18114894b42b701590af8b77",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "task_id": "import-94920f727a546ae394c8954e"
+    }
+  ]
+}

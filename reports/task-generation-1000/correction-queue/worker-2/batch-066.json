@@ -1,0 +1,143 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-066.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "dbc9a193aee6f72444b68bc7e1bf1495a36433228626b20d0afede5ab33dd580",
+      "question": "Why does the Python domain cross-reference handler's link processing method require optimization to reduce redundant string operations when processing multiple similar cross-references in high-volume builds?",
+      "question_sha256": "0cb9a78198ee1a36bb7a0d7659aa0df392c9a335d2d02c8c3b130919eaaeac27",
+      "reference_answer": "PyXRefRole.process_link records module/class context, normalizes implicit titles and targets, abbreviates tilde titles, and marks leading-dot references as refspecific (sphinx/domains/python/__init__.py:570-595). Repeated references repeat these operations, but the code does not establish a significant bottleneck or that every string operation allocates. Profile representative builds before optimizing. Any cache must preserve explicit-title behavior and per-node context/refspecific side effects; similar patterns alone do not imply identical results.",
+      "reference_sha256": "d4818e2a2b6931ffa6da05de034bc9254eb96a0a93e0554d4cdb86517398011a",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-5b009b0c0f46da0ef68686e3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "30464be92517bd7df002905fefb37d7d015d1d422d84130fafd189b2f56bf81a",
+      "question": "Why does the exception raised when character literal decoding produces multiple characters integrate with the parser's error handling to distinguish valid single-character from invalid multi-character literals during AST construction?",
+      "question_sha256": "d7ce1121fa941ef1e19b37ca1e81203194741a07a1523e66d2e131c4ced8e68b",
+      "reference_answer": "ASTCharLiteral rejects decoded data unless it has one character, raising UnsupportedMultiCharacterCharLiteral. The parser catches that exception and calls fail with a multiple-decoded-characters diagnostic (sphinx/domains/c/_parser.py:155-165; sphinx/domains/cpp/_parser.py:225-235). This separates construction from user-facing error reporting. The distinction is supported versus unsupported by this AST implementation, not proof that multi-character literals are invalid C/C++ constructs.",
+      "reference_sha256": "da10984419c48bfb608bb8cd9beefa58ab653dd4898c3049fd56fe13b8191ed8",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-62754687cf75112341a70c15"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "cb3f2aa0fcfdae359091e0f82bfbc918fd8a9d9c3de8df498218b799f58bc3ad",
+      "question": "What is the dependency mechanism in the directive class that handles CSV table rendering in the patches module's execution method on the build environment context to correctly resolve file paths?",
+      "question_sha256": "360e4ad442ed12b6a263b9ba2f62a8c7327894c4c2c3e42a2af092c72a25be20",
+      "reference_answer": "CSVTable.run accesses env only for a file option beginning with a path separator. If that absolute path already exists, it warns and leaves the option unchanged. Otherwise it joins env.srcdir to the option without its first separator, obtains the current document directory via env.doc2path, and rewrites the option using relpath before delegating to the parent directive (sphinx/directives/patches.py:64-82).",
+      "reference_sha256": "0ca0f5dc2f01be49e5f564437965730c31b566a1105a722cedf1d9864430c0af",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-6b86a8542b1f719a255eaa9b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "fc217c76534967199451ccd36df085fd52689fdc99cd8d0d64f1bb5d715d01f6",
+      "question": "Why does the Python domain's object resolution method reconcile the tension between fully-qualified and unqualified references while maintaining predictable resolution order?",
+      "question_sha256": "120dd1045c08787bb6b2c5fb1e39f0512ebc2635d20f3fc78d95cbcc0d55a2ec",
+      "reference_answer": "find_obj has two predictable but different orders. Mode1 tries module.class.name, module.name, bare name, then suffix matches, filtering object types. Mode0 first tries the supplied name exactly, returns no result for an unmatched module reference, then tries class.name, module.name and module.class.name (sphinx/domains/python/__init__.py:886-937). Thus specificity is prioritized only in mode1; mode0 favors an existing exact name. Context-sensitive references select the appropriate mode, rather than a universal most-specific-first rule.",
+      "reference_sha256": "6b6552d86e067a3a85cb47d972081745d3aac6f0201f8b350903f3ca2bda0cd8",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-721ac1a2f9bb10c32d99fb87"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "054695ce3257bb9ede0d4203dd3bb776ac71dfa93e6696cd19a48f8cfc13afe0",
+      "question": "Where are the conditional branches that determine whether the pointer suffix identifier generation method in the parenthesized declarator node class of the C++ domain applies version-specific transformations?",
+      "question_sha256": "dd7e7c9c4a07c13ec25a329eecd8769e624282b483ff92ff133bfd482dfa6c48",
+      "reference_answer": "ASTDeclaratorParen.get_ptr_suffix_id branches on version == 1 and immediately raises NoOldIdError. Statements after that raise in the branch are unreachable, so no version1 concatenation occurs. For other versions the method returns inner.get_ptr_suffix_id(version) + next.get_ptr_suffix_id(version) (sphinx/domains/cpp/_ast.py:3227-3235).",
+      "reference_sha256": "1407043fcf23f01f529bcaa9181100fda21a3b573156e5b5ce3ed987388e55e8",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-7318b2894e8550d08fc091e1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "ee29a7b3cf8b585a01f41ee07b19462bb30df94f4185237cec1dd9d98d8b3385",
+      "question": "Why does the remote image downloader use a two-level structure with URI hash parent and sanitized basename, rather than a flat directory?",
+      "question_sha256": "f0c81a6ffeed7b54368865df25b1cad79f0fac96a04e7ba2292a2bf76f786c3b",
+      "reference_answer": "ImageDownloader combines a SHA1 of the full URI with a sanitized basename, separating ordinary same-basename URLs while retaining a recognizable filename (sphinx/transforms/post_transforms/images.py:61-76). Repeated identical URIs reuse the path; _download_image uses its timestamp for If-Modified-Since but still sends a request (lines 82-94). This supports conditional reuse, not guaranteed collision impossibility or avoidance of all repeat requests.",
+      "reference_sha256": "2b3db2dba71cf1f861e6711310dd3d0310a8897d630e14cce8259afd0f1c520f",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-7a44b24f12a20b78f8f0c5f5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "22255369fed271a391e1d90b35d29b4da2165458a5493565631879600c41b83a",
+      "question": "Why do separate recursive directory traversals for source and compiled translation files in the catalog compilation verification test impact performance with thousands of locale catalog files?",
+      "question_sha256": "5e5846014fe0f2466c192420de288bea4e08fc28a5f16dab7bd2cb6c15a94bbe",
+      "reference_answer": "test_compile_all_catalogs independently enumerates .po and .mo paths, derives expected outputs from the former and compares sets (tests/test_intl/test_catalogs.py:47-55). Two recursive enumerations can repeat directory traversal work for large trees. One enumeration classifying both suffixes is a possible optimization, but the source contains no timing evidence and does not imply a system call per file, doubled physical I/O, or absence of filesystem caching.",
+      "reference_sha256": "325cacf99dae35b22f118ba1a9b3b49341a65e2d4c7b6b3abf46a87d391bbb56",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-7c4badf82e8577dbcd4566d4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "792755aec3dbdb2e9cae7368ea930ccf6ee235da4403bd29fc66e0c941df0c36",
+      "question": "How does the documentation generation system determine which class members should be excluded from generated documentation?",
+      "question_sha256": "566d26a0db18c794e4f1928fdcb74d5c1bdba24cda9b867083195e5c079b6897",
+      "reference_answer": "In autosummary, _get_members obtains members, filters requested documenter types and imported-member policy, then asks _skip_member to emit autodoc-skip-member. True excludes, False forces inclusion in both lists, and None includes in all members but uses underscore/include_public rules for the public list (sphinx/ext/autosummary/generate.py:442-457,499-517). Templates consume these lists. This explains autosummary filtering; it is not a guarantee that an excluded member cannot appear through any other documentation directive.",
+      "reference_sha256": "6cbf1b6eeefbcc3daad90de2042f01abe2776e711eb7c7180157c4510b0d6640",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-7c700b38e0ebd554d85a122f"
+    }
+  ]
+}

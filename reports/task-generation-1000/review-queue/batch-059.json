@@ -1,0 +1,569 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sanic-org--sanic-57d44f263fa8",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 139,
+            "file_sha256": "9546f6b0155fe02b6a6ffade8f46f578938cde9f9debd831480e2d13e5c563ed",
+            "path": "sanic/worker/process.py",
+            "start_line": 109
+          },
+          {
+            "end_line": 434,
+            "file_sha256": "c7d23e4001b324e2064f2167cb0d936ed44b5aa13b05171a3cd8c61f1b725877",
+            "path": "sanic/worker/manager.py",
+            "start_line": 424
+          },
+          {
+            "end_line": 299,
+            "file_sha256": "c7d23e4001b324e2064f2167cb0d936ed44b5aa13b05171a3cd8c61f1b725877",
+            "path": "sanic/worker/manager.py",
+            "start_line": 287
+          },
+          {
+            "end_line": 155,
+            "file_sha256": "9546f6b0155fe02b6a6ffade8f46f578938cde9f9debd831480e2d13e5c563ed",
+            "path": "sanic/worker/process.py",
+            "start_line": 147
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "sanic/application/constants.py",
+              "sanic/constants.py",
+              "sanic/http/constants.py",
+              "sanic/worker/constants.py"
+            ],
+            "end_line": 25,
+            "path": "constants.py",
+            "reason": "ambiguous_basename",
+            "reference": "constants.py",
+            "start_line": 13
+          }
+        ]
+      },
+      "question": "Why does Sanic's WorkerManager experience race conditions during worker restart operations that can result in processes becoming stuck in non-idle states and failing to respawn?",
+      "question_sha256": "9c67dc9b736beaa92bfea77d555cd4032df516bf3c73bf5b14ba365cda2fe0b8",
+      "reference_answer": "Sanic's WorkerManager experiences race conditions during worker restarts due to concurrent execution between the restart operation and the state synchronization process. The race condition occurs specifically between the WorkerProcess.restart method (process.py: lines 109-139) and the WorkerManager._sync_states method (manager.py: lines 424-434).\n\nWhen a restart is initiated, WorkerProcess.restart first sets the process state to RESTARTING (line 116) and then, for SHUTDOWN_FIRST order, calls _terminate_now (line 118) which terminates the current process via terminate() (line 175). Subsequently, restart attempts to spawn a new process (line 126) and start it (line 127).\n\nMeanwhile, the WorkerManager runs a monitor loop (manager.py: lines 287-299) that continuously polls for messages and calls _sync_states (line 294). The _sync_states method iterates through all processes and checks their liveness using is_alive (line 431). When a process is detected as not alive, it determines the new state based on the exitcode: FAILED if exitcode is non-zero, COMPLETED otherwise (line 432). It then updates the process state if different from the current state (lines 433-434).\n\nThe race condition manifests in the critical window between process termination and the spawn call. After _terminate_now kills the process but before spawn creates a new one, _sync_states may run and detect the terminated process as not alive. It then sets the state from RESTARTING to COMPLETED. When spawn subsequently executes (process.py: lines 147-155), it checks that the state must be either IDLE or RESTARTING (line 148). Since _sync_states has changed the state to COMPLETED, spawn raises the exception 'Cannot spawn a worker process until it is idle' (line 149).\n\nThis leaves the process in a non-functional state where it cannot be restarted, as the state is COMPLETED but no actual worker process exists. The ProcessState enum (constants.py: lines 13-25) shows that COMPLETED has a higher integer value than RESTARTING, meaning the state transition from RESTARTING to COMPLETED is permitted by the force=True parameter in set_state. The fundamental issue is the lack of synchronization or locking between the restart operation and the monitor's state synchronization, combined with the spawn method's strict state requirements.",
+      "reference_sha256": "dc6ab8c9653cd979e92cfe19e334a31657472e1bd87702732218c46e87b8fa78",
+      "repository": {
+        "commit": "57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+        "family_id": "sanic-org/sanic",
+        "url": "https://github.com/sanic-org/sanic"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sanic-org--sanic-57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+      "task_id": "import-b04ae6e1b695f33eeae9e5d2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sanic-org--sanic-57d44f263fa8",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 186,
+            "file_sha256": "47130707d98669d066a0b1a7da9ec8e98898eb6bf0134b1fb573a2a2d4c6d20c",
+            "path": "sanic/server/protocols/http_protocol.py",
+            "start_line": 79
+          },
+          {
+            "end_line": 171,
+            "file_sha256": "7120409f322e57b59a1d4de92737e22254c51257375803fe2a5ccd5601fdeddc",
+            "path": "sanic/http/http1.py",
+            "start_line": 102
+          },
+          {
+            "end_line": 279,
+            "file_sha256": "7120409f322e57b59a1d4de92737e22254c51257375803fe2a5ccd5601fdeddc",
+            "path": "sanic/http/http1.py",
+            "start_line": 172
+          },
+          {
+            "end_line": 46,
+            "file_sha256": "7120409f322e57b59a1d4de92737e22254c51257375803fe2a5ccd5601fdeddc",
+            "path": "sanic/http/http1.py",
+            "start_line": 45
+          },
+          {
+            "end_line": 199,
+            "file_sha256": "6c05d89f114965b34e3322fa5c0722b48d38723144c541f52639e672e4d0454d",
+            "path": "sanic/request/types.py",
+            "start_line": 147
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "7120409f322e57b59a1d4de92737e22254c51257375803fe2a5ccd5601fdeddc",
+            "kind": "file_reference",
+            "line_count": 594,
+            "path": "sanic/http/http1.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does Sanic implement the HTTP/1.1 header parsing algorithm in its protocol layer to convert raw socket bytes into structured Request objects?",
+      "question_sha256": "7750fa82024e277eff605f6d4e21f9dd69c8a58bcfdab1a461e2e8f71fdbabfb",
+      "reference_answer": "Sanic implements HTTP/1.1 header parsing through a multi-layered protocol architecture centered on the Http class in sanic/http/http1.py. The process begins when the HttpProtocol class (sanic/server/protocols/http_protocol.py: lines 79-186) establishes a connection via connection_made() which initializes recv_buffer and creates a connection_task. This task delegates HTTP handling to an Http instance by calling http1() (sanic/http/http1.py: lines 102-171).\n\nThe core parsing algorithm is implemented in the http1_request_header method (sanic/http/http1.py: lines 172-279) which operates through several distinct stages:\n\n1. Buffer Accumulation: Raw socket bytes are accumulated in recv_buffer until the complete header delimiter sequence '\\r\\n\\r\\n' is detected. The search uses a progressive algorithm starting from position 0, updating pos to max(0, len(buf) - 3) to avoid rescanning the entire buffer on each iteration (lines 178-187).\n\n2. Size Validation: During accumulation, the parser enforces configurable size limits through HEADER_MAX_SIZE validation (sanic/http/http1.py: lines 45-46) with HEADER_CEILING set to 16,384 bytes to prevent denial-of-service attacks via oversized headers. If exceeded, PayloadTooLarge is raised (lines 189-190).\n\n3. Header Decoding and Splitting: Once complete, the header block is decoded using 'surrogateescape' error handling to accommodate non-ASCII characters, then split on '\\r\\n' delimiters to separate the request line from individual header fields (lines 194-196).\n\n4. Request Line Decomposition: The first line undergoes space-based splitting to extract the HTTP method, URL path, and protocol version. The protocol version determines keep_alive behavior - HTTP/1.1 defaults to True, HTTP/1.0 to False (lines 197-210).\n\n5. Header Field Processing: Each header line is parsed into name-value pairs using colon separation with special handling for: 'content-length' and 'transfer-encoding' (which determine request body presence), 'connection' (which controls keep-alive behavior), and 'upgrade' (for WebSocket detection) (lines 216-230).\n\n6. Request Object Construction: The parsed components are used to construct a structured Request object (sanic/request/types.py: lines 147-199) with url_bytes, headers, head, version, method, transport, and app parameters. The Request constructor performs URL parsing via httptools.parse_url and wraps headers in a Header instance for subsequent processing (lines 239-248).",
+      "reference_sha256": "3932e4ad9ec26fcc27faceab5674ecedf46b86b9dda761e3e428a6bc6447b56f",
+      "repository": {
+        "commit": "57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+        "family_id": "sanic-org/sanic",
+        "url": "https://github.com/sanic-org/sanic"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sanic-org--sanic-57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+      "task_id": "import-b886dccbfa355d52998c7a80"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sanic-org--sanic-57d44f263fa8",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 35,
+            "file_sha256": "30d4e3a8e77804d6e6587f7b3dc6d022376d1ca5f017511010081ef4d1c97a9a",
+            "path": "sanic/server/events.py",
+            "start_line": 11
+          },
+          {
+            "end_line": 192,
+            "file_sha256": "1dcffb1987fdaea471f59dfee058d71e2a3e6b782f2b48d403357aebc1ccb06d",
+            "path": "sanic/server/runners.py",
+            "start_line": 176
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 115,
+            "line_count": 114,
+            "path": "sanic/server/async_server.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "sanic/server/async_server.py",
+            "resolved_path": "sanic/server/async_server.py",
+            "start_line": 14
+          },
+          {
+            "end_line": 529,
+            "line_count": 528,
+            "path": "sanic/worker/manager.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "sanic/worker/manager.py",
+            "resolved_path": "sanic/worker/manager.py",
+            "start_line": 30
+          }
+        ]
+      },
+      "question": "What are the inheritance relationships and dependencies between the AsyncioServer, WorkerManager, and server event trigger components for managing async resource cleanup during graceful shutdown?",
+      "question_sha256": "b7c85276b5a4b708e470c7547592a25f2dc2a97531442474878e01c90536f68f",
+      "reference_answer": "The Sanic async resource cleanup system during graceful shutdown uses composition rather than classical inheritance, with clear dependency relationships between three main components.\n\n**AsyncioServer (sanic/server/async_server.py: lines 14-115)** wraps individual asyncio servers and exposes lifecycle methods: `before_start()`, `after_start()`, `before_stop()`, and `after_stop()` (lines 38-52). These methods delegate to `_server_event()` (lines 98-104), which calls `app._server_event()` to trigger the app's registered event handlers.\n\n**WorkerManager (sanic/worker/manager.py: lines 30-529)** manages multiple Worker processes through composition, storing them in `transient` and `durable` dictionaries (lines 69-70). The `run()` method (lines 186-192) orchestrates the full lifecycle: `start()`, `monitor()`, `join()`, `terminate()`, and `cleanup()`. Graceful shutdown is handled by `shutdown()` (lines 385-390) which terminates live processes, and `shutdown_signal()` (lines 374-383) which responds to SIGINT/SIGTERM by sending termination messages and calling `shutdown()`.\n\n**trigger_events (sanic/server/events.py: lines 11-35)** is the event execution mechanism that iterates through registered callbacks and runs them either synchronously or asynchronously via `loop.run_until_complete()` if the result is awaitable (lines 34-35).\n\n**Shutdown orchestration** occurs in `_run_server_forever()` (sanic/server/runners.py: lines 176-192), which runs the event loop and in its `finally` block executes: `before_stop()` (line 184), optional `cleanup()` (lines 186-187), and `after_stop()` (line 189). The `_cleanup()` function defined in `_serve_http_1()` (lines 266-296) handles connection draining with timeout management, task completion, and forceful connection termination.\n\n**Dependency flow**: WorkerManager spawns workers that call `serve()` \u2192 `_serve_http_1()` \u2192 creates AsyncioServer or runs `_run_server_forever()`. AsyncioServer depends on the Sanic app for event dispatch. Both AsyncioServer lifecycle methods and `_serve_http_1()` use `trigger_events` indirectly through `app._server_event()`.",
+      "reference_sha256": "64404b876d0f1797c3ab906ff72a2970ad0ff6f8881a7a05056c635b014b79f6",
+      "repository": {
+        "commit": "57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+        "family_id": "sanic-org/sanic",
+        "url": "https://github.com/sanic-org/sanic"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sanic-org--sanic-57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+      "task_id": "import-bf149121cb76684a05f92945"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sanic-org--sanic-57d44f263fa8",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 99,
+            "file_sha256": "07e711fe22c73cb3da9679ecc9842eada4b351b6e770c822ce4f5e1e10dbe2d7",
+            "path": "setup.py",
+            "start_line": 97
+          },
+          {
+            "end_line": 8,
+            "file_sha256": "dba5a0cc1586d29e2a5f2a80a789f253b4d830544f7a54d7b23d421b2c75e1fb",
+            "path": "tox.ini",
+            "start_line": 7
+          },
+          {
+            "end_line": 49,
+            "file_sha256": "175f9c875aac80f076245c7d7e072dd6fec4cbb06f7d33805d37e31d45d7f7c2",
+            "path": "sanic/response/types.py",
+            "start_line": 40
+          },
+          {
+            "end_line": 73,
+            "file_sha256": "6c05d89f114965b34e3322fa5c0722b48d38723144c541f52639e672e4d0454d",
+            "path": "sanic/request/types.py",
+            "start_line": 70
+          },
+          {
+            "end_line": 34,
+            "file_sha256": "f26843190cf059a2197583658442aad9512c77014971aa2d9eef5cc9073a93a4",
+            "path": "sanic/server/loop.py",
+            "start_line": 23
+          },
+          {
+            "end_line": 50,
+            "file_sha256": "c7d23e4001b324e2064f2167cb0d936ed44b5aa13b05171a3cd8c61f1b725877",
+            "path": "sanic/worker/manager.py",
+            "start_line": 30
+          },
+          {
+            "end_line": 159,
+            "file_sha256": "07e711fe22c73cb3da9679ecc9842eada4b351b6e770c822ce4f5e1e10dbe2d7",
+            "path": "setup.py",
+            "start_line": 151
+          },
+          {
+            "end_line": 88,
+            "file_sha256": "5c2a8ebe7ca2e758aa4fa60eca19b3aa2c387011b228dfd47ddd485e6eb4b4e5",
+            "path": "README.rst",
+            "start_line": 82
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "07e711fe22c73cb3da9679ecc9842eada4b351b6e770c822ce4f5e1e10dbe2d7",
+            "kind": "file_reference",
+            "line_count": 174,
+            "path": "setup.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does Sanic implement conditional dependency installation for performance libraries like ujson and uvloop through environment variables rather than using standard optional dependency groups?",
+      "question_sha256": "c7158318b262f2073b406d78f0119e19c2be85031cd45d87431815d8c99ced86",
+      "reference_answer": "Sanic implements conditional dependency installation for ujson and uvloop through environment variables rather than optional dependency groups for several critical architectural reasons. First, platform compatibility requirements are embedded directly in the dependency specifications (setup.py: line 97-99), where the env_dependency variable restricts these libraries to non-Windows CPython environments to prevent installation failures on unsupported platforms. Second, the testing infrastructure leverages environment variables for comprehensive validation (tox.ini: line 7-8), where the -no-ext test environments use SANIC_NO_UJSON and SANIC_NO_UVLOOP flags to explicitly test fallback behavior without these performance libraries. Third, the runtime architecture implements graceful degradation through try/except ImportError blocks (sanic/response/types.py: line 40-49, sanic/request/types.py: line 70-73, sanic/server/loop.py: line 23-34), allowing Sanic to function with standard library alternatives when these C-extensions are unavailable. Fourth, Sanic's multiprocess WorkerManager architecture (sanic/worker/manager.py: line 30-50) benefits significantly from these performance libraries' C-extension implementations, but the environment variable approach ensures deployment flexibility where package conflicts or build constraints might prevent their installation. The setup.py installation logic (setup.py: line 151-159) provides clear user feedback when dependencies are excluded, while the README documentation (README.rst: line 82-88) guides users on opting out during installation, making this approach more transparent and controllable than standard optional dependency groups for performance-critical libraries with platform restrictions.",
+      "reference_sha256": "7f4245dcf3f399a17d929a0eb0dbf5874bf2920259151738f6487fb36ddecf19",
+      "repository": {
+        "commit": "57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+        "family_id": "sanic-org/sanic",
+        "url": "https://github.com/sanic-org/sanic"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sanic-org--sanic-57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+      "task_id": "import-bf84144d154c5e33ddafded1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sanic-org--sanic-57d44f263fa8",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 165,
+            "file_sha256": "f77c8ca4f38ba9396a5b523c6de8fb1d2c026dfefcae05253de8f21bac63e62a",
+            "path": "sanic/mixins/static.py",
+            "start_line": 24
+          },
+          {
+            "end_line": 122,
+            "file_sha256": "47f8a778f0ede28dfc6c233ce6e9268d173acafa86084e3e3466276513b89a73",
+            "path": "sanic/app.py",
+            "start_line": 116
+          },
+          {
+            "end_line": 26,
+            "file_sha256": "e7957738b78b4e7c929231a0504a60d229ff493ec86337f9c599172d1b23a59d",
+            "path": "sanic/base/root.py",
+            "start_line": 18
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 375,
+            "line_count": 374,
+            "path": "sanic/mixins/static.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "sanic/mixins/static.py",
+            "resolved_path": "sanic/mixins/static.py",
+            "start_line": 167
+          }
+        ]
+      },
+      "question": "What is the inheritance hierarchy and dependency relationship between StaticMixin and StaticHandleMixin in Sanic's static file serving architecture?",
+      "question_sha256": "1f5a41a73baa293aea01ae94808c88b960b86dcaf7997a7043bd864342355306",
+      "reference_answer": "Sanic's static file serving architecture uses a two-layer mixin approach implementing the Template Method pattern with diamond inheritance. StaticMixin (sanic/mixins/static.py: lines 24-165) serves as the interface layer, inheriting from BaseMixin and using SanicMeta as its metaclass. It provides the public static() method (lines 31-164) for registering static file routes with extensive configuration options including URI patterns, modified-since headers, content range support, and directory handling. StaticMixin also defines an abstract _apply_static() method (lines 28-29) that raises NotImplementedError, establishing the template method contract. StaticHandleMixin (sanic/mixins/static.py: lines 167-375) provides the concrete implementation layer using SanicMeta metaclass. It overrides _apply_static() (lines 168-169) to delegate to _register_static() (lines 171-245), which handles the actual route registration including URI construction, handler wrapping via functools.partial, and route binding. StaticHandleMixin also provides _static_request_handler() (lines 247-343) for serving files with features like modified-since validation, content range processing, and large file streaming, plus _get_file_path() (lines 345-375) for secure path resolution. The inheritance flows as: Sanic class (sanic/app.py: lines 116-122) inherits from StaticHandleMixin and BaseSanic, where BaseSanic (sanic/base/root.py: lines 18-26) inherits from StaticMixin among other mixins. This creates a diamond inheritance pattern where StaticHandleMixin's concrete _apply_static() implementation overrides StaticMixin's abstract method through Python's Method Resolution Order (MRO), enabling static file serving while maintaining separation between interface definition and implementation.",
+      "reference_sha256": "4595a3b3dfdd08191d8422c03d5084d2e63f3e9d7b204c1dfe41f92faff30ea7",
+      "repository": {
+        "commit": "57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+        "family_id": "sanic-org/sanic",
+        "url": "https://github.com/sanic-org/sanic"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sanic-org--sanic-57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+      "task_id": "import-dae5c3bd405e1e44920c9dcf"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sanic-org--sanic-57d44f263fa8",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 35,
+            "file_sha256": "86f8c06a09e2ef5a59ea0060aa9452b0c2ae1da1d10082e4ceacf03acaa11be6",
+            "path": "sanic/pages/css.py",
+            "start_line": 21
+          },
+          {
+            "end_line": 18,
+            "file_sha256": "86f8c06a09e2ef5a59ea0060aa9452b0c2ae1da1d10082e4ceacf03acaa11be6",
+            "path": "sanic/pages/css.py",
+            "start_line": 9
+          },
+          {
+            "end_line": 43,
+            "file_sha256": "0d0a6b34024761741eeb7a022e9ed28d3e17fff7f8415a0efbbbfd79a058309a",
+            "path": "sanic/pages/base.py",
+            "start_line": 42
+          },
+          {
+            "end_line": 40,
+            "file_sha256": "5e6a9947601e2e432d6d73a0ffb50dd2778ad2b1ffbb927f9ecd96bb9aec6ae0",
+            "path": "sanic/pages/styles/BasePage.css",
+            "start_line": 27
+          },
+          {
+            "end_line": 69,
+            "file_sha256": "5e6a9947601e2e432d6d73a0ffb50dd2778ad2b1ffbb927f9ecd96bb9aec6ae0",
+            "path": "sanic/pages/styles/BasePage.css",
+            "start_line": 60
+          },
+          {
+            "end_line": 56,
+            "file_sha256": "ad5264af6bb7caaa176f1fe2446535b5fd24b72372cd59f46218dfda11bf06e1",
+            "path": "sanic/pages/styles/DirectoryPage.css",
+            "start_line": 34
+          },
+          {
+            "end_line": 63,
+            "file_sha256": "ad5264af6bb7caaa176f1fe2446535b5fd24b72372cd59f46218dfda11bf06e1",
+            "path": "sanic/pages/styles/DirectoryPage.css",
+            "start_line": 59
+          },
+          {
+            "end_line": 94,
+            "file_sha256": "41f16228c06ac3cf32382fddb26e53ce8d2e70cb71c4d0b65b12513247c1464b",
+            "path": "sanic/pages/styles/ErrorPage.css",
+            "start_line": 87
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "5e6a9947601e2e432d6d73a0ffb50dd2778ad2b1ffbb927f9ecd96bb9aec6ae0",
+            "kind": "file_reference",
+            "line_count": 146,
+            "path": "sanic/pages/styles/BasePage.css"
+          },
+          {
+            "file_sha256": "ad5264af6bb7caaa176f1fe2446535b5fd24b72372cd59f46218dfda11bf06e1",
+            "kind": "file_reference",
+            "line_count": 63,
+            "path": "sanic/pages/styles/DirectoryPage.css"
+          },
+          {
+            "file_sha256": "41f16228c06ac3cf32382fddb26e53ce8d2e70cb71c4d0b65b12513247c1464b",
+            "kind": "file_reference",
+            "line_count": 108,
+            "path": "sanic/pages/styles/ErrorPage.css"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the responsive CSS framework implemented that handles viewport-dependent styling and mobile layout adaptations for Sanic's built-in error pages and directory listings?",
+      "question_sha256": "a2f229aeaa378624156185ef7606512a38b0a1daf4b813f29e8f0409a1f00c13",
+      "reference_answer": "The responsive CSS framework for Sanic's built-in pages is implemented through a sophisticated metaclass-based system in the sanic/pages/ module. The CSS metaclass (sanic/pages/css.py: line 21-35) serves as the foundation, combining styles from multiple sources using the _extract_style function (sanic/pages/css.py: line 9-18) which automatically loads CSS files from the styles directory. Style injection is coordinated through the BasePage class's _head method (sanic/pages/base.py: line 42-43) using self.doc.style(HTML(self.style)). The responsive design is primarily implemented in BasePage.css with dark mode support via @media (prefers-color-scheme: dark) queries (sanic/pages/styles/BasePage.css: line 27-40), and viewport-dependent font scaling through a media query for screens under 1000px width (sanic/pages/styles/BasePage.css: line 60-69) that uses calc(6px + 10 * 100vw / 1000) for dynamic font sizing. DirectoryPage.css extends this with responsive table layouts using flexbox (sanic/pages/styles/DirectoryPage.css: line 34-56) and dark mode hover state adaptations (sanic/pages/styles/DirectoryPage.css: line 59-63). ErrorPage.css contributes responsive elements through CSS Grid layouts for key-value displays (sanic/pages/styles/ErrorPage.css: line 87-94) and responsive container constraints.",
+      "reference_sha256": "8ddc4ca903132676217f87d628331462a9f1b16d0cdc6d78a23ddef44e518646",
+      "repository": {
+        "commit": "57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+        "family_id": "sanic-org/sanic",
+        "url": "https://github.com/sanic-org/sanic"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sanic-org--sanic-57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+      "task_id": "import-dcdbb224d447895f2675826d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sanic-org--sanic-57d44f263fa8",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 608,
+            "file_sha256": "6c05d89f114965b34e3322fa5c0722b48d38723144c541f52639e672e4d0454d",
+            "path": "sanic/request/types.py",
+            "start_line": 596
+          },
+          {
+            "end_line": 1574,
+            "file_sha256": "47f8a778f0ede28dfc6c233ce6e9268d173acafa86084e3e3466276513b89a73",
+            "path": "sanic/app.py",
+            "start_line": 1542
+          },
+          {
+            "end_line": 232,
+            "file_sha256": "08740b4c5d3cb5f43ce046a4d5897ea72bc4b0c0d69f1d25ec586b653f08c7bf",
+            "path": "sanic/mixins/middleware.py",
+            "start_line": 164
+          },
+          {
+            "end_line": 76,
+            "file_sha256": "ec90b7af183d5dd6a4f946cd08c04ff9278f3ba439abe7ce5f1c5c31be9ff48a",
+            "path": "guide/content/en/guide/how-to/authentication.md",
+            "start_line": 49
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does Sanic coordinate JWT token validation across middleware layers when implementing the protected decorator for route authorization?",
+      "question_sha256": "505123562138445ac50335be0fad7c697a35d646370a7214836b974ecc5439e0",
+      "reference_answer": "Sanic core coordinates JWT token validation through its middleware infrastructure rather than built-in JWT functionality. The coordination works through three main components: (1) Token extraction is handled by the Request class's token property (sanic/request/types.py: line 596-608), which automatically parses Bearer tokens from the Authorization header using the parse_credentials function with prefixes like 'Bearer' and 'Token'. (2) Middleware coordination occurs through the app's _run_request_middleware and _run_response_middleware methods (sanic/app.py: line 1542-1574, 1576-1601) that execute middleware collections in priority order, allowing authentication middleware to intercept requests before they reach route handlers. The finalize_middleware method (sanic/mixins/middleware.py: line 164-232) sorts and optimizes middleware execution by priority and definition order. (3) The @protected decorator implementation (guide/content/en/guide/how-to/authentication.md: line 49-76) demonstrates how JWT validation integrates with this system: the decorator wraps route handlers, calls check_token on the request object which accesses the parsed token property, validates the JWT using libraries like PyJWT with configured secrets and algorithms, and returns 401 responses for invalid tokens. This approach allows JWT validation logic to run as request middleware before the protected route handler executes, with middleware coordination ensuring proper execution order across the application's middleware layers.",
+      "reference_sha256": "4b23ca0bdc62f8429616a46f9bba807888c662bfbd3d75c7b1ead0c3029b460a",
+      "repository": {
+        "commit": "57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+        "family_id": "sanic-org/sanic",
+        "url": "https://github.com/sanic-org/sanic"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sanic-org--sanic-57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+      "task_id": "import-e316bff6ecfed59956cf0f6c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sanic-org--sanic-57d44f263fa8",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 56,
+            "file_sha256": "c7d23e4001b324e2064f2167cb0d936ed44b5aa13b05171a3cd8c61f1b725877",
+            "path": "sanic/worker/manager.py",
+            "start_line": 30
+          },
+          {
+            "end_line": 77,
+            "file_sha256": "47130707d98669d066a0b1a7da9ec8e98898eb6bf0134b1fb573a2a2d4c6d20c",
+            "path": "sanic/server/protocols/http_protocol.py",
+            "start_line": 45
+          },
+          {
+            "end_line": 69,
+            "file_sha256": "8b337e251b1598b1f0d88b8735e581174d62660015a06318d242ec4841b44eea",
+            "path": "sanic/config.py",
+            "start_line": 68
+          },
+          {
+            "end_line": 229,
+            "file_sha256": "47130707d98669d066a0b1a7da9ec8e98898eb6bf0134b1fb573a2a2d4c6d20c",
+            "path": "sanic/server/protocols/http_protocol.py",
+            "start_line": 187
+          },
+          {
+            "end_line": 222,
+            "file_sha256": "47130707d98669d066a0b1a7da9ec8e98898eb6bf0134b1fb573a2a2d4c6d20c",
+            "path": "sanic/server/protocols/http_protocol.py",
+            "start_line": 220
+          },
+          {
+            "end_line": 19,
+            "file_sha256": "e339c5cd65f3044cb56dea842f225b6626a2a6836a567aa94d15945d201f6594",
+            "path": "sanic/http/constants.py",
+            "start_line": 4
+          },
+          {
+            "end_line": 299,
+            "file_sha256": "c7d23e4001b324e2064f2167cb0d936ed44b5aa13b05171a3cd8c61f1b725877",
+            "path": "sanic/worker/manager.py",
+            "start_line": 274
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the WorkerManager coordinate with HTTP protocol timeout handling across multiple worker processes?",
+      "question_sha256": "f7485c55584b5fa7f3708e5c0bca7988e03dbac2a8007247059f2defcc5f77d1",
+      "reference_answer": "The WorkerManager coordinates with HTTP protocol timeout handling through a deliberate separation of concerns that enables scalable, independent timeout management across multiple worker processes. The WorkerManager (sanic/worker/manager.py: lines 30-56) serves as the central coordinator for process lifecycle management, handling worker creation, monitoring, restarting, and termination without directly managing request timeouts. Each worker process operates independently with its own HttpProtocolMixin instance (sanic/server/protocols/http_protocol.py: lines 45-77) that configures timeout values from the application config including REQUEST_TIMEOUT and RESPONSE_TIMEOUT (sanic/config.py: lines 68-69). The timeout enforcement occurs entirely within each worker's event loop through the check_timeouts method (sanic/server/protocols/http_protocol.py: lines 187-229), which uses a self-scheduling mechanism via loop.call_later (sanic/server/protocols/http_protocol.py: lines 220-222) to periodically enforce timeouts based on HTTP processing stages (sanic/http/constants.py: lines 4-19). This architecture allows each worker to independently enforce REQUEST_TIMEOUT and RESPONSE_TIMEOUT based on the current Stage (IDLE, REQUEST, HANDLER, RESPONSE, FAILED) without requiring cross-process coordination. The WorkerManager can monitor and restart failed workers (sanic/worker/manager.py: lines 274-299) without affecting active requests in other workers, while each worker's event loop manages timeout logic independently through its own check_timeouts scheduling, preventing timeout conflicts between concurrent requests across the worker pool and ensuring scalable timeout handling regardless of the number of worker processes.",
+      "reference_sha256": "356a1017d0419b628f99200bad9f235ca836de1477c910ccd11b9617c672d4ef",
+      "repository": {
+        "commit": "57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+        "family_id": "sanic-org/sanic",
+        "url": "https://github.com/sanic-org/sanic"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sanic-org--sanic-57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+      "task_id": "import-e63c78d867d2555aecb057f3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sanic-org--sanic-57d44f263fa8",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 26,
+            "file_sha256": "0e4ec5518743b85c4c31d2cb2094a2f76d6480b1bc54c53b0cc9618aca8bce75",
+            "path": "sanic/compat.py",
+            "start_line": 26
+          },
+          {
+            "end_line": 173,
+            "file_sha256": "1dcffb1987fdaea471f59dfee058d71e2a3e6b782f2b48d403357aebc1ccb06d",
+            "path": "sanic/server/runners.py",
+            "start_line": 156
+          },
+          {
+            "end_line": 173,
+            "file_sha256": "1dcffb1987fdaea471f59dfee058d71e2a3e6b782f2b48d403357aebc1ccb06d",
+            "path": "sanic/server/runners.py",
+            "start_line": 170
+          },
+          {
+            "end_line": 183,
+            "file_sha256": "0e4ec5518743b85c4c31d2cb2094a2f76d6480b1bc54c53b0cc9618aca8bce75",
+            "path": "sanic/compat.py",
+            "start_line": 162
+          },
+          {
+            "end_line": 179,
+            "file_sha256": "0e4ec5518743b85c4c31d2cb2094a2f76d6480b1bc54c53b0cc9618aca8bce75",
+            "path": "sanic/compat.py",
+            "start_line": 175
+          },
+          {
+            "end_line": 173,
+            "file_sha256": "0e4ec5518743b85c4c31d2cb2094a2f76d6480b1bc54c53b0cc9618aca8bce75",
+            "path": "sanic/compat.py",
+            "start_line": 163
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does Sanic implement different signal handling strategies for Windows versus Unix systems in its server lifecycle management?",
+      "question_sha256": "a61ab062db9b7423003e05f8c25ffa38c11539ea73035a91bfbcfffa083fe0d2",
+      "reference_answer": "Sanic implements different signal handling strategies for Windows versus Unix systems due to fundamental limitations in Windows' asyncio implementation regarding signal handling integration with the event loop. The platform detection occurs through OS_IS_WINDOWS (sanic/compat.py: line 26), which checks if the operating system name equals \"nt\". In the _setup_system_signals function (sanic/server/runners.py: lines 156-173), Sanic branches its signal handling approach based on this platform detection. On Unix systems, Sanic uses the standard asyncio approach by calling loop.add_signal_handler for both SIGINT and SIGTERM signals (sanic/server/runners.py: lines 170-173), passing a partial function that invokes app.stop with terminate=False. This integrates cleanly with the asyncio event loop's native signal handling capabilities. However, on Windows systems, asyncio's event loop does not support add_signal_handler for these signals, necessitating the ctrlc_workaround_for_windows implementation (sanic/compat.py: lines 162-183). This Windows-specific workaround establishes a custom signal handler for SIGINT using Python's signal module that sets a boolean flag rather than immediately calling app.stop (sanic/compat.py: lines 175-179, 181-182). It then launches a background asyncio task called stay_active that periodically wakes up every 0.1 seconds to check this flag (sanic/compat.py: lines 163-173). When the flag is set, the async task calls app.stop from within the proper asyncio context. This design circumvents Windows' limitation where signal handlers cannot safely interact with the asyncio event loop, while the periodic wakeups ensure that the Windows event loop doesn't block indefinitely on I/O operations, allowing signal processing to occur promptly.",
+      "reference_sha256": "7e8bb662908035ca47f2db2433d2b919b4647cea3b443b9d0fdd887343a778d0",
+      "repository": {
+        "commit": "57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+        "family_id": "sanic-org/sanic",
+        "url": "https://github.com/sanic-org/sanic"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sanic-org--sanic-57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+      "task_id": "import-f474915d5eb21168ff5ede92"
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-037.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "34bcfc6228a262a35d31ba9f73c83ade2d88b75f8d04909da2f8320e735518ef",
+      "question": "What is the semantic significance of the `no_proxy` keyword argument in `get_environ_proxies` overriding environment variable precedence, and what does returning a non-empty dictionary when this override is applied indicate?",
+      "question_sha256": "a8dff26fc9ffe01083dc4b993d092b366000d1de1afe9325c47ffc1b951eb4fe",
+      "reference_answer": "A non-None no_proxy argument supplies the bypass list instead of reading no_proxy/NO_PROXY for the initial match. The function temporarily sets lowercase no_proxy for the lower-level proxy_bypass check (src/requests/utils.py:769-813). get_environ_proxies returns {} when bypass applies, otherwise getproxies(); a nonempty result therefore means bypass did not apply and proxy configuration was available, not that a particular proxy connection has already been made (src/requests/utils.py:816-825).",
+      "reference_sha256": "2361ab80e02bb1eed3085890df32c613c20335627adbf402ca92f04938615a88",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-45c370741c488f1730b36857"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "49910c59d303989cddea1edabdf51c4665887a203b227add4c052db831768aaa",
+      "question": "How does the Response class manage the dual-state content consumption pattern to prevent memory exhaustion while maintaining backward compatibility with both streaming and non-streaming access patterns?",
+      "question_sha256": "d904f8021e87caa9589db6e62ad203aa1b00db271f1a5ebfbb20977c6ff65785",
+      "reference_answer": "Response distinguishes cached body data (_content, initially False) from raw-stream exhaustion (_content_consumed). iter_content streams incrementally until consumed, but raises StreamConsumedError if consumed with no cache; it slices cached content only when materialization already occurred (src/requests/models.py:816-855). The content property joins the stream into memory and marks it consumed, or raises RuntimeError if the uncached stream was already consumed (src/requests/models.py:891-907). Streaming avoids obligatory full buffering; content access still buffers the whole body and does not guarantee bounded memory.",
+      "reference_sha256": "d4feeb8d9c67ba85056a26e6ef37633387e07d519fc379ad25f3af419758472a",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-508b0d30c967d124813f7b1d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "c15a51ed6660252444e6f299a46a5d51780bb80a8eaf85e0df9aac753f794a54",
+      "question": "What is the architectural design in RequestException that leverages conditional request object resolution through response introspection to maintain backward compatibility while managing the control flow of exception initialization across the requests library's exception hierarchy?",
+      "question_sha256": "0ebe31f2c4d72540546ef1a9015a0e718b3bed39b0ef69766b227b63625bd06d",
+      "reference_answer": "RequestException pops response and request from kwargs, stores them, and fills self.request from response.request only when response is not None, self.request is falsy, and the attribute exists. It then forwards remaining arguments to the base initializer (src/requests/exceptions.py:17-24). This permits callers to supply only a response whose request was set by the adapter (src/requests/adapters.py:367-369), but does not guarantee either context object is present or prove a historical compatibility motive.",
+      "reference_sha256": "b7a0ddac8c424ca7420b271ef1f7b12295f39af8398f7cfd570b7c403ef3d3c2",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-5c466e04c9918eb631c0cc32"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "c93f8ee82a778feecf57cdf0cd5b1351451b7f804b4a4a3afaf7efdffa971fc1",
+      "question": "What is the architectural responsibility of the request preparation layer in the requests library for normalizing heterogeneous file object metadata when constructing multipart form-data payloads?",
+      "question_sha256": "b8e7f1b7073d58d865b966b90446eca509beaea2a0e7b1014acdcc950247364c",
+      "reference_answer": "_encode_files normalizes field/file pairs and file-value tuples of filename, object, optional content type and headers. Otherwise it guesses a filename from the object or field key. Strings/bytes/bytearrays are data directly, read-capable objects are read, None is skipped, and other objects pass through. It builds urllib3 RequestField objects, calls make_multipart, and delegates final encoding to encode_multipart_formdata (src/requests/models.py:137-203). A path string is not opened as a file by this code; it is treated as supplied data. prepare_body selects this path when files is truthy (src/requests/models.py:552-568).",
+      "reference_sha256": "00aa4eb5d454fea04745b25e967fbc7ad2bfd1cc7974565ad65da8695d47e15b",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-7d32415b82cbe00f47ca2acb"
+    }
+  ]
+}

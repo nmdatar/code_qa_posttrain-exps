@@ -1,0 +1,521 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 327,
+            "file_sha256": "0e168dc2e20e85db7647be28382f58e19f19a6bc4562245be5d50fe5bcb220dc",
+            "path": "src/flask/json/tag.py",
+            "start_line": 325
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "flask.json",
+            "reason": "not_tracked",
+            "reference": "flask.json",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "Where does the base64-decoding method for byte sequence tags get invoked during the recursive untagging process after JSON parsing?",
+      "question_sha256": "c29cec6ec326b62eca9ded48fe514bb08234e7b08a13b0f85dc36e5e903d44d2",
+      "reference_answer": "The base64-decoding method for byte sequence tags gets invoked in the `untag` method of the `TaggedJSONSerializer` class, which is called during the recursive `_untag_scan` process that occurs after JSON parsing.\n\nHere's the specific integration flow:\n\n1. **Entry Point**: The `TaggedJSONSerializer.loads()` method (line 325-327 in `src/flask/json/tag.py`) first parses the JSON string using `loads(value)` from `flask.json`, then passes the result to `_untag_scan()`.\n\n2. **Recursive Processing**: The `_untag_scan()` method (line 309-319) recursively traverses the parsed JSON structure:\n   - For dictionaries: it first recursively untags all values, then calls `untag()` on the dictionary itself\n   - For lists: it recursively untags each item\n\n3. **Integration Point**: The `untag()` method (line 297-307) is where the base64-decoding occurs:\n   ```python\n   def untag(self, value: dict[str, t.Any]) -> t.Any:\n       \"\"\"Convert a tagged representation back to the original type.\"\"\"\n       if len(value) != 1:\n           return value\n       \n       key = next(iter(value))\n       \n       if key not in self.tags:\n           return value\n       \n       return self.tags[key].to_python(value[key])  # <-- Integration point\n   ```\n\n4. **Specific Invocation**: When a dictionary with the key `\" b\"` (the tag key for `TagBytes`) is encountered, `untag()` looks up the corresponding tag in `self.tags[\" b\"]` and calls its `to_python()` method (line 169-170), which performs `b64decode(value)` to convert the base64-encoded string back to bytes.\n\nThis design ensures that base64-decoding happens at the correct stage: after JSON parsing but during the recursive reconstruction of nested tagged structures, allowing byte sequences to be properly decoded whether they appear at the top level or nested within dictionaries, lists, or other tagged objects.",
+      "reference_sha256": "317b5a07a60819f1d1acd4ca0e0135cf323846f0e682f0412f0b2cb14fcd5bc5",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-684874418f7cdcf4b33fee47"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 236,
+            "file_sha256": "c120125d8745456266a9c2f45eaf93ecdf8f0d55128851af8cef643d9839f1b9",
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 236
+          },
+          {
+            "end_line": 71,
+            "file_sha256": "53416203889a17bbb591a2ff4082f473c4d5fc4e80988eda1200aef048df3a09",
+            "path": "tests/test_helpers.py",
+            "start_line": 71
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "53416203889a17bbb591a2ff4082f473c4d5fc4e80988eda1200aef048df3a09",
+            "kind": "file_reference",
+            "line_count": 360,
+            "path": "tests/test_helpers.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "examples/celery/src/task_app/templates/index.html",
+              "examples/tutorial/flaskr/templates/blog/index.html",
+              "tests/static/index.html",
+              "tests/test_apps/blueprintapp/apps/admin/templates/admin/index.html",
+              "tests/test_apps/blueprintapp/apps/frontend/templates/frontend/index.html"
+            ],
+            "end_line": null,
+            "path": "index.html",
+            "reason": "ambiguous_basename",
+            "reference": "index.html",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "What does the method that enables the test helper class representing pathlib.Path objects return when invoked by the standard library path conversion function?",
+      "question_sha256": "2a893919e9f32c33b231d73d8689b25ad533a06a97f5783e2c3422d5ec8c87fe",
+      "reference_answer": "Based on my exploration of the Flask repository, specifically the `FakePath` class in `./tests/test_helpers.py`, the method returns the stored path string value.\n\nThe `FakePath` class (lines 11-22) is a test helper that implements the PathLike protocol (PEP 519) to represent `pathlib.Path` objects. The class stores a path string in `self.path` during initialization (line 19), and the `__fspath__` method (lines 21-22) simply returns `self.path`:\n\n```python\ndef __fspath__(self):\n    return self.path\n```\n\nWhen `os.fspath()` is invoked on a `FakePath` instance (as seen in Flask's codebase, for example in the `static_folder` setter at line 236 of `src/flask/sansio/scaffold.py`), Python's `os.fspath()` function calls the object's `__fspath__()` method. The method returns the string value stored in `self.path`, which was passed during object initialization.\n\nThis return value enables `FakePath` to function as a PathLike object because `os.fspath()` expects `__fspath__()` to return a string (or bytes) representing the filesystem path. The returned string is then used by Flask's internal code (like in `static_folder` setter) to convert the PathLike object into a regular string path for filesystem operations.\n\nThe test at line 71 of `test_helpers.py` demonstrates this usage: `app.send_static_file(FakePath(\"index.html\"))` works because `FakePath`'s `__fspath__()` method returns the string `\"index.html\"` when `os.fspath()` is called internally by Flask's path handling code.",
+      "reference_sha256": "e07f98945679b6c6ab0c629f157d4700e5b87ae6cf274f953843999172c4fb96",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-6bf72bdb09136c49cf400fb0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 124,
+            "file_sha256": "6ed25a4ff0d4de95f09173e675117daa1012b3fc8776a94799ff5e60ef5725a7",
+            "path": "docs/appcontext.rst",
+            "start_line": 114
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "b0f2b36a1aad831692eced32f44fcdcd424d503c930fa3381a40eb56ed9f5376",
+            "kind": "file_reference",
+            "line_count": 449,
+            "path": "src/flask/ctx.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the error handling strategy in the application context globals namespace class's attribute access, deletion, and removal methods balance between raising AttributeError for missing attributes and providing default values?",
+      "question_sha256": "f89bbdc882e1039de2434100e3cdf541fb55719e3c123315a169f55b494513e8",
+      "reference_answer": "The error handling strategy in `_AppCtxGlobals` (defined in `src/flask/ctx.py`) balances strict exception raising with optional default values through different method behaviors:\n\n**Strict Error Raising (`__getattr__` and `__delattr__`):**\n\nBoth `__getattr__` (lines 52-56) and `__delattr__` (lines 61-65) always raise `AttributeError` for missing attributes, with no default value option:\n\n```python\ndef __getattr__(self, name: str) -> t.Any:\n    try:\n        return self.__dict__[name]\n    except KeyError:\n        raise AttributeError(name) from None\n\ndef __delattr__(self, name: str) -> None:\n    try:\n        del self.__dict__[name]\n    except KeyError:\n        raise AttributeError(name) from None\n```\n\nThis enforces explicit attribute existence when using direct attribute access (`g.attr`) or deletion (`del g.attr`).\n\n**Flexible Default Provision (`pop` method):**\n\nThe `pop` method (lines 78-90) uses a sentinel pattern to provide optional defaults:\n\n```python\ndef pop(self, name: str, default: t.Any = _sentinel) -> t.Any:\n    if default is _sentinel:\n        return self.__dict__.pop(name)  # Raises KeyError if missing\n    else:\n        return self.__dict__.pop(name, default)  # Returns default if missing\n```\n\nWhen called without a default (`g.pop('attr')`), it raises `KeyError` for missing attributes. When called with a default (`g.pop('attr', None)`), it returns the default instead of raising an exception.\n\n**Additional Defensive Methods:**\n\nThe class also provides a `get` method (lines 67-76) that always accepts a default value, and `__contains__` (line 104) for membership testing, enabling defensive patterns like:\n\n```python\nif 'db' not in g:\n    g.db = connect_to_database()\ndb = g.pop('db', None)  # Safe removal with default\n```\n\nThis design allows developers to choose between strict error detection (via `__getattr__`/`__delattr__`) and defensive programming (via `pop` with defaults, `get`, or `__contains__` checks), as demonstrated in Flask's documentation (`docs/appcontext.rst` lines 114-124) and tutorial examples.",
+      "reference_sha256": "e4b5fdb17c792902b80763fef524609ad42aacd68bd204ceb0539c3fc985cdd9",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-6d68ecd979748f1847974a59"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 94,
+            "file_sha256": "76ebd81a608687f1f772032ecb6a1e4a3ac2b02bcbca517808128e5e9374426b",
+            "path": "src/flask/sessions.py",
+            "start_line": 84
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does unconditionally setting the session access tracking attribute in dictionary access methods impact signed cookie string conversion performance during frequent read operations?",
+      "question_sha256": "8b54bc0e10d841d99d7d21f1f638cfe77270dab3adbff453127bebd7edc2ec42",
+      "reference_answer": "The unconditional setting of the session access tracking attribute in dictionary access methods impacts signed cookie string conversion performance because it triggers unnecessary serialization operations during read-only requests.\n\n**Technical Details:**\n\nIn `SecureCookieSession` (`src/flask/sessions.py`, lines 84-94), the `__getitem__`, `get`, and `setdefault` methods unconditionally set `self.accessed = True` whenever they are called, even for read-only operations:\n\n```84:94:src/flask/sessions.py\n    def __getitem__(self, key: str) -> t.Any:\n        self.accessed = True\n        return super().__getitem__(key)\n\n    def get(self, key: str, default: t.Any = None) -> t.Any:\n        self.accessed = True\n        return super().get(key, default)\n\n    def setdefault(self, key: str, default: t.Any = None) -> t.Any:\n        self.accessed = True\n        return super().setdefault(key, default)\n```\n\n**Performance Impact:**\n\nWhen `save_session` is called at the end of each request (lines 351-399), it checks `should_set_cookie()` (line 383), which returns `True` if either:\n1. The session was modified (`session.modified`), OR\n2. The session is permanent AND `SESSION_REFRESH_EACH_REQUEST` is `True` (lines 259-261)\n\nIf `should_set_cookie()` returns `True`, the method executes `self.get_signing_serializer(app).dumps(dict(session))` (line 387), which serializes the entire session dictionary into a signed cookie string. This serialization involves:\n- Converting the session dictionary to a JSON-like format using `TaggedJSONSerializer`\n- Signing the serialized data using HMAC with SHA-1\n- Encoding the result as a URL-safe base64 string\n\n**The Problem in High-Frequency Read Scenarios:**\n\nWhen `SESSION_REFRESH_EACH_REQUEST` is `True` (the default for permanent sessions) and the session is permanent, every request that accesses the session (even read-only) will:\n1. Set `accessed = True` via the dictionary access methods\n2. Trigger `should_set_cookie()` to return `True` (because the session is permanent and refresh is enabled)\n3. Execute the expensive `dumps(dict(session))` serialization operation (line 387)\n4. Set the cookie in the response (lines 388-398)\n\nIn high-frequency read scenarios where the session is only read (not modified), this causes unnecessary serialization on every request, even when the session data hasn't changed. The unconditional setting of `accessed = True` means that even checking for a key's existence with `get()` will mark the session as accessed, potentially triggering this expensive serialization when combined with the refresh-each-request behavior.\n\n**Additional Context:**\n\nThe `accessed` attribute is also used to add a `Vary: Cookie` header (line 363-364), which is necessary for proper HTTP caching behavior, but the main performance impact comes from the cookie serialization that occurs when `should_set_cookie()` returns `True`.",
+      "reference_sha256": "3a11a144354971b6ddecdd9f9a1bf8c41b8f07781ee54674baa9b4199cf78d9d",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-6dc2da81340708145f2188d0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 319,
+            "file_sha256": "76d9cc13d30d2053a8c036eee7167f069a566cbe6b945d2d058cad9b7c703dc7",
+            "path": "src/flask/sansio/app.py",
+            "start_line": 319
+          },
+          {
+            "end_line": 496,
+            "file_sha256": "76d9cc13d30d2053a8c036eee7167f069a566cbe6b945d2d058cad9b7c703dc7",
+            "path": "src/flask/sansio/app.py",
+            "start_line": 482
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "76d9cc13d30d2053a8c036eee7167f069a566cbe6b945d2d058cad9b7c703dc7",
+            "kind": "file_reference",
+            "line_count": 964,
+            "path": "src/flask/sansio/app.py"
+          },
+          {
+            "file_sha256": "5c6aa0151b0b8018732280761d27eda0c4c83378630e21faadd57b73783720a7",
+            "kind": "file_reference",
+            "line_count": 1536,
+            "path": "src/flask/app.py"
+          },
+          {
+            "file_sha256": "c120125d8745456266a9c2f45eaf93ecdf8f0d55128851af8cef643d9839f1b9",
+            "kind": "file_reference",
+            "line_count": 792,
+            "path": "src/flask/sansio/scaffold.py"
+          },
+          {
+            "file_sha256": "3e2a85d033da9ba1d6d051f8087d61a574c17b7d0d4b38cf10ec2bcf56fa92dd",
+            "kind": "file_reference",
+            "line_count": 367,
+            "path": "src/flask/config.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the application root path get transformed during initialization when instance-relative configuration mode is enabled before reaching the configuration storage object?",
+      "question_sha256": "4bd6d53487d5f5a19b06fe5fe1c9c9956d678aaafdfd24ef6315956c45b193a2",
+      "reference_answer": "The application root path is transformed in the `make_config` method of the `App` class (located in `src/flask/sansio/app.py`), which is called during initialization.\n\nFlow:\n1. Initialization starts in `Flask.__init__` (in `src/flask/app.py`), which calls `super().__init__()` to `App.__init__` (in `src/flask/sansio/app.py`).\n2. `App.__init__` calls `super().__init__()` to `Scaffold.__init__` (in `src/flask/sansio/scaffold.py`), which sets `self.root_path` (either from the `root_path` parameter or via `get_root_path(self.import_name)`).\n3. Back in `App.__init__`, `self.instance_path` is set (from the `instance_path` parameter or via `auto_find_instance_path()`).\n4. `App.__init__` then calls `self.make_config(instance_relative_config)` (line 319 in `src/flask/sansio/app.py`).\n\nTransformation in `make_config`:\nThe transformation occurs in `make_config` (lines 482-496 in `src/flask/sansio/app.py`):\n\n```python\ndef make_config(self, instance_relative: bool = False) -> Config:\n    root_path = self.root_path\n    if instance_relative:\n        root_path = self.instance_path\n    defaults = dict(self.default_config)\n    defaults[\"DEBUG\"] = get_debug_flag()\n    return self.config_class(root_path, defaults)\n```\n\nWhen `instance_relative_config` is `True`:\n- `root_path` is initially set to `self.root_path` (the application root).\n- If `instance_relative` is `True`, `root_path` is replaced with `self.instance_path`.\n- The `Config` object is created with this transformed `root_path`.\n\nThe `Config` class (in `src/flask/config.py`) stores this `root_path` in its `__init__` method (line 100), and uses it for relative file paths in methods like `from_pyfile` (line 204) and `from_file` (line 290).\n\nSo the transformation happens in `make_config`, where the application root path is conditionally replaced with the instance path before being passed to the `Config` constructor.",
+      "reference_sha256": "3853419c922331ae09b7f83352673b034c2c1790af13294dcbc536e0d29e8224",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-7179f24c607ffda8c3848ea6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "d82e3ff54ee177e2b929653d99f2a312baed9ea3cafe41ee1456e2814c2c4c39",
+            "kind": "file_reference",
+            "line_count": 1127,
+            "path": "src/flask/cli.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "src/flask/app.py",
+              "src/flask/sansio/app.py",
+              "tests/test_apps/cliapp/app.py"
+            ],
+            "end_line": 256,
+            "path": "app.py",
+            "reason": "ambiguous_basename",
+            "reference": "app.py",
+            "start_line": 256
+          }
+        ]
+      },
+      "question": "Where does the control flow in the CLI group class's command retrieval method determine whether to return a directly registered command, an entry point loaded command, or an application CLI group command?",
+      "question_sha256": "aa7e15c3d0429c3217816e91aebe0f4fac4a3aa674ccd51b70e97b8a46b9c052",
+      "reference_answer": "The control flow decision point is at **line 615-616** in `./src/flask/cli.py`, specifically the conditional check `if rv is not None: return rv`.\n\nThe `get_command()` method in the CLI group class (FlaskGroup) implements a three-stage lookup:\n\n**Stage 1: Built-in and Plugin Commands (lines 610-616)**\n- Line 610: `self._load_plugin_commands()` ensures plugin commands from entry points (group=\"flask.commands\") are loaded into the group\n- Line 613: `rv = super().get_command(ctx, name)` looks up commands in the parent click.Group, which includes:\n  - Built-in commands: directly registered via `self.add_command()` in `__init__` (run_command, shell_command, routes_command at lines 594-596)\n  - Plugin commands: loaded by `_load_plugin_commands()` from entry points and added via `self.add_command()` (lines 604-605)\n- Line 615-616: **This is the decision point** - if `rv is not None`, the method returns immediately, stopping the lookup\n\n**Stage 2: Transition Condition (line 615)**\n- The transition from built-in/plugin lookup to app-provided lookup occurs when `rv is None`, meaning the command was not found in the parent group's commands\n\n**Stage 3: App-Provided Commands (lines 618-634)**\n- Line 618: Retrieves ScriptInfo from the context\n- Lines 622-626: Attempts to load the Flask application via `info.load_app()`. If `NoAppException` is raised, it displays an error and returns `None`, preventing app-provided command lookup\n- Lines 631-632: Pushes an application context if not already active\n- Line 634: `return app.cli.get_command(ctx, name)` - looks up commands from the application's CLI group (`app.cli` is an AppGroup instance created in Flask.__init__ at line 256 of app.py)\n\n**Data Conditions Triggering Transitions:**\n- **Built-in/Plugin \u2192 App-provided**: When `super().get_command()` returns `None` (command not found in parent group)\n- **App-provided lookup requires**: Successful app loading (no `NoAppException`). If app loading fails, the method returns `None` at line 626 without attempting app-provided lookup\n\nThe three-stage lookup ensures built-in and plugin commands are available even if the application fails to load, while app-provided commands require a successfully loaded application instance.",
+      "reference_sha256": "fb1e90317b66590625d91b2f5d1c83abb4d3745da6515f25e0df7d6924e02580",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-71d4d03cae99337aaa2ec333"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 978,
+            "file_sha256": "5c6aa0151b0b8018732280761d27eda0c4c83378630e21faadd57b73783720a7",
+            "path": "src/flask/app.py",
+            "start_line": 966
+          },
+          {
+            "end_line": 30,
+            "file_sha256": "0a6a50bfd651581478abe8cda5c94aba6d70df35567a220aabc7ba08202d471c",
+            "path": "tests/test_async.py",
+            "start_line": 30
+          },
+          {
+            "end_line": 45,
+            "file_sha256": "d8ccc9c865191b6465eb45e421af4a4c89372fcf9f7251ba5b0b99f54fe55a5e",
+            "path": "docs/async-await.rst",
+            "start_line": 36
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "c73271ea826a18495386d12085937b65018cc394c3172b91c5491e73046e0280",
+            "kind": "file_reference",
+            "line_count": 191,
+            "path": "src/flask/views.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the asynchronous HTTP method view class inherit from the synchronous HTTP method dispatch base class rather than implementing async dispatch independently?",
+      "question_sha256": "27fde113f1471e3f2c3610bea6ab502b10422131b9919fb7dd01131cad7663ca",
+      "reference_answer": "The asynchronous HTTP method view class inherits from the synchronous HTTP method dispatch base class because the base class already supports asynchronous methods through Flask's `ensure_sync` mechanism, eliminating the need for a separate implementation.\n\nIn `src/flask/views.py`, the `MethodView` class (lines 138-192) overrides `dispatch_request()` to route HTTP requests to method-specific handlers. At line 191, it uses `current_app.ensure_sync(meth)(**kwargs)` to invoke the handler method. The `ensure_sync` method (defined in `src/flask/app.py` at lines 966-978) automatically detects whether a function is a coroutine and wraps it using `async_to_sync` if needed, which uses the `asgiref` library to run async functions in an event loop.\n\nThis design means `MethodView` already handles both synchronous and asynchronous method handlers transparently. When `AsyncMethodView` (defined in `tests/test_async.py` at line 30) inherits from `MethodView` and defines `async def get()` and `async def post()` methods, the inherited `dispatch_request()` method automatically routes to these async methods and `ensure_sync` ensures they execute correctly.\n\nBy inheriting rather than implementing independently, `AsyncMethodView` reuses:\n1. The method discovery logic in `__init_subclass__` (lines 165-180) that automatically sets the `methods` attribute based on defined handlers\n2. The HEAD request fallback logic (lines 187-188) that routes HEAD to GET if no HEAD handler exists\n3. The integration with Flask's view registration system through the inherited `as_view()` method from `View`\n\nThe architectural constraint is that Flask's async support runs each async view in a thread with an event loop (as documented in `docs/async-await.rst` lines 36-45), meaning each request still ties up one WSGI worker. This limits true concurrency compared to ASGI frameworks, but the inheritance design allows async methods to work seamlessly within Flask's existing WSGI architecture without requiring a separate implementation.",
+      "reference_sha256": "9e9f5ab9faf4af93053f1c1b40ff21e0cba50a9f18230e470fb9662f4860a37b",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-72bb083ccf26445bda20e838"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 42,
+            "file_sha256": "5dd419992b4198f22cf2df77b63c7aa4eec19b78286c068e3569057141da19ab",
+            "path": "src/flask/globals.py",
+            "start_line": 42
+          },
+          {
+            "end_line": 193,
+            "file_sha256": "b0f2b36a1aad831692eced32f44fcdcd424d503c930fa3381a40eb56ed9f5376",
+            "path": "src/flask/ctx.py",
+            "start_line": 155
+          },
+          {
+            "end_line": 677,
+            "file_sha256": "0f77f7b0a22b7c92be25aa67b7aeecb73e6f7be9b6b710c46a6e6167ccf01b7d",
+            "path": "CHANGES.rst",
+            "start_line": 676
+          },
+          {
+            "end_line": 202,
+            "file_sha256": "8c19e1468ed3360efccef5e5ea886377cfe5baf8bb259b34dc84ee993974a764",
+            "path": "tests/test_reqctx.py",
+            "start_line": 148
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "b0f2b36a1aad831692eced32f44fcdcd424d503c930fa3381a40eb56ed9f5376",
+            "kind": "file_reference",
+            "line_count": 449,
+            "path": "src/flask/ctx.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the decorator that copies request contexts handle isolation of lightweight concurrent execution contexts while preserving session data across execution boundaries?",
+      "question_sha256": "04194a94959c980cc514df9de2c8adbbb5cb7b8979cfef07c8c20a527576f955",
+      "reference_answer": "The decorator that copies request contexts (`copy_current_request_context` in `src/flask/ctx.py`) handles isolation of lightweight concurrent execution contexts while preserving session data through a combination of Python's `contextvars` module and explicit session object copying.\n\n**Isolation Mechanism:**\nFlask uses Python's `contextvars.ContextVar` to provide automatic isolation between execution contexts. The request context is stored in `_cv_request` (defined in `src/flask/globals.py` line 42), which is a `ContextVar` that automatically maintains separate values for each execution context (thread, greenlet, or async task). When a greenlet switches contexts, Python's `contextvars` ensures each greenlet has its own isolated context space, preventing data leakage between concurrent executions.\n\n**Context Copying Process:**\nThe `copy_current_request_context` decorator (lines 155-193 in `src/flask/ctx.py`) works by:\n1. Retrieving the current request context using `_cv_request.get(None)` (line 179)\n2. Creating a copy via `ctx.copy()` (line 187), which calls `RequestContext.copy()` (lines 337-355)\n3. Wrapping the decorated function to push the copied context when called (lines 189-191)\n\n**Session Preservation:**\nThe `RequestContext.copy()` method (lines 337-355) explicitly includes the current session object in the copied context:\n```python\nreturn self.__class__(\n    self.app,\n    environ=self.request.environ,\n    request=self.request,\n    session=self.session,  # Current session object is included\n)\n```\n\nThis design (introduced in Flask 1.1, as noted in `CHANGES.rst` lines 676-677) prevents `flask.session` from pointing to an out-of-date object. By copying the session object reference rather than reloading it, the copied context maintains access to the same session state that was active when the copy was created, even when executed in a different greenlet.\n\n**Execution Boundary Handling:**\nWhen the copied context is pushed in a new greenlet (via the `with ctx:` block in line 190), it creates a new entry in that greenlet's context stack. The `RequestContext.push()` method (lines 367-394) ensures proper isolation by:\n- Creating a new app context if needed (lines 370-376)\n- Storing context tokens in `_cv_tokens` (line 378) for proper cleanup\n- Using `contextvars.ContextVar.set()` to bind the context to the current execution context\n\nThis ensures that each greenlet has its own isolated request context copy, while the session object reference is preserved across the boundary, allowing the greenlet to access the same session data that was available in the original context.\n\nThe test cases in `tests/test_reqctx.py` (lines 148-202) demonstrate this behavior: they show that session data set in the original context (`flask.session[\"fizz\"] = \"buzz\"`) is accessible in the greenlet after the context is copied and pushed, confirming that session state is preserved across execution boundaries while maintaining proper isolation.",
+      "reference_sha256": "484a7b929befe389be723a8e74d84762080b13df2b408c6cb2838c23ccfa0942",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-75067f6e8485dbf168747a9e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 154,
+            "file_sha256": "0e168dc2e20e85db7647be28382f58e19f19a6bc4562245be5d50fe5bcb220dc",
+            "path": "src/flask/json/tag.py",
+            "start_line": 154
+          },
+          {
+            "end_line": 293,
+            "file_sha256": "0e168dc2e20e85db7647be28382f58e19f19a6bc4562245be5d50fe5bcb220dc",
+            "path": "src/flask/json/tag.py",
+            "start_line": 293
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the list serialization tag's item conversion method interact with the serializer's type dispatcher to recursively process nested list structures containing mixed types?",
+      "question_sha256": "d5395d73f9f9abc94f66a00784b63d4953eca345a32cb25b16abf6af730b44b8",
+      "reference_answer": "The interaction occurs at two points in the code:\n\n1. In `PassList.to_json()` (line 154 of `src/flask/json/tag.py`): When processing a list, it calls `self.serializer.tag(item)` for each item in the list comprehension: `return [self.serializer.tag(item) for item in value]`\n\n2. In `TaggedJSONSerializer.tag()` (line 293 of `src/flask/json/tag.py`): The dispatcher method calls `tag.tag(value)` when a tag's `check()` method returns True. Since `PassList.tag = to_json` (line 156), this means `PassList.tag()` directly calls `PassList.to_json()`.\n\nThe recursive delegation chain works as follows:\n- `PassList.to_json()` receives a list and calls `serializer.tag(item)` for each item\n- `TaggedJSONSerializer.tag()` iterates through registered tags in `self.order` (line 291) and checks each tag using `tag.check(value)` (line 292)\n- When a matching tag is found (e.g., `PassList` for nested lists, `PassDict` for dicts, `TagTuple` for tuples), it calls `tag.tag(value)` (line 293)\n- For `PassList`, `tag.tag()` equals `to_json()`, which calls `serializer.tag()` again for nested items, creating recursion\n- For mixed types in nested lists, each item is processed through the dispatcher, which routes it to the appropriate tag handler (PassList for nested lists, PassDict for dicts, TagBytes for bytes, etc.)\n\nThis design allows nested structures with mixed types to be recursively serialized, with each level delegating to the appropriate tag handler through the central dispatcher.",
+      "reference_sha256": "5fe7e4d985fb5948c7a1a88aa6f4e701192387d9aae91ef553d3d883c992750a",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-783e928a3c75c32dfd207f30"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 365,
+            "file_sha256": "c120125d8745456266a9c2f45eaf93ecdf8f0d55128851af8cef643d9839f1b9",
+            "path": "src/flask/sansio/scaffold.py",
+            "start_line": 336
+          },
+          {
+            "end_line": 87,
+            "file_sha256": "ac3b0f12bf2a89e10c6b8f04d142b6103f9f1495030b8ff2c559d9952e060a00",
+            "path": "src/flask/typing.py",
+            "start_line": 84
+          },
+          {
+            "end_line": 146,
+            "file_sha256": "9ddfadbcfc1cc4e70194ee06c6b6b598fefb92d08e23f484a4bcc7f146a37b26",
+            "path": "pyproject.toml",
+            "start_line": 127
+          },
+          {
+            "end_line": 1231,
+            "file_sha256": "5c6aa0151b0b8018732280761d27eda0c4c83378630e21faadd57b73783720a7",
+            "path": "src/flask/app.py",
+            "start_line": 1230
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "4554c7c77994fdd2ba2a8c50756c418aba619707f3e951551f26e8e9fd37c72a",
+            "kind": "file_reference",
+            "line_count": 112,
+            "path": "tests/type_check/typing_route.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the route handler function that returns a list of dictionaries integrate with the framework's route decorator and static type checker configuration to validate return type annotations in the type checking test files?",
+      "question_sha256": "d4eadaac0b5152a6add8ddc052da0fc32609b68c9154befbc795a4e378987604",
+      "reference_answer": "The route handler function that returns a list of dictionaries integrates with Flask's routing and type checking system at three points:\n\n1. **Route decorator registration** (`src/flask/sansio/scaffold.py:336-365`): The `@app.route(\"/json/dict\")` decorator uses the `route` method, which accepts functions typed as `T_route` (bound to `ft.RouteCallable`). The decorator registers the function via `add_url_rule`, storing it in `self.view_functions: dict[str, ft.RouteCallable]` (line 108).\n\n2. **Type system definition** (`src/flask/typing.py:84-87`): `RouteCallable` is defined as `t.Callable[..., ResponseReturnValue]`, where `ResponseReturnValue` (lines 36-42) includes `ResponseValue`, which explicitly includes `list[t.Any]` (line 16). This allows the function's `-> list[t.Any]` annotation to conform to the expected return type.\n\n3. **Static type checker configuration** (`pyproject.toml:127-146`): The type checking test files in `tests/type_check/` are configured for both mypy (lines 127-141) and pyright (lines 143-146), with `tests/type_check` included in their file paths. When type checkers analyze `typing_route.py`, they verify that the function's return type annotation `-> list[t.Any]` is compatible with `RouteCallable`'s expected `ResponseReturnValue`, ensuring type safety across the test module.\n\nAt runtime, the integration continues in `src/flask/app.py:1230-1231`, where `make_response` converts list return values to JSON responses using `self.json.response(rv)`, but the type checking validation occurs statically during the type checker analysis phase.\n</start_of_answer>",
+      "reference_sha256": "4891df47908de464714f17f95a4f12fcfbcd761c89f994e63e4f04a28de5dc91",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-7ad8ddd5d0a532fc3a120a6c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 254,
+            "file_sha256": "3e2a85d033da9ba1d6d051f8087d61a574c17b7d0d4b38cf10ec2bcf56fa92dd",
+            "path": "src/flask/config.py",
+            "start_line": 218
+          },
+          {
+            "end_line": 141,
+            "file_sha256": "09df8aec5f88df421fa5b47bd66ee4e3aef23384c7c36a1be191d24723caadd0",
+            "path": "tests/test_config.py",
+            "start_line": 132
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the inheritance chain between parent and child configuration classes affect configuration resolution when loading from a class object?",
+      "question_sha256": "a116f75e9d5fa40282a5d26248f98e80c3fdb6c20a8aa2c30a769fec59d4dceb",
+      "reference_answer": "The inheritance chain affects configuration resolution in the `from_object` method of the `Config` class, located in `./src/flask/config.py` at lines 218-254.\n\nWhen `from_object` is called with a class object (like the child configuration class in the test), it uses Python's `dir()` function to enumerate attributes:\n\n```python\ndef from_object(self, obj: object | str) -> None:\n    if isinstance(obj, str):\n        obj = import_string(obj)\n    for key in dir(obj):\n        if key.isupper():\n            self[key] = getattr(obj, key)\n```\n\nThe `dir()` function traverses the Method Resolution Order (MRO), which includes attributes from the class and all its base classes. In the test case (`test_config_from_class` at lines 132-141 in `tests/test_config.py`), when `from_object(Test)` is called:\n\n1. `dir(Test)` includes attributes from both `Test` and its parent `Base`\n2. It finds `TEST_KEY` from the parent class `Base` (line 134)\n3. It finds `SECRET_KEY` from the child class `Test` (line 137)\n4. Both are uppercase, so both are added to the configuration dictionary\n\nThis is verified by the `common_object_test` function (lines 13-16), which asserts that both `app.secret_key == \"config\"` and `app.config[\"TEST_KEY\"] == \"foo\"` are present, confirming that attributes from the parent class are successfully resolved and loaded through the inheritance chain.\n\nThe inheritance chain's effect occurs specifically at line 252 where `dir(obj)` is called, as this function automatically includes inherited attributes in its result, enabling the configuration loader to access parent class attributes without explicit traversal of the inheritance hierarchy.",
+      "reference_sha256": "a8f390403864710c62a9ceb4a27fbabb2ab768c52880f615042340dd91d076d3",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-84b03ba4886f9348f881c038"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pallets--flask-85c5d93cbd04",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 846,
+            "file_sha256": "76d9cc13d30d2053a8c036eee7167f069a566cbe6b945d2d058cad9b7c703dc7",
+            "path": "src/flask/sansio/app.py",
+            "start_line": 823
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the linear traversal of the exception class hierarchy in _find_error_handler create performance overhead when handling errors in applications with deep exception inheritance chains and multiple registered error handlers?",
+      "question_sha256": "91d26a56d31b1758ee4636522488a5602c4301d5847fb08bfb10ccffb8c36e2f",
+      "reference_answer": "The `_find_error_handler` method in `src/flask/sansio/app.py` (lines 823-846) creates performance overhead through its linear traversal of the exception class's Method Resolution Order (MRO) using a nested loop structure.\n\n**Implementation Analysis:**\n\nThe method uses three nested loops:\n1. Outer loop: Iterates through HTTP status codes `(code, None)` if code exists, otherwise `(None,)`\n2. Middle loop: Iterates through blueprint names `(*blueprints, None)`\n3. Inner loop: **Linearly traverses** `exc_class.__mro__` (line 841) to find matching error handlers\n\nThe critical performance bottleneck is on line 841:\n```python\nfor cls in exc_class.__mro__:\n    handler = handler_map.get(cls)\n    if handler is not None:\n        return handler\n```\n\n**Performance Impact:**\n\n1. **Linear MRO Traversal**: The `__mro__` attribute contains the complete method resolution order of the exception class, which includes all parent classes in the inheritance hierarchy. For deep exception hierarchies (e.g., `CustomError -> SpecificError -> BaseError -> Exception -> BaseException -> object`), this requires checking every class in the chain sequentially.\n\n2. **Nested Lookup Complexity**: The algorithm performs O(n \u00d7 m \u00d7 k) operations where:\n   - n = number of codes to check (typically 1-2: specific code and None)\n   - m = number of blueprint names to check (blueprints list length + 1 for app-level)\n   - k = depth of the MRO chain (can be 5-10+ for complex hierarchies)\n\n3. **Worst-Case Scenarios**: When error handlers are registered for base exception classes (like `Exception` or `ValueError`), the method must traverse the entire MRO chain before finding a match. For exceptions with deep inheritance, this means checking every class from the specific exception type all the way up to `object`.\n\n4. **Repeated Dictionary Lookups**: For each class in the MRO, the method performs a dictionary lookup (`handler_map.get(cls)`), and this is repeated for each combination of code and blueprint name, multiplying the overhead.\n\n**Example Scenario:**\n\nFor an exception with MRO: `[CustomDBError, DatabaseError, ConnectionError, OSError, Exception, BaseException, object]` and 3 blueprints, the method would perform up to 2 (codes) \u00d7 4 (blueprints + app) \u00d7 7 (MRO depth) = 56 dictionary lookups in the worst case.\n\n**Optimization Opportunities:**\n\nThe performance could be improved by:\n- Caching MRO traversal results per exception class\n- Using a more efficient lookup structure (e.g., pre-computed handler mapping keyed by exception class)\n- Implementing early termination when a handler is found (already done, but could be optimized further)\n- Reversing the lookup order if handlers are more commonly registered for specific exception types rather than base classes",
+      "reference_sha256": "65e89dc2523b0a9422093acaf25daa1cb3529840d9f2f2c5c5724741eb7e990c",
+      "repository": {
+        "commit": "85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+        "family_id": "pallets/flask",
+        "url": "https://github.com/pallets/flask"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pallets--flask-85c5d93cbd049c4bd0679c36fd1ddcae8c37b642",
+      "task_id": "import-84c901ed4005931ea617ed3c"
+    }
+  ]
+}

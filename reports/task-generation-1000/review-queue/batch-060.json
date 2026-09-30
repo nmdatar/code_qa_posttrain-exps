@@ -1,0 +1,438 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "0929cb031d0695b5e568485b69cc585de77f381f635b99046a992558a137c2ae",
+            "kind": "file_reference",
+            "line_count": 1270,
+            "path": "sklearn/svm/_base.py"
+          },
+          {
+            "file_sha256": "0c09e66b9e86d11a960da7a7bae6f167fe11bee4942de1fa2d0bc5d447e9906c",
+            "kind": "file_reference",
+            "line_count": 1798,
+            "path": "sklearn/svm/_classes.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where in the codebase are the probability calibration mechanisms that enable SVC and NuSVC to produce consistent probability estimates through predict_proba and predict_log_proba methods?",
+      "question_sha256": "1ca419eee2f4d14fa6b2fcb92c4d5901d7e8b6fc1c46f44636ac504f6a6e6f16",
+      "reference_answer": "The probability calibration mechanisms for SVC and NuSVC are located in the `sklearn/svm/_base.py` file, specifically in the `BaseSVC` class (lines 702-1014). Both SVC and NuSVC inherit from `BaseSVC`, which implements the probability estimation functionality.\n\n**Primary Location - BaseSVC class (`sklearn/svm/_base.py`):**\n\n1. **Probability prediction methods** (lines 847-911):\n   - `predict_proba` method (line 847): Computes probability estimates using Platt scaling parameters\n   - `predict_log_proba` method (line 884): Computes log probabilities by calling `np.log(self.predict_proba(X))`\n\n2. **Platt scaling parameter storage** (lines 991-1009):\n   - `probA_` property (line 992): Returns `_probA`, the first Platt scaling parameter\n   - `probB_` property (line 1002): Returns `_probB`, the second Platt scaling parameter\n   - These parameters are learned during training when `probability=True` and stored as internal attributes `_probA` and `_probB`\n\n3. **Implementation methods** (lines 913-973):\n   - `_dense_predict_proba` (line 913): Handles probability prediction for dense matrices by calling `libsvm.predict_proba` with Platt scaling parameters\n   - `_sparse_predict_proba` (line 940): Handles probability prediction for sparse matrices by calling `libsvm_sparse.libsvm_sparse_predict_proba` with Platt scaling parameters\n   - Both methods pass `self._probA` and `self._probB` to the underlying libsvm functions\n\n**Class definitions (`sklearn/svm/_classes.py`):**\n- `SVC` class (line 623): Inherits from `BaseSVC`, uses `_impl = \"c_svc\"`\n- `NuSVC` class (line 900): Inherits from `BaseSVC`, uses `_impl = \"nu_svc\"`\n- Both classes automatically inherit the probability calibration functionality from `BaseSVC`\n\n**Low-level implementation (`sklearn/svm/_libsvm.pyx`):**\n- The actual Platt scaling computation occurs in the underlying libsvm C library\n- `libsvm.fit` (line 50) computes `_probA` and `_probB` during training when `probability=True` (lines 265-278)\n- `libsvm.predict_proba` (line 468) uses these parameters to convert decision function values to probabilities\n\n**How it works:**\nThe calibration uses Platt scaling, which applies a logistic transformation: `1 / (1 + exp(decision_value * probA_ + probB_))` to convert raw decision function values into probability estimates. The parameters are learned through 5-fold cross-validation during training when `probability=True` is set, ensuring consistent probability estimates across both `predict_proba` and `predict_log_proba` methods.\n</start_of_answer>",
+      "reference_sha256": "09423f3eb4b61b94e9ed22701af8715a335dcfc0f1151a8653cf161a35b3cd4b",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-03c353ad6fa3ffc08d120bf1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "8fc10cb1f94e36fc3a7f5033f4975044591a36a16361f099bbe7dc7aed65f4bd",
+            "kind": "file_reference",
+            "line_count": 178,
+            "path": "examples/manifold/plot_lle_digits.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where in the scikit-learn repository are the manifold learning classes and dimensionality reduction algorithms imported and utilized within the plot_embedding function's execution context?",
+      "question_sha256": "3719937f008dfb08e737e8b69aff7445c4744dcf5ec1516ac34429e592e230fc",
+      "reference_answer": "The non-linear embedding techniques and matrix decomposition methods are imported and utilized in the execution context of the visualization helper function within the file `./examples/manifold/plot_lle_digits.py`.\n\n**Import locations (lines 98-110):**\n- **Non-linear embedding techniques** are imported from `sklearn.manifold` at lines 101-107:\n  - `MDS` (Multidimensional Scaling)\n  - `TSNE` (t-distributed Stochastic Neighbor Embedding)\n  - `Isomap` (Isometric Mapping)\n  - `LocallyLinearEmbedding` (with methods: standard, modified, hessian, ltsa)\n  - `SpectralEmbedding` (Laplacian Eigenmaps)\n\n- **Matrix decomposition methods** are imported at:\n  - Line 98: `TruncatedSVD` from `sklearn.decomposition`\n  - Line 99: `LinearDiscriminantAnalysis` from `sklearn.discriminant_analysis`\n  - Line 110: `SparseRandomProjection` from `sklearn.random_projection`\n  - Line 108: `NeighborhoodComponentsAnalysis` from `sklearn.neighbors`\n\n**Utilization in execution context:**\n\n1. **Instantiation (lines 112-151)**: All imported classes are instantiated and stored in an `embeddings` dictionary with configuration parameters (e.g., `n_components=2`, `n_neighbors=30`).\n\n2. **Data transformation (lines 160-170)**: Each embedding/transformer in the dictionary is used to transform the input data via `fit_transform()`, creating a `projections` dictionary containing the reduced-dimensional representations.\n\n3. **Function call (line 176)**: The transformed data from `projections[name]` is passed as the first argument to the visualization helper function `plot_embedding()`, which then creates scatter plots visualizing the 2D embeddings with digit annotations.\n\nThe execution flow demonstrates that these techniques are imported at the module level, instantiated before the visualization function is called, used to transform high-dimensional digit data into 2D embeddings, and then the resulting projections are passed to the visualization helper function for plotting.",
+      "reference_sha256": "5b305e0d5da9979f968faa908b9c2465513cce2053521e5ae24a8f8f930110a5",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-111271e1beeaffda07e7e679"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 470,
+            "file_sha256": "2e61b77f34eb238f13d04a75d394a70a10caa777f34dea84d48c9be55e1c5c99",
+            "path": "sklearn/pipeline.py",
+            "start_line": 443
+          },
+          {
+            "end_line": 1569,
+            "file_sha256": "75c9d95c5854f2a746a52869b4c48134f7b3b30eb4155acf6520afad54df68b8",
+            "path": "sklearn/utils/_metadata_requests.py",
+            "start_line": 1569
+          },
+          {
+            "end_line": 1124,
+            "file_sha256": "75c9d95c5854f2a746a52869b4c48134f7b3b30eb4155acf6520afad54df68b8",
+            "path": "sklearn/utils/_metadata_requests.py",
+            "start_line": 1119
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the Pipeline class explicitly reject the sample_weight parameter during fit when the underlying estimator does not declare support for it through metadata routing?",
+      "question_sha256": "dcec51daa2f42ec53a69c6e8bab6409812feff003d9b038d86b7d2291ad732bf",
+      "reference_answer": "The composite estimator class (Pipeline) validates and rejects the sample weighting parameter when the final estimator doesn't declare support through metadata routing to provide early error detection, ensure proper routing, and maintain API consistency.\n\nWhen metadata routing is enabled, Pipeline's `fit` method calls `_check_method_params` (lines 443-470 in `sklearn/pipeline.py`), which invokes `process_routing` (line 445). `process_routing` (in `sklearn/utils/_metadata_requests.py`, line 1569) calls `validate_metadata` (line 1637), which checks whether all passed metadata parameters are routed to at least one object in the pipeline.\n\nIf `sample_weight` is passed but the final estimator hasn't declared support via metadata routing (e.g., through `set_fit_request(sample_weight=True)`), `validate_metadata` raises a `TypeError` indicating the parameter is \"not routed to any object\" (lines 1119-1124 in `sklearn/utils/_metadata_requests.py`).\n\nThis explicit validation at the Pipeline level:\n1. Provides early, clear error messages at the composite level rather than deep within steps\n2. Ensures metadata is properly declared before routing, preventing silent failures\n3. Maintains consistency with the metadata routing API design, where consumers must explicitly request metadata\n4. Prevents ambiguous behavior where parameters might be ignored or cause unexpected errors later\n\nWhen metadata routing is disabled, Pipeline uses different logic (lines 447-470) that requires the `stepname__parameter` format, also providing explicit parameter specification to avoid ambiguity.",
+      "reference_sha256": "89e0f8fa079692fbef85a2d40d7f6a4c688ed97acc52b4403c230e56b09d5aab",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-13e632d561c0b1740b2074fa"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 952,
+            "file_sha256": "b2f1bd99d0aa1aac00530c5c02ed62561148e8f3b66759f607f0257dd9061f72",
+            "path": "sklearn/utils/estimator_checks.py",
+            "start_line": 952
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "023c0d46bfcfc123f961369c6cdfa9f42a6ba1d2e69a797a2d2411d6193a890f",
+            "kind": "file_reference",
+            "line_count": 1686,
+            "path": "sklearn/utils/tests/test_estimator_checks.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the control flow in _NotAnArray.__array_function__ determine whether a TypeError is raised versus a boolean value returned, and what is the data dependency between the func parameter's __name__ attribute and the exception handling path?",
+      "question_sha256": "7c271ab27957bcea36b6fdf51c888e454bbb1c33d190cf896941eaf4ca52df15",
+      "reference_answer": "The control flow decision point is at the conditional check on line 952 of `sklearn/utils/estimator_checks.py`, specifically the `if` statement that compares `func.__name__` to the string `\"may_share_memory\"`.\n\nThe `__array_function__` method implementation (lines 951-954) contains the following control flow:\n\n```python\ndef __array_function__(self, func, types, args, kwargs):\n    if func.__name__ == \"may_share_memory\":\n        return True\n    raise TypeError(\"Don't want to call array_function {}!\".format(func.__name__))\n```\n\nThe decision point is the `if func.__name__ == \"may_share_memory\":` condition on line 952. When this condition evaluates to `True`, the method returns the boolean value `True` (line 953). When the condition is `False`, execution continues to line 954, which raises a `TypeError` exception.\n\nThis design allows `_NotAnArray` to selectively permit only the `may_share_memory` NumPy function to operate on it (returning `True`), while blocking all other NumPy array functions by raising a `TypeError`. This behavior is tested in `test_not_an_array_array_function()` in `sklearn/utils/tests/test_estimator_checks.py`, which verifies that functions like `np.sum()` raise `TypeError`, while `np.may_share_memory()` returns `True`.",
+      "reference_sha256": "e7233a5448f01f0f219a733ef71077652af357fec3fd79e9acca59717cf3e34b",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-18f1bdc95f3006c4e6746b8f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 262,
+            "file_sha256": "a683255784485d7a8924a4171786163b3d62e045b05371c8e0cecbc545df1d6f",
+            "path": "sklearn/neighbors/_nearest_centroid.py",
+            "start_line": 260
+          },
+          {
+            "end_line": 518,
+            "file_sha256": "b4487cc4e487844883197558c5aa155fc3930014a7dab84d428395f57f41e514",
+            "path": "doc/modules/neighbors.rst",
+            "start_line": 516
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the shrink_threshold parameter implementation in the fit method employ soft thresholding to achieve feature selection, and what data consistency guarantees must be maintained between the deviations_ and centroids_ attributes during this transformation?",
+      "question_sha256": "6078f55972ad0bf46843864fe4eeb5115713b8b3dc44c6c0aeff46526d01253c",
+      "reference_answer": "The threshold parameter in the NearestCentroid classifier's fit method implements soft thresholding for feature selection through a multi-step process in the training phase.\n\nFirst, the method computes normalized deviations (lines 260-262 in `_nearest_centroid.py`):\n```python\nself.deviations_ = np.array(\n    (self.centroids_ - dataset_centroid_) / ms, copy=False\n)\n```\nHere, `deviations_` represents the normalized difference between each class centroid and the overall dataset centroid, scaled by `ms` (which incorporates within-class standard deviation and class size factors).\n\nWhen `shrink_threshold` is set, soft thresholding is applied (lines 265-269):\n```python\nif self.shrink_threshold:\n    signs = np.sign(self.deviations_)\n    self.deviations_ = np.abs(self.deviations_) - self.shrink_threshold\n    np.clip(self.deviations_, 0, None, out=self.deviations_)\n    self.deviations_ *= signs\n```\n\nThis process:\n1. Stores the signs of deviations\n2. Takes absolute values and subtracts the threshold\n3. Clips negative results to zero (this is the soft thresholding operation)\n4. Restores the original signs\n\nFeatures are effectively removed when their absolute normalized deviation is less than the threshold, as they get shrunk to zero. As noted in the documentation (lines 516-518 of `neighbors.rst`), \"if a particular feature value crosses zero, it is set to zero. In effect, this removes the feature from affecting the classification.\"\n\nAfter soft thresholding, the centroids are recalculated from the shrunk deviations (lines 271-272):\n```python\nmsd = ms * self.deviations_\nself.centroids_ = np.array(dataset_centroid_ + msd, copy=False)\n```\n\nData consistency between `deviations_` and `centroids_` is maintained through the inverse relationship:\n- Initial computation: `deviations_ = (centroids_ - dataset_centroid_) / ms`\n- After soft thresholding: `centroids_ = dataset_centroid_ + ms * deviations_`\n\nThis ensures that `centroids_` always equals `dataset_centroid_ + ms * deviations_`, maintaining consistency even after soft thresholding modifies `deviations_`. The relationship is preserved because `centroids_` is recomputed from the modified `deviations_` using the same transformation formula, just in reverse.",
+      "reference_sha256": "1fe17c335103f2ac3d2c68e86608a10c41feeb3ccec734e5151634e2370dd585",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-1ac88ef029f81440cbfd6431"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "528d2879b262ca30a7ae44b1f660cdf3d10f6c58e19a157673c6e85042174724",
+            "kind": "file_reference",
+            "line_count": 237,
+            "path": "sklearn/neighbors/tests/test_nearest_centroid.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "sklearn.neighbors._nearest_centroid.py",
+            "reason": "not_tracked",
+            "reference": "sklearn.neighbors._nearest_centroid.py",
+            "start_line": null
+          },
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "sklearn.utils._available_if.py",
+            "reason": "not_tracked",
+            "reference": "sklearn.utils._available_if.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "How does the NearestCentroid class leverage the available_if decorator pattern to conditionally expose decision_function, predict_proba, and predict_log_proba methods only for euclidean metrics, and what are the implications for API consistency across different metric configurations?",
+      "question_sha256": "1f6d2e05e974d2b3ebd48de0c5c849ae2fdc8688aec3113b8dd3f7b71b8934ff",
+      "reference_answer": "The centroid-based classifier class (`NearestCentroid` in `sklearn.neighbors._nearest_centroid.py`) uses the conditional method decorator pattern (`available_if` from `sklearn.utils._available_if.py`) to conditionally expose three prediction methods only when the euclidean distance metric is configured.\n\n**Implementation Details:**\n\n1. **The Check Function**: The class defines a private method `_check_euclidean_metric()` (lines 337-338) that returns `self.metric == \"euclidean\"`. This function serves as the condition for method availability.\n\n2. **Decorator Application**: Three methods are decorated with `available_if(_check_euclidean_metric)`:\n   - `decision_function` (line 340-342)\n   - `predict_proba` (line 344-346)  \n   - `predict_log_proba` (line 348-350)\n\n   These methods are inherited from `DiscriminantAnalysisPredictionMixin` and wrapped by the decorator.\n\n3. **How the Decorator Works**: The `available_if` decorator uses Python's descriptor protocol (`_AvailableIfDescriptor` class). When a decorated method is accessed:\n   - It calls the check function (`_check_euclidean_metric()`)\n   - If the check returns `False` (i.e., metric is not \"euclidean\"), it raises an `AttributeError`\n   - If the check returns `True`, it returns the actual method bound to the instance\n   - This makes `hasattr()` return `False` for these methods when the metric is not euclidean\n\n4. **Why Only Euclidean**: The underlying `_decision_function` method (lines 309-335) computes discriminant scores using squared distances (line 330: `distances **= 2`). This mathematical operation is only valid for euclidean distances, as it relies on the relationship between euclidean distance and squared euclidean distance. The discriminant analysis approach used here (referencing equation 18.2 from \"The Elements of Statistical Learning\") requires euclidean metric properties.\n\n5. **Behavior Verification**: Tests in `sklearn/neighbors/tests/test_nearest_centroid.py` confirm this behavior. The test `test_method_not_available_with_manhattan` (lines 219-225) verifies that calling these methods with the manhattan metric raises an `AttributeError`.\n\nThis pattern ensures that methods requiring specific mathematical properties (euclidean distance) are only accessible when those properties are available, preventing runtime errors and maintaining API consistency.",
+      "reference_sha256": "eebcdce5d3fcb0b23c3f196bdc5a20e5cf21d9bbccb264d877c9d5e250495e70",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-1af9fb0fba15575c4a366234"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 744,
+            "file_sha256": "db4c637d064073e83533bcb920cc2b544a26b92d517b09d8a07c59780a3594fd",
+            "path": "sklearn/utils/_param_validation.py",
+            "start_line": 743
+          },
+          {
+            "end_line": 80,
+            "file_sha256": "db4c637d064073e83533bcb920cc2b544a26b92d517b09d8a07c59780a3594fd",
+            "path": "sklearn/utils/_param_validation.py",
+            "start_line": 77
+          },
+          {
+            "end_line": 138,
+            "file_sha256": "db4c637d064073e83533bcb920cc2b544a26b92d517b09d8a07c59780a3594fd",
+            "path": "sklearn/utils/_param_validation.py",
+            "start_line": 137
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where in the codebase do functions conditionally invoke the _CVObjects constraint validation logic, and how does the constraint's is_satisfied_by method propagate validation results through the parameter validation framework?",
+      "question_sha256": "7966ceb13259e03e8b2f9421388e5d98e9e7b7615040ce836e59d6522818626a",
+      "reference_answer": "The cross-validation object constraint's satisfaction method propagates validation results through the parameter validation framework via a boolean return value that flows through the constraint evaluation loop.\n\n**Implementation details:**\n\n1. **Constraint satisfaction method** (`_CVObjects.is_satisfied_by` in `sklearn/utils/_param_validation.py`, lines 743-744):\n   - The method uses `any()` to check if any of its internal constraints are satisfied:\n     ```python\n     def is_satisfied_by(self, val):\n         return any(c.is_satisfied_by(val) for c in self._constraints)\n     ```\n   - It evaluates four internal constraints in sequence: `Interval(Integral, 2, None, closed=\"left\")`, `HasMethods([\"split\", \"get_n_splits\"])`, `_IterablesNotString()`, and `_NoneConstraint()`.\n   - Returns `True` if any internal constraint is satisfied, `False` otherwise.\n\n2. **Result propagation in validation loop** (`validate_parameter_constraints` in `sklearn/utils/_param_validation.py`, lines 77-80):\n   - The framework iterates through all constraints for a parameter and calls `constraint.is_satisfied_by(param_val)` for each.\n   - If the method returns `True`, the loop breaks immediately (early exit), indicating validation passed:\n     ```python\n     for constraint in constraints:\n         if constraint.is_satisfied_by(param_val):\n             # this constraint is satisfied, no need to check further.\n             break\n     ```\n   - If all constraints return `False` (the `for...else` block at line 81), an `InvalidParameterError` is raised with a formatted error message.\n\n3. **Conditional invocation points:**\n   - The validation is conditionally invoked in:\n     - `BaseEstimator._validate_params()` (line 463-475), which calls `validate_parameter_constraints` when not skipped by the `skip_parameter_validation` configuration flag.\n     - The `_fit_context` decorator (line 1358-1359) checks `global_skip_validation` and `partial_fit_and_fitted` flags before calling `_validate_params`.\n     - The `validate_params` decorator (line 189-191) checks `global_skip_validation` before invoking validation.\n\n4. **Constraint creation** (`make_constraint` in `sklearn/utils/_param_validation.py`, lines 137-138):\n   - When a parameter constraint is specified as the string `\"cv_object\"`, `make_constraint` creates an instance of `_CVObjects()`:\n     ```python\n     if isinstance(constraint, str) and constraint == \"cv_object\":\n         return _CVObjects()\n     ```\n\n**Propagation flow:**\nThe boolean result from `is_satisfied_by` propagates upward through the call stack: `_CVObjects.is_satisfied_by()` \u2192 `validate_parameter_constraints()` \u2192 `BaseEstimator._validate_params()` or `validate_params` decorator wrapper. The boolean determines whether validation succeeds (True breaks the loop) or fails (False triggers error raising), enabling early termination when any constraint is satisfied.",
+      "reference_sha256": "e7dca4fbe0423228799f5e1d9fef2c157b05043d80cef447cd7c5e7a425f9cc5",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-1ba513c05f25d8f0d106a05c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 753,
+            "file_sha256": "fcbd6e0f7823f6b50feef32ded7c133c1eff60ac2cc9c6ee173448dd7c5bd164",
+            "path": "sklearn/utils/validation.py",
+            "start_line": 753
+          },
+          {
+            "end_line": 1213,
+            "file_sha256": "fcbd6e0f7823f6b50feef32ded7c133c1eff60ac2cc9c6ee173448dd7c5bd164",
+            "path": "sklearn/utils/validation.py",
+            "start_line": 1194
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "f6acdbd70eba5ba0550ba8c577cc28af5bb2984360f351e3d0684182d23241d0",
+            "kind": "file_reference",
+            "line_count": 2329,
+            "path": "sklearn/linear_model/_logistic.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the semantic mismatch created by the conditional logic in the fit method's type checking mechanism between the declared accept_large_sparse=True parameter and the actual runtime behavior when processing sparse data with 64-bit indices?",
+      "question_sha256": "98e1ea15089224b44739aecbee824e4b3ac4eb165340d7c856034c5b36982fc3",
+      "reference_answer": "The semantic mismatch occurs in the `fit` method of `LogisticRegression` (and related classes like `LogisticRegressionCV`) in `sklearn/linear_model/_logistic.py`.\n\n**The Declared Behavior:**\nThe `check_array()` function (line 753 in `sklearn/utils/validation.py`) and `validate_data()` function (line 1260) declare `accept_large_sparse=True` as the default parameter. The documentation states that when `accept_large_sparse=True`, sparse matrices with 64-bit integer indices (int64) are accepted.\n\n**The Runtime Behavior:**\nHowever, in the `fit` method implementations (lines 287, 1256, and 1917 in `sklearn/linear_model/_logistic.py`), the code conditionally overrides this default:\n\n```python\naccept_large_sparse=solver not in [\"liblinear\", \"sag\", \"saga\"]\n```\n\nThis means:\n- For solvers like \"lbfgs\", \"newton-cg\", \"newton-cholesky\", the value is `True` (accepts 64-bit sparse matrices)\n- For solvers \"liblinear\", \"sag\", or \"saga\", the value is `False` (rejects 64-bit sparse matrices)\n\n**The Semantic Mismatch:**\nThe mismatch is that the function signature/documentation declares `accept_large_sparse=True` as the default, suggesting that 64-bit sparse matrices are accepted. However, at runtime, when certain solvers are used, the conditional logic passes `accept_large_sparse=False` to the validation function, causing it to reject sparse matrices with 64-bit indices via the `_check_large_sparse()` function (lines 1194-1213 in `sklearn/utils/validation.py`), which raises a `ValueError` stating \"Only sparse matrices with 32-bit integer indices are accepted.\"\n\nThis creates a discrepancy between what the declared interface suggests (acceptance by default) and what actually happens at runtime (conditional rejection based on solver choice), making the behavior non-obvious to users who might expect consistent acceptance based on the default parameter value.",
+      "reference_sha256": "2578cd0b61858491ae1fac6b7beb3fe0516053a046d3778da69a2044cb6ce548",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-1c055f43bc6d8dc15a443d12"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 449,
+            "file_sha256": "17724af11149d28b1980f963c73b9212c98e1526a4f9d88b1135ec55de20b2e7",
+            "path": "sklearn/metrics/_plot/roc_curve.py",
+            "start_line": 427
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "4d9b728c1be7a3f30bfa7db33c5a0cca08e8f6dd33742f35167d462da6515298",
+            "kind": "file_reference",
+            "line_count": 443,
+            "path": "sklearn/utils/_plotting.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the delegation of the actual curve computation to `from_predictions` after response value extraction enable code reuse between estimator-based and prediction-based visualization workflows, and what is the significance of this design pattern?",
+      "question_sha256": "64f55657f31acc9f28aa9857f24a8a789f716ce8dd2983e3e2a54a1c44d76a7f",
+      "reference_answer": "The delegation pattern enables code reuse by centralizing curve computation logic in `from_predictions` while `from_estimator` handles only estimator-specific response extraction.\n\n**The Delegation Pattern:**\n\nIn scikit-learn's visualization Display classes (e.g., `RocCurveDisplay`, `PrecisionRecallDisplay`, `DetCurveDisplay`), the `from_estimator` class method follows this pattern:\n\n1. **Response Value Extraction**: `from_estimator` first calls `_validate_and_get_response_values` (defined in `_BinaryClassifierCurveDisplayMixin` in `sklearn/utils/_plotting.py`), which internally uses `_get_response_values_binary` to extract predictions/scores from the estimator. This handles the estimator-specific logic of determining which response method to use (`predict_proba`, `decision_function`, or auto-detection).\n\n2. **Delegation to `from_predictions`**: After extracting the response values (`y_score`), `from_estimator` immediately delegates to `from_predictions` by calling `cls.from_predictions(...)` with the extracted values.\n\n3. **Centralized Curve Computation**: `from_predictions` contains all the actual curve computation logic (calling functions like `roc_curve`, `precision_recall_curve`, `det_curve` from `sklearn.metrics._ranking`), creates the Display object with computed values, and calls the `plot` method.\n\n**Code Reuse Benefits:**\n\nThis design enables code reuse because:\n- **Single Source of Truth**: The curve computation, Display object creation, and plotting logic exists only once in `from_predictions`\n- **Separation of Concerns**: `from_estimator` handles only the estimator-specific extraction step, while `from_predictions` handles the computation and visualization\n- **Consistency**: Both workflows (estimator-based and prediction-based) produce identical visualizations since they share the same computation path\n- **Maintainability**: Bug fixes and enhancements to curve computation only need to be made in one place (`from_predictions`)\n\n**Example from the Codebase:**\n\nIn `sklearn/metrics/_plot/roc_curve.py` (lines 427-449), `RocCurveDisplay.from_estimator` demonstrates this pattern:\n\n```python\n@classmethod\ndef from_estimator(cls, estimator, X, y, ...):\n    # Step 1: Extract response values\n    y_score, pos_label, name = cls._validate_and_get_response_values(\n        estimator, X, y, response_method=response_method,\n        pos_label=pos_label, name=name,\n    )\n    \n    # Step 2: Delegate to from_predictions\n    return cls.from_predictions(\n        y_true=y,\n        y_score=y_score,  # Uses extracted values\n        ...\n    )\n```\n\nThe same pattern is consistently used across all curve display classes (`PrecisionRecallDisplay`, `DetCurveDisplay`, etc.), ensuring a uniform architecture throughout scikit-learn's visualization API.",
+      "reference_sha256": "b8fef82a0a3ccf23f13bbbe44449d2fd60517a64cbe370f55efadff8cfb7e920",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-1fe68f4454e2cf101c9e166f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 182,
+            "file_sha256": "a683255784485d7a8924a4171786163b3d62e045b05371c8e0cecbc545df1d6f",
+            "path": "sklearn/neighbors/_nearest_centroid.py",
+            "start_line": 170
+          },
+          {
+            "end_line": 687,
+            "file_sha256": "90fd5d3aa12c0f43e65dbcd4bbd3ecb0851598f0b8950cd0b94cd8b8dd180205",
+            "path": "sklearn/utils/sparsefuncs.py",
+            "start_line": 687
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the NearestCentroid classifier reconcile the different centroid computation strategies between euclidean and manhattan metrics during the fit phase, and what architectural implications does this dual-path approach have for maintaining consistency across sparse and dense data representations?",
+      "question_sha256": "ef3c7f99f61a4d70ac025f65dfabcda2da1b67b88c4b92ccb9257dc290d4a1ac",
+      "reference_answer": "The nearest-centroid classifier reconciles different centroid computation strategies for euclidean and manhattan metrics during fitting through conditional branching based on the metric type and data sparsity, while storing results in a unified interface.\n\n**Reconciliation mechanism:**\n\n1. **Data validation phase** (lines 170-182 in `sklearn/neighbors/_nearest_centroid.py`):\n   - For manhattan metric: validates data with `accept_sparse=[\"csc\"]`, requiring CSC format for sparse matrices\n   - For euclidean metric: validates data with `accept_sparse=[\"csr\", \"csc\"]`, allowing both CSR and CSC formats\n\n2. **Centroid computation phase** (lines 226-233):\n   - For manhattan metric:\n     - Dense arrays: uses `np.median(X[center_mask], axis=0)` (line 229)\n     - Sparse CSC matrices: uses `csc_median_axis_0(X[center_mask])` (line 231), a specialized function from `sklearn.utils.sparsefuncs` that computes median across axis 0 for CSC format matrices\n   - For euclidean metric:\n     - Both dense and sparse: uses `X[center_mask].mean(axis=0)` (line 233), which works for both array types\n\n3. **Unified storage**:\n   - Both computation paths store results in the same `self.centroids_` array (initialized at line 215 as `np.empty((n_classes, n_features), dtype=np.float64)`), ensuring a consistent interface regardless of metric or data representation\n\n**Technical details:**\n\nThe reconciliation uses the `is_X_sparse` flag (line 183, computed via `sp.issparse(X)`) to branch logic. For manhattan with sparse data, the specialized `csc_median_axis_0()` function (defined in `sklearn/utils/sparsefuncs.py` at line 687) handles median computation by:\n- Iterating through CSC matrix columns using `indptr`\n- Computing median for each feature column using `_get_median()`, which accounts for implicit zeros in sparse matrices\n- Returning a dense numpy array of medians\n\nThis dual-path approach ensures mathematical correctness (median for L1 distance minimization, mean for L2 distance minimization) while maintaining compatibility with both sparse and dense data representations through format-specific optimizations.",
+      "reference_sha256": "50e0047c8a30fdf869939338beb0f35c0f79f38454614b2b887eeffe0d0b8bbf",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-2516a52c8fbb9da2afca507a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 117,
+            "file_sha256": "845c0b8a97c756e44890b7d2db9a2c36fab9f7c13fa464407ad10113a411832d",
+            "path": "sklearn/datasets/_openml.py",
+            "start_line": 85
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the exception handling mechanism in OpenMLError impact the performance of HTTP error recovery operations when processing large-scale dataset downloads with retry logic?",
+      "question_sha256": "ad86ca0a8372a29f65c64035e4649d038a74a9cb9e8ad88772461db021df9c59",
+      "reference_answer": "The exception handling mechanism for the custom exception class representing HTTP 412 errors from the OpenML API impacts the retry mechanism's performance during bulk data retrieval operations through several mechanisms:\n\n**1. Exception Handling Overhead in the Retry Chain:**\n\nWhen an HTTP 412 error occurs during dataset downloads, the exception handling flow creates overhead:\n- The `_retry_on_network_error` decorator (lines 85-117 in `sklearn/datasets/_openml.py`) catches the HTTPError, checks if the code is 412 (lines 104-106), and immediately raises without retrying\n- The `_get_json_content_from_openml_api` function (lines 202-255) then catches the HTTPError again, checks if `error.code != 412` (line 251), and if it is 412, raises `OpenMLError` (line 255)\n- This double exception handling (catch \u2192 check \u2192 re-raise) adds overhead, especially when processing many dataset downloads\n\n**2. Bypassing Retry Logic:**\n\nHTTP 412 errors are specifically excluded from retry logic. The `_retry_on_network_error` decorator explicitly checks for HTTP 412 and immediately raises without retrying (lines 104-106):\n```python\nif isinstance(e, HTTPError) and e.code == 412:\n    raise\n```\nThis means that for large-scale operations, any transient 412 errors cause immediate failure without the benefit of retry attempts, potentially requiring manual intervention or additional API calls.\n\n**3. Fallback Mechanism Triggering Additional API Calls:**\n\nWhen `OpenMLError` is caught in `_get_data_info_by_name` (line 337), it triggers a fallback mechanism that makes an additional API call with a modified URL (`/status/deactivated`, line 342). This fallback adds:\n- An extra HTTP request/response cycle\n- Additional network latency\n- More exception handling overhead\n- Potential cache operations\n\n**4. Performance Impact During Bulk Operations:**\n\nFor large-scale dataset downloads:\n- The exception handling chain (HTTPError \u2192 code check \u2192 OpenMLError) accumulates overhead across multiple failed requests\n- The immediate failure on 412 errors (without retries) can cause cascading failures in batch operations\n- The fallback mechanism at line 337-350 doubles the number of API calls for certain error scenarios\n- All of this occurs within the retry logic flow, which is already performance-sensitive for network operations\n\n**Code References:**\n- `OpenMLError` class definition: lines 196-199\n- `_retry_on_network_error` decorator with 412 check: lines 85-117, specifically lines 104-106\n- `_get_json_content_from_openml_api` exception handling: lines 246-255\n- Fallback mechanism in `_get_data_info_by_name`: lines 337-350\n\nThe performance impact is most noticeable when processing many datasets where HTTP 412 errors occur, as each error triggers the exception handling chain and potentially the fallback mechanism, adding latency and computational overhead to the bulk data retrieval process.\n</start_of_answer>",
+      "reference_sha256": "723619c85f619b6d26b5d68a59b656f9e8199896bf88675ad3ad7257303d3a54",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-2b68938f4832c48ae2956b42"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "025a4fb78c8edd373a7f2102db65fcd556caceea0812f1ab0a12fc8ffb32b5fe",
+            "kind": "file_reference",
+            "line_count": 460,
+            "path": "sklearn/utils/_set_output.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where in the codebase are the lower-level helper functions that _SetOutputMixin delegates to in order to wrap the tuple output returned by EstimatorReturnTuple's transform method?",
+      "question_sha256": "deb8a440a36a8c378817a30552dc9a73909b4fdd0baf0f3b59d320f4159b3030",
+      "reference_answer": "The helper functions that the mixin that wraps transform methods delegates to for wrapping tuple outputs are located in the file `sklearn/utils/_set_output.py`.\n\nThe delegation chain works as follows:\n\n1. **`_wrap_method_output`** (lines 311-331): This is the wrapper function that `_SetOutputMixin.__init_subclass__` uses to wrap the `transform` method (line 386). When a transform method returns a tuple, this function detects it (line 317) and calls `_wrap_data_with_container` on only the first element of the tuple (line 320), preserving the rest of the tuple elements unchanged (lines 319-322). It also handles namedtuples by using their `_make` method if available (lines 325-326).\n\n2. **`_wrap_data_with_container`** (lines 265-308): This is the main function that wraps data with container adapters. It:\n   - Calls `_get_output_config` to retrieve the output configuration (line 290)\n   - Checks if auto-wrapping is configured (line 292)\n   - Gets the appropriate container adapter from `ADAPTERS_MANAGER.adapters` (line 303)\n   - Calls the adapter's `create_container` method to wrap the data (lines 304-308)\n\n3. **`_get_output_config`** (lines 230-262): This helper function retrieves the output configuration from either the estimator's `_sklearn_output_config` attribute or the global configuration (lines 250-254).\n\n4. **`_get_container_adapter`** (lines 221-227): This function retrieves the container adapter based on the output configuration, though in the tuple wrapping flow, the adapter is accessed directly via `ADAPTERS_MANAGER.adapters[dense_config]` in `_wrap_data_with_container` (line 303).\n\nAll of these functions are defined in the same file (`sklearn/utils/_set_output.py`) and work together to handle tuple outputs from transform methods by wrapping only the first element of the tuple with the configured container type (pandas DataFrame, polars DataFrame, etc.) while preserving the tuple structure and any namedtuple types.",
+      "reference_sha256": "1d41d39f0c51e397508f2779079f14a7911fff66d9dd4f23c800106d3bc79867",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-2fa42694820c172f327e517b"
+    }
+  ]
+}

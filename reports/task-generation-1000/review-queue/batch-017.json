@@ -1,0 +1,577 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/fitbenchmarking--fitbenchmarking-df465dc1b60d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 63,
+            "file_sha256": "651d97032fbf34e5643a8d76466f8a58dfe7130993eefb1ce83947fc3a457d95",
+            "path": "fitbenchmarking/controllers/base_controller.py",
+            "start_line": 28
+          },
+          {
+            "end_line": 31,
+            "file_sha256": "5a5308cdf3df7783120c198906e7c5867283326e9a3b5a3e4e06e6a5d56172dd",
+            "path": "fitbenchmarking/controllers/scipy_controller.py",
+            "start_line": 17
+          },
+          {
+            "end_line": 37,
+            "file_sha256": "c7250db3af11d11d1815d8c7d420678e19c2484e8b84545d35d9e7e1c172ee86",
+            "path": "fitbenchmarking/controllers/gsl_controller.py",
+            "start_line": 21
+          },
+          {
+            "end_line": 73,
+            "file_sha256": "651d97032fbf34e5643a8d76466f8a58dfe7130993eefb1ce83947fc3a457d95",
+            "path": "fitbenchmarking/controllers/base_controller.py",
+            "start_line": 65
+          },
+          {
+            "end_line": 56,
+            "file_sha256": "c1b25228e2ecf1f74d93073a9d448b5f8cde224dd80d44b5cfee53eac67cde1b",
+            "path": "fitbenchmarking/controllers/controller_factory.py",
+            "start_line": 15
+          },
+          {
+            "end_line": 49,
+            "file_sha256": "218ff906a044b528d9dc1db9e7ab20a6647c177d314693489de6ddc2fb2c5f14",
+            "path": "fitbenchmarking/core/fitting_benchmarking.py",
+            "start_line": 44
+          },
+          {
+            "end_line": 384,
+            "file_sha256": "218ff906a044b528d9dc1db9e7ab20a6647c177d314693489de6ddc2fb2c5f14",
+            "path": "fitbenchmarking/core/fitting_benchmarking.py",
+            "start_line": 310
+          },
+          {
+            "end_line": 310,
+            "file_sha256": "651d97032fbf34e5643a8d76466f8a58dfe7130993eefb1ce83947fc3a457d95",
+            "path": "fitbenchmarking/controllers/base_controller.py",
+            "start_line": 280
+          },
+          {
+            "end_line": 130,
+            "file_sha256": "bfc2c645f7ef0c2813ea13d069fa494994e89d15fcb5d5b552cd4a2fc2e370ef",
+            "path": "fitbenchmarking/cost_func/base_cost_func.py",
+            "start_line": 112
+          },
+          {
+            "end_line": 343,
+            "file_sha256": "651d97032fbf34e5643a8d76466f8a58dfe7130993eefb1ce83947fc3a457d95",
+            "path": "fitbenchmarking/controllers/base_controller.py",
+            "start_line": 329
+          },
+          {
+            "end_line": 327,
+            "file_sha256": "651d97032fbf34e5643a8d76466f8a58dfe7130993eefb1ce83947fc3a457d95",
+            "path": "fitbenchmarking/controllers/base_controller.py",
+            "start_line": 312
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the algorithm classification system categorize and select minimization algorithms across different fitting software controllers in the benchmarking framework?",
+      "question_sha256": "e75f3432948ebf7687e7d3185b8f9b5ede6b0ae99c80cc285837f048098a365c",
+      "reference_answer": "Each controller uses an algorithm_check dictionary that maps algorithm categories to available minimizers. The base Controller class (fitbenchmarking/controllers/base_controller.py: lines 28-63) defines this template with 12 categories: 'all', 'ls', 'deriv_free', 'general', 'simplex', 'trust_region', 'levenberg-marquardt', 'gauss_newton', 'bfgs', 'conjugate_gradient', 'steepest_descent', and 'global_optimization'. Each concrete controller overrides this with its own mappings. For example, ScipyController (fitbenchmarking/controllers/scipy_controller.py: lines 17-31) maps 'Nelder-Mead' to both 'deriv_free' and 'simplex', while GSLController (fitbenchmarking/controllers/gsl_controller.py: lines 21-37) puts 'lmsder' and 'lmder' under 'ls', 'trust_region', and 'levenberg-marquardt'. Controllers also declare jacobian_enabled_solvers (fitbenchmarking/controllers/base_controller.py: lines 65-73) and hessian_enabled_solvers (lines 75-83) to indicate which minimizers can use derivative info.\n\nThe ControllerFactory (fitbenchmarking/controllers/controller_factory.py: lines 15-56) creates controllers dynamically. Its create_controller method (lines 24-56) imports the right module based on software name using import_module (line 39), then finds the controller class via getmembers with isclass/issubclass checks (lines 51-55).\n\nThe benchmarking loop structure (fitbenchmarking/core/fitting_benchmarking.py: lines 44-49) runs 6 nested levels: problems, starting values, software, minimizers, jacobians, and hessians. The loop_over_minimizers function (fitbenchmarking/core/fitting_benchmarking.py: lines 310-384) handles algorithm selection through three validation steps. First, validate_minimizer (fitbenchmarking/controllers/base_controller.py: lines 280-310) grabs minimizers from algorithm_check for each requested algorithm type (lines 295-296) and checks if the current minimizer appears in any of those lists (line 297). If there's no match, it raises UnknownMinimizerError. Second, the cost function's validate_algorithm_type method (base_cost_func.py: lines 112-130) checks if the minimizer's category conflicts with the cost function. For instance, general cost functions set invalid_algorithm_types = ['ls'] (line 36), so least-squares minimizers get rejected (lines 125-130). Third, if the problem has bounds, check_minimizer_bounds (fitbenchmarking/controllers/base_controller.py: lines 329-343) verifies the minimizer supports bounded optimization by checking support_for_bounds and the no_bounds_minimizers list (lines 339-340). After validation passes, record_alg_type (fitbenchmarking/controllers/base_controller.py: lines 312-327) collects all matching algorithm types for the minimizer by iterating through algorithm_check (lines 323-324) and joining them into a comma-separated string for result reporting.",
+      "reference_sha256": "a185b076b74f845dff2884881b9a6c5f9a44bce91c4415178a1dc29dc03ec9c4",
+      "repository": {
+        "commit": "df465dc1b60d580dfb885ee9d03866c25988566f",
+        "family_id": "fitbenchmarking/fitbenchmarking",
+        "url": "https://github.com/fitbenchmarking/fitbenchmarking"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/fitbenchmarking--fitbenchmarking-df465dc1b60d580dfb885ee9d03866c25988566f",
+      "task_id": "import-31eac5408780f375485d1372"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/fitbenchmarking--fitbenchmarking-df465dc1b60d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 589,
+            "file_sha256": "218ff906a044b528d9dc1db9e7ab20a6647c177d314693489de6ddc2fb2c5f14",
+            "path": "fitbenchmarking/core/fitting_benchmarking.py",
+            "start_line": 535
+          },
+          {
+            "end_line": 148,
+            "file_sha256": "8de6bedecfab75c599d25a039d104648aafb8abb6f0fede7402ecae0cbde4d39",
+            "path": "fitbenchmarking/utils/options.py",
+            "start_line": 148
+          },
+          {
+            "end_line": 81,
+            "file_sha256": "85aa058258fc93e3267331bf96a0f86c3d302524da0a3fd30b8e922d48042f35",
+            "path": "fitbenchmarking/utils/fitbm_result.py",
+            "start_line": 81
+          },
+          {
+            "end_line": 59,
+            "file_sha256": "2919859c8a345b27fd4dd0e7c725b06061647aaf1a534423c2326c2fd82b78a0",
+            "path": "docs/source/users/options/fitting_option.rst",
+            "start_line": 59
+          },
+          {
+            "end_line": 14,
+            "file_sha256": "46d8a108309bff9ce6b1129b73b5f91c87b0292f09d0a2cad3b88ab0735bc4bd",
+            "path": "fitbenchmarking/results_processing/runtime_table.py",
+            "start_line": 12
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the runtime metric aggregation system in fitbenchmarking use simple averaging instead of more robust statistical measures for processing multiple timing measurements?",
+      "question_sha256": "e44d72b2474399204dc9d208f3b3c0ef782b53d874daa70dcc336c646006a9e0",
+      "reference_answer": "The runtime metric aggregation in fitbenchmarking uses simple arithmetic averaging for implementation simplicity and API consistency rather than statistical sophistication. The perform_fit function (fitbenchmarking/core/fitting_benchmarking.py: lines 535-589) collects timing data by calling timeit.Timer.repeat() with num_runs iterations (default 5, configured in fitbenchmarking/utils/options.py: line 148), then computes the runtime as sum(runtime_list) / num_runs at line 560.\n\nThe codebase shows awareness of timing variability through an outlier detection mechanism at lines 563-575. This calculates the ratio of maximum to minimum runtime and issues a warning when this ratio exceeds a tolerance of 4, suggesting potential caching effects or system interference. However, the warning doesn't change the aggregation method - the average is still returned regardless of detected outliers.\n\nSeveral factors explain this design. First, the FittingResult class (fitbenchmarking/utils/fitbm_result.py: line 81) expects a single float for runtime, and changing to median or trimmed mean would require no API changes but would alter result reproducibility. Second, the documentation (docs/source/users/options/fitting_option.rst: line 59) explicitly states num_runs controls averaging, setting user expectations around this behavior. Third, the RuntimeTable class docstring (fitbenchmarking/results_processing/runtime_table.py: lines 12-14) describes results as calculated from an average using timeit, establishing this as intentional documented behavior.\n\nNotably, Python's timeit documentation recommends using minimum time for benchmarks since the lowest measurement is most reproducible. The fitbenchmarking choice to average instead reflects different goals: fitting problems have inherently variable runtimes depending on convergence behavior, making average runtime more representative of typical usage than minimum time. The warning system offers a practical compromise - it alerts users to potentially unreliable measurements while maintaining simple, predictable aggregation behavior.",
+      "reference_sha256": "70e2517c1999c9b40dd92c7d225cc205037ab5662246fea981ee8af6027d5216",
+      "repository": {
+        "commit": "df465dc1b60d580dfb885ee9d03866c25988566f",
+        "family_id": "fitbenchmarking/fitbenchmarking",
+        "url": "https://github.com/fitbenchmarking/fitbenchmarking"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/fitbenchmarking--fitbenchmarking-df465dc1b60d580dfb885ee9d03866c25988566f",
+      "task_id": "import-3444d274f9cae3a319785822"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/fitbenchmarking--fitbenchmarking-df465dc1b60d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 63,
+            "file_sha256": "651d97032fbf34e5643a8d76466f8a58dfe7130993eefb1ce83947fc3a457d95",
+            "path": "fitbenchmarking/controllers/base_controller.py",
+            "start_line": 28
+          },
+          {
+            "end_line": 31,
+            "file_sha256": "5a5308cdf3df7783120c198906e7c5867283326e9a3b5a3e4e06e6a5d56172dd",
+            "path": "fitbenchmarking/controllers/scipy_controller.py",
+            "start_line": 17
+          },
+          {
+            "end_line": 37,
+            "file_sha256": "c7250db3af11d11d1815d8c7d420678e19c2484e8b84545d35d9e7e1c172ee86",
+            "path": "fitbenchmarking/controllers/gsl_controller.py",
+            "start_line": 21
+          },
+          {
+            "end_line": 310,
+            "file_sha256": "651d97032fbf34e5643a8d76466f8a58dfe7130993eefb1ce83947fc3a457d95",
+            "path": "fitbenchmarking/controllers/base_controller.py",
+            "start_line": 280
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the algorithm categorization scheme used by the controller system to classify optimization minimizers?",
+      "question_sha256": "ba1957ef4442312bc23bdd9c80f77511508de2eb2caf731f5ccda080b3c783b7",
+      "reference_answer": "The algorithm categorization scheme uses a standardized dictionary called algorithm_check defined in the base Controller class (fitbenchmarking/controllers/base_controller.py: lines 28-63). This template contains 12 predefined category keys: 'all' for complete minimizer lists, 'ls' for least-squares algorithms, 'deriv_free' for derivative-free methods, 'general' for generic min f(x) solvers, 'simplex' for Nelder-Mead style algorithms, 'trust_region' for trust-region approaches, 'levenberg-marquardt' for LM algorithms, 'gauss_newton' for Gauss-Newton methods, 'bfgs' for BFGS variants, 'conjugate_gradient' for CG methods, 'steepest_descent' for gradient descent, and 'global_optimization' for global optimizers. Each category maps to a list of minimizer names supported by that controller.\n\nConcrete controllers override this dictionary with their software-specific mappings. ScipyController (fitbenchmarking/controllers/scipy_controller.py: lines 17-31) maps 'Nelder-Mead' to both 'deriv_free' and 'simplex', while 'BFGS' and 'L-BFGS-B' go under 'bfgs'. GSLController (fitbenchmarking/controllers/gsl_controller.py: lines 21-37) classifies 'lmsder' and 'lmder' under 'ls', 'trust_region', and 'levenberg-marquardt' simultaneously, reflecting how a single minimizer can belong to multiple categories.\n\nThe validate_minimizer method (fitbenchmarking/controllers/base_controller.py: lines 280-310) enforces this scheme during benchmarking. It retrieves the minimizer lists for each requested algorithm type from algorithm_check (lines 295-296), then checks whether the current minimizer appears in any of those lists (line 297). If no match is found, it raises UnknownMinimizerError. The record_alg_type method (lines 312-327) uses the same dictionary to record which algorithm types a minimizer matched, iterating through algorithm_check entries and collecting matching category names into a comma-separated string for reporting.",
+      "reference_sha256": "3a86357b5ebce094e03a33830e49de23819e8050e3ecad8dcfb5816960fb109e",
+      "repository": {
+        "commit": "df465dc1b60d580dfb885ee9d03866c25988566f",
+        "family_id": "fitbenchmarking/fitbenchmarking",
+        "url": "https://github.com/fitbenchmarking/fitbenchmarking"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/fitbenchmarking--fitbenchmarking-df465dc1b60d580dfb885ee9d03866c25988566f",
+      "task_id": "import-373aa29d8b5bfa69b48d18c3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/fitbenchmarking--fitbenchmarking-df465dc1b60d",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "cfc00a389bad314eb6a3a464d5e23b3903b49decd87bbddbe4f7acd4a15600cf",
+            "kind": "file_reference",
+            "line_count": 55,
+            "path": "ci/prep_and_tag_release.sh"
+          },
+          {
+            "file_sha256": "3bfc92c03faccfc833f80e0cda8399612392cd71974c5b6104a2936b1c4c033e",
+            "kind": "file_reference",
+            "line_count": 21,
+            "path": "README.md"
+          },
+          {
+            "file_sha256": "cad92ff36700fbf817ed8457ee8226440f39b4ac66ee97bbf9f758d3b2b25fa6",
+            "kind": "file_reference",
+            "line_count": 28,
+            "path": ".github/workflows/release.yml"
+          },
+          {
+            "file_sha256": "c9316ce8c26aadffc3725d69a3a67972c32542d6ee6041ec1bbe13d6970b06ab",
+            "kind": "file_reference",
+            "line_count": 167,
+            "path": ".github/workflows/main.yml"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 34,
+            "line_count": 21,
+            "path": "README.md",
+            "reason": "line_range_out_of_bounds",
+            "reference": "README.md",
+            "resolved_path": "README.md",
+            "start_line": 34
+          }
+        ]
+      },
+      "question": "Where is the automated badge versioning system implemented that ensures README badges point to release-specific URLs rather than master branch during PyPI releases?",
+      "question_sha256": "aa2520f3a894fce5c33428ae72ac47227a39cb015f33b67c20de806930f34fc2",
+      "reference_answer": "The automated badge versioning system is implemented in ci/prep_and_tag_release.sh. The script first creates a backup of README.md at line 34, then uses sed commands (lines 36-46) to modify shield.io badge URLs and ReadTheDocs links from master/latest references to the specific release tag. The sed replacements target the Build and Publish workflow badge, Tests workflow badge, ReadTheDocs documentation badge, and various documentation links. After modification, the script commits the changes (line 49), creates an annotated git tag (line 50), then immediately restores README.md from backup (line 52) and commits the restoration (lines 54-55). This ensures the tagged release commit shows version-specific badge URLs, while the repository continues pointing to master for ongoing development.\n\nThe README.md file contains the actual badges (lines 1-7): Build Status linking to release.yml, Tests Status linking to main.yml, Documentation Status for ReadTheDocs, Coverage Status for Coveralls, plus Windows/Ubuntu support and Chat badges. The script enforces that releases can only be created from release branches matching the pattern release-X.Y.x (lines 28-32).\n\nThe .github/workflows/release.yml workflow (29 lines) handles PyPI publishing, triggered when releases are published. It builds the package and publishes to PyPI using the pypa/gh-action-pypi-publish action. The .github/workflows/main.yml workflow defines the Tests workflow that runs on pushes, pull requests, releases, and schedules, providing the test status that the badge displays.",
+      "reference_sha256": "7dcdbd458565bc57ccc0346361ce0bab00c9ad9d611a6504874ef844695970a9",
+      "repository": {
+        "commit": "df465dc1b60d580dfb885ee9d03866c25988566f",
+        "family_id": "fitbenchmarking/fitbenchmarking",
+        "url": "https://github.com/fitbenchmarking/fitbenchmarking"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/fitbenchmarking--fitbenchmarking-df465dc1b60d580dfb885ee9d03866c25988566f",
+      "task_id": "import-4485991c91c0846307404438"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/fitbenchmarking--fitbenchmarking-df465dc1b60d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 60,
+            "file_sha256": "5f3ac8a1a407c331da00789c2f79641af0960e3d4a3b7facd0385ee1ce04f62c",
+            "path": "fitbenchmarking/utils/output_grabber.py",
+            "start_line": 20
+          },
+          {
+            "end_line": 49,
+            "file_sha256": "218ff906a044b528d9dc1db9e7ab20a6647c177d314693489de6ddc2fb2c5f14",
+            "path": "fitbenchmarking/core/fitting_benchmarking.py",
+            "start_line": 44
+          },
+          {
+            "end_line": 56,
+            "file_sha256": "c1b25228e2ecf1f74d93073a9d448b5f8cde224dd80d44b5cfee53eac67cde1b",
+            "path": "fitbenchmarking/controllers/controller_factory.py",
+            "start_line": 15
+          },
+          {
+            "end_line": 589,
+            "file_sha256": "218ff906a044b528d9dc1db9e7ab20a6647c177d314693489de6ddc2fb2c5f14",
+            "path": "fitbenchmarking/core/fitting_benchmarking.py",
+            "start_line": 535
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 423,
+            "line_count": 422,
+            "path": "fitbenchmarking/controllers/base_controller.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "fitbenchmarking/controllers/base_controller.py",
+            "resolved_path": "fitbenchmarking/controllers/base_controller.py",
+            "start_line": 16
+          }
+        ]
+      },
+      "question": "How does the benchmarking framework implement cross-platform execution coordination and resource cleanup in its nested benchmark pipeline?",
+      "question_sha256": "5cbe006477e4e9da71e119d97214b5931814d78ee26a4e80d8a1ee42ad0290d7",
+      "reference_answer": "The benchmarking framework coordinates cross-platform execution through a layered context manager architecture centered on output stream handling and controller abstraction. The OutputGrabber class (fitbenchmarking/utils/output_grabber.py: lines 20-60) provides platform-aware stdout/stderr redirection, checking platform.system() at line 31 to disable functionality on Windows. It wraps two StreamGrabber instances (lines 63-127) that perform the actual stream capture using os.pipe() at line 85 and os.dup2() at lines 92 and 112 for low-level file descriptor manipulation.\n\nExecution flows through six nested loops documented in fitbenchmarking/core/fitting_benchmarking.py (lines 44-49): problems, starting values, cost functions, software, minimizers, jacobians, and hessians. The loop_over_benchmark_problems function (lines 79-149) creates a single grabbed_output instance at line 95 that gets passed down through all loop levels. Each inner function receives this shared context manager, using it via 'with grabbed_output:' blocks to capture third-party output during operations like parsing (line 105), controller creation (line 289), and fitting (line 551).\n\nSoftware-specific behavior is abstracted through the Controller base class (fitbenchmarking/controllers/base_controller.py: lines 16-423). It defines abstract methods setup() (line 384), fit() (line 400), and cleanup() (line 410) that concrete controllers must implement. The ControllerFactory (fitbenchmarking/controllers/controller_factory.py: lines 15-56) dynamically imports the right controller module using import_module at line 39 and finds Controller subclasses via getmembers inspection at lines 51-55.\n\nResource cleanup in perform_fit (fitbenchmarking/core/(fitbenchmarking/core/fitting_benchmarking.py: lines 535-589: lines 535-629) uses multiple mechanisms. Timer resets occur at lines 578 and 611 via controller.timer.reset() to ensure clean state between operations. Platform-specific cleanup handles Matlab controllers specially - line 607 checks hasattr(controller, 'clear_matlab') and calls it at line 608 to release Matlab memory. The comprehensive try/except structure (lines 550-604) catches ValidationException and general exceptions, setting appropriate error flags (lines 592, 600) while ensuring cleanup code runs regardless of fitting success or failure.",
+      "reference_sha256": "8d8ad39c434674f9f3fdba88faf4def34e2d19ad1ae6eb556895e23911721bc9",
+      "repository": {
+        "commit": "df465dc1b60d580dfb885ee9d03866c25988566f",
+        "family_id": "fitbenchmarking/fitbenchmarking",
+        "url": "https://github.com/fitbenchmarking/fitbenchmarking"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/fitbenchmarking--fitbenchmarking-df465dc1b60d580dfb885ee9d03866c25988566f",
+      "task_id": "import-53606b9e461942e29f7b3dc6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/fitbenchmarking--fitbenchmarking-df465dc1b60d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 69,
+            "file_sha256": "19fca1f83ab596c3b665fe29a8467b3ce5e622ed3ec0afa1d44219ada8802903",
+            "path": "fitbenchmarking/templates/js/table.js",
+            "start_line": 47
+          },
+          {
+            "end_line": 31,
+            "file_sha256": "19fca1f83ab596c3b665fe29a8467b3ce5e622ed3ec0afa1d44219ada8802903",
+            "path": "fitbenchmarking/templates/js/table.js",
+            "start_line": 16
+          },
+          {
+            "end_line": 83,
+            "file_sha256": "a73266e948501eabaf4dbd68b7b1791f5be280d7dbf30f1048e8af790a4f613b",
+            "path": "fitbenchmarking/results_processing/base_table.py",
+            "start_line": 22
+          },
+          {
+            "end_line": 9,
+            "file_sha256": "91d757b41c39024376025d3bade0feb2a320e03724adc257f270a73fb81110e1",
+            "path": "fitbenchmarking/templates/js/dropdown.js",
+            "start_line": 1
+          },
+          {
+            "end_line": 61,
+            "file_sha256": "ac15ab8932c8a4728546bc58eda6b3a4d246c90b2c9e73bb30a4c170913c6b03",
+            "path": "fitbenchmarking/templates/css/dropdown_style.css",
+            "start_line": 55
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "4958eb1bc10dc6ba9e1dedce76c2ca177248893cd576c623ddb9c6c3fe4f6805",
+            "kind": "file_reference",
+            "line_count": 164,
+            "path": "fitbenchmarking/templates/table_template.html"
+          },
+          {
+            "file_sha256": "19fca1f83ab596c3b665fe29a8467b3ce5e622ed3ec0afa1d44219ada8802903",
+            "kind": "file_reference",
+            "line_count": 69,
+            "path": "fitbenchmarking/templates/js/table.js"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the table column toggling functionality implemented for dynamically showing/hiding minimizer columns in the results tables?",
+      "question_sha256": "1ef5449e408f6770485391aaf603b1c7e889ada61a4ded1c9cdac5a3f2c966b5",
+      "reference_answer": "The table column toggling functionality spans JavaScript, Python, and HTML template layers. The core toggle logic lives in the toggle_minimizer() function (fitbenchmarking/templates/js/table.js: lines 47-69), which uses jQuery to dynamically show and hide minimizer columns. When called, it locates the minimizer header element by text matching, toggles its visibility, then adjusts the colspan of parent headers (cost function and software) via the _adjust_colspan() helper (fitbenchmarking/templates/js/table.js: lines 16-31). It also toggles all data cells in that column by computing the column index from a custom 'col' attribute and using an nth-child CSS selector.\n\nThe Python backend generates the necessary HTML structure through the Table class (fitbenchmarking/results_processing/base_table.py: lines 22-83). The minimizer_dropdown_html() method (lines 539-559) builds checkbox dropdown controls where each checkbox's onclick handler calls toggle_minimizer() with the software and minimizer name. The to_html() method (lines 300-364) creates table headers with specific CSS classes: cost_function_header, software_header, and minimizer_header (lines 310-323). These classes let the JavaScript precisely target the right DOM elements.\n\nThe HTML template (fitbenchmarking/templates/table_template.html) ties everything together. Lines 42-44 render the problem and minimizer dropdown controls, lines 58-60 render the table itself, and line 13 loads the table.js script. The dropdown visibility toggle uses show_dropdown() from dropdown.js (lines 1-9), which adds or removes a 'visible' CSS class. The dropdown_style.css (lines 55-61) defines how this class controls display state, switching the dropdown items from display:none to display:block.",
+      "reference_sha256": "4e7cacd10fc13313c4c955e5b83599aceed48af68088632b4cd12456372ebfc6",
+      "repository": {
+        "commit": "df465dc1b60d580dfb885ee9d03866c25988566f",
+        "family_id": "fitbenchmarking/fitbenchmarking",
+        "url": "https://github.com/fitbenchmarking/fitbenchmarking"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/fitbenchmarking--fitbenchmarking-df465dc1b60d580dfb885ee9d03866c25988566f",
+      "task_id": "import-8067202b59802400f5895cb1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/fitbenchmarking--fitbenchmarking-df465dc1b60d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 103,
+            "file_sha256": "d557bb907c78ab0c73914b1540dc949054fb5a20760005f1f84b939107564228",
+            "path": "fitbenchmarking/utils/create_dirs.py",
+            "start_line": 9
+          },
+          {
+            "end_line": 11,
+            "file_sha256": "289e08a662607497eeb076a2800ea2cd58ce10bdb0f95039eb3bf0fbcb40480c",
+            "path": "fitbenchmarking/utils/write_files.py",
+            "start_line": 8
+          },
+          {
+            "end_line": 100,
+            "file_sha256": "4d9dfe01faa6b67167727b2ce0e2ae08cf2f622462522c398a9264d38e3f3174",
+            "path": "fitbenchmarking/core/results_output.py",
+            "start_line": 84
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "d557bb907c78ab0c73914b1540dc949054fb5a20760005f1f84b939107564228",
+            "kind": "file_reference",
+            "line_count": 119,
+            "path": "fitbenchmarking/utils/create_dirs.py"
+          },
+          {
+            "file_sha256": "8de6bedecfab75c599d25a039d104648aafb8abb6f0fede7402ecae0cbde4d39",
+            "kind": "file_reference",
+            "line_count": 512,
+            "path": "fitbenchmarking/utils/options.py"
+          },
+          {
+            "file_sha256": "289e08a662607497eeb076a2800ea2cd58ce10bdb0f95039eb3bf0fbcb40480c",
+            "kind": "file_reference",
+            "line_count": 37,
+            "path": "fitbenchmarking/utils/write_files.py"
+          },
+          {
+            "file_sha256": "eb95da89e7c8e3248ab5e09af6b024c73050055ac56be4915ceffb0f70b65db4",
+            "kind": "file_reference",
+            "line_count": 484,
+            "path": "fitbenchmarking/cli/main.py"
+          },
+          {
+            "file_sha256": "4d9dfe01faa6b67167727b2ce0e2ae08cf2f622462522c398a9264d38e3f3174",
+            "kind": "file_reference",
+            "line_count": 384,
+            "path": "fitbenchmarking/core/results_output.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where are the core directory creation and path resolution utilities implemented in fitbenchmarking's results management system?",
+      "question_sha256": "a0758e49b16f10f075e709dbc7c2409b0001a8553658caabf3622a9e19768b58",
+      "reference_answer": "The directory creation and path resolution utilities for fitbenchmarking's results system are spread across five modules with distinct responsibilities.\n\nThe create_dirs.py module (fitbenchmarking/utils/create_dirs.py: lines 9-103) provides the specialized directory creation functions. It defines results() (lines 9-26) which creates the top-level results folder using os.makedirs, group_results() (lines 29-52) which creates and clears group-specific subdirectories, support_pages() (lines 55-69) for support page directories, figures() (lines 72-86) for figure storage, and css() (lines 89-103) for local CSS directories. Each function uses os.path.join for safe path construction and returns the created directory path.\n\nThe Options class in options.py (fitbenchmarking/utils/options.py) manages the results directory configuration. The results_dir property (lines 384-389) returns the stored path, while the setter (lines 391-396) converts any relative path to absolute using os.path.abspath(directory). This ensures consistent path handling regardless of the working directory when the benchmarking runs.\n\nThe write_files.py module (fitbenchmarking/utils/write_files.py: lines 8-11, 26-36) handles filepath length validation. It defines a 260-character limit (CHARACTER_LIMIT) for Windows compatibility and provides a write_file decorator that catches FileNotFoundError exceptions related to path length, raising FilepathTooLongError with a helpful message.\n\nThe CLI main.py (fitbenchmarking/cli/main.py) handles command-line path operations. Lines 83-86 set default problem sets using glob.glob and os.path.join to locate benchmark problems. Line 319 captures the current working directory with os.path.abspath(os.path.curdir), and line 344 constructs full data directory paths by joining the current path with subdirectory names.\n\nThe results_output.py module (fitbenchmarking/core/results_output.py: lines 84-100) contains create_directories(), which orchestrates the directory creation process. It calls the create_dirs functions in sequence: first results() for the main directory, then group_results() for group-specific folders, support_pages() for support files, and figures() for plot storage. This establishes the complete directory hierarchy needed for storing benchmarking results.",
+      "reference_sha256": "e2b5e24813bec4b72b0020f8d7d0efab58628bf8ea3743cf2e8732a021620a16",
+      "repository": {
+        "commit": "df465dc1b60d580dfb885ee9d03866c25988566f",
+        "family_id": "fitbenchmarking/fitbenchmarking",
+        "url": "https://github.com/fitbenchmarking/fitbenchmarking"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/fitbenchmarking--fitbenchmarking-df465dc1b60d580dfb885ee9d03866c25988566f",
+      "task_id": "import-d5f285a182b89f3bc2e6bca9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/fitbenchmarking--fitbenchmarking-df465dc1b60d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 21,
+            "file_sha256": "5def0a753b604ab518e018d2f5c3ce1514ef822e5da5080dc8d0d0ffa0d386a1",
+            "path": "build/mantid.sh",
+            "start_line": 13
+          },
+          {
+            "end_line": 54,
+            "file_sha256": "4e359698d9064ab7181dede23bc1ca2798f1cdfb519808b96be1acf619d3caf2",
+            "path": "build/cutest.sh",
+            "start_line": 8
+          },
+          {
+            "end_line": 5,
+            "file_sha256": "ca4c3352f94158abc91e15ea9c6387da23a139031195e797d56ac5caacea33ff",
+            "path": "build/gsl.sh",
+            "start_line": 3
+          },
+          {
+            "end_line": 16,
+            "file_sha256": "a3492b95cf8cf3ad047bb6e123afd0090d21be4d6fa8000281c57b075e50354f",
+            "path": "build/ralfit.sh",
+            "start_line": 8
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "5def0a753b604ab518e018d2f5c3ce1514ef822e5da5080dc8d0d0ffa0d386a1",
+            "kind": "file_reference",
+            "line_count": 30,
+            "path": "build/mantid.sh"
+          },
+          {
+            "file_sha256": "4e359698d9064ab7181dede23bc1ca2798f1cdfb519808b96be1acf619d3caf2",
+            "kind": "file_reference",
+            "line_count": 66,
+            "path": "build/cutest.sh"
+          },
+          {
+            "file_sha256": "ca4c3352f94158abc91e15ea9c6387da23a139031195e797d56ac5caacea33ff",
+            "kind": "file_reference",
+            "line_count": 5,
+            "path": "build/gsl.sh"
+          },
+          {
+            "file_sha256": "a3492b95cf8cf3ad047bb6e123afd0090d21be4d6fa8000281c57b075e50354f",
+            "kind": "file_reference",
+            "line_count": 24,
+            "path": "build/ralfit.sh"
+          },
+          {
+            "file_sha256": "d9192438a5941db810a7556c04ee41df3a98c4a87e2c9c8128a8efac8878ef56",
+            "kind": "file_reference",
+            "line_count": 142,
+            "path": "fitbenchmarking/controllers/ralfit_controller.py"
+          },
+          {
+            "file_sha256": "c7250db3af11d11d1815d8c7d420678e19c2484e8b84545d35d9e7e1c172ee86",
+            "kind": "file_reference",
+            "line_count": 244,
+            "path": "fitbenchmarking/controllers/gsl_controller.py"
+          },
+          {
+            "file_sha256": "0a966ce83f9f5c4778fa67d765891e568b9da949b0d66f7129c2dc52f0bf51b4",
+            "kind": "file_reference",
+            "line_count": 363,
+            "path": "fitbenchmarking/parsing/cutest_parser.py"
+          },
+          {
+            "file_sha256": "07fc015b76493e5e21c9084deca7c0343dd9689cb4e2939156c9d9a5cfbd69af",
+            "kind": "file_reference",
+            "line_count": 54,
+            "path": "setup.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where are the external software build scripts implemented for different fitting software dependencies in the fitbenchmarking framework?",
+      "question_sha256": "638a7d9f3c6a82672890dffc06f5b528b238460561131a44b203a77056f08cb5",
+      "reference_answer": "The external software build scripts are located in the build/ directory as individual shell scripts, each implementing a distinct installation pattern for different fitting software dependencies.\n\nThe mantid.sh script (build/mantid.sh: lines 13-21) uses an apt repository approach. It adds a signing key (line 14), configures the Mantid apt repository and PPA (lines 17-18), then installs the mantid package via apt-get (line 21). Post-installation, it sets up the PYTHONPATH environment variable (line 23) and runs a simpleapi initialization step to prevent segfaults (line 27).\n\nThe cutest.sh script (build/cutest.sh: lines 8-54) implements a complex compilation-from-source pattern. It clones three git repositories (ARCHDefs, SIFDecode, CUTEst) at lines 8-10, sets up multiple environment variables including ARCHDEFS, SIFDECODE, CUTEST, MYARCH, and PYCUTEST_CACHE (lines 14-21), then runs interactive installation scripts with predefined input responses for both SIFDecode (lines 24-34) and CUTEst (lines 38-52). Finally, it installs the pycutest Python interface via pip (line 54).\n\nThe gsl.sh script (build/gsl.sh: lines 3-5) follows the simplest pattern, directly installing GSL system packages via apt-get (line 3) followed by pip installation of the pygsl Python bindings (line 5).\n\nThe ralfit.sh script (build/ralfit.sh: lines 8-16) uses a cmake-based build approach. It clones the RALFit repository (line 8), creates a build directory, runs cmake and make (lines 13-14), then performs Python setup installation (lines 15-16). It also sets up the LD_LIBRARY_PATH for the built libraries (line 20).\n\nThese scripts install external dependencies that are then utilized by corresponding controllers (fitbenchmarking/controllers/ralfit_controller.py importing ral_nlls, fitbenchmarking/controllers/gsl_controller.py importing pygsl) and parsers (fitbenchmarking/parsing/cutest_parser.py importing pycutest). The setup.py file (lines 32-42) lists some of these as optional dependencies in extras_require, indicating they extend available fitting software options rather than being mandatory for basic functionality.",
+      "reference_sha256": "560fe57ac344615f0fe7535fc7413b747feb260aa39aaa9e390fcc354e8b20fd",
+      "repository": {
+        "commit": "df465dc1b60d580dfb885ee9d03866c25988566f",
+        "family_id": "fitbenchmarking/fitbenchmarking",
+        "url": "https://github.com/fitbenchmarking/fitbenchmarking"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/fitbenchmarking--fitbenchmarking-df465dc1b60d580dfb885ee9d03866c25988566f",
+      "task_id": "import-dc1baf839bf7024efff74187"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/fitbenchmarking--fitbenchmarking-df465dc1b60d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 52,
+            "file_sha256": "8b1465466e71dcfd47ceb98998d9d4a9d68064b7a185061e634b04b30f308076",
+            "path": "fitbenchmarking/results_processing/plots.py",
+            "start_line": 22
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "60145205ff1eabc3f883daa30af6ca9e2a87645b3226807b7801d56b9ecfb8b0",
+            "kind": "file_reference",
+            "line_count": 210,
+            "path": "fitbenchmarking/results_processing/performance_profiler.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where are the plot styling constants defined that control the visual appearance of data, initial guess, best fit, and regular fit lines in the plotting system?",
+      "question_sha256": "4d63a59cc052500e2071e94aebd275d0fb86b30a33a5d4d5eb2a0db2076fe0b6",
+      "reference_answer": "The plot styling constants are defined as class attributes in the Plot class within fitbenchmarking/results_processing/plots.py (lines 22-52). These dictionaries configure matplotlib styling for different plot elements: data_plot_options (lines 22-27) uses black color with 'x' markers and no line style for displaying data points; ini_guess_plot_options (lines 28-33) uses pink color '#ff6699' with solid lines for initial guess curves; best_fit_plot_options (lines 34-38) uses blue color '#6699ff' with dotted line style for the best fit result; and fit_plot_options (lines 39-43) uses green color '#99ff66' with solid lines for regular fit curves. Each dictionary specifies zorder for layering control, with data at zorder 0, initial guess at 1, regular fits at 2, and best fit at 3 to ensure proper visual stacking. Two additional variants exist for summary comparison plots: summary_best_plot_options (lines 44-47) and summary_plot_options (lines 48-52), where the latter includes an alpha value of 0.5 for transparency. Separately, performance profile plots use a different color scheme defined in fitbenchmarking/results_processing/performance_profiler.py within the create_plot function (line 187). This colors array contains nine matplotlib color codes ['C0' through 'C8'], combined with four line styles to produce 36 unique line/color combinations for distinguishing multiple solvers in performance profile step plots.",
+      "reference_sha256": "be04ce0a09d9c45d1c7b641348f007aec61f4adb0e76bb74efd9d1edf9876a49",
+      "repository": {
+        "commit": "df465dc1b60d580dfb885ee9d03866c25988566f",
+        "family_id": "fitbenchmarking/fitbenchmarking",
+        "url": "https://github.com/fitbenchmarking/fitbenchmarking"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/fitbenchmarking--fitbenchmarking-df465dc1b60d580dfb885ee9d03866c25988566f",
+      "task_id": "import-df9f0a9790e7c322298d3c3a"
+    }
+  ]
+}

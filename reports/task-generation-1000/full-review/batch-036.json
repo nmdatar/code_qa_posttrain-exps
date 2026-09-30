@@ -1,0 +1,274 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-0fce241788d5057d546c7640",
+      "reference_sha256": "948934905d56ba4cbc8f6741577bede1961f3f4d6e9b0c3e13eef97080a72af7",
+      "question_sha256": "0184fadb582dd1b9b3506334533f06c56e593031a39af4822b13e783b889765f",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Each wrapper call reparses immutable URL with known high-volume cost",
+          "verdict": "partially_supported",
+          "reason": "get_full_url only parses with Host override; read-only wrapper does not enforce underlying request immutability, and parsing cost/cache effects are unmeasured.",
+          "evidence": {
+            "path": "src/requests/cookies.py",
+            "start_line": 30,
+            "end_line": 56
+          }
+        }
+      ],
+      "material_errors": [
+        "get_full_url only parses with Host override; read-only wrapper does not enforce underlying request immutability, and parsing cost/cache effects are unmeasured."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "MockRequest parses the URL for scheme at construction and netloc in get_host; get_full_url parses only when a Host header overrides the URL authority (src/requests/cookies.py:35-66). Caching a parsed result per wrapper could reduce repeated calls if profiling shows material cost. To preserve behavior when the wrapped request is externally mutable, cache by current URL or document snapshot semantics; do not infer immutability from the wrapper's read-only contract."
+    },
+    {
+      "task_id": "import-1b384ce28a37f75922bf0423",
+      "reference_sha256": "c95f4b1dc83f8b5c550b7e7a88183745f25f353dd43e3e1f084ebf3c35ebdb62",
+      "question_sha256": "eeee60bf279b1d5ae11273834e74baebe72ab368bf4f8c7f5d03c9c797d0807f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Redirects extract prior response cookies merge session jar and regenerate Cookie header",
+          "verdict": "supported",
+          "reason": "Header removal precedes extraction/merge/preparation, and each sent response updates session jar.",
+          "evidence": {
+            "path": "src/requests/sessions.py",
+            "start_line": 234,
+            "end_line": 279
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-28c3e8a144476fa768b63f94",
+      "reference_sha256": "169f06ef4205f9cec65c6b6a0ac27710ba1be484f84c99c1264eb9fc4ef35f8c",
+      "question_sha256": "569c22149bdfc88028637975584948c94eb3c36542c84400a57e5462421ef92d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Body-position sentinel distinguishes tell failure from untracked body",
+          "verdict": "supported",
+          "reason": "Source comment documents non-None sentinel purpose and redirect rewind guard.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 532,
+            "end_line": 541
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-2b51ade18300f08f75f60aea",
+      "reference_sha256": "988c19150f6b715602fdd350d9db3dd5bd4f8ab12cdac7419544d5c2eac5a808",
+      "question_sha256": "9e7a1f2f1b0417186a5669f6a9749e8d3b40b5dac4dc9902d7a3b7ced6682f9a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Header preparation validates then normalizes names into case-insensitive dictionary",
+          "verdict": "supported",
+          "reason": "prepare_headers sequence and lower-key/original-spelling storage match.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 483,
+            "end_line": 492
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-2f3c8028c5a3f4f11f316e5c",
+      "reference_sha256": "9217ca62823831ca07e772cf773f6ed34a8a3777090b192d0392b75de4984732",
+      "question_sha256": "98095a2135ac2becd45f7a81c3b0b5499ff5e5c1c515a35ff3810b74a094c940",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Same-host redirects preserve credentials generally",
+          "verdict": "partially_supported",
+          "reason": "Same-host scheme/port changes may strip; netrc may reapply destination credentials.",
+          "evidence": {
+            "path": "src/requests/sessions.py",
+            "start_line": 282,
+            "end_line": 300
+          }
+        }
+      ],
+      "material_errors": [
+        "Same-host scheme/port changes may strip; netrc may reapply destination credentials."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "resolve_redirects calls rebuild_auth before sending the next request (src/requests/sessions.py:244-246). should_strip_auth strips on hostname changes and generally on scheme/port changes, except same-host standard-port HTTP-to-HTTPS and equivalent default ports (127-157). rebuild_auth removes Authorization when required, then may load destination credentials from netrc if trust_env is enabled (282-300). Same host alone does not guarantee retention."
+    },
+    {
+      "task_id": "import-32b13dca143dd8ff9e079b9f",
+      "reference_sha256": "60bb91b7d95c2d5f99ae457582eeb7d6f5e62078a896f890331c5b2e89d49865",
+      "question_sha256": "f47b46780e61ef8ddbda3115415cbe4c2004d21ad61e014188784bd00d1f0555",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Morsel expiration prefers max-age else parses expires else None",
+          "verdict": "supported",
+          "reason": "Exact if/elif and strptime conversion match; parser exceptions propagate.",
+          "evidence": {
+            "path": "src/requests/cookies.py",
+            "start_line": 492,
+            "end_line": 503
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-36475bcb5e2621f2e7608d02",
+      "reference_sha256": "3d8179812e9fb0367b9298362e263542769d192e75a5e84032611f33bb2fe34b",
+      "question_sha256": "18ee7019bf6375b634569fdc71994021cf5c9d16134c3f5fc9828aaddbccbbce",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "InvalidSchema is catchable as RequestException and ValueError",
+          "verdict": "supported",
+          "reason": "Dual inheritance and RequestException request/response fields establish semantics.",
+          "evidence": {
+            "path": "src/requests/exceptions.py",
+            "start_line": 99,
+            "end_line": 108
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-381108a98da087f9eab5eb8c",
+      "reference_sha256": "7e5c59c229ff1cad39918866a761983c1dbdb9bbbfe4385fcee24f5e827fb2aa",
+      "question_sha256": "9ff681851ef501433e5879d9a49c136badb3306d3f3a6a7e7231cc25f4ab6f74",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "ConnectionError translates transport failures with specialized subclasses",
+          "verdict": "supported",
+          "reason": "Adapter mapping explicitly handles ProtocolError/OSError, retry reasons and closed pools.",
+          "evidence": {
+            "path": "src/requests/adapters.py",
+            "start_line": 658,
+            "end_line": 680
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-3c9a62a4f97b39abf81119fc",
+      "reference_sha256": "b701d0d52dbbafd5a71c433e915f589be5f6498c4b4428f0129c56293c64137c",
+      "question_sha256": "df88005deea9311051a87eef2b20b399de60699a660f60d31edbb55d9214e578",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Repeated lowercasing is proven throughput bottleneck",
+          "verdict": "partially_supported",
+          "reason": "Per-access normalization is real; significance and bottleneck conclusions require measurement. Stored keys are already normalized.",
+          "evidence": {
+            "path": "src/requests/structures.py",
+            "start_line": 46,
+            "end_line": 55
+          }
+        }
+      ],
+      "material_errors": [
+        "Per-access normalization is real; significance and bottleneck conclusions require measurement. Stored keys are already normalized."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "CaseInsensitiveDict stores entries under lowercase keys and calls key.lower() on each get/delete (src/requests/structures.py:46-55). This adds work proportional to lookup-key length before usual dictionary lookup. Repeated lookups therefore have normalization overhead, but this source does not establish that it is significant or a bottleneck compared with HTTP I/O. Any cache optimization should be benchmarked and account for its memory/lookup overhead."
+    },
+    {
+      "task_id": "import-42094ef70792940aeb437a5e",
+      "reference_sha256": "1eb784bd29e2a796c735ca5c046b8feca0266e0160d4633e23e8157d3968632d",
+      "question_sha256": "96010e2f5ca9405cebf4048d65c8cf63da9fd7e92360cf6f7f1999a65320b627",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Tests import and assert request exceptions while auth redirects use header policy",
+          "verdict": "supported",
+          "reason": "TooManyRedirects test checks request, response and history; auth policy need not raise exceptions.",
+          "evidence": {
+            "path": "tests/test_requests.py",
+            "start_line": 241,
+            "end_line": 250
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-42cec52322387ba7c0875586",
+      "reference_sha256": "f5509e9c2bed37382e9bd5a7b0f9bf325af36283ca20ad5857f70df3ca7a7a3b",
+      "question_sha256": "bf2ec236e7f01f6fb527c336a1faaea35369cb7715642e15157cbb903216d1c3",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "All encoding detection regexes use re.I and parse HTTP headers",
+          "verdict": "partially_supported",
+          "reason": "Test concerns content declarations, and XML regex does not use re.I. Case-preserving output is correct.",
+          "evidence": {
+            "path": "src/requests/utils.py",
+            "start_line": 493,
+            "end_line": 501
+          }
+        }
+      ],
+      "material_errors": [
+        "Test concerns content declarations, and XML regex does not use re.I. Case-preserving output is correct."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "test_pragmas supplies HTML meta and XML content declarations containing UTF-8 and asserts the extracted string remains UTF-8 (tests/test_utils.py:368-384). get_encodings_from_content returns regex capture groups without lowercasing (src/requests/utils.py:493-501). HTML patterns are case-insensitive; the XML pattern is not. This tests document content, not response header decoding."
+    },
+    {
+      "task_id": "import-43544c025fdaa9cc2029afcd",
+      "reference_sha256": "0fcc69dab5e2a85dc82da01f9e33c0a947c1bc37510ab34aa28e182737247169",
+      "question_sha256": "5b80ae5f74bad28e96cf9e42d3837db6626966a72992266ee68e1dac466ad454",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Repeated Response.close calls never close raw twice",
+          "verdict": "contradicted",
+          "reason": "close does not mark content consumed or track closure; unread repeated calls invoke raw.close again.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 1028,
+            "end_line": 1039
+          }
+        }
+      ],
+      "material_errors": [
+        "close does not mark content consumed or track closure; unread repeated calls invoke raw.close again."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Response context exit calls close. close invokes raw.close when _content_consumed is false and invokes release_conn when available (src/requests/models.py:1028-1039). Consumed content skips raw.close, but close itself does not change _content_consumed or set a closed flag. Repeated close on an unread response can therefore call raw.close repeatedly; safe repeated cleanup depends on the underlying object, not an explicit double-close guard here."
+    }
+  ]
+}

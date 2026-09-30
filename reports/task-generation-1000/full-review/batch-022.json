@@ -1,0 +1,219 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-0f6f649727d8a9e3210b711d",
+      "reference_sha256": "9070a29e4157041ca52b5c7712987947c917b73989bfe82f2d853034eba09372",
+      "question_sha256": "ae884ba73a174d0536c9e8dce7b6697d4cea4bce486e3a240135967cce069067",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "pytest hook collects native .hy modules",
+          "verdict": "supported",
+          "reason": "Suffix/directory/init exclusions and Module.from_parent match; setup.cfg:3 includes both normal and mangled test patterns.",
+          "evidence": {
+            "path": "conftest.py",
+            "start_line": 7,
+            "end_line": 19
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-1d56f337f7af2b7f3211654a",
+      "reference_sha256": "58d828a809cdc8c49dd2b9a015fd22f40176bcf476dcb2d89920d152325964a2",
+      "question_sha256": "22f5c0badda967a5195bbf1b5a5cba25c0fe752dc009f0f8fb5bc20272b5f354",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Recwrap tracks active object IDs and clears in finally",
+          "verdict": "supported",
+          "reason": "as_model checks _seen before wrapper lookup at 138-146; dict uses equivalent finally cleanup at 574-579.",
+          "evidence": {
+            "path": "hy/models.py",
+            "start_line": 516,
+            "end_line": 524
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-43ba4b7d41182c8cb13e3ba1",
+      "reference_sha256": "15fc61fa260cc17434a20cb67f262bb4b61b5297262b365a279e55406c4711c7",
+      "question_sha256": "a3922955ae7a1e97135b2cf3927b993a04f2020ba11646f77bc94b14c899c4a7",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Object hierarchy has nine direct and seven Sequence subclasses",
+          "verdict": "supported",
+          "reason": "Class declaration scan verifies all listed bases; Object is conceptual base, not enforced abstract ABC.",
+          "evidence": {
+            "path": "hy/models.py",
+            "start_line": 374,
+            "end_line": 427
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-788dfcdf0987b8c1c5905128",
+      "reference_sha256": "e469f2b1d34c14615e38e17383ace75d85a71d0581bd114dc99f27fdced3308c",
+      "question_sha256": "55f43fe368615caec1ff0690ebe36aabdd74b9c230dfe304cc5fd7dc6786385e",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "source_to_code hook always ignores .pyc cache",
+          "verdict": "unsupported",
+          "reason": "Only replaces source compilation hook, not get_code cache validation/loading. No evidence of bypassing valid bytecode.",
+          "evidence": {
+            "path": "hy/importer.py",
+            "start_line": 105,
+            "end_line": 128
+          }
+        }
+      ],
+      "material_errors": [
+        "False blanket bytecode bypass; wheel/source startup difference and entry-point interaction are unmeasured."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "Hy registers .hy as a source suffix and overrides SourceFileLoader.source_to_code to compile Hy source when that hook is invoked (hy/importer.py:105-128). The custom setup install command also creates checked-hash bytecode for .hy outputs (setup.py:29-41). These facts do not imply that valid bytecode is ignored or that every import recompiles source. The claimed wheel-specific startup slowdown requires measurements and inspection of installed cache validity; it is not established by this source."
+    },
+    {
+      "task_id": "import-9727687cbe94d470df0524fb",
+      "reference_sha256": "2251ffc58fde4c4459ed3e69f8c26eef5193bab7933ab55daae74588fceb24f8",
+      "question_sha256": "67ec466a2b71a389af3929ad770e5a83372c57e3852aec945fac9fd8ca12e1d7",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Hidden traceback modules resolved to paths plus frozen identifiers",
+          "verdict": "supported",
+          "reason": "Finds specs, package directories or normalized paths; excludes unresolved entries and adds runtime-specific frozen names.",
+          "evidence": {
+            "path": "hy/errors.py",
+            "start_line": 187,
+            "end_line": 238
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-a1c330b35030b4338aab1cf4",
+      "reference_sha256": "b58c8dc81ce19613f628c6c298cff075fc7358296644184fd14401a9ad8d5e8e",
+      "question_sha256": "9f42c56a3998b19be3067431a0de52eb450cd7f390e0f9abb39f52a9feb6eb4e",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Setup customizes bytecode, entry points and version",
+          "verdict": "supported",
+          "reason": "Imports fastentrypoints, checked-hash install hook, includes Hy data; get_version.py:11-23 resolves environment/git and writes version.",
+          "evidence": {
+            "path": "setup.py",
+            "start_line": 14,
+            "end_line": 63
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-a80b5d2b022efb16ab0950e0",
+      "reference_sha256": "56ff214bfa77a524a4c107126e0f76aef90baa86922ccfa162ce8d19fd925c56",
+      "question_sha256": "b37f875be56f48876302f784b87095aa7da1e89e3bf7d9d8e1ace1c2ee83c373",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "cond emits if while reuse branch checks if*",
+          "verdict": "supported",
+          "reason": "Recursive expansion emits ordinary if.",
+          "evidence": {
+            "path": "hy/core/macros.hy",
+            "start_line": 36,
+            "end_line": 41
+          }
+        },
+        {
+          "claim": "Statement branches create temporary assignments",
+          "verdict": "supported",
+          "reason": "if* check enables reuse; statements require result storage; pure expression branches use IfExp, so claim applies only to statement-containing cases.",
+          "evidence": {
+            "path": "hy/core/result_macros.py",
+            "start_line": 649,
+            "end_line": 702
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-aa1108f825baba2e331398d1",
+      "reference_sha256": "a7f90b57ac652c61a074ef5e97150490b833473e22078fd41bac64b31f13c56d",
+      "question_sha256": "76d2b1f7fa42cdb39ffc4efce639e5a72f43ae9b9c0255c554a909499458050e",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Compilation invokes macroexpand before expression lowering",
+          "verdict": "supported",
+          "reason": "Calls expansion and accepts Result/AST or recompiles alternate model.",
+          "evidence": {
+            "path": "hy/compiler.py",
+            "start_line": 560,
+            "end_line": 569
+          }
+        },
+        {
+          "claim": "Engine resolves macros and iterates expansions",
+          "verdict": "supported",
+          "reason": "Expands top-level repeatedly under MacroExceptions; nested expansion comes from compiler recursion, not this function recursively walking all children.",
+          "evidence": {
+            "path": "hy/macros.py",
+            "start_line": 360,
+            "end_line": 397
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-cefead944ec86189b2d4046d",
+      "reference_sha256": "80b1f5f70fb437c30fac7e306f9d88f2b8ae61c79f1c4b4903b181629d92265d",
+      "question_sha256": "4661336384be06305d835e1de368b4e935e0e722424425d517d1f67f0c886b4a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "as_model uses exact-type wrapper registry and recursive wrappers",
+          "verdict": "supported",
+          "reason": "Registry lookup promotes, verifies Object and preserves metadata; recwrap recursively promotes elements with _seen protection at 516-524.",
+          "evidence": {
+            "path": "hy/models.py",
+            "start_line": 138,
+            "end_line": 146
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

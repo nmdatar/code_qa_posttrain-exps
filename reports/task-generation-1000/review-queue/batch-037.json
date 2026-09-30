@@ -1,0 +1,476 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 272,
+            "file_sha256": "5ef1d612edb55d4629fa8c3c6867bae0bf69050b951da9954927e42e48b88ff1",
+            "path": "tests/test_utils.py",
+            "start_line": 267
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "5aa53ceab677c2f842fad42359c8ed1ff1c4299c1607789609957a496e4311d4",
+            "kind": "file_reference",
+            "line_count": 1086,
+            "path": "src/requests/utils.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the semantic significance of the `no_proxy` keyword argument in `get_environ_proxies` overriding environment variable precedence, and what does returning a non-empty dictionary when this override is applied indicate?",
+      "question_sha256": "a8dff26fc9ffe01083dc4b993d092b366000d1de1afe9325c47ffc1b951eb4fe",
+      "reference_answer": "The semantic significance of the bypass exclusion keyword argument overriding environment variable precedence is that it enables **programmatic runtime control** over proxy bypass settings, taking priority over static environment configuration.\n\nIn the implementation (`src/requests/utils.py`), the function `get_environ_proxies` calls `should_bypass_proxies(url, no_proxy=no_proxy)`. Within `should_bypass_proxies` (lines 769-771), the precedence logic works as follows:\n\n```python\nno_proxy_arg = no_proxy\nif no_proxy is None:\n    no_proxy = get_proxy(\"no_proxy\")  # Falls back to environment variable\n```\n\nWhen the keyword argument is provided (non-None), it is used directly, bypassing the environment variable lookup. Additionally, at line 803, the code uses `with set_environ(\"no_proxy\", no_proxy_arg):` to temporarily override the environment variable for the `proxy_bypass` call, ensuring the argument value takes precedence even in lower-level proxy bypass checks.\n\nThis design allows:\n1. **Runtime flexibility**: Applications can programmatically control proxy bypass behavior per-request or per-session without modifying global environment variables\n2. **Explicit override**: The keyword argument provides a clear, explicit way to override environment settings when needed\n3. **Consistent behavior**: The temporary environment override ensures that both the custom bypass logic and the standard library's `proxy_bypass` function use the same override value\n\nThis is demonstrated in the test `test_not_bypass_no_proxy_keyword` (lines 267-272 in `tests/test_utils.py`), which explicitly tests that \"the 'no_proxy' argument overrides the environment variable 'no_proxy'\", showing that a URL not matching the keyword argument's bypass list will use proxies even if it would otherwise match an environment variable's bypass list.",
+      "reference_sha256": "34bcfc6228a262a35d31ba9f73c83ade2d88b75f8d04909da2f8320e735518ef",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-45c370741c488f1730b36857"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 660,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 658
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "src/requests/utils.py",
+              "tests/utils.py"
+            ],
+            "end_line": 578,
+            "path": "utils.py",
+            "reason": "ambiguous_basename",
+            "reference": "utils.py",
+            "start_line": 571
+          }
+        ]
+      },
+      "question": "How does the Response class manage the dual-state content consumption pattern to prevent memory exhaustion while maintaining backward compatibility with both streaming and non-streaming access patterns?",
+      "question_sha256": "d904f8021e87caa9589db6e62ad203aa1b00db271f1a5ebfbb20977c6ff65785",
+      "reference_answer": "The response object class manages dual-state content consumption using two flags: `_content` and `_content_consumed`.\n\nInitialization (lines 658-660 in `src/requests/models.py`):\n- `_content` starts as `False` (not loaded)\n- `_content_consumed` starts as `False` (not consumed)\n\nStreaming access via `iter_content()` (lines 799-855):\n- If `_content_consumed` is `False`, it uses `stream_chunks` from the raw stream, reading incrementally without loading everything into memory\n- After streaming completes, it sets `_content_consumed = True` (line 837)\n- If `_content_consumed` is `True` and `_content` is still `False` (boolean), it raises `StreamConsumedError` (line 839-840)\n- If `_content_consumed` is `True` and `_content` has been loaded (bytes), it uses `reused_chunks` via `iter_slices()` to iterate over the already-loaded content (lines 846, 850)\n\nNon-streaming access via `content` property (lines 891-907):\n- If `_content is False`, it reads all content via `iter_content(CONTENT_CHUNK_SIZE)` and stores it in `_content` (line 902)\n- If `_content_consumed` is already `True` when accessing `content`, it raises `RuntimeError` (line 896-897)\n- After loading, it sets `_content_consumed = True` (line 904)\n\nMemory exhaustion prevention:\n- Streaming reads from the raw stream incrementally without buffering everything\n- Content is only fully loaded when the `content` property is accessed\n- After streaming, subsequent `iter_content()` calls use `reused_chunks` from the already-loaded `_content` via `iter_slices()` (lines 571-578 in `utils.py`), avoiding re-reading the stream\n\nBackward compatibility:\n- Supports both streaming (`iter_content()`) and non-streaming (`content` property) access patterns\n- After streaming, accessing `content` would fail (raises `RuntimeError`), but `iter_content()` can still be called using `reused_chunks`\n- After accessing `content`, `iter_content()` works using `reused_chunks` from the loaded `_content`\n- This maintains compatibility with code that uses either pattern while preventing double consumption of the stream\n</start_of_answer>",
+      "reference_sha256": "49910c59d303989cddea1edabdf51c4665887a203b227add4c052db831768aaa",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-508b0d30c967d124813f7b1d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 918,
+            "file_sha256": "4508b22c1aa65417427fe7e51ea1f4e3a3d43d3021acdeb5a5260720a1b367a1",
+            "path": "tests/test_requests.py",
+            "start_line": 914
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "kind": "file_reference",
+            "line_count": 1039,
+            "path": "src/requests/models.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where in the requests library codebase are the lower-level validation and encoding mechanisms implemented that handle the simultaneous processing of both data and files parameters in POST requests, and how do they interact to prevent the ValueError raised in the test?",
+      "question_sha256": "bb9e7c56ff8186d1537ded640b9ff847e40ea0818a8138ec3a14953a90d3655e",
+      "reference_answer": "The validation and encoding mechanisms that prevent ValueError when data and files parameters are used together are implemented in the `RequestEncodingMixin` class within the `src/requests/models.py` file.\n\nThe validation check is in the `_encode_files` static method (lines 137-203). At lines 148-149, it raises `ValueError(\"Data must not be a string.\")` when the `data` parameter is a string (including JSON strings) and `files` is provided:\n\n```python\nelif isinstance(data, basestring):\n    raise ValueError(\"Data must not be a string.\")\n```\n\nThis prevents using string data (e.g., JSON strings like `'[{\"some\": \"data\"}]'`) with file uploads, which is tested in `test_conflicting_post_params` (tests/test_requests.py, lines 914-918).\n\nThe encoding mechanisms are:\n1. `_encode_files` (lines 137-203): a static method in `RequestEncodingMixin` that builds multipart/form-data bodies when files are present. It validates that data is not a string, then encodes both data fields and file fields into a multipart form structure using urllib3's `encode_multipart_formdata`.\n2. `_encode_params` (lines 107-134): a static method in `RequestEncodingMixin` that encodes form parameters using URL encoding for regular form data when files are not present.\n\nThese are coordinated by the `prepare_body` method (lines 494-570) in the `PreparedRequest` class, which inherits from `RequestEncodingMixin`. When files are present, `prepare_body` calls `_encode_files(files, data)` at line 555, which triggers the validation. When files are not present, it calls `_encode_params(data)` at line 558 for form-urlencoded encoding.\n\nThe `PreparedRequest` class (line 313) inherits from `RequestEncodingMixin`, so it has access to both encoding methods. The validation in `_encode_files` ensures that when files are provided, the data parameter must be a dictionary, list of tuples, or None\u2014not a string\u2014to prevent conflicts in multipart encoding.",
+      "reference_sha256": "c20de2c263f829b422152ffafb97bce715ab34a53802e89b1a50cebebc03454f",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-516a4679efc41a78cc0adef3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 191,
+            "file_sha256": "0a5d5da449ce7f0af3ccf6e4bbe7a67a935e37846dff4ff9f08cb6c7e2464e6f",
+            "path": "src/requests/sessions.py",
+            "start_line": 191
+          },
+          {
+            "end_line": 500,
+            "file_sha256": "0a5d5da449ce7f0af3ccf6e4bbe7a67a935e37846dff4ff9f08cb6c7e2464e6f",
+            "path": "src/requests/sessions.py",
+            "start_line": 500
+          },
+          {
+            "end_line": 95,
+            "file_sha256": "8c93d2d545804ecf3a4a155468ba2b4e225bd52686ba83445a020225ea7e5646",
+            "path": "src/requests/exceptions.py",
+            "start_line": 95
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "fd96fd39aeedcd5222cd32b016b3e30c463d7a3b66fce9d2444467003c46b10b",
+            "kind": "file_reference",
+            "line_count": 157,
+            "path": "src/requests/api.py"
+          },
+          {
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "kind": "file_reference",
+            "line_count": 1039,
+            "path": "src/requests/models.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where in the codebase is the TooManyRedirects exception raised and what is the call chain that leads to its instantiation from the redirect handling logic?",
+      "question_sha256": "21f5cb775c83641fbf4ac202c52600e6842be3c91f1dc21c493477fd7dbe97b6",
+      "reference_answer": "The exception for exceeding the maximum redirect count is raised in the `resolve_redirects` method of the `SessionRedirectMixin` class, located in `src/requests/sessions.py` at line 191.\n\nThe call chain leading to its instantiation from redirect handling logic is:\n\n1. **Entry point**: When a user makes a request via `requests.get()`, `requests.post()`, or similar functions in `src/requests/api.py`, these functions create a `Session` instance and call `session.request()`.\n\n2. **Request preparation and sending**: `Session.request()` (line 500 in `sessions.py`) prepares the request and calls `Session.send()` (line 673).\n\n3. **Redirect handling check**: In `Session.send()`, if `allow_redirects=True` (line 721), the method calls `self.resolve_redirects(r, request, **kwargs)` (line 723).\n\n4. **Redirect processing loop**: `resolve_redirects()` (line 159) is a generator method in `SessionRedirectMixin` that processes redirects in a `while url:` loop (line 177). For each redirect:\n   - It tracks redirect history in a `hist` list (line 173)\n   - Updates `resp.history` with the accumulated redirects (line 183)\n   - Checks if the redirect count exceeds the limit: `if len(resp.history) >= self.max_redirects:` (line 190)\n\n5. **Exception instantiation**: When the redirect count reaches or exceeds `self.max_redirects` (defaults to 30, defined as `DEFAULT_REDIRECT_LIMIT` in `src/requests/models.py`), the exception is raised at line 191-193:\n   ```python\n   raise TooManyRedirects(\n       f\"Exceeded {self.max_redirects} redirects.\", response=resp\n   )\n   ```\n\nThe exception is instantiated with a message indicating the number of redirects exceeded and includes the response object in the exception for debugging purposes. The `TooManyRedirects` exception class itself is defined in `src/requests/exceptions.py` at line 95, inheriting from `RequestException`.",
+      "reference_sha256": "1e3001a44d5307c235d957b25142fb1ec0ccd917c7b6a5530d51ea1425cc5b51",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-528b2c0d9016f69a22fea98e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 625,
+            "file_sha256": "5ef1d612edb55d4629fa8c3c6867bae0bf69050b951da9954927e42e48b88ff1",
+            "path": "tests/test_utils.py",
+            "start_line": 566
+          },
+          {
+            "end_line": 526,
+            "file_sha256": "5aa53ceab677c2f842fad42359c8ed1ff1c4299c1607789609957a496e4311d4",
+            "path": "src/requests/utils.py",
+            "start_line": 504
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the parametrize decorator coordinate with the test function signature to implement the test case generation algorithm for _parse_content_type_header?",
+      "question_sha256": "b5666bb02542ef7facb9c72dd4bf8cb0a44416501c1d30755d3ea6a2a9a76095",
+      "reference_answer": "The pytest parametrize decorator coordinates with the test function signature through parameter name matching to generate test cases. Here's how it works:\n\n**Parameter Name Matching**: The decorator at lines 566-625 in `tests/test_utils.py` specifies parameter names as a comma-separated string: `\"value, expected\"`. The test function signature at line 626 has matching parameter names: `def test__parse_content_type_header(value, expected):`. pytest uses these names to map test case tuples to function arguments.\n\n**Test Case Generation**: The decorator's second argument is a tuple of test cases (lines 568-624), where each case is a tuple `(value, expected)` matching the parameter order. For example:\n- `(\"application/xml\", (\"application/xml\", {}))`\n- `(\"application/json ; charset=utf-8\", (\"application/json\", {\"charset\": \"utf-8\"}))`\n\n**Execution Algorithm**: For each test case tuple, pytest:\n1. Unpacks the tuple according to the parameter names from the decorator\n2. Calls the test function with those values as keyword arguments\n3. Executes the assertion: `assert _parse_content_type_header(value) == expected`\n\nThis generates multiple test invocations from a single function definition\u2014one per test case tuple. The function being tested (`_parse_content_type_header` in `src/requests/utils.py`, lines 504-526) parses HTTP Content-Type headers by splitting on semicolons, extracting the content type, and parsing parameters into a dictionary.\n\nThe coordination is automatic: pytest matches decorator parameter names to function signature parameters, then unpacks each test case tuple into those parameters when calling the function.",
+      "reference_sha256": "7e75a1963ba9614bb545bdc583d721150831bd24439f1dd99f27b6873233d4d3",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-5820941a82e48bd290697cd0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 24,
+            "file_sha256": "8c93d2d545804ecf3a4a155468ba2b4e225bd52686ba83445a020225ea7e5646",
+            "path": "src/requests/exceptions.py",
+            "start_line": 17
+          },
+          {
+            "end_line": 1026,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 1026
+          },
+          {
+            "end_line": 368,
+            "file_sha256": "f275f5d7781b6f5db7694b71d844e400dffa22c617f8cd9f4682c696e4c47119",
+            "path": "src/requests/adapters.py",
+            "start_line": 368
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the architectural design in RequestException that leverages conditional request object resolution through response introspection to maintain backward compatibility while managing the control flow of exception initialization across the requests library's exception hierarchy?",
+      "question_sha256": "0ebe31f2c4d72540546ef1a9015a0e718b3bed39b0ef69766b227b63625bd06d",
+      "reference_answer": "The architectural design in the base exception class (`RequestException`) implements conditional request resolution through response attribute inspection in its `__init__` method (located in `src/requests/exceptions.py`, lines 17-24). \n\nThe implementation works as follows:\n\n1. **Conditional Resolution Logic**: The `__init__` method first extracts the `request` parameter from kwargs (line 21). If `request` is not explicitly provided, but a `response` parameter is provided, the code checks whether the response object has a `request` attribute using `hasattr(response, \"request\")` (line 22).\n\n2. **Response Attribute Inspection**: If the response object contains a `request` attribute, the code automatically assigns `self.response.request` to `self.request` (line 23). This allows the exception to access the original request object that generated the response.\n\n3. **Backward Compatibility**: This design maintains backward compatibility by allowing exceptions to be raised with only the `response` parameter. For example, in `src/requests/models.py` (line 1026), `HTTPError` is raised as `raise HTTPError(http_error_msg, response=self)`, where only the response is passed. The request object is automatically extracted from the response, eliminating the need to pass it explicitly.\n\n4. **Control Flow Management**: This conditional logic manages the control flow of exception initialization across the entire exception hierarchy. Since all exceptions in the requests library inherit from `RequestException` (including `HTTPError`, `ConnectionError`, `Timeout`, `SSLError`, `ProxyError`, and others), they all benefit from this automatic request resolution mechanism.\n\n5. **Response-Request Relationship**: The response object's `request` attribute is set during response processing. In `src/requests/adapters.py` (line 368), when a response is built, it receives a reference to the request: `response.request = req`. This establishes the relationship that the exception initialization logic leverages.\n\nThis architectural pattern ensures that exception objects always have access to both request and response context for debugging and error handling, while providing flexibility in how exceptions are instantiated throughout the codebase.",
+      "reference_sha256": "c15a51ed6660252444e6f299a46a5d51780bb80a8eaf85e0df9aac753f794a54",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-5c466e04c9918eb631c0cc32"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 659,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 659
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the Response class separate concerns between lazy content materialization and serialization state management to enable pickle support while maintaining streaming semantics?",
+      "question_sha256": "6b805933f46fc895527e0d4e58f2d7ac99811c63000165cfc048b2935029e096",
+      "reference_answer": "The HTTP response class in requests separates lazy content materialization from serialization state management through distinct mechanisms that work together:\n\n**Lazy Content Materialization:**\nThe class uses a `_content` attribute initialized to `False` (line 659 in `models.py`) and a `content` property (lines 891-907) that materializes content only when accessed. The property checks `if self._content is False:` before reading from the underlying `raw` stream, ensuring content is read only when needed, not at object creation.\n\n**Serialization State Management for Pickle:**\nPickle support is handled through `__getstate__` (lines 711-717) and `__setstate__` (lines 719-725). The `__getstate__` method ensures content is materialized before serialization by accessing `self.content` if `_content_consumed` is False, then serializes only attributes listed in `__attrs__` (lines 645-656), which includes `_content` but excludes unpickleable objects like `raw` and internal state flags. The `__setstate__` method restores these attributes and sets `_content_consumed = True` and `raw = None` for unpickled objects, since they can no longer access the original stream.\n\n**Streaming Semantics Preservation:**\nStreaming is maintained through the `_content_consumed` flag and conditional logic in `iter_content` (lines 799-855). When `iter_content` is called, it checks `_content_consumed` at line 850: `chunks = reused_chunks if self._content_consumed else stream_chunks`. If content hasn't been consumed, it streams directly from `raw`; if it has been materialized (e.g., after accessing the `content` property or after pickling), it reuses the already-read `_content` data. This allows the class to support both streaming (when content hasn't been read) and reuse of materialized content (when it has been read or unpickled), maintaining streaming semantics while enabling pickle support.\n\n**Separation of Concerns:**\nThe separation is achieved by:\n1. Using `_content` as a flag/cache separate from the `raw` stream\n2. Using `_content_consumed` as a state flag separate from the content itself\n3. Having `__getstate__` materialize content only when needed for serialization\n4. Having `iter_content` check consumption state to decide between streaming and reusing materialized content\n\nThis design allows the class to be pickleable (by materializing content before serialization) while still supporting streaming semantics (by checking consumption state and streaming when possible).",
+      "reference_sha256": "1fadaea8fc2422cf9456ef72676cf0833445b9bd6c975ffcee0a2aea0a86beb3",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-5dd45a2df70b293f78842f8d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 128,
+            "file_sha256": "8c93d2d545804ecf3a4a155468ba2b4e225bd52686ba83445a020225ea7e5646",
+            "path": "src/requests/exceptions.py",
+            "start_line": 127
+          },
+          {
+            "end_line": 840,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 839
+          },
+          {
+            "end_line": 136,
+            "file_sha256": "8c93d2d545804ecf3a4a155468ba2b4e225bd52686ba83445a020225ea7e5646",
+            "path": "src/requests/exceptions.py",
+            "start_line": 135
+          },
+          {
+            "end_line": 1086,
+            "file_sha256": "5aa53ceab677c2f842fad42359c8ed1ff1c4299c1607789609957a496e4311d4",
+            "path": "src/requests/utils.py",
+            "start_line": 1071
+          },
+          {
+            "end_line": 257,
+            "file_sha256": "0a5d5da449ce7f0af3ccf6e4bbe7a67a935e37846dff4ff9f08cb6c7e2464e6f",
+            "path": "src/requests/sessions.py",
+            "start_line": 255
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the semantic distinction between UnrewindableBodyError and StreamConsumedError in the requests exception hierarchy, and what specific conditions trigger each exception during HTTP request body handling?",
+      "question_sha256": "f6348826665dd8ac529857f36d429e36a8b7d2e17db8f5874f51f21b2299ebf6",
+      "reference_answer": "The semantic distinction between these two exceptions lies in their domain of operation and inheritance hierarchy:\n\n**StreamConsumedError** (defined in `src/requests/exceptions.py:127-128`):\n- Inherits from both `RequestException` and `TypeError`\n- Raised during **response** body handling\n- Triggered in the `iter_content()` method (`src/requests/models.py:839-840`) when:\n  - `_content_consumed` is `True` (content was already read from the stream)\n  - AND `_content` is still a boolean (`False`), meaning the content was never actually read into memory\n- This occurs when attempting to iterate over response content that was consumed from the stream but not buffered\n\n**UnrewindableBodyError** (defined in `src/requests/exceptions.py:135-136`):\n- Inherits only from `RequestException` (not TypeError)\n- Raised during **request** body handling, specifically during redirect processing\n- Triggered in the `rewind_body()` function (`src/requests/utils.py:1071-1086`) when:\n  - The request body lacks a `seek` method, OR `_body_position` is not an integer (could be `None` or `object()`)\n  - OR when calling `seek()` on the body raises an `OSError`\n- This occurs in `src/requests/sessions.py:255-257` during redirect handling when the library needs to rewind the request body to resend it with the redirected request, but the body cannot be rewound\n\nThe key semantic difference: `StreamConsumedError` relates to **response** content that cannot be re-accessed, while `UnrewindableBodyError` relates to **request** body that cannot be rewound for redirect resending. Additionally, `StreamConsumedError` is also a `TypeError` (indicating a type-related issue with accessing consumed content), while `UnrewindableBodyError` is purely a `RequestException`.",
+      "reference_sha256": "308616eba7a32ad8177e48e95dd8c2e80f00a83c91805df841f48ad1f5f6b15c",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-60f10fba4e17f899cefa26f7"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 960,
+            "file_sha256": "5aa53ceab677c2f842fad42359c8ed1ff1c4299c1607789609957a496e4311d4",
+            "path": "src/requests/utils.py",
+            "start_line": 955
+          },
+          {
+            "end_line": 976,
+            "file_sha256": "5aa53ceab677c2f842fad42359c8ed1ff1c4299c1607789609957a496e4311d4",
+            "path": "src/requests/utils.py",
+            "start_line": 961
+          },
+          {
+            "end_line": 962,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 962
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "5ef1d612edb55d4629fa8c3c6867bae0bf69050b951da9954927e42e48b88ff1",
+            "kind": "file_reference",
+            "line_count": 977,
+            "path": "tests/test_utils.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the architectural distinction in the TestGuessJSONUTF class between BOM-based encoding detection and raw byte-pattern detection that ensures correct UTF variant identification across the utility layer?",
+      "question_sha256": "4994130cbcd60db249ae1fa76e96ce65b909a87e4f9be58264127936a18a5e41",
+      "reference_answer": "The architectural distinction in the test class that validates UTF encoding detection for JSON data (`TestGuessJSONUTF` in `tests/test_utils.py`) between the detection method that checks for byte order marks and the detection method that analyzes null byte patterns is a priority-based two-stage detection system that ensures correct UTF variant identification.\n\n**BOM-based detection (first stage, takes precedence):**\n- Implemented in `guess_json_utf` (lines 955-960 in `src/requests/utils.py`)\n- Checks for BOM markers at the start of the data sample (first 2-4 bytes)\n- Returns generic encoding names when BOM is present: \"utf-16\" or \"utf-32\" (not specific endianness variants)\n- Validated by `test_guess_by_bom` (lines 425-427), which encodes data with `\\ufeff{}` and expects generic encoding names\n\n**Raw byte-pattern detection (fallback stage):**\n- Implemented in `guess_json_utf` (lines 961-976 in `src/requests/utils.py`)\n- Only executes when no BOM is detected\n- Analyzes null byte patterns in the first 4 bytes by counting nulls and checking their positions\n- Can detect specific endianness variants: \"utf-16-be\", \"utf-16-le\", \"utf-32-be\", \"utf-32-le\"\n- Validated by `test_encoded` (lines 409-411), which encodes data without BOM and expects exact encoding names including endianness\n\n**The architectural distinction:**\n1. **Priority/Order**: BOM detection executes first and takes precedence; byte-pattern detection is a fallback\n2. **Return value specificity**: BOM detection returns generic encoding names, while byte-pattern detection returns specific endianness variants\n3. **Detection strategy**: BOM detection relies on explicit markers, while byte-pattern detection uses structural analysis of null byte distribution\n\nThis two-stage approach ensures correct UTF variant identification: when a BOM is present, it provides definitive encoding information; when absent, the byte-pattern analysis can still determine the encoding variant by examining the data structure, which is critical for JSON parsing in the utility layer (used in `models.py` line 962 for response JSON decoding).",
+      "reference_sha256": "e06e8a2e3858709299c12a0655e68bec769570fbc4d6088dc32986ae94ab5efc",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-6f8cdd07160337b5eb598b40"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 1
+          },
+          {
+            "end_line": 1021,
+            "file_sha256": "5aa53ceab677c2f842fad42359c8ed1ff1c4299c1607789609957a496e4311d4",
+            "path": "src/requests/utils.py",
+            "start_line": 1008
+          },
+          {
+            "end_line": 94,
+            "file_sha256": "905ef9b6a9cb72d67d31ffe19bd4d9223e1c4169cde6ec51cfca16b31e70991d",
+            "path": "src/requests/auth.py",
+            "start_line": 94
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the URL parsing and credential extraction dataflow in the prepare() method handle the propagation of authentication information through the request preparation pipeline when a URL contains a long username and password string?",
+      "question_sha256": "d7a9fc2503e13b23be8576a12c05ccf5015098cf56b088042e81c7eff7ce918a",
+      "reference_answer": "The URL parsing and credential extraction process that handles authentication propagation for long username and password strings occurs in two sequential steps within `PreparedRequest.prepare()` in `./src/requests/models.py`:\n\n1. **URL Parsing Phase** (`prepare_url()` method, lines 409-481): When `prepare()` is called, it first invokes `prepare_url()` at line 367. This method uses `parse_url()` from urllib3 (line 433) to parse the URL and extract the authentication component as a single string (e.g., \"username:password\"). The auth component is preserved in the netloc reconstruction (lines 459-462): `netloc = auth or \"\"`, then `netloc += \"@\"`, then `netloc += host`. The URL is reconstructed using `urlunparse()` at line 480 and stored in `self.url`. This preserves the full authentication string, including long usernames and passwords, within the URL structure.\n\n2. **Credential Extraction Phase** (`prepare_auth()` method, lines 588-608): After URL preparation, `prepare()` calls `prepare_auth()` at line 371. When no explicit auth is provided, it calls `get_auth_from_url(self.url)` at line 593. This function (defined in `./src/requests/utils.py` at lines 1008-1021) uses `urlparse()` from urllib.parse (line 1014) to parse the URL and extract `parsed.username` and `parsed.password` separately. Both values are then unquoted using `unquote()` at line 1017, which properly handles URL-encoded long strings. The extracted credentials are returned as a tuple `(username, password)`.\n\n3. **Authentication Propagation**: If credentials are found, they are converted to an `HTTPBasicAuth` object (line 599 in `prepare_auth()`), which is then called as a callable at line 602. The `HTTPBasicAuth.__call__()` method (in `./src/requests/auth.py` at line 94) adds the `Authorization` header to the request headers using `_basic_auth_str()` to encode the credentials in base64 format.\n\nThe dataflow ensures that long username and password strings are:\n- Preserved during URL parsing in `prepare_url()` through the netloc reconstruction\n- Properly extracted and unquoted in `prepare_auth()` using `urlparse()` and `unquote()`\n- Propagated to the request headers as an Authorization header via the `HTTPBasicAuth` handler\n\nThis two-phase approach (URL preservation followed by credential extraction) allows the system to handle authentication information of any length, as the URL parsing preserves the raw auth component, and the subsequent extraction properly decodes URL-encoded long strings.",
+      "reference_sha256": "9ef6e7d144fa032c927f3ad05088efcadac68741619ead1e74190e59717ae62f",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-777dde0184a6d7f4f0cd1b22"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 377,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 351
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the architectural responsibility of the request preparation layer in the requests library for normalizing heterogeneous file object metadata when constructing multipart form-data payloads?",
+      "question_sha256": "b8e7f1b7073d58d865b966b90446eca509beaea2a0e7b1014acdcc950247364c",
+      "reference_answer": "The architectural responsibility of the component that prepares HTTP requests for transmission (the `PreparedRequest` class) is to standardize diverse file input formats into uniform structures when building multipart form-data request bodies. This responsibility is fulfilled through the `_encode_files()` static method, which is part of the `RequestEncodingMixin` class inherited by `PreparedRequest`.\n\nThe normalization process works as follows:\n\n1. **Input Format Handling**: The method accepts heterogeneous file inputs including:\n   - Dictionaries mapping field names to file objects\n   - Lists of tuples with 2, 3, or 4 elements: `(filename, fileobj)`, `(filename, fileobj, content_type)`, or `(filename, fileobj, content_type, custom_headers)`\n\n2. **Metadata Extraction**: For each file input, the method extracts and normalizes:\n   - **Filename**: If provided explicitly in a tuple, it uses that; otherwise, it calls `guess_filename()` to extract the filename from the file object's `name` attribute, or falls back to the dictionary key\n   - **File data**: Handles different file object types:\n     - Strings, bytes, or bytearrays are used directly\n     - File-like objects with a `read()` method have their content read\n     - Other objects are used as-is\n   - **Content type**: Extracted from 3-tuple or 4-tuple inputs, or left as `None`\n   - **Custom headers**: Extracted from 4-tuple inputs, or left as `None`\n\n3. **Unified Structure Creation**: The normalized metadata is used to create `RequestField` objects (from urllib3) with:\n   - Field name (the dictionary key)\n   - File data (normalized to bytes/bytes-like)\n   - Filename (extracted or guessed)\n   - Custom headers (if provided)\n   - Content type (set via `RequestField.make_multipart()`)\n\n4. **Payload Construction**: The normalized `RequestField` objects are passed to urllib3's `encode_multipart_formdata()` function, which constructs the final multipart form-data body and content-type header with boundary information.\n\nThis normalization layer ensures that regardless of how files are provided (as file paths, file-like objects, with or without explicit metadata), they are transformed into a consistent format suitable for multipart encoding, abstracting away the heterogeneity of file input formats from the lower-level encoding logic.\n\nThe method is called from `PreparedRequest.prepare_body()` when files are present, as part of the overall request preparation orchestration in the `prepare()` method (lines 351-377 in `models.py`). This architectural separation allows the request preparation layer to handle file metadata normalization as a distinct responsibility before the actual multipart encoding occurs.",
+      "reference_sha256": "c93f8ee82a778feecf57cdf0cd5b1351451b7f804b4a4a3afaf7efdffa971fc1",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-7d32415b82cbe00f47ca2acb"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 518,
+            "file_sha256": "6cd8be8aa123e0d3d9d34fa86feac7bf392f39bccdde5129830de0ea9692dd7c",
+            "path": "src/requests/cookies.py",
+            "start_line": 492
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the morsel_to_cookie function determine whether to convert a max-age attribute into an expires timestamp, and what is the underlying mechanism that transforms relative time values into absolute expiration times?",
+      "question_sha256": "68fdccf94194082eef671e42e7691f423ff088f79f37d7b78088d74fecfc2c01",
+      "reference_answer": "The function `morsel_to_cookie` in `./src/requests/cookies.py` (lines 492-518) converts `Morsel` objects (from `http.cookies`) into `Cookie` objects (from `http.cookiejar`) for compatibility with the requests library's cookie handling.\n\nIt converts `max-age` to `expires` because `http.cookiejar.Cookie` expects `expires` as an absolute Unix timestamp (integer), not a relative `max-age` value. The function bridges these two representations.\n\nThe conversion mechanism (lines 496-500):\n```python\nif morsel[\"max-age\"]:\n    try:\n        expires = int(time.time() + int(morsel[\"max-age\"]))\n    except ValueError:\n        raise TypeError(f\"max-age: {morsel['max-age']} must be integer\")\n```\n\nIt computes the absolute expiration by adding the current Unix timestamp (`time.time()`) to the `max-age` seconds (`int(morsel[\"max-age\"])`), producing an absolute expiration timestamp. If `max-age` is not present but `expires` is, it parses the `expires` string using a time template (lines 501-503).\n\nThis conversion ensures compatibility between the `Morsel` representation (which may use `max-age`) and the `Cookie` representation (which requires `expires` as an absolute timestamp) used by the cookie jar system.",
+      "reference_sha256": "e94291c175759924bac50d5811ac0cf596de804a2e080352655a9ddd01db561f",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-7f7fb5e8a5e6c2cd6981ceaa"
+    }
+  ]
+}

@@ -1,0 +1,235 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-c3b94f9c8addf9d27d2f9967",
+      "reference_sha256": "72763958504997c80bd8a83b5319aada8aa6b97c03f520d55570cd7976326f35",
+      "question_sha256": "d97a1ff0d3b7e80e52e4c33f1fb0b408d6c29ca048bd6782cb2d6dc76ac787be",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Timeout parametrization and httpbin fixture feed two test cases",
+          "verdict": "supported",
+          "reason": "Decorator supplies two timeouts and fixture wraps plugin URL; request checks success, not elapsed-time bound.",
+          "evidence": {
+            "path": "tests/test_requests.py",
+            "start_line": 2502,
+            "end_line": 2513
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-c66f68de1bb6bf36d4da9fb0",
+      "reference_sha256": "755a13a2a7b81eb293d39fcacc49abf0fed7703495e4e9ad1d8f0aaf2cd55d8e",
+      "question_sha256": "32eb3f077ce069158c64c0da2e4b9d1eb65847c9c63961d31608b01767ac4770",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Dictionary iteration returns stored cased keys",
+          "verdict": "supported",
+          "reason": "Test fixture inserts Accept and list expectation matches __iter__ on stored tuple keys.",
+          "evidence": {
+            "path": "tests/test_structures.py",
+            "start_line": 6,
+            "end_line": 14
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-c7de1bb281a9a22e10168b1f",
+      "reference_sha256": "4730ad99b5cbbbd049daf6f84cf538ee097f9160e59eb02a979546c19a81758c",
+      "question_sha256": "cf0d020d34372c8a14a5f24714a3b269c9c2b9c676a8f7d55803dba142af13a4",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "TLS tests depend on local server SSL certificate and filesystem facilities",
+          "verdict": "supported",
+          "reason": "nosan fixture imports trustme and builds local TLS server; TLSServer loads provided cert chain.",
+          "evidence": {
+            "path": "tests/conftest.py",
+            "start_line": 35,
+            "end_line": 58
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-dc55393bfd90497b05ffddc0",
+      "reference_sha256": "b390b7b3c6affaa90a7d73bac18a6117ec89cc28a7297088547c0f4cf92cee39",
+      "question_sha256": "dee7bcb34d06f638167f1aab7cced29781c0ebd1d74fe41a4f911a1ca55be999",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "raise_for_status catches HTTPError itself and ConnectionError only precedes a response",
+          "verdict": "partially_supported",
+          "reason": "raise_for_status raises HTTPError; separate response truthiness helper catches it, and transport errors can occur during response reads.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 999,
+            "end_line": 1026
+          }
+        }
+      ],
+      "material_errors": [
+        "raise_for_status raises HTTPError; separate response truthiness helper catches it, and transport errors can occur during response reads."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "HTTPError and ConnectionError are sibling RequestException subclasses (src/requests/exceptions.py:55-60). Response.raise_for_status raises HTTPError with response=self for 4xx/5xx (models.py:1015-1026); it does not itself catch that exception. Adapter transport failures are mapped to ConnectionError or specialized subclasses (adapters.py:658-680). Callers can catch the common base or handle status failures separately from transport failures; transport failures are not restricted to initial connection establishment."
+    },
+    {
+      "task_id": "import-de856d15114a7c0e30b8dd03",
+      "reference_sha256": "7dcdb75e15d0f53b36f18029fc2c32b32bbcfbde6d733739285a5d0fb3d27c71",
+      "question_sha256": "c093829b2c82b0f8a80037c4043a2b282c68a9d8ff81884012af1a0744c47919",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "list.remove is identity-only and cannot remove hooks registered via iterable",
+          "verdict": "contradicted",
+          "reason": "list.remove uses equality; individual elements from iterable registration can be removed normally.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 207,
+            "end_line": 227
+          }
+        }
+      ],
+      "material_errors": [
+        "list.remove uses equality; individual elements from iterable registration can be removed normally."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "register_hook appends one callable or extends with callable elements from an iterable; it does not store the collection (src/requests/models.py:207-216). deregister_hook removes one matching element using list.remove and returns false if absent (218-227). Thus passing the original collection is not bulk deregistration, but its individual hooks can be removed. list.remove matches by equality, not exclusively identity; registration origin does not prevent removal."
+    },
+    {
+      "task_id": "import-dfb0db0012798d808eecfe26",
+      "reference_sha256": "c525fb467a2392ef21858e5250f40273798cecad58c8f526792236272cb08449",
+      "question_sha256": "92f8586862939316a58d4511f8e02ac51f06ccc60b08247b3ace66dc121fbac1",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "All other port changes necessarily strip auth",
+          "verdict": "partially_supported",
+          "reason": "Same-scheme implicit/explicit default ports also preserve auth, and host equality is checked first.",
+          "evidence": {
+            "path": "src/requests/sessions.py",
+            "start_line": 127,
+            "end_line": 157
+          }
+        }
+      ],
+      "material_errors": [
+        "Same-scheme implicit/explicit default ports also preserve auth, and host equality is checked first."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "should_strip_auth first strips on hostname change. For the same host, it preserves auth on standard-port HTTP-to-HTTPS upgrades; the comment identifies backward compatibility as the reason (src/requests/sessions.py:127-143). It also preserves equivalent implicit/explicit default ports under the same scheme (145-154). Other scheme/port changes strip auth. This describes the code policy without asserting blanket RFC compliance."
+    },
+    {
+      "task_id": "import-e041ffe44f26e8db1067ccc8",
+      "reference_sha256": "a0c79c819c2559665ccad1440f02601fe7bd227d4da0b4572f2f71f4cb525417",
+      "question_sha256": "cd39f1ca7f52a613ddaba9731ed4c4945ff588b800de8e6f4967638aca4eed99",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Redirect sequence updates history after release and non-None means successful tell",
+          "verdict": "partially_supported",
+          "reason": "History is updated first; non-None also includes failed-tell sentinel.",
+          "evidence": {
+            "path": "src/requests/sessions.py",
+            "start_line": 173,
+            "end_line": 196
+          }
+        }
+      ],
+      "material_errors": [
+        "History is updated first; non-None also includes failed-tell sentinel."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "resolve_redirects first appends history, then consumes the current response (with raw-read fallback), checks redirect count, and closes it (src/requests/sessions.py:173-196). It rebuilds the next request and rewinds when _body_position is non-None and length/transfer headers are present (248-257); a failed-tell sentinel enters this path to raise UnrewindableBodyError. stream is passed to send, while intermediate redirect bodies are consumed regardless (265-272)."
+    },
+    {
+      "task_id": "import-e270a6ca69ae7ed29865bc7c",
+      "reference_sha256": "0b09c21256448514b522a0763078122276e73cb4af6683533dc4c2f3ea2cd8e2",
+      "question_sha256": "1f233095fb0e342e98112f7ce55ef55c0dd29f57bbb180bc3d7c902644e6b3db",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "guess_filename prevents stream exfiltration and path traversal attacks",
+          "verdict": "contradicted",
+          "reason": "Function only chooses a transmitted filename; it neither controls reading the file object nor guarantees receiver-side path safety.",
+          "evidence": {
+            "path": "src/requests/utils.py",
+            "start_line": 251,
+            "end_line": 255
+          }
+        }
+      ],
+      "material_errors": [
+        "Function only chooses a transmitted filename; it neither controls reading the file object nor guarantees receiver-side path safety."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "guess_filename reads obj.name, accepts a nonempty string not starting with < and not ending with >, and returns os.path.basename(name) (src/requests/utils.py:251-255). This avoids pseudo-filenames and strips local directory components for multipart metadata. It does not open or block streams, prove prevention of data exfiltration, or guarantee how a remote server handles filenames."
+    },
+    {
+      "task_id": "import-f399dd3ff4d2bd9180f44f59",
+      "reference_sha256": "fa06d3ef6938f13f3bbef4573454bf0cae65ddcba2946d34aaf0cf3c25d99934",
+      "question_sha256": "8fd10f4a80b1ee8f38d66041e407640dc67f22a62cec6553015d2d68557bc9d3",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Repeated host accesses necessarily fully reparse and prove measurable degradation",
+          "verdict": "partially_supported",
+          "reason": "Delegation and parse call exist, but parser caching and actual workload cost are not established; wrapped request can be externally mutable.",
+          "evidence": {
+            "path": "src/requests/cookies.py",
+            "start_line": 98,
+            "end_line": 100
+          }
+        }
+      ],
+      "material_errors": [
+        "Delegation and parse call exist, but parser caching and actual workload cost are not established; wrapped request can be externally mutable."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "MockRequest.host delegates to get_host, which returns urlparse(self._r.url).netloc (src/requests/cookies.py:43-44,98-100). This adds Python calls versus a cached attribute, but the source does not quantify cost or prove full reparsing for identical URLs. If profiling justifies memoization, cache by URL or ensure wrapper snapshot semantics so externally changed request URLs do not leave a stale host."
+    },
+    {
+      "task_id": "import-f5260bf6ca6a0840c2e5026b",
+      "reference_sha256": "93069a9ce3994e9b62671d67e28b62e2c63a44f531d36e1cb40f0275b1cf3d24",
+      "question_sha256": "33e0a2451055d16b32f637295916edb6e5dd0966979b28192fab9f476debc26b",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Server context coordinates ready/stop events socket closure and thread join",
+          "verdict": "supported",
+          "reason": "run finally closes socket and signals stop; enter waits readiness; exit closes and joins.",
+          "evidence": {
+            "path": "tests/testserver/server.py",
+            "start_line": 117,
+            "end_line": 135
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    }
+  ]
+}

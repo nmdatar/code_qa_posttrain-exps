@@ -1,0 +1,739 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the boolean caching control parameter in the wrapper class initialization method for convolution models create a trade-off between memory consumption and computational overhead when the discretization step size for integration approximation limits is dynamically increased during runtime?",
+      "question_sha256": "c8df26c2f688adc0882a3f816deca5b05e2a5e043c4b34c8d069843cf188e811",
+      "reference_answer": "The boolean caching control parameter (`cache`) in the `Convolution` wrapper class initialization method creates a trade-off between memory consumption and computational overhead when the discretization step size is dynamically decreased (finer discretization) during runtime.\n\nThe `resolution` parameter controls the step size for the integration approximation: `bounding_box.domain(resolution)` generates a discretized domain using `np.arange(self.lower, self.upper + resolution, resolution)`. When the resolution is decreased (finer discretization), the domain contains more points, resulting in a larger meshgrid that must be computed via `np.meshgrid(*domain)` and evaluated through the convolution operation.\n\nWhen `cache=True` (default), the computed convolution on this larger domain is stored as a `RegularGridInterpolator` object in `self._convolution`. This increases memory consumption proportionally to the number of points in the discretized domain. However, subsequent evaluations only require interpolation from this cached grid, resulting in low computational overhead per call.\n\nWhen `cache=False`, the convolution is not stored, avoiding memory overhead. However, every call to the model triggers a complete recomputation of the convolution on the full discretized domain (via `super().__call__(*mesh, **kwargs)`), which becomes computationally expensive as the domain size grows with finer discretization.\n\nTherefore, enabling caching trades increased memory usage for reduced per-call computation, while disabling caching trades memory savings for increased per-call computation when the discretization step size is made smaller during runtime.",
+      "reference_sha256": "7d9fe0423b667591300f6144ab69b46234b3830f0a37a6823d08ea4433778e9f",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "task_id": "import-044fbaedd790bfa9f36b0f7b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/conan-io--conan-52f43d98fe44",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 152,
+            "file_sha256": "6cf61cdeb28da39163e45e2176caa8c5860ded68489f2089ab1ab526b2c04038",
+            "path": "conan/tools/scm/git.py",
+            "start_line": 152
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "spaces.txt",
+            "reason": "not_tracked",
+            "reference": "spaces.txt",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "Why does the method that checks if a repository has uncommitted changes implement its own exclusion filtering instead of using git's built\u2011in pathspec options?",
+      "question_sha256": "398215b212b50d4744d9bfeaa41a4bcf64d763ba47ead21a575bad12fa38deca",
+      "reference_answer": "1. ## Summary\n\n   `Git.is_dirty` implements its own exclusion filtering using Python's `fnmatch` module instead of git's pathspec options for several practical reasons related to **complexity, portability, and maintainability**.\n\n   ## Key Findings\n\n   ### 1. **Git's Handling of Special Characters**\n\n   Git's `status --short` output quotes filenames with spaces:\n\n   ```bash\n    M \"file with spaces.txt\"\n   ```\n\n   The current implementation at line 152 explicitly handles this:\n\n   ```152:152:conan/tools/scm/git.py\n           lines = [line.split(maxsplit=1)[1].strip('\"') for line in lines if line]\n   ```\n\n   When I tested git pathspecs with filenames containing spaces, they fail with complex quoting:\n\n   ```bash\n   # This fails:\n   git status --short ':!\"file with spaces.txt\"'\n   # Error: fatal: Unimplemented pathspec magic '\"'\n   ```\n\n   ### 2. **Shell Escaping Complexity**\n\n   Git pathspecs use the `:!pattern` syntax for exclusions. Programmatically building these requires careful shell escaping that varies by platform (Unix vs Windows), especially when patterns contain:\n\n   - Spaces\n   - Quotes\n   - Special shell characters\n   - Glob patterns\n\n   The Python approach avoids this complexity entirely by parsing the output after git returns it.\n\n   ### 3. **Historical Context**\n\n   Looking at the git history, the feature evolved in two stages:\n\n   - **Commit 86557a9d0** (Dec 2023): Changed from `git status -s` to `git status . -s` to support subfolder checking\n   - **Commit 4c0e9c8f2** (Jan 2024): Added exclusion filtering using fnmatch\n\n   The implementation needed to work with path-limited git status (checking only the current folder `.`), and combining pathspecs with path restrictions adds another layer of complexity.\n\n   ### 4. **Pattern Matching Consistency**\n\n   The `fnmatch` module provides simple, predictable glob patterns that are:\n\n   - Platform-independent\n   - Well-documented in Python\n   - Easy for users to understand (same as shell glob patterns)\n   - Consistent with other Conan patterns\n\n   Git pathspecs have subtleties and \"magic signatures\" (like `:(exclude)`) that are less familiar to most users.\n\n   ### 5. **Simpler, More Maintainable Code**\n\n   The current approach:\n\n   ```python\n   # Simple and clear\n   lines = [line for line in lines if not any(fnmatch.fnmatch(line, p) for p in self._excluded)]\n   ```\n\n   vs. a pathspec approach which would require:\n\n   - Building complex command strings with proper escaping\n   - Platform-specific quoting logic\n   - Handling edge cases for different git versions\n   - More complex error handling\n\n   ## Conclusion\n\n   The design choice prioritizes **simplicity, portability, and robustness** over potential minor performance gains. The approach of parsing git's output in Python and filtering with `fnmatch` is more maintainable and handles edge cases (like spaces in filenames) more gracefully than attempting to pass complex pathspecs through the shell to git.",
+      "reference_sha256": "25be1f59caa560d5a1c0f9d11f66f6f4653a9e895b91b7e03900b9e00908e3bf",
+      "repository": {
+        "commit": "52f43d98fe44ab92d01317110488d0670c3e9e64",
+        "family_id": "conan-io/conan",
+        "url": "https://github.com/conan-io/conan"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/conan-io--conan-52f43d98fe44ab92d01317110488d0670c3e9e64",
+      "task_id": "import-07783c19f1efdb9b1314b31f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/dwavesystems--dwave-cloud-client-88e14e9b7459",
+      "category": "{'id': '7.4', 'name': 'reverse proxy / URL routing / websocket / CDN / streaming'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 302,
+            "file_sha256": "32022775d3f9e722171ce6d1e2cc0169046c067f681010756599ace8256bfaf1",
+            "path": "dwave/cloud/utils.py",
+            "start_line": 282
+          },
+          {
+            "end_line": 518,
+            "file_sha256": "8483f5d76fda4cab03df7b41288813c8c26afd29debbe6edc10773506a411d09",
+            "path": "dwave/cloud/client.py",
+            "start_line": 518
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why is the BaseUrlSession class responsible for URL routing and HTTP session management within the D-Wave cloud client architecture?",
+      "question_sha256": "26800859eef7283b37cd2250c427c2147a3e65adf112cc6ea31e1435a9a81077",
+      "reference_answer": "The BaseUrlSession class (dwave/cloud/utils.py: lines 282-302) is responsible for URL routing and HTTP session management because the client requires a centralized URL resolution pattern. This design enables the Client class to consistently use relative paths throughout the codebase, such as 'solvers/remote/', 'problems/', and 'bqm/multipart/{problem_id}/part/{part_id}', without hardcoding full URLs. The Client instantiates BaseUrlSession with the endpoint as the base_url (dwave/cloud/client.py: line 518), allowing the same client code to work across different deployment environments by simply changing the configured endpoint.",
+      "reference_sha256": "7bd8d6a36c4e679aaa1f4e0ae30920b6235156a052f908a7bf7366ab64140b18",
+      "repository": {
+        "commit": "88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+        "family_id": "dwavesystems/dwave-cloud-client",
+        "url": "https://github.com/dwavesystems/dwave-cloud-client"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/dwavesystems--dwave-cloud-client-88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+      "task_id": "import-1bb79aa402423c16dff40dee"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/geopandas--geopandas-7d460d9efff5",
+      "category": "{'id': '5.3', 'name': 'threading / execution limits / scheduling / memory / timeout'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 243,
+            "file_sha256": "79a1d7d244ff55ec8eb60722667504fcd376331a54996a379831b7503545dc84",
+            "path": "geopandas/sindex.py",
+            "start_line": 56
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "a6afda682e2eb019af677e047775f6eaf1c7db9101cba5bc14bf6259b96ab2fd",
+            "kind": "file_reference",
+            "line_count": 6200,
+            "path": "geopandas/base.py"
+          },
+          {
+            "file_sha256": "79a1d7d244ff55ec8eb60722667504fcd376331a54996a379831b7503545dc84",
+            "kind": "file_reference",
+            "line_count": 505,
+            "path": "geopandas/sindex.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does geopandas' spatial indexing implementation fail to scale efficiently when processing large datasets with high-concurrency spatial operations?",
+      "question_sha256": "2cafd95f4701560eff0ae029e0b8dd7fe0de9001cef66cb859b57c597219ca78",
+      "reference_answer": "GeoPandas\u2019 spatial indexing scales poorly under large, highly concurrent workloads because its core design forces expensive, serialized work to be repeated and then funnels results through Python level coordination rather than allowing shared or parallel execution. Concretely, the .sindex attribute on GeoSeries and GeoDataFrame is implemented as a lazily constructed, object local cache, so the first access triggers a full synchronous build of the spatial index and that build is tied to the specific object instance rather than being shared across copies or derived objects, which means concurrent workflows that create many intermediate GeoSeries repeatedly pay the full construction cost; this behavior is implemented directly in GeoSeries.sindex in geopandas/base.py where the index is created on demand and stored on the object itself (lines 4888 to 4938). The actual index build is performed in SpatialIndex.__init__ in geopandas/sindex.py, which constructs a Shapely STRtree from the complete geometry array in one shot (lines 25 to 35), a design that assumes build once, query many usage and provides no incremental update or concurrency aware construction. Query execution then further limits scalability because SpatialIndex.query returns raw integer indices from the underlying tree which are subsequently converted, aligned, and filtered back into pandas objects in Python (lines 56 to 243 in geopandas/sindex.py), so as dataset size and concurrency increase, time is increasingly dominated by Python dispatch, pandas alignment, and GIL bound work rather than the spatial search itself. Together, these concrete implementation choices explain why GeoPandas\u2019 spatial indexing cannot scale efficiently for large datasets with many concurrent spatial operations: index builds are serialized and repeatedly triggered, and query results require substantial Python side post processing that prevents linear scaling.",
+      "reference_sha256": "246db94aa831c03fba864fc9af41bb49860a413f06e30967f31cb8a56fbcfa9a",
+      "repository": {
+        "commit": "7d460d9efff57720c970fd6a040914286846c589",
+        "family_id": "geopandas/geopandas",
+        "url": "https://github.com/geopandas/geopandas"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/geopandas--geopandas-7d460d9efff57720c970fd6a040914286846c589",
+      "task_id": "import-08933d31a87481f23a4dc833"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hylang--hy-902233d854d7",
+      "category": "{'id': '0.0', 'name': 'Unicode / formatting / parsing / data validation'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 80,
+            "file_sha256": "7859c13989d6d0762c49cecf29e0636e17fd5812e7008c60ec257d16d90dbcd3",
+            "path": "hy/macros.py",
+            "start_line": 37
+          },
+          {
+            "end_line": 38,
+            "file_sha256": "52f59a1ae43476665f82a7fb41b6c5d21d8ddc19d4e7cab44e36ab4f66b3dde5",
+            "path": "hy/model_patterns.py",
+            "start_line": 34
+          },
+          {
+            "end_line": 17,
+            "file_sha256": "52f59a1ae43476665f82a7fb41b6c5d21d8ddc19d4e7cab44e36ab4f66b3dde5",
+            "path": "hy/model_patterns.py",
+            "start_line": 9
+          },
+          {
+            "end_line": 112,
+            "file_sha256": "52f59a1ae43476665f82a7fb41b6c5d21d8ddc19d4e7cab44e36ab4f66b3dde5",
+            "path": "hy/model_patterns.py",
+            "start_line": 112
+          },
+          {
+            "end_line": 66,
+            "file_sha256": "52f59a1ae43476665f82a7fb41b6c5d21d8ddc19d4e7cab44e36ab4f66b3dde5",
+            "path": "hy/model_patterns.py",
+            "start_line": 58
+          },
+          {
+            "end_line": 64,
+            "file_sha256": "7859c13989d6d0762c49cecf29e0636e17fd5812e7008c60ec257d16d90dbcd3",
+            "path": "hy/macros.py",
+            "start_line": 64
+          },
+          {
+            "end_line": 71,
+            "file_sha256": "7859c13989d6d0762c49cecf29e0636e17fd5812e7008c60ec257d16d90dbcd3",
+            "path": "hy/macros.py",
+            "start_line": 66
+          },
+          {
+            "end_line": 563,
+            "file_sha256": "e7ba50cd831b07b2efb44d38b5b57c29d43f24fe7a392eb3127baa4cb3ccb60f",
+            "path": "hy/compiler.py",
+            "start_line": 563
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "7859c13989d6d0762c49cecf29e0636e17fd5812e7008c60ec257d16d90dbcd3",
+            "kind": "file_reference",
+            "line_count": 429,
+            "path": "hy/macros.py"
+          },
+          {
+            "file_sha256": "52f59a1ae43476665f82a7fb41b6c5d21d8ddc19d4e7cab44e36ab4f66b3dde5",
+            "kind": "file_reference",
+            "line_count": 155,
+            "path": "hy/model_patterns.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the pattern macro system implement syntax validation and compilation integration through the decorator pattern in Hy's macro infrastructure?",
+      "question_sha256": "005e48e97a05be7227dc8cca4cc66e4698e8d59d15afd5937cffa19e709faf0c",
+      "reference_answer": "The pattern macro system implements syntax validation through a three-layer decorator architecture defined in hy/macros.py. The @pattern_macro decorator (hy/macros.py: line 37-80) uses a wrapper_maker (line 44) to generate a validation wrapper for the target macro. This wrapper intercepts compilation calls to validate arguments using parser combinators defined in hy/model_patterns.py. These combinators, such as FORM, SYM, and KEYWORD (hy/model_patterns.py: line 34-38), are built upon funcparserlib primitives imported in hy/model_patterns.py (line 9-17) and custom combinators like times (hy/model_patterns.py: line 112). The whole() combinator (hy/model_patterns.py: line 58-66) ensures complete argument matching. During macro expansion, the wrapper invokes pattern.parse(args) (hy/macros.py: line 64); if validation fails, a NoParseError is caught (line 65) and converted into a descriptive compiler syntax error via _syntax_error (hy/macros.py: line 66-71). This validation mechanism integrates with the compilation process when the macro is invoked by macroexpand() inside the compile_expression method (hy/compiler.py: line 563), ensuring invalid macro syntax is caught before code generation.",
+      "reference_sha256": "41c6c3ef3b2e7c73852328e36e99b757f5ac5cd633cd4fb1a981b1730a45e279",
+      "repository": {
+        "commit": "902233d854d765058927402d60f1ee8bef02daf8",
+        "family_id": "hylang/hy",
+        "url": "https://github.com/hylang/hy"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hylang--hy-902233d854d765058927402d60f1ee8bef02daf8",
+      "task_id": "import-032ed4ac089801d8763d60f5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/mkdocs--mkdocs-74d3191e419b",
+      "category": "{'id': '4.4', 'name': 'CI pipelines / coverage / lint / GitHub Actions / security checks'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 11,
+            "file_sha256": "b1d69336910c0d9cd6ea78225712d2ad292b60339991907109cb1799592cf920",
+            "path": ".travis.yml",
+            "start_line": 3
+          },
+          {
+            "end_line": 5,
+            "file_sha256": "13cf9e6dd50d7313584bf7a220b70ba01b79f4102ba054d58120edc3c34f234e",
+            "path": "tox.ini",
+            "start_line": 2
+          },
+          {
+            "end_line": 12,
+            "file_sha256": "13cf9e6dd50d7313584bf7a220b70ba01b79f4102ba054d58120edc3c34f234e",
+            "path": "tox.ini",
+            "start_line": 12
+          },
+          {
+            "end_line": 108,
+            "file_sha256": "750f50c23faf20e63f12c309c1d7cf19fb696da36779eef896561b7630c04251",
+            "path": "mkdocs/tests/integration.py",
+            "start_line": 91
+          },
+          {
+            "end_line": 10,
+            "file_sha256": "212488b2c75add9f5e6794602e494c399b512a351583f09024c36781f155c3c2",
+            "path": ".travis.sh",
+            "start_line": 3
+          },
+          {
+            "end_line": 17,
+            "file_sha256": "13cf9e6dd50d7313584bf7a220b70ba01b79f4102ba054d58120edc3c34f234e",
+            "path": "tox.ini",
+            "start_line": 15
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "77b934a9f2748d551c5cebbb65215240a010ceab8c846f10d828654577d4fb55",
+            "kind": "file_reference",
+            "line_count": 42,
+            "path": "mkdocs/compat.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does MkDocs implement multi-environment testing and coverage reporting across different Python versions in its CI pipeline?",
+      "question_sha256": "2043239fe443f940d760d875d1f6e00c8e615efbd7f56d3a85d38744c7323025",
+      "reference_answer": "MkDocs implements multi-environment testing and coverage reporting through a coordinated system of Travis CI, Tox, and custom testing scripts. The Travis CI configuration (.travis.yml: line 3-11) defines a build matrix using `TOX_ENV` environment variables that specify combinations of Python versions (2.6, 2.7, 3.3, 3.4) with test types including unittests, integration tests, flake8 linting, and coverage reporting. Tox orchestrates isolated virtual environments for each combination (tox.ini: line 2-5), with unittest environments executing nose tests that include coverage collection using the `--with-coverage` flag and generate HTML coverage reports (tox.ini: line 12). Integration testing uses a dedicated Python script (mkdocs/tests/integration.py: line 91-108) built with click that systematically iterates through all 15 builtin themes (line 101: `for theme in sorted(MKDOCS_THEMES)`), building the MkDocs documentation with each theme via the `build()` function (lines 47-88) to validate cross-theme compatibility. Coverage reporting to Coveralls is handled conditionally through a shell script (.travis.sh: line 3-10) that installs coveralls and uploads coverage data only when `TOX_ENV` equals 'coverage' (line 3), running the `py27-unittests` environment for coverage collection (line 6). The system also includes code quality checks through a separate flake8 environment (tox.ini: line 15-17) that enforces style guidelines across the codebase while excluding specific files (`mkdocs/compat.py`) and error codes (`E501`).",
+      "reference_sha256": "53e1eeace2a7aef9d4682f093f2bd5b4aa4d1e1acb5fbaa08d83363c436b5979",
+      "repository": {
+        "commit": "74d3191e419b7cb79fe66f700119ead3365f70d0",
+        "family_id": "mkdocs/mkdocs",
+        "url": "https://github.com/mkdocs/mkdocs"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/mkdocs--mkdocs-74d3191e419b7cb79fe66f700119ead3365f70d0",
+      "task_id": "import-0286db3e04e10bc0cb64bc59"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/omni-us--jsonargparse-dd0f9e3767fc",
+      "category": "{'id': '0.2', 'name': 'CLI args / syntax / regex / command completion'}",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "4f161245b92103259cf22f5211872628465dd6594297e88d80b7d5f26d1626d4",
+            "kind": "file_reference",
+            "line_count": 1290,
+            "path": "jsonargparse/_typehints.py"
+          },
+          {
+            "file_sha256": "51a7cb0e398c84ba09096fb649e69fdd191b395cbe172e2bb53c85264323c514",
+            "kind": "file_reference",
+            "line_count": 1515,
+            "path": "jsonargparse/_core.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the hierarchical structure and responsibility distribution of jsonargparse's type hint validation system that enables complex type annotation parsing for CLI argument generation?",
+      "question_sha256": "3d725edc1767c882c84a4818aac486e3054be193fb5a6940fa006e79e4c62c8e",
+      "reference_answer": "jsonargparse employs a recursive, hierarchy-based validation system primarily driven by the ActionTypeHint class, which intercepts standard argparse actions to enforce complex Python type hints such as List[int], Union[str, int], or nested Dict structures.\nAt the top of this system is ActionTypeHint (located in jsonargparse/_typehints.py around line 152), which serves as the main orchestrator and integrates directly with the argparse workflow by inheriting from argparse.Action and being automatically assigned to arguments with valid type annotations.\nWhen an argument is parsed, ActionTypeHint.call is invoked as the entry point for validation, determining whether the provided value conforms to the expected type hint and producing appropriate error messages when validation fails; during initialization, it relies on is_supported_typehint to ensure the type annotation itself is supported before attaching the action.\nThe structural validity of type hints is handled by the static method is_supported_typehint (defined in _typehints.py around line 302), which validates the schema of the type hint rather than any concrete value by recursively traversing the type hierarchy, descending into constructs such as List[...] or Union[...], and verifying that every component is supported by the library.\nIn this process, types are categorized into leaf types, such as primitive types like str, int, float, bool, and NoneType, and root types, which include container and composite structures like List, Dict, Iterable, Sequence, Union, Type, and Enum, and these categories define the recursion structure and base cases.\nThe actual runtime validation and conversion of command-line input is performed by the adapt_typehints function (located in _typehints.py around line 748), which implements the core recursive logic that transforms raw command-line strings into properly typed Python objects.\nFor leaf types, adapt_typehints attempts direct casting, such as converting a string to an integer; for container types like List[T], it iterates over input elements and recursively applies adapt_typehints to each element using the subtype T; for Union types, it sequentially attempts validation against each member and accepts the first successful match.\nWhen the target type is a class rather than a primitive, adapt_typehints handles instantiation logic, often supporting dependency injection patterns through mechanisms such as class_path and init_args dictionaries.\nThis validation pipeline is integrated into argparse through the ActionsContainer and SignatureArguments components (defined in _core.py around line 101), where ActionsContainer overrides the standard argument registration process by inspecting arguments passed to add_argument and automatically replacing the default argparse action with ActionTypeHint when a supported type hint is detected.\nIn parallel, SignatureArguments extracts type hints from function signatures and docstrings, allowing the validation system to be populated automatically without explicit type specification in argument definitions.\nOverall, the system operates as a clear delegation hierarchy: ArgumentParser delegates argument registration to ActionsContainer, which assigns validation responsibility to ActionTypeHint; ActionTypeHint delegates detailed type-specific checking to adapt_typehints; and adapt_typehints recursively descends from root types such as containers and unions down to leaf types such as primitives, ensuring that the entire nested structure of an argument value conforms to its declared type hint.",
+      "reference_sha256": "6ca6085492bbb0ab159282cbde366bc411b30203310ddbb54ec8da3d6b5e445f",
+      "repository": {
+        "commit": "dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+        "family_id": "omni-us/jsonargparse",
+        "url": "https://github.com/omni-us/jsonargparse"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/omni-us--jsonargparse-dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+      "task_id": "import-034d845133236ae9b7f5a3f3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 549,
+            "file_sha256": "234e40e2d865a0bac626185995fbadb9eb2e9d075bd10279f69c3e0ebfb79018",
+            "path": "xarray/coding/cftimeindex.py",
+            "start_line": 542
+          },
+          {
+            "end_line": 965,
+            "file_sha256": "3d1c872c25d0b70a3f3ff9d8fd9472d73baa4a9d1471d0c9f14a8ba35b05805d",
+            "path": "xarray/tests/test_cftimeindex.py",
+            "start_line": 962
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does subtracting a CFTimeIndex from a scalar cftime datetime object raise a ValueError with 'difference exceeds' message, and what underlying constraint in the cftime arithmetic implementation necessitates this validation?",
+      "question_sha256": "f75ae08677b44cab0450bfdf63f39a27050e47b896007612faa8281b7b5ff1e1",
+      "reference_answer": "When subtracting a CFTimeIndex from a scalar cftime datetime object (e.g., `scalar_cftime - CFTimeIndex`), Python calls the `__rsub__` method of the CFTimeIndex class, defined in `./xarray/coding/cftimeindex.py` at lines 542-549.\n\nThe `__rsub__` method attempts to create a pandas `TimedeltaIndex` from the time difference:\n\n```python\ndef __rsub__(self, other):\n    try:\n        return pd.TimedeltaIndex(other - np.array(self))\n    except OUT_OF_BOUNDS_TIMEDELTA_ERRORS as err:\n        raise ValueError(\n            \"The time difference exceeds the range of values \"\n            \"that can be expressed at the nanosecond resolution.\"\n        ) from err\n```\n\nThe ValueError with the \"difference exceeds\" message is raised when pandas cannot represent the time difference as a `TimedeltaIndex` due to nanosecond resolution limits. Pandas `TimedeltaIndex` uses nanosecond resolution internally, which has a limited range (approximately \u00b1292 years). When the difference between the scalar cftime datetime and the CFTimeIndex elements exceeds this range, pandas raises either `pd.errors.OutOfBoundsTimedelta` or `OverflowError` (captured by the `OUT_OF_BOUNDS_TIMEDELTA_ERRORS` tuple defined at lines 74-78).\n\nThe `__rsub__` method catches these exceptions and re-raises them as a `ValueError` with the message: \"The time difference exceeds the range of values that can be expressed at the nanosecond resolution.\"\n\nThis behavior is tested in `./xarray/tests/test_cftimeindex.py` at lines 962-965, where subtracting a CFTimeIndex from a very distant cftime datetime (year 1) raises the ValueError:\n\n```python\ndef test_distant_cftime_datetime_sub_cftimeindex(calendar):\n    a = xr.date_range(\"2000\", periods=5, calendar=calendar, use_cftime=True)\n    with pytest.raises(ValueError, match=\"difference exceeds\"):\n        a.date_type(1, 1, 1) - a\n```\n\nThe underlying constraint is that pandas `TimedeltaIndex` uses nanosecond resolution, which cannot represent time differences beyond approximately \u00b1292 years. This limitation comes from using 64-bit integers to represent nanoseconds, creating a finite range that cftime datetime objects (which can represent dates far outside this range) may exceed.",
+      "reference_sha256": "9bc94fc63e1036d12bb09888aa144cd864286ac6c10ee37aa3f67af26c5cb927",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "task_id": "import-05472f493dc811e6307cc99a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 284,
+            "file_sha256": "ebf31a8738065ad418c354ceeed99562926055587c664501e9f8d194e4078202",
+            "path": "src/_pytest/python.py",
+            "start_line": 284
+          },
+          {
+            "end_line": 675,
+            "file_sha256": "a846e231ae62b1d7278a9119bfd36b923057b5033b238765c9a7a64d41d798fe",
+            "path": "src/_pytest/pytester.py",
+            "start_line": 675
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "8127808359baaa711775862b32bfbe0a7e5c16a2e8c9923d60ddd45f031b66fa",
+            "kind": "file_reference",
+            "line_count": 1055,
+            "path": "src/_pytest/pathlib.py"
+          },
+          {
+            "file_sha256": "93ccee856c3c5a5a251a905efdabf9d507da3e99e63986143ddf99ea1ba80160",
+            "kind": "file_reference",
+            "line_count": 316,
+            "path": "src/_pytest/skipping.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "_pytest/pytester.py",
+            "reason": "not_tracked",
+            "reference": "_pytest/pytester.py",
+            "start_line": null
+          },
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "_pytest/pathlib.py",
+            "reason": "not_tracked",
+            "reference": "_pytest/pathlib.py",
+            "start_line": null
+          },
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "_pytest/python.py",
+            "reason": "not_tracked",
+            "reference": "_pytest/python.py",
+            "start_line": null
+          },
+          {
+            "candidates": [],
+            "end_line": 437,
+            "path": "_pytest/mark/structures.py",
+            "reason": "not_tracked",
+            "reference": "_pytest/mark/structures.py",
+            "start_line": 407
+          },
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "_pytest/skipping.py",
+            "reason": "not_tracked",
+            "reference": "_pytest/skipping.py",
+            "start_line": null
+          },
+          {
+            "candidates": [],
+            "end_line": 307,
+            "path": "_pytest/_code/code.py",
+            "reason": "not_tracked",
+            "reference": "_pytest/_code/code.py",
+            "start_line": 285
+          }
+        ]
+      },
+      "question": "Why would repeated invocations of pytester.getitem() followed by evaluate_xfail_marks() impact test suite performance, and what internal caching mechanisms could mitigate redundant AST parsing and mark evaluation across multiple test evaluations?",
+      "question_sha256": "f89ec53e9a1d4045f413b3a2faaf9a089dff8cc6deadb29881616d37fa47187b",
+      "reference_answer": "Repeated calls to the test infrastructure method that performs collection and returns test items, followed by the function that evaluates xfail marker conditions, impact performance because:\n\n1. **Module Import and AST Parsing Overhead**: Each call to the collection method (`getitem()` in `_pytest/pytester.py`) triggers a full collection process via `getmodulecol()` \u2192 `getnode()` \u2192 `perform_collect()`. This involves:\n   - Writing source code to a file (`makepyfile()`)\n   - Importing the module via `import_path()` in `_pytest/pathlib.py`\n   - Python's import mechanism automatically parses the source code into an Abstract Syntax Tree (AST) during module import\n   - While `sys.modules` provides some caching (lines 545-547, 559 in `pathlib.py`), repeated calls with different source or in different sessions still trigger re-imports and AST parsing\n\n2. **Collection and Mark Extraction**: The collection process (`Module.collect()` in `_pytest/python.py`) involves:\n   - Extracting marks from Python objects via `get_unpacked_marks()` (lines 407-437 in `_pytest/mark/structures.py`)\n   - Storing marks in `own_markers` (line 284 in `python.py`)\n   - While `_mod_collections` WeakKeyDictionary (line 675 in `pytester.py`) caches collection results per collector, it only helps when the same collector object is reused\n\n3. **Mark Condition Compilation and Evaluation**: The xfail evaluation function (`evaluate_xfail_marks()` in `_pytest/skipping.py`) calls `evaluate_condition()` (lines 88-158) which:\n   - For string conditions: compiles the condition string to bytecode via `compile()` (line 117) and executes it via `eval()` (line 118), which is computationally expensive\n   - For boolean conditions: converts them to bool (line 138)\n   - Builds a globals dictionary with `os`, `sys`, `platform`, `config`, and namespace hooks (lines 99-114)\n   - While results are cached in `item.stash[xfailed_key]` (lines 239, 248, 255-257, 266-268 in `skipping.py`), this only helps if the same item object is reused; repeated calls with new items redo the compilation/evaluation\n\n4. **Lack of Cross-Call Caching**: The existing caching mechanisms (`sys.modules`, `item.stash`, `_mod_collections`) operate at different scopes:\n   - `sys.modules` caches imported modules but doesn't prevent re-collection\n   - `item.stash` caches per-item but new items require new evaluation\n   - `_mod_collections` caches per-collector but new collectors trigger new collection\n\n**Existing Caching Mechanisms:**\n- **`sys.modules` cache** (Python's built-in): Prevents re-importing already-imported modules (used in `import_path()` at lines 545-547, 559 in `pathlib.py`)\n- **`item.stash[xfailed_key]` cache**: Stores xfail evaluation results per item to avoid re-evaluation (lines 239, 248, 255-257, 266-268 in `skipping.py`)\n- **`_mod_collections` WeakKeyDictionary**: Caches collection results per collector object (line 675 in `pytester.py`, used at lines 1328-1329)\n- **AST cache in exception handling**: Used for traceback representation (lines 285-307 in `_pytest/_code/code.py`) but not for collection\n\nThe performance impact is most significant when:\n- Different source code is provided in each call (bypassing `sys.modules` cache)\n- New item objects are created (bypassing `item.stash` cache)\n- New collector objects are created (bypassing `_mod_collections` cache)\n- String conditions in xfail marks require compilation and evaluation on each call\n</start_of_answer>",
+      "reference_sha256": "e2e2dad01955bb0c1df7ea3eef58c40f84b8c78d3e57bcbebe1387b357578b46",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-05c4419df577dcd774daea5a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does a function marked with the event handler decorator receive arguments from the text input component to update state variables in the framework's event processing system?",
+      "question_sha256": "d8ba1245cb8455204bbf833d0f4caadeb96bae0df13b19bc106fe7f22cbabf2f",
+      "reference_answer": "Reflex's event system passes arguments from rx.input() to @event-decorated state methods through three key stages:\n1. Event binding: Input components declare event handlers with type annotations (on_change: EventHandler[input_event]). The input_event transformer extracts e.target.value from JavaScript events. When assigned a state method, EventHandler.__call__ creates an EventSpec with argument mappings as (param_name_var, value_var) tuples.\n2. Frontend compilation: EventSpec.args are compiled to JavaScript via format_event, generating payload objects like {text: e.target.value} embedded as ReflexEvent calls. When events fire, the frontend sends the event name and evaluated payload to the backend via WebSocket.\n3. Backend processing: _process_event receives the payload dictionary, inspects handler type hints, and coerces values (handling Pydantic models, dataclasses, enums). It unpacks the payload as keyword arguments to invoke the state method, which updates state fields and returns StateUpdate deltas to the frontend.",
+      "reference_sha256": "308080afde0f96a33379f399293c61dc0efc39f3836f06baa0f250a1bbcc34c3",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "task_id": "import-050b5693297db6d96c6cf5d6"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-47757c4062a6",
+      "category": "{'id': '4.0', 'name': 'version control / Docker / build cache'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 348,
+            "file_sha256": "e505cceed611b75b38ab4d061cfb402b6108c6ee86fd4933301dcc38a3a4b942",
+            "path": "sphinx/application.py",
+            "start_line": 326
+          },
+          {
+            "end_line": 540,
+            "file_sha256": "f34efc4eb2d750445ad116c104b671c0f0e7758aa1a9364daf094bdb3c338fa0",
+            "path": "sphinx/environment/__init__.py",
+            "start_line": 477
+          },
+          {
+            "end_line": 770,
+            "file_sha256": "f34efc4eb2d750445ad116c104b671c0f0e7758aa1a9364daf094bdb3c338fa0",
+            "path": "sphinx/environment/__init__.py",
+            "start_line": 759
+          },
+          {
+            "end_line": 425,
+            "file_sha256": "eb188f1100fd7655199e7ac4afba499f008f071aa5c99f897fd4232787fd2ca9",
+            "path": "sphinx/builders/html/__init__.py",
+            "start_line": 382
+          },
+          {
+            "end_line": 335,
+            "file_sha256": "9c94c8027a1367abc5dde6ed85651e0998418d2d439c7921c9b4748c42a4f1f4",
+            "path": "sphinx/builders/__init__.py",
+            "start_line": 318
+          },
+          {
+            "end_line": 284,
+            "file_sha256": "f34efc4eb2d750445ad116c104b671c0f0e7758aa1a9364daf094bdb3c338fa0",
+            "path": "sphinx/environment/__init__.py",
+            "start_line": 275
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does Sphinx's incremental build system fail to scale efficiently when dealing with large documentation projects in containerized CI environments?",
+      "question_sha256": "614cf9534e78a40955ffa217fc0ae68a58dc6c173ccff12f240f8eaa12cedb9c",
+      "reference_answer": "Sphinx's incremental build scales poorly for large documentation projects in containerized CI because its \"incremental\" decision-making still requires **project-wide scanning, filesystem timestamp/stat I/O, and frequent cache (de)serialization**, and container runs often weaken or discard the cached state that incremental builds depend on.\nIncremental builds rely on a persisted build environment stored under the doctree directory. Sphinx will load `environment.pickle` from `doctreedir` when it exists, but it creates a fresh environment if the file is missing, if `freshenv` is requested, or if unpickling fails (sphinx/application.py: line 326-348). In container CI, this cache is often not persisted across runs (or becomes invalid), so builds frequently start from a fresh environment and lose most incremental benefits.\nEven when the cache exists, Sphinx still has to **walk large sets of documents and dependencies** to decide what is \"outdated.\" `BuildEnvironment.get_outdated_files()` iterates over all discovered documents, checks for missing doctree files, checks source mtimes using `_last_modified_time(os.stat(...).st_mtime_ns)`, and also checks the mtimes (and existence) of each document's recorded dependency files (sphinx/environment/__init__.py: line 477-540; sphinx/environment/__init__.py: line 759-770). For HTML output, the HTML builder also iterates all documents and compares the source mtime (and template mtime) against the output file's mtime, and it can force a rebuild of all docs when `.buildinfo` does not match (sphinx/builders/html/__init__.py: line 382-425). On large projects this becomes a huge volume of filesystem metadata operations, which is commonly slower in containerized filesystems and mounted volumes.\nFinally, incremental builds still pay global costs when anything changed: the builder computes dependent documents to rewrite and then pickles the full environment back to `environment.pickle` (sphinx/builders/__init__.py: line 318-335). The environment intentionally clears in-memory doctree caches during pickling to reduce memory and avoid stale state, which also means rebuilds can re-trigger disk reads later (sphinx/environment/__init__.py: line 275-284). In short, large projects amplify the cost of \"figuring out what changed,\" and container CI often makes cache reuse and filesystem I/O less efficient, so incremental builds stop scaling well.",
+      "reference_sha256": "e96f703faedec50f813fefe7995f18a8d79ab66f9ebb0fb01a26f565166c425f",
+      "repository": {
+        "commit": "47757c4062a6421feeaf0ae2ded89896d6cb3526",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-47757c4062a6421feeaf0ae2ded89896d6cb3526",
+      "task_id": "import-02afcdc8ff44636a2507af03"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/streamlink--streamlink-ab1f36560005",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the test method that verifies error handling when plugin module execution fails simulate and verify plugin loading failure when the module execution function raises ImportError during lazy URL matching?",
+      "question_sha256": "5e681b472c3f068e1204c92ad0719704b561cbb8b6554623a165017215be62a2",
+      "reference_answer": "The test_fail_builtin method uses monkeypatch to replace streamlink.session.plugins.exec_module with a Mock object configured to raise ImportError when called. This simulates a scenario where the plugin module cannot be imported during lazy loading. The test then verifies that session.plugins.match_url returns None, indicating no plugin was found, checks that session.plugins.get_loaded() returns an empty dictionary confirming no plugin was loaded, and validates the expected debug and error log messages are recorded through caplog to ensure proper error handling and logging during plugin loading failure.",
+      "reference_sha256": "0c3f94e2365f0ce3d4211f84d423232536151ac22928f24796d90ab0f8281de0",
+      "repository": {
+        "commit": "ab1f36560005253ca6a290a614730bf18a29a7f9",
+        "family_id": "streamlink/streamlink",
+        "url": "https://github.com/streamlink/streamlink"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/streamlink--streamlink-ab1f36560005253ca6a290a614730bf18a29a7f9",
+      "task_id": "import-150e2ee523cd090d02e9b255"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/yt-dlp--yt-dlp-f2a4983df7a6",
+      "category": "{'id': '3.3', 'name': 'extensibility / configuration framework / plugin architecture'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 4,
+            "file_sha256": "752a1d4d90798442bb828b9be20976128b7f5617ee92f115f9ce40169da5be69",
+            "path": "yt_dlp/extractor/_extractors.py",
+            "start_line": 4
+          },
+          {
+            "end_line": 20,
+            "file_sha256": "8663e5ab900b5f6b020909f2e042169703d7b5a1e35989a679dd80e4aa7232cf",
+            "path": "devscripts/make_lazy_extractors.py",
+            "start_line": 15
+          },
+          {
+            "end_line": 13,
+            "file_sha256": "7820aa30e2bb7fd91ca931832d70a79a1709fb53027cec9a562f63ab1b2e4dbf",
+            "path": "yt_dlp/extractor/__init__.py",
+            "start_line": 7
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "752a1d4d90798442bb828b9be20976128b7f5617ee92f115f9ce40169da5be69",
+            "kind": "file_reference",
+            "line_count": 2614,
+            "path": "yt_dlp/extractor/_extractors.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does yt-dlp implement a multi-layered extractor registration system with both static imports and lazy loading mechanisms?",
+      "question_sha256": "c55120601619ab062a7c1d536a9334bceb6a9a532cc473d598c03879d09283ab",
+      "reference_answer": "yt-dlp implements a multi-layered extractor registration system to balance deterministic extractor selection, controlled resource usage, and long-term maintainability. These concerns are addressed through a combination of statically ordered extractor imports and optional lazy loading. First, deterministic URL matching is ensured through the static import order defined in yt_dlp/extractor/_extractors.py : line 4. Extractors are evaluated sequentially, and the first extractor whose `_VALID_URL` matches a given URL is selected. Because multiple extractors may match overlapping URL patterns, the declaration order directly determines precedence. Specialized extractors are placed earlier in the list, while `GenericIE`, which matches any URL via a catch-all pattern, is appended last to serve as a fallback. This ordering guarantees that generic patterns do not preempt more specific extractors. Second, lazy loading is used to defer full extractor module imports until they are actually required. The lazy extractor definitions generated by devscripts/make_lazy_extractors.py : lines 15\u201320 create lightweight placeholder classes that expose minimal matching metadata such as `_VALID_URL` and `IE_NAME`, while recording the underlying implementation module via a `_module` reference. During URL matching, only this lightweight metadata is needed, allowing the system to avoid importing all extractor implementations during startup. Third, the registration system supports incremental growth and robustness through centralized discovery logic. Extractor classes are collected into the `_ALL_CLASSES` registry without requiring manual registration logic beyond inclusion in yt_dlp/extractor/_extractors.py. The `gen_extractor_classes()` factory function in yt_dlp/extractor/__init__.py : lines 7\u201313 provides a single interface that assembles the ordered extractor list for use by the rest of the application. The system supports both lazy and direct imports, allowing it to fall back to direct extractor loading when lazy extractors are unavailable, while preserving the same matching semantics.",
+      "reference_sha256": "bb78a3a803c64c67292d1e64beb007684d8a1fac4558f2b7a4377eeffbb30956",
+      "repository": {
+        "commit": "f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+        "family_id": "yt-dlp/yt-dlp",
+        "url": "https://github.com/yt-dlp/yt-dlp"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/yt-dlp--yt-dlp-f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+      "task_id": "import-092081db4ada9466237f5b14"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 875,
+            "file_sha256": "1b93e8c2efecf56a95c36eb9c2799bb2cfe85704b81d499ed3e5423aa55188d7",
+            "path": "src/sqlfluff/dialects/dialect_exasol.py",
+            "start_line": 875
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": null,
+            "path": "/src/sqlfluff/core/parser/grammar/sequence.py",
+            "reason": "unsafe_path",
+            "reference": "/src/sqlfluff/core/parser/grammar/sequence.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "Where does the table reference segment parsed from the table-like clause flow through the bracketed delimited identifier grammar to determine which columns are included in the table creation statement?",
+      "question_sha256": "3cea3fd2333ae88fd7c864666901634f156333a8d51bb1e8a792aeb448dcbeec",
+      "reference_answer": "The table reference segment parsed from the table-like clause flows through the bracketed delimited identifier grammar via the Sequence.match() method in the parser's grammar matching system.\n\nIn the Exasol dialect, the CreateTableLikeClauseSegment defines a match_grammar that is a Sequence containing:\n1. The \"LIKE\" keyword\n2. A TableReferenceSegment (the table reference)\n3. A Bracketed grammar element containing Delimited(SingleIdentifierGrammar...) for column identifiers\n4. Optional INCLUDING/EXCLUDING clauses\n\nThe flow occurs during parsing when Sequence.match() processes elements sequentially:\n\n1. **Initial matching**: The Sequence.match() method (in `/src/sqlfluff/core/parser/grammar/sequence.py`) iterates through elements in order (line 163: `for elem in self._elements`).\n\n2. **Table reference parsing**: First, it matches the \"LIKE\" keyword, then matches the TableReferenceSegment at the current position in the segment stream (lines 234-237). This creates a MatchResult containing the parsed table reference.\n\n3. **Position advancement**: After successfully matching the TableReferenceSegment, the matched_idx is updated to the end of that match (line 316: `matched_idx = elem_match.matched_slice.stop`), advancing the parser position.\n\n4. **Bracketed column identifier processing**: The parser then processes the Bracketed grammar element. The Bracketed.match() method (in the same file, starting at line 463) first matches the opening bracket, then calls `super().match()` (line 513) - which invokes Sequence.match() - to process the inner content (the Delimited(SingleIdentifierGrammar...) sequence).\n\n5. **Delimited processing**: Within the Bracketed content, the Delimited grammar processes the SingleIdentifierGrammar elements sequentially, creating column identifier segments.\n\n6. **Result assembly**: All matched segments (table reference and column identifiers) are collected as child_matches in the MatchResult (line 334), which is then returned and becomes part of the CreateTableLikeClauseSegment structure.\n\nThe parsed table reference data doesn't directly \"flow\" as data between these elements - rather, the parser processes them sequentially in the same parsing context, with each match advancing the parser position. The table reference and column identifiers are both child segments of the CreateTableLikeClauseSegment, accessible through the segment's structure after parsing completes.\n\nThe CreateTableLikeClauseSegment is then integrated into the CreateTableStatementSegment through the OneOf grammar option (line 875 in dialect_exasol.py), where it can appear as an alternative to column definitions or AS SELECT syntax.",
+      "reference_sha256": "ee5ed5e9d401c93bbcc00fda6b2f239bb606664d6ad2d34edcd0cb2b11b68658",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "selection": "additional diagnostic risk sample",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-0bc3cde110c8dd1cd64fd09b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/mwaskom--seaborn-3d3d715989d1",
+      "category": "{'id': '6.2', 'name': 'build pipeline / doc building / Sphinx / cloud provisioning'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 44,
+            "file_sha256": "bf3d942261bd5ba22bfc67744d57c8b917609b7cd595173e735b584bcc99065e",
+            "path": "doc/conf.py",
+            "start_line": 43
+          },
+          {
+            "end_line": 19,
+            "file_sha256": "bf3d942261bd5ba22bfc67744d57c8b917609b7cd595173e735b584bcc99065e",
+            "path": "doc/conf.py",
+            "start_line": 19
+          },
+          {
+            "end_line": 391,
+            "file_sha256": "557b3df33532539f9e733a17d84e1e4e28cc54cdbd7638984931920a536b9e6c",
+            "path": "doc/sphinxext/gallery_generator.py",
+            "start_line": 332
+          },
+          {
+            "end_line": 366,
+            "file_sha256": "339ec625125f28d753639976ad54c111862df1ca6a0478f1aafc30932483cee2",
+            "path": "doc/sphinxext/tutorial_builder.py",
+            "start_line": 365
+          },
+          {
+            "end_line": 77,
+            "file_sha256": "339ec625125f28d753639976ad54c111862df1ca6a0478f1aafc30932483cee2",
+            "path": "doc/sphinxext/tutorial_builder.py",
+            "start_line": 49
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 394,
+            "line_count": 393,
+            "path": "doc/sphinxext/gallery_generator.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "doc/sphinxext/gallery_generator.py",
+            "resolved_path": "doc/sphinxext/gallery_generator.py",
+            "start_line": 392
+          }
+        ]
+      },
+      "question": "Where are the custom Sphinx extension entry points and their corresponding handler functions defined in seaborn's documentation build system?",
+      "question_sha256": "87fb67b63098989f617976b19d61eaecd4dffc25211d24b432a5c7a8ad7db21d",
+      "reference_answer": "Seaborn\u2018s documentation build system defines custom Sphinx extension entry points in the Sphinx configuration file and implements their handlers in dedicated extension modules. The extension entry points are registered in (doc/conf.py: line 43-44), where `gallery_generator` and `tutorial_builder` are listed in the `extensions` configuration. Import of these custom extensions is enabled by modifying the Python search path in doc/conf.py: line 19 to include the `doc/sphinxext/` directory. The corresponding handler functions are defined within the extension modules under doc/sphinxext/. The `gallery_generator` extension implements its entry hook via a `setup()` function in (doc/sphinxext/gallery_generator.py: line 392-394), which connects a main handler to the `builder-inited` Sphinx event, with the core gallery generation logic implemented in the `main()` function at (doc/sphinxext/gallery_generator.py: line 332-391). Similarly, the `tutorial_builder` extension defines its `setup()` function in (doc/sphinxext/tutorial_builder.py: line 365-366) and registers a corresponding main handler implemented in (doc/sphinxext/tutorial_builder.py: line 49-77).",
+      "reference_sha256": "8d53b6aa6e5756da9fa6cfd605f43e17fe2031fec74914716d808fb9efa27d2c",
+      "repository": {
+        "commit": "3d3d715989d1a9cecc2b08fb23c695b6bb686754",
+        "family_id": "mwaskom/seaborn",
+        "url": "https://github.com/mwaskom/seaborn"
+      },
+      "selection": "additional diagnostic risk sample",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/mwaskom--seaborn-3d3d715989d1a9cecc2b08fb23c695b6bb686754",
+      "task_id": "import-1517a212c8df5b2477819c8e"
+    }
+  ]
+}

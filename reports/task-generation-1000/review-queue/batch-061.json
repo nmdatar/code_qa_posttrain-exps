@@ -1,0 +1,459 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 736,
+            "file_sha256": "d31eb4ddb6cf94f1d4cdbbd91ea8f6dde73c05c8e0af74592ea5bfa84b1d3c20",
+            "path": "sklearn/cluster/_spectral.py",
+            "start_line": 713
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "7c33f036b16003edcf2c5f5114dc6156fbb9b1e13973c6d30e9a19c6a1d2bd43",
+            "kind": "file_reference",
+            "line_count": 335,
+            "path": "sklearn/cluster/tests/test_spectral.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the control flow in test_affinities determine which affinity computation pathway is executed based on the kernel type, and what data transformations occur at each decision point before labels are generated?",
+      "question_sha256": "ee6443e51ecbd5f8e842702d63cbb01d2e2c519848782a38d0c72cfa26438930",
+      "reference_answer": "The control flow that determines which affinity computation pathway is executed based on the kernel type parameter is located in the `fit` method of the `SpectralClustering` class, specifically in lines 713-736 of `./sklearn/cluster/_spectral.py`.\n\nThe decision structure uses a conditional if-elif-else block that checks the value of `self.affinity`:\n\n1. **If `affinity == \"nearest_neighbors\"`** (lines 713-717): The pathway constructs a k-nearest neighbors connectivity graph using `kneighbors_graph()`, then symmetrizes it by computing `0.5 * (connectivity + connectivity.T)` to create the affinity matrix.\n\n2. **If `affinity == \"precomputed_nearest_neighbors\"`** (lines 718-723): The pathway uses a `NearestNeighbors` estimator with precomputed distances, builds a connectivity graph via `kneighbors_graph()`, and symmetrizes it similarly.\n\n3. **If `affinity == \"precomputed\"`** (lines 724-725): The pathway directly assigns the input matrix `X` as the affinity matrix without transformation.\n\n4. **Else (kernel types)** (lines 726-736): This is the pathway for kernel-based affinity computation (e.g., 'rbf', 'poly', 'sigmoid', 'laplacian', 'chi2', 'cosine', 'linear'). It:\n   - Extracts kernel parameters (`gamma`, `degree`, `coef0`) from `self.kernel_params` or uses instance attributes\n   - Calls `pairwise_kernels()` with `metric=self.affinity` to compute the kernel matrix, which transforms the input data `X` into a similarity/affinity matrix using the specified kernel function\n\nAfter the affinity matrix is computed, the data flow continues to `_spectral_embedding()` (line 748), which:\n- Computes the normalized Laplacian matrix from the affinity matrix\n- Performs eigendecomposition to obtain the spectral embedding (maps)\n- The embedding is then transformed into cluster labels via one of three methods: k-means clustering (line 760), QR-based clustering (line 768), or discretization (line 770), depending on the `assign_labels` parameter.\n\nThe test function `test_affinities` in `./sklearn/cluster/tests/test_spectral.py` exercises these pathways by iterating through available kernel types from `kernel_metrics()` and testing each with `SpectralClustering.fit()`.\n</start_of_answer>",
+      "reference_sha256": "9d2aaa356dfc1866803da978dcd3fcf773487021743c84f30d35ac23d8c3283c",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-3a81650143eee2434dd3a1c1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 264,
+            "file_sha256": "4b42302c4f0c1a59cf54559cb47baaacb3450c0ea7693a4e62aa4497ae4412bc",
+            "path": "sklearn/metrics/_ranking.py",
+            "start_line": 259
+          },
+          {
+            "end_line": 212,
+            "file_sha256": "bd11e4cd7eac7b0df69ce0e2318e6ccd2017a677e046c4f8d3cc1ab1bfb425ea",
+            "path": "sklearn/utils/_response.py",
+            "start_line": 211
+          },
+          {
+            "end_line": 265,
+            "file_sha256": "4b42302c4f0c1a59cf54559cb47baaacb3450c0ea7693a4e62aa4497ae4412bc",
+            "path": "sklearn/metrics/_ranking.py",
+            "start_line": 265
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the `pos_label` parameter resolution process handle the case where a user provides an explicit `pos_label` value versus relying on the default `estimators.classes_[1]` assumption in multi-class classification scenarios?",
+      "question_sha256": "aad8170db20e025515034230cd1b19d170f91bee516862bec57d18774995bb4a",
+      "reference_answer": "The parameter resolution process handles explicit user-provided values versus default class selection differently in multi-class classification scenarios:\n\n**For Multi-Class Classification:**\n\n1. **Fixed Default Value**: In multi-class scenarios, the parameter is fixed to `1` (not derived from `classes_[1]` or any class array). This is enforced in functions like `average_precision_score` in `sklearn/metrics/_ranking.py` (lines 259-264):\n   ```python\n   elif y_type == \"multiclass\":\n       if pos_label != 1:\n           raise ValueError(\n               \"Parameter pos_label is fixed to 1 for multiclass y_true. \"\n               \"Do not set pos_label or set pos_label to 1.\"\n           )\n   ```\n\n2. **Explicit User Value Handling**: If a user provides an explicit value other than `1`, the system raises a `ValueError` indicating that the parameter must be `1` for multi-class targets. The user cannot override this default in multi-class scenarios.\n\n3. **Binary Classification Context**: The default behavior differs for binary classification. In `_get_response_values` (`sklearn/utils/_response.py`, lines 211-212), when the parameter is `None` and the target type is binary, it defaults to `classes[-1]` (which equals `classes[1]` in binary classification):\n   ```python\n   elif pos_label is None and target_type == \"binary\":\n       pos_label = classes[-1]\n   ```\n\n4. **Multi-Class Conversion**: For multi-class targets, the labels are binarized using `label_binarize` (line 265 in `_ranking.py`), and then the fixed value of `1` is used for all subsequent binary metric calculations.\n\n**Key Difference**: Unlike binary classification where the default can be inferred from `classes[-1]` (or `classes[1]`), multi-class classification enforces a hard-coded default of `1` and does not allow user override. This ensures consistency when converting multi-class problems to binary sub-problems for metric computation.",
+      "reference_sha256": "191c7cb560a05da12c7d8051b8fe0a65ccd4b47650c039a68804d7d6e05c3fd3",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-4c8ebe954a3040bb5d4a29b5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "90628fca68b26aac2c4f57305b6302c549952d3873e6651209ffcafb2c95ff3d",
+            "kind": "file_reference",
+            "line_count": 973,
+            "path": "sklearn/gaussian_process/_gpc.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the warm_start mechanism in _posterior_mode() reduce computational overhead during hyperparameter optimization, and what performance trade-offs occur when caching the latent function values across multiple log_marginal_likelihood evaluations?",
+      "question_sha256": "448e7a1df10fc6672a51da0a6b97587cf9cedc2d67fcaf529bf858076a17d0a7",
+      "reference_answer": "The warm-start mechanism reduces computational overhead during kernel hyperparameter optimization by reusing the cached latent function values from the previous Newton iteration as initialization, instead of starting from zeros each time.\n\n**Implementation Details:**\n\nIn `sklearn/gaussian_process/_gpc.py`, the `_posterior_mode()` method (lines 443-499) in the `_BinaryGaussianProcessClassifierLaplace` class finds the posterior mode using Newton's iteration (Algorithm 3.1 from GPML). When `warm_start=True` (lines 95-101, 580-586), the method checks if a cached solution exists:\n\n```python\nif (\n    self.warm_start\n    and hasattr(self, \"f_cached\")\n    and self.f_cached.shape == self.y_train_.shape\n):\n    f = self.f_cached\nelse:\n    f = np.zeros_like(self.y_train_, dtype=np.float64)\n```\n\nAfter each Newton iteration completes, the solution is cached (line 495):\n```python\nself.f_cached = f  # Remember solution for later warm-starts\n```\n\n**Why It Reduces Overhead:**\n\nDuring kernel hyperparameter optimization (lines 214-253), the `log_marginal_likelihood()` method is called repeatedly with different kernel hyperparameters `theta`. Each call invokes `_posterior_mode()` (line 381), which performs Newton's iteration to find the posterior mode.\n\nWhen hyperparameters are similar (common during optimization), the posterior modes are also similar. Starting from the previous solution (`f_cached`) is closer to the new solution than starting from zeros, so Newton's method converges faster\u2014requiring fewer iterations to reach the convergence criterion (lines 491-492). This reduces the total number of iterations across multiple `log_marginal_likelihood()` evaluations during optimization.\n\nThe documentation (lines 95-101, 580-586) explicitly states: \"This can speed up convergence when `_posterior_mode` is called several times on similar problems as in hyperparameter optimization.\"",
+      "reference_sha256": "2e34b561a08b16aabd68d9658ab95199d861896168337a88cf0d4c21c7527901",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-667d41494071f29d516a169b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "e63074cccca6017def204c0c680c8f6131b73e11687f4db0518b3f7506a63e4c",
+            "kind": "file_reference",
+            "line_count": 772,
+            "path": "sklearn/manifold/_spectral_embedding.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does SpectralEmbedding's _get_affinity_matrix method implement a fallback strategy when sparse input is detected for nearest_neighbors affinity, and what are the implications of this runtime exception handling for the algorithm's behavior?",
+      "question_sha256": "59ee67e8458c99b0b6911a315702f5579ad045388c4c03f6858824a8091d465b",
+      "reference_answer": "The affinity matrix calculation method in the SpectralEmbedding class (located in `sklearn/manifold/_spectral_embedding.py`) implements a fallback strategy for sparse input when using the nearest_neighbors affinity mode through a conditional check that modifies the instance's affinity attribute at runtime.\n\n**Implementation Details:**\n\nThe fallback occurs in the `_get_affinity_matrix` method (lines 654-710). When `self.affinity == \"nearest_neighbors\"` and the input `X` is detected as sparse using `sparse.issparse(X)` (line 684), the method:\n\n1. **Issues a warning** (lines 685-689): A `warnings.warn()` call notifies the user that \"Nearest neighbors affinity currently does not support sparse input, falling back to rbf affinity\"\n\n2. **Modifies the affinity attribute** (line 690): The method sets `self.affinity = \"rbf\"`, changing the instance's affinity mode from \"nearest_neighbors\" to \"rbf\"\n\n3. **Continues execution**: After modifying the affinity attribute, the code continues execution. Since `self.affinity` is now \"rbf\", the method falls through to the rbf affinity handling block (lines 705-708), which computes the affinity matrix using `rbf_kernel(X, gamma=self.gamma_)`\n\n**Key Technical Points:**\n\n- This is **not exception-based handling**; it's a **runtime attribute modification** that silently changes the affinity computation strategy\n- The fallback happens **before** any attempt to construct the nearest neighbors graph, preventing errors from unsupported sparse operations\n- The modification is **persistent** - once `self.affinity` is changed to \"rbf\", subsequent calls would use RBF affinity unless reset\n- The RBF kernel (`rbf_kernel`) supports sparse matrices, making it a suitable fallback that maintains functionality\n\n**Code Reference:**\n```python\nif self.affinity == \"nearest_neighbors\":\n    if sparse.issparse(X):\n        warnings.warn(\n            \"Nearest neighbors affinity currently does \"\n            \"not support sparse input, falling back to \"\n            \"rbf affinity\"\n        )\n        self.affinity = \"rbf\"\n    else:\n        # ... normal nearest_neighbors processing\nif self.affinity == \"rbf\":\n    # ... RBF affinity computation (executed after fallback)\n```\n\nThis design allows the algorithm to continue processing sparse input data by automatically switching to a compatible affinity computation method, though it changes the intended affinity mode from graph-based nearest neighbors to kernel-based RBF similarity.",
+      "reference_sha256": "d0c94b822268e9b73890af697c1c77d440165bfd5f06d25c67496868ea5456b7",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-72b8d8c83c8e3f87c2c31c35"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 274,
+            "file_sha256": "183d8e6833b9dd9129d1913e4e84b76d7992fa1eee6e3819438187a4bbabe423",
+            "path": "sklearn/ensemble/_base.py",
+            "start_line": 251
+          },
+          {
+            "end_line": 71,
+            "file_sha256": "be4a3d8df81dcde5a077f2ae9b5572a0f77277b392b081381658c5a7793cdd50",
+            "path": "sklearn/utils/metaestimators.py",
+            "start_line": 52
+          },
+          {
+            "end_line": 359,
+            "file_sha256": "c2166d803ee48660996a34b9d96c8ef08d5f092beba5b561c60a36a219c240fc",
+            "path": "sklearn/base.py",
+            "start_line": 317
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "be4a3d8df81dcde5a077f2ae9b5572a0f77277b392b081381658c5a7793cdd50",
+            "kind": "file_reference",
+            "line_count": 164,
+            "path": "sklearn/utils/metaestimators.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the `set_params` method in `_BaseHeterogeneousEnsemble` delegate parameter setting to its parent class, and what is the control flow path that determines whether individual estimators are modified, replaced, or dropped based on the 'drop' sentinel value?",
+      "question_sha256": "5aa98a28efe527a2dfa261d049e3573f0859b960a0d266fc372fd75d72fd8dd4",
+      "reference_answer": "The parameter-setting method in the heterogeneous ensemble base class delegates parameter setting to its parent class through a two-level delegation chain:\n\n1. **First delegation**: In `_BaseHeterogeneousEnsemble.set_params()` (located in `sklearn/ensemble/_base.py` at line 251-274), the method calls `super()._set_params(\"estimators\", **params)` at line 273. This delegates to the `_set_params()` method of `_BaseComposition`, which is the immediate parent class (defined in `sklearn/utils/metaestimators.py`).\n\n2. **Second delegation**: Within `_BaseComposition._set_params()` (lines 52-71 in `metaestimators.py`), after handling estimator-specific parameter setting (including replacing individual estimators via `_replace_estimator()` at line 67), the method calls `super().set_params(**params)` at line 70. This final call delegates to `BaseEstimator.set_params()` (defined in `sklearn/base.py` at lines 317-359), which handles setting parameters on the estimator instance itself using `setattr()`.\n\nThe complete delegation path is:\n`_BaseHeterogeneousEnsemble.set_params()` \u2192 `_BaseComposition._set_params()` \u2192 `BaseEstimator.set_params()`\n\nThe `_BaseComposition._set_params()` method handles the special logic for managing named sub-estimators (including the 'drop' sentinel value) before delegating remaining parameters to the base estimator class.",
+      "reference_sha256": "0f8dd3db0ad59f4ce16ce963a8e8792541546c4be68ac2f5a5269b36fe6e5161",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-7660d4151be40b9f8de022ac"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 578,
+            "file_sha256": "8160b20ab5c212e86adee669cc51882090a76eb3897e1822baa85b184ed34df4",
+            "path": "sklearn/feature_selection/_univariate_selection.py",
+            "start_line": 542
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "46107a6798d39706502e0ced45119ab6a805e1baacad13edd4660f5401207838",
+            "kind": "file_reference",
+            "line_count": 580,
+            "path": "sklearn/feature_selection/_mutual_info.py"
+          },
+          {
+            "file_sha256": "e7d856790a8810e64919c13920be72de3327941c056e9bb01fce7938a520a6c0",
+            "kind": "file_reference",
+            "line_count": 1018,
+            "path": "sklearn/feature_selection/tests/test_feature_select.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the repeated instantiation of SelectKBest and GenericUnivariateSelect objects in test_mutual_info_regression impact memory allocation and computational overhead compared to reusing a single fitted estimator instance across multiple transform operations?",
+      "question_sha256": "c7456e045b548c1416d380ed2e32d9ee173421c95b4306d03bd67490c6f86242",
+      "reference_answer": "Repeatedly instantiating these feature selection classes in the test function causes significant memory allocation and computational overhead for several reasons:\n\n**1. Expensive Mutual Information Computation on Each Fit:**\nEach time a new instance is created and `fit()` is called, it invokes `mutual_info_regression` (the scoring function), which is computationally expensive. As seen in `sklearn/feature_selection/_mutual_info.py`, this function:\n- Creates `NearestNeighbors` and `KDTree` objects for each feature (lines 57-70 in `_compute_mi_cc`)\n- Performs parallel processing across features using `Parallel(n_jobs=n_jobs)` (line 317 in `_estimate_mi`)\n- Scales and processes the data, adding noise to continuous features (lines 297-315)\n- Computes mutual information using k-nearest neighbor estimation, which has O(n_samples \u00d7 n_features) complexity\n\n**2. Memory Allocation for Scores and P-values:**\nEach `fit()` call in `_BaseFilter.fit()` (lines 542-578 in `_univariate_selection.py`) stores:\n- `self.scores_` - an array of shape (n_features,) containing feature scores\n- `self.pvalues_` - an array of shape (n_features,) containing p-values (if returned by the scoring function)\n\nThese arrays are allocated in memory for each new instance, even though they contain the same computed values.\n\n**3. Memory Overhead from Mergesort in SelectKBest:**\nWhen `transform()` is called, it invokes `_get_support_mask()` which for `SelectKBest` uses `np.argsort(scores, kind=\"mergesort\")` (line 800). The code comment explicitly notes: \"Request a stable sort. Mergesort takes more memory (~40MB per megafeature on x86-64).\" This sorting operation is repeated for each new instance.\n\n**4. Additional Overhead in GenericUnivariateSelect:**\nThe `GenericUnivariateSelect._get_support_mask()` method (lines 1165-1171) creates a new selector instance via `_make_selector()` each time it's called, even though it reuses the same `scores_` and `pvalues_`. This adds object creation overhead.\n\n**5. Object Creation and Initialization Costs:**\nEach new instance requires:\n- Python object allocation\n- Parameter validation\n- Method resolution and attribute storage\n\n**Comparison with Reusing a Fitted Estimator:**\nReusing a single fitted estimator instance would:\n- Compute mutual information only once during the initial `fit()`\n- Allocate `scores_` and `pvalues_` arrays only once\n- Perform the mergesort operation only when needed (not on every transform)\n- Avoid repeated object creation and initialization\n\nThe test function at lines 927-934 and 931-934 in `test_feature_select.py` creates new instances for each comparison, which is appropriate for testing equivalence but demonstrates the overhead of repeated instantiation versus reusing a fitted estimator for multiple transform operations.",
+      "reference_sha256": "0ec89f1cb4a8839523f49ca5da7cbdc79736919f3d7313e6cbbcd91d84ed72ca",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-774e6143baa89afd72d7ffdc"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "6069dbbd085b4b47391caef72661e7849a304c2c6e55045129b01b7d48a43529",
+            "kind": "file_reference",
+            "line_count": 2146,
+            "path": "sklearn/feature_extraction/text.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where in the CountVectorizer class initialization is the token_pattern parameter processed and how does its assignment relate to the subsequent tokenizer parameter validation logic?",
+      "question_sha256": "c5a2e2d7b1338d7aa87941ef1fe556b672003029e3d2be963920a001db8a633f",
+      "reference_answer": "In the CountVectorizer class (located in `sklearn/feature_extraction/text.py`), the `token_pattern` parameter is assigned during `__init__` at line 1193 with a simple assignment: `self.token_pattern = token_pattern`. However, **no processing occurs during initialization** - the parameter is merely stored as an instance attribute.\n\nThe actual processing and validation of `token_pattern` happens later in the `build_tokenizer()` method (lines 355-373), which is called when building the analyzer. The relationship between the `token_pattern` assignment and `tokenizer` parameter validation follows a **priority-based conditional logic**:\n\n1. **Priority check** (line 363): The method first checks if `self.tokenizer is not None`. If a custom tokenizer is provided, it returns immediately, completely bypassing `token_pattern` processing.\n\n2. **Conditional processing** (line 365): Only when `tokenizer` is `None` does the code compile `token_pattern`: `token_pattern = re.compile(self.token_pattern)`.\n\n3. **Validation** (lines 367-371): After compilation, the code validates that the compiled pattern has at most one capturing group, raising a `ValueError` if `token_pattern.groups > 1`.\n\n4. **Warning mechanism** (lines 525-529): The `_warn_for_unused_params()` method warns users if both `tokenizer` and `token_pattern` are provided, since `token_pattern` will be ignored.\n\nThis design means the assignment in `__init__` stores the value, but the validation logic in `build_tokenizer()` ensures that `tokenizer` takes precedence over `token_pattern`, and `token_pattern` is only processed and validated when no custom tokenizer is provided. The relationship is one of **conditional precedence** - the tokenizer parameter validation logic prioritizes the custom tokenizer over the token_pattern, making token_pattern a fallback option.",
+      "reference_sha256": "06e6edd94b439b869c7591c95930d67d86413bbc4a9718f49c2de873870c5af6",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-7b5af2c59e7c62c1afe6e116"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 578,
+            "file_sha256": "2e61b77f34eb238f13d04a75d394a70a10caa777f34dea84d48c9be55e1c5c99",
+            "path": "sklearn/pipeline.py",
+            "start_line": 578
+          },
+          {
+            "end_line": 344,
+            "file_sha256": "3b3c0af35fe1ea17bf02a96b2b5ffb47fa67bb4dc871a32460e25f180daea8ac",
+            "path": "sklearn/compose/tests/test_target.py",
+            "start_line": 336
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "3b3c0af35fe1ea17bf02a96b2b5ffb47fa67bb4dc871a32460e25f180daea8ac",
+            "kind": "file_reference",
+            "line_count": 439,
+            "path": "sklearn/compose/tests/test_target.py"
+          },
+          {
+            "file_sha256": "c2166d803ee48660996a34b9d96c8ef08d5f092beba5b561c60a36a219c240fc",
+            "kind": "file_reference",
+            "line_count": 1370,
+            "path": "sklearn/base.py"
+          },
+          {
+            "file_sha256": "b2b2f3b069921ea5f793e10b2041072e98aa5148cb71afbc9d6a1d76b242dc61",
+            "kind": "file_reference",
+            "line_count": 397,
+            "path": "sklearn/compose/_target.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does DummyTransformer's fit_counter mechanism enable detection of redundant fit invocations in scikit-learn's pipeline cloning and composition workflows?",
+      "question_sha256": "dc17fed69c6bf3ccdb763dd79074316fae343015f567cb93ee8ea7177799cfa4",
+      "reference_answer": "The invocation counting attribute in the test transformer class enables detection of redundant fit calls by tracking how many times the `fit()` method is invoked on a transformer instance during pipeline cloning and composition workflows.\n\n**Mechanism:**\n1. **Invocation tracking**: The test transformer class (`DummyTransformer` in `sklearn/compose/tests/test_target.py`) maintains an attribute that increments each time `fit()` is called (lines 321-326). This provides a simple counter to detect multiple fit invocations on the same instance.\n\n2. **Cloning behavior**: When the sequential composition class (`Pipeline`) processes estimators, it clones them before fitting (line 578 in `sklearn/pipeline.py`: `cloned_transformer = clone(transformer)`). The `clone()` function in `sklearn/base.py` creates a deep copy of the estimator and its parameters, ensuring each cloned instance is independent.\n\n3. **Composition context**: When a meta-estimator like `TransformedTargetRegressor` (in `sklearn/compose/_target.py`) is used within a Pipeline, the transformer is cloned in `_fit_transformer()` (line 175: `self.transformer_ = clone(self.transformer)`) and then fitted once (line 204: `self.transformer_.fit(y)`).\n\n4. **Detection capability**: The counting attribute enables tests (e.g., `test_transform_target_regressor_count_fit` in `sklearn/compose/tests/test_target.py`, lines 336-344) to verify that transformers are only fitted once, even when nested in complex composition workflows. If the cloning or composition logic is incorrect, the same transformer instance might be fitted multiple times, which the counter would detect by showing a value greater than 1.\n\n5. **Regression testing**: This mechanism was specifically introduced to address issue #11618, ensuring that transformers in `TransformedTargetRegressor` are not redundantly fitted when used in Pipeline contexts, preventing performance issues and potential state corruption from multiple fit calls on the same instance.\n\nThe counting attribute serves as a diagnostic tool that reveals whether the cloning mechanism properly isolates transformer instances, ensuring each transformer is fitted exactly once per workflow execution, which is critical for correct behavior in scikit-learn's estimator composition system.",
+      "reference_sha256": "e6761e13ddd0664e1741d3507d3bcca8d2ec99b720f3fa79f1166c0eb51f7017",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-8880fe60d348fb42ba9caf18"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 471,
+            "file_sha256": "c2166d803ee48660996a34b9d96c8ef08d5f092beba5b561c60a36a219c240fc",
+            "path": "sklearn/base.py",
+            "start_line": 471
+          },
+          {
+            "end_line": 1359,
+            "file_sha256": "c2166d803ee48660996a34b9d96c8ef08d5f092beba5b561c60a36a219c240fc",
+            "path": "sklearn/base.py",
+            "start_line": 1359
+          },
+          {
+            "end_line": 208,
+            "file_sha256": "db4c637d064073e83533bcb920cc2b544a26b92d517b09d8a07c59780a3594fd",
+            "path": "sklearn/utils/_param_validation.py",
+            "start_line": 208
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "db4c637d064073e83533bcb920cc2b544a26b92d517b09d8a07c59780a3594fd",
+            "kind": "file_reference",
+            "line_count": 910,
+            "path": "sklearn/utils/_param_validation.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where in the codebase are the constraint validation classes that invoke InvalidParameterError, and how does the error propagation chain from _Constraint subclasses back to the parameter validation entry points?",
+      "question_sha256": "ed8c2a1ddb9bea4343194288d32755b30ded51e62d2ae7ddb4eb7970c1d06de1",
+      "reference_answer": "The parameter validation function that raises the custom exception when constraint checks fail is located in `sklearn/utils/_param_validation.py`.\n\nSpecifically, the `InvalidParameterError` exception is raised at **line 98** within the `validate_parameter_constraints()` function. This function is the central validation orchestrator that:\n\n1. **Iterates through parameters** (lines 63-101): For each parameter in the provided dictionary, it retrieves the associated constraints.\n\n2. **Converts constraints to constraint objects** (line 75): Uses `make_constraint()` to convert constraint declarations (strings, types, Interval objects, etc.) into `_Constraint` subclass instances.\n\n3. **Checks constraints** (lines 77-80): Iterates through constraints and calls `constraint.is_satisfied_by(param_val)` for each. If any constraint is satisfied, validation passes for that parameter.\n\n4. **Raises the exception** (lines 81-101): If no constraint is satisfied (the `else` block of the for loop), it:\n   - Filters out hidden constraints (lines 86-88)\n   - Formats an informative error message (lines 90-96)\n   - Raises `InvalidParameterError` with the formatted message (lines 98-101)\n\n**Important architectural detail:** The `_Constraint` subclasses (such as `_InstancesOf`, `Interval`, `StrOptions`, `Options`, `MissingValues`, `HasMethods`, etc.) do **not** directly raise `InvalidParameterError`. They only implement the `is_satisfied_by()` abstract method (defined in the `_Constraint` base class at line 268) which returns a boolean. The exception raising is centralized in `validate_parameter_constraints()`.\n\n**Error propagation chain:**\n- **Entry points** call `validate_parameter_constraints()`:\n  - `BaseEstimator._validate_params()` (line 471 in `sklearn/base.py`) \u2192 called by `_fit_context` decorator (line 1359 in `sklearn/base.py`)\n  - `validate_params` decorator wrapper (line 208 in `_param_validation.py`)\n- **Exception can be re-raised** in the `validate_params` decorator wrapper (line 229) to replace the caller name in error messages when the decorated function delegates validation to an inner estimator.\n\nThe exception class `InvalidParameterError` itself is defined at **line 20** in the same file, inheriting from both `ValueError` and `TypeError` for backward compatibility.",
+      "reference_sha256": "0ada394617e96ef432a3ae0daf87b9a1e38883dd6af5bcb0ec4123305c349f46",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-8f22baed8bc14544d72b7e73"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 319,
+            "file_sha256": "2036e9e10e92f4e67798fe7b6020deae1e179b4b3a014a928ba09b149dde4322",
+            "path": "sklearn/externals/_packaging/version.py",
+            "start_line": 292
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the Version class defer the extraction of numeric components from pre, post, and dev tuples until property access time rather than storing them directly during initialization?",
+      "question_sha256": "da4fad4620828fb054123b8c977358165fa150fbf7205750420402b4c1f6a85b",
+      "reference_answer": "The version parsing class defers extracting numeric components from pre-release, post-release, and development segment tuples until property access time because the full tuples `(str, int)` are required for version comparison and sorting operations, while the numeric components are only needed when accessed via properties.\n\nDuring initialization (lines 292-319 in `sklearn/externals/_packaging/version.py`), the class stores complete tuples in `self._version`:\n- `pre`: `Optional[Tuple[str, int]]` (e.g., `(\"a\", 0)`, `(\"rc\", 1)`)\n- `post`: `Optional[Tuple[str, int]]` (e.g., `(\"post\", 1)`)\n- `dev`: `Optional[Tuple[str, int]]` (e.g., `(\"dev\", 0)`)\n\nThese full tuples are immediately used to compute the comparison key `self._key` via `_cmpkey()` (lines 312-319), which requires both the string and integer components to implement PEP 440 sorting rules. The `_cmpkey` function (lines 475-535) uses the complete tuples to:\n- Compare pre-release segments (alpha < beta < rc)\n- Handle special sorting cases (e.g., dev versions before pre-releases)\n- Implement proper version ordering according to PEP 440\n\nHowever, the `post` and `dev` properties (lines 367-373) extract only the numeric component `[1]` when accessed:\n```python\n@property\ndef post(self) -> Optional[int]:\n    return self._version.post[1] if self._version.post else None\n\n@property\ndef dev(self) -> Optional[int]:\n    return self._version.dev[1] if self._version.dev else None\n```\n\nThis design avoids redundant storage: storing both the full tuple (needed for comparisons) and extracted integers (needed for property access) would duplicate data. By deferring extraction, the class:\n1. Stores the data once in the format needed for comparisons\n2. Extracts numeric values on-demand when properties are accessed\n3. Maintains efficiency while preserving the information required for both comparison operations and property access\n\nNote that the `pre` property (lines 362-365) returns the full tuple because it's used in `__str__` (line 336) where both components are needed for string representation.",
+      "reference_sha256": "9982763e9fac2a0988c4b1a8c13cd0c89576485c5e930b65fb3dfa922c42f84d",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-9090a5ee6e510bdbc8a36db1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 91,
+            "file_sha256": "cdd14ad1af6a2cd19278f231e53dc2b05d620231c3052a20390a4388c6368907",
+            "path": "sklearn/tests/test_docstring_parameters.py",
+            "start_line": 85
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the layered validation architecture implemented by the test_docstring_parameters function that separates concerns between module discovery, class inspection, method validation, and error aggregation?",
+      "question_sha256": "f9c538d2ec492811826312033cceb11fa7085fbeb17f95afe20685ca69d314cf",
+      "reference_answer": "The layered validation architecture implemented by the test function that validates docstring parameters across sklearn modules separates concerns into four distinct layers:\n\n**1. Module Discovery Layer** (lines 85-91 in `test_docstring_parameters.py`):\n   - Uses `walk_packages` from `pkgutil` to discover all public sklearn modules, stored in the `PUBLIC_MODULES` set (lines 43-51)\n   - Filters out private modules (containing \"._\"), test modules (\".tests.\"), and external modules (\"sklearn.externals\")\n   - Iterates through each module name and dynamically imports it using `importlib.import_module`\n   - Applies exclusion rules (e.g., skips \".conftest\" modules and \"sklearn.utils.fixes\")\n\n**2. Class Inspection Layer** (lines 94-114):\n   - Uses `inspect.getmembers(module, inspect.isclass)` to discover all classes within each module\n   - Filters classes to only include those whose `__module__` starts with \"sklearn\" (excluding imported classes)\n   - Applies multiple filters: skips classes in `_DOCSTRING_IGNORES`, private classes (starting with \"_\"), abstract classes, and deprecated classes\n   - Uses `docscrape.ClassDoc` from numpydoc to parse and extract class docstring information\n   - Validates the `__init__` method's docstring using `check_docstring_parameters(cls.__init__, cdoc)`\n\n**3. Method Validation Layer** (lines 116-128):\n   - Iterates through all methods listed in `cdoc.methods` (extracted from the class docstring)\n   - Retrieves each method object using `getattr(cls, method_name)`\n   - Skips deprecated methods\n   - Handles special cases: for methods in `_METHODS_IGNORE_NONE_Y` (like \"fit\", \"score\", \"predict\"), if the \"y\" parameter has a default value of None, it's ignored during validation\n   - Calls `check_docstring_parameters(method, ignore=param_ignore)` to validate each method's docstring against its function signature\n\n**4. Error Aggregation Layer** (lines 84, 98, 130, 145, 147-149):\n   - Maintains a top-level `incorrect` list (line 84) to collect all validation errors\n   - Uses a per-class `this_incorrect` list (line 98) to collect errors for each class before aggregating\n   - Accumulates errors from class `__init__` validation (line 114) and method validations (line 128) into `this_incorrect`\n   - Aggregates class-level errors into the global `incorrect` list (line 130)\n   - Also validates standalone functions in modules (lines 132-145) and adds their errors to `incorrect`\n   - At the end, joins all error messages with newlines (line 147) and raises a single `AssertionError` if any errors were found (lines 148-149)\n\nThis architecture ensures separation of concerns: module discovery is independent of class inspection, class inspection is independent of method validation, and all validation errors are collected and reported in a unified manner. The design allows each layer to focus on its specific responsibility while maintaining a clear data flow from modules \u2192 classes \u2192 methods \u2192 aggregated errors.",
+      "reference_sha256": "2ab7c15c74f235309ebd9a72a8fd97072fdb731cc6dc83c5d45018561e0fc470",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-922d4c14d36f069b3d9ec937"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "39f7b746bc99a9a72be5aba3e2ceccb04ca51a281f7b27fcb1a805bcafab3efd",
+            "kind": "file_reference",
+            "line_count": 90,
+            "path": "sklearn/externals/_packaging/_structures.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "sklearn/_build_utils/version.py",
+              "sklearn/externals/_packaging/version.py"
+            ],
+            "end_line": 502,
+            "path": "version.py",
+            "reason": "ambiguous_basename",
+            "reference": "version.py",
+            "start_line": 502
+          }
+        ]
+      },
+      "question": "Where does the InfinityType class control the flow of comparison operations to ensure that its ordering semantics are preserved across all comparison chains, and what data transformation occurs when the __neg__ method is invoked to produce a NegativeInfinityType instance?",
+      "question_sha256": "55c5d6a7d37632c03005b6ad4855db9a39dd673804b9a451d0f51ca226be0629",
+      "reference_answer": "The positive infinity representation class (`InfinityType`) defines its comparison magic methods directly within the class definition in the file `sklearn/externals/_packaging/_structures.py`, specifically at lines 36-52.\n\nThe class controls comparison operations through six magic methods that implement the comparison protocol:\n- `__lt__` (line 36-37): Returns `False`, ensuring Infinity is never less than any other value\n- `__le__` (line 39-40): Returns `False`, ensuring Infinity is never less than or equal to any non-Infinity value\n- `__eq__` (line 42-43): Returns `True` only when comparing with another `InfinityType` instance using `isinstance` check\n- `__ne__` (line 45-46): Returns `True` for any non-InfinityType instance\n- `__gt__` (line 48-49): Returns `True`, ensuring Infinity is always greater than any other value\n- `__ge__` (line 51-52): Returns `True`, ensuring Infinity is always greater than or equal to any other value\n\nThese methods are defined directly in the class body (lines 29-55), not delegated to other modules or functions. The hardcoded boolean return values ensure that the ordering semantics are preserved: Infinity always sorts as the maximum value in any comparison chain, which is critical for PEP 440 version comparison where Infinity is used to represent versions without pre-release, post-release, or development segments (as seen in `version.py` lines 502, 515).\n\nThe comparison flow is controlled at the class definition level, meaning all instances of `InfinityType` (including the singleton `Infinity` instance created at line 58) inherit this comparison behavior, ensuring consistent ordering semantics across all comparison operations in the version comparison system.",
+      "reference_sha256": "e5acede158a557f966d429e4b9ccac6bfaf48f9f1e16fea0648535daefd738d1",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-a03334ace499931cc91cbe7b"
+    }
+  ]
+}

@@ -1,0 +1,461 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/qiboteam--qibo-2f98679c4a73",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 58,
+            "file_sha256": "a17b1cec63746180374ed0aa968fb23d44b0d4b848769e5e1d39fbd5c1df5612",
+            "path": "src/qibo/models/circuit.py",
+            "start_line": 45
+          },
+          {
+            "end_line": 58,
+            "file_sha256": "5b70e8b3c899cdafd1b72641d693d533f19e7e9bbc9bed5121ec8218f56ee6bb",
+            "path": "src/qibo/gates/special.py",
+            "start_line": 51
+          },
+          {
+            "end_line": 928,
+            "file_sha256": "a17b1cec63746180374ed0aa968fb23d44b0d4b848769e5e1d39fbd5c1df5612",
+            "path": "src/qibo/models/circuit.py",
+            "start_line": 881
+          },
+          {
+            "end_line": 97,
+            "file_sha256": "5b70e8b3c899cdafd1b72641d693d533f19e7e9bbc9bed5121ec8218f56ee6bb",
+            "path": "src/qibo/gates/special.py",
+            "start_line": 87
+          },
+          {
+            "end_line": 149,
+            "file_sha256": "5b70e8b3c899cdafd1b72641d693d533f19e7e9bbc9bed5121ec8218f56ee6bb",
+            "path": "src/qibo/gates/special.py",
+            "start_line": 102
+          },
+          {
+            "end_line": 134,
+            "file_sha256": "eb19d4baadd84d633ae524647916ab345634e9672ea9850941268e6e457fecb9",
+            "path": "src/qibo/backends/numpy.py",
+            "start_line": 110
+          },
+          {
+            "end_line": 75,
+            "file_sha256": "a17b1cec63746180374ed0aa968fb23d44b0d4b848769e5e1d39fbd5c1df5612",
+            "path": "src/qibo/models/circuit.py",
+            "start_line": 60
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does qibo implement the automatic gate fusion optimization algorithm to merge quantum gates into FusedGate objects for enhanced simulation performance?",
+      "question_sha256": "3111d31969bfbc6827c1a63d020027fbc1c0634b7d1542c0a1fd29eaf27bbc1e",
+      "reference_answer": "Qibo's gate fusion optimization algorithm operates through three coordinated phases to merge quantum gates into FusedGate objects for enhanced simulation performance. The preprocessing phase begins in the to_fused method (src/qibo/models/circuit.py: lines 45-58), which iterates through all gates in the circuit queue, converting each gate to a FusedGate using the FusedGate.from_gate class method (src/qibo/gates/special.py: lines 51-58). During this conversion, the algorithm establishes temporal neighbor relationships by maintaining a last_gate dictionary that tracks the most recent gate acting on each qubit. For each new gate, left_neighbors and right_neighbors dictionaries are populated to link gates that share qubits in temporal sequence. The fusion execution phase occurs in the main fuse method (src/qibo/models/circuit.py: lines 881-928), which iterates through all FusedGate objects in the queue. For each unmarked gate, it attempts bidirectional fusion with temporal neighbors: first checking right_neighbors (forward in time) and then left_neighbors (backward in time) for each qubit the gate acts upon. The can_fuse constraint checking (src/qibo/gates/special.py: lines 87-97) verifies three conditions: the neighbor gate exists, neither gate is already marked as fused, and the combined qubit set does not exceed the max_qubits limit. The actual gate merging logic in the FusedGate.fuse method (src/qibo/gates/special.py: lines 102-149) determines parent-child relationships based on which gate has more external neighbors. It checks for blocking gates between the two candidates and, if fusion is valid, marks the child gate, appends or prepends its gates to the parent, and updates the neighbor graph to maintain connectivity. The matrix composition phase is implemented in the asmatrix_fused method (src/qibo/backends/numpy.py: lines 110-134), which computes the composite unitary matrix by starting with an identity matrix of dimension 2^rank (where rank is the number of qubits in the fused gate). For each constituent gate, it expands the gate matrix via Kronecker product with an appropriately sized identity matrix, reshapes into a tensor form, applies index transposition to align the gate's target qubits with the correct positions in the fused gate's qubit space, and then multiplies into the cumulative matrix. Finally, the from_fused method (src/qibo/models/circuit.py: lines 60-75) creates the optimized circuit by filtering out marked gates and replacing single-gate FusedGate objects with their original gates for efficiency, while preserving special gates that were marked by default.",
+      "reference_sha256": "a8179756a41288a6181eabce90c4a06847af6b7c401893b40297657c9001a51b",
+      "repository": {
+        "commit": "2f98679c4a738d5a59de17eccd4712659d52a461",
+        "family_id": "qiboteam/qibo",
+        "url": "https://github.com/qiboteam/qibo"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/qiboteam--qibo-2f98679c4a738d5a59de17eccd4712659d52a461",
+      "task_id": "import-40603cf12997884c409942d3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/qiboteam--qibo-2f98679c4a73",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does qibo's distributed quantum circuit execution system partition gates into device-specific queues and coordinate global qubit swapping across multiple accelerators?",
+      "question_sha256": "9aeae242b4c60c0ac7428379704e4b06402f8db5745e082b04dfcb36d875d97b",
+      "reference_answer": "Qibo's distributed quantum circuit execution system partitions gates into device-specific queues because quantum state vectors grow exponentially as 2^n elements and must be distributed across multiple accelerators to overcome single-device memory limitations. The DistributedQueues class implements this coordination through several key mechanisms. First, it establishes a device_to_ids mapping that assigns each accelerator device to specific state vector piece indices, enabling parallel processing of different portions of the quantum state. Second, it categorizes qubits into global qubits (distributed across devices, where nglobal = log2(ndevices)) and local qubits (processed within individual devices, where nlocal = nqubits - nglobal), ensuring the number of devices is a power of 2 for efficient state partitioning. Third, the system uses transpose operations with predefined transpose_order and reverse_transpose_order to split full state vectors into distributed pieces and merge them back, maintaining proper quantum entanglement semantics across the distributed computation. Fourth, global-local qubit swapping is managed through the transform method, which automatically inserts SWAP gates between global and local qubits when gates need to operate on global qubits, ensuring quantum circuit correctness while enabling distributed execution. Finally, special gates that require access to the full quantum state (such as CallbackGate or measurement operations) are queued separately for CPU execution where the complete state vector can be accessed. This architecture enables scaling quantum simulations beyond single-device memory constraints while preserving the correctness of quantum circuit operations.",
+      "reference_sha256": "bdebf8b620847946f58df8ac36bf4816fe057c4f5e52c9cf2227679962414809",
+      "repository": {
+        "commit": "2f98679c4a738d5a59de17eccd4712659d52a461",
+        "family_id": "qiboteam/qibo",
+        "url": "https://github.com/qiboteam/qibo"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/qiboteam--qibo-2f98679c4a738d5a59de17eccd4712659d52a461",
+      "task_id": "import-4763ded2aee9e35bc66c4499"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/qiboteam--qibo-2f98679c4a73",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 90,
+            "file_sha256": "34e37c93fb7c71fcac15e960c74c0f69da46b5cf918160af94676ad79c26c41f",
+            "path": "src/qibo/states.py",
+            "start_line": 84
+          },
+          {
+            "end_line": 35,
+            "file_sha256": "f062143ef5dbaaad82ee110919c09e5d0db05bd8f1e7138c2b015a7a7cb9f1e1",
+            "path": "src/qibo/backends/__init__.py",
+            "start_line": 32
+          },
+          {
+            "end_line": 65,
+            "file_sha256": "c693ca3ea5aef01e50ac6348746f7f81934f23a446781e5deb712e51bd81f25e",
+            "path": "setup.py",
+            "start_line": 55
+          },
+          {
+            "end_line": 61,
+            "file_sha256": "acc67dbf7b4b18d99fd5671b099af3d49d70d9b11d7d20628de020ccd64f1b45",
+            "path": "doc/source/getting-started/backends.rst",
+            "start_line": 54
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 247,
+            "line_count": 246,
+            "path": "src/qibo/states.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "src/qibo/states.py",
+            "resolved_path": "src/qibo/states.py",
+            "start_line": 235
+          }
+        ]
+      },
+      "question": "What analytical visualization and fitting mechanisms does Qibocal implement for Rabi oscillation calibration experiments that enable automated parameter extraction from time-domain measurements?",
+      "question_sha256": "3291ce664cbb459c6c4e8da6421f18fe8f159359227c08c636a963e0fa1b4f50",
+      "reference_answer": "The qiboteam/qibo repository examined at commit 2f98679c4 does not contain the Qibocal Rabi oscillation calibration implementation referenced in the query. This repository serves as the foundational quantum computing framework that provides core infrastructure including measurement and sampling systems through the CircuitResult class (src/qibo/states.py: line 84-90), expectation value computation capabilities (src/qibo/states.py: line 235-247), and hardware control backend interfaces including qibolab integration (src/qibo/backends/__init__.py: line 32-35). The framework includes matplotlib as a dependency for visualization support (setup.py: line 55-65) and provides hardware control backends for superconducting qubit systems (doc/source/getting-started/backends.rst: line 54-61). However, the specific Qibocal protocols for Rabi amplitude sweeping, sinusoidal curve fitting, visualization pipeline, and automated parameter extraction mechanisms are not implemented in this repository.",
+      "reference_sha256": "e92bc23a12c4ddc476deb7c72e71388e788289b084e6d5da9814189124dcfb00",
+      "repository": {
+        "commit": "2f98679c4a738d5a59de17eccd4712659d52a461",
+        "family_id": "qiboteam/qibo",
+        "url": "https://github.com/qiboteam/qibo"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/qiboteam--qibo-2f98679c4a738d5a59de17eccd4712659d52a461",
+      "task_id": "import-4e0704513cf4685f265c667c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/qiboteam--qibo-2f98679c4a73",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1458,
+            "file_sha256": "a17b1cec63746180374ed0aa968fb23d44b0d4b848769e5e1d39fbd5c1df5612",
+            "path": "src/qibo/models/circuit.py",
+            "start_line": 1275
+          },
+          {
+            "end_line": 64,
+            "file_sha256": "c693ca3ea5aef01e50ac6348746f7f81934f23a446781e5deb712e51bd81f25e",
+            "path": "setup.py",
+            "start_line": 64
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "c35619ab50a60e9ee08744c8ca649f69e7f5f25d258abee9709e83cbe5b59ff3",
+            "kind": "file_reference",
+            "line_count": 666,
+            "path": "src/qibo/tests/test_models_circuit.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the circuit visualization and drawing functionality implemented in qibo's codebase?",
+      "question_sha256": "d53cc69e7df96df7bb141802c8dc79b7c7bc8fd4262d9bbbfd778882ab87ecff",
+      "reference_answer": "The circuit visualization and drawing functionality in qibo is centrally implemented in the `Circuit.draw()` method located in `src/qibo/models/circuit.py` (lines 1275-1458). This method generates text-based Unicode diagrams of quantum circuits.\n\n**Core Implementation:**\n\n1. **Gate Label Mapping** (lines 1287-1332): A comprehensive `labels` dictionary maps gate names to their visual symbols, supporting standard gates (H, X, Y, Z, S, T, rotation gates RX/RY/RZ, U1/U2/U3), controlled gates (CX, CZ, CRX, CRY, CRZ, CCX), multi-qubit gates (SWAP, iSWAP, fSim, fSWAP), and noise channels (PauliNoiseChannel, KrausChannel, DepolarizingChannel, ThermalRelaxationChannel, ResetChannel).\n\n2. **Matrix-based Layout Algorithm** (lines 1334-1377): The method builds a 2D matrix representation where each row corresponds to a qubit. For each gate, it determines the column position based on whether it's a single-qubit gate (placed at current qubit index) or multi-qubit gate (placed at maximum index across all qubits). Control qubits are marked with 'o', targets with the gate symbol, and intermediate qubits with '|'.\n\n3. **Measurement Gate Handling** (lines 1379-1384): Measurement gates are appended separately, marking measured qubits with 'M'.\n\n4. **Line Wrapping** (lines 1420-1453): When the `line_wrap` parameter is specified, the circuit diagram is split into chunks using a `chunkstring` helper function, with '...' continuation markers between chunks.\n\n5. **Legend Generation** (lines 1404-1418): When `legend=True`, uses the `tabulate` library to create a formatted table explaining symbols for callbacks and noise channels.\n\n**Dependencies:**\n- The `tabulate` package is specified in `setup.py` (line 64) as an install requirement.\n\n**Test Coverage** (`src/qibo/tests/test_models_circuit.py`):\n- `test_circuit_draw` (lines 533-549): Tests basic circuit drawing with standard gates\n- `test_circuit_draw_line_wrap` (lines 552-606): Tests line wrapping at different widths (30 and 50 characters)\n- `test_circuit_draw_channels` (lines 609-640): Tests noise channel visualization with optional legend\n- `test_circuit_draw_callbacks` (lines 643-666): Tests callback gate representation (e.g., EntanglementEntropy)",
+      "reference_sha256": "fd6cab7350cdd93aae12011649544a4e03f8aa92aba9a000d9299f07bcab193f",
+      "repository": {
+        "commit": "2f98679c4a738d5a59de17eccd4712659d52a461",
+        "family_id": "qiboteam/qibo",
+        "url": "https://github.com/qiboteam/qibo"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/qiboteam--qibo-2f98679c4a738d5a59de17eccd4712659d52a461",
+      "task_id": "import-bcdb090bf0ccaec686389e44"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/qiboteam--qibo-2f98679c4a73",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 590,
+            "file_sha256": "c038ec0ffdf8cecf6c5ec10aaf71a7953d1c978f5b218aec2d8cec762db89727",
+            "path": "src/qibo/models/variational.py",
+            "start_line": 583
+          },
+          {
+            "end_line": 589,
+            "file_sha256": "c038ec0ffdf8cecf6c5ec10aaf71a7953d1c978f5b218aec2d8cec762db89727",
+            "path": "src/qibo/models/variational.py",
+            "start_line": 587
+          },
+          {
+            "end_line": 642,
+            "file_sha256": "c038ec0ffdf8cecf6c5ec10aaf71a7953d1c978f5b218aec2d8cec762db89727",
+            "path": "src/qibo/models/variational.py",
+            "start_line": 591
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What are the subclasses inheriting from the QAOA variational quantum algorithm class and their overridden or extended specialized methods?",
+      "question_sha256": "90dbae5e4af5358131ffd694be1d014d29bda70a632c2bdd984821d9efcff275",
+      "reference_answer": "The FALQON (Feedback-based ALgorithm for Quantum OptimizatioN) class is the only direct subclass that inherits from the QAOA variational quantum algorithm class in this repository. FALQON extends QAOA through several key specializations. First, it calls the parent constructor super().__init__() to inherit QAOA's initialization of hamiltonian, mixer, solver, callbacks, and accelerators (src/qibo/models/variational.py: line 583-590). Second, it adds a specialized evol_hamiltonian attribute computed as 1j * (hamiltonian @ mixer - mixer @ hamiltonian), which represents the commutator-based evolution Hamiltonian for the feedback mechanism (src/qibo/models/variational.py: line 587-589). Most significantly, FALQON completely overrides the minimize() method to implement a fundamentally different optimization approach (src/qibo/models/variational.py: line 591-642). Instead of QAOA's traditional angle-based parameterization and standard optimization methods, FALQON's minimize method uses delta_t (time step) and max_layers parameters to perform iterative optimization where each layer's parameters are determined by feedback from the commutator evolution. This feedback-based algorithm progressively builds up the parameter set by evaluating the expectation value of the evolution Hamiltonian at each iteration, making it distinct from QAOA's direct parameter optimization approach.",
+      "reference_sha256": "e8b18d028d53049c7b15c34e0a899ce73ceb90925ac5e26526dcfb3203df7d54",
+      "repository": {
+        "commit": "2f98679c4a738d5a59de17eccd4712659d52a461",
+        "family_id": "qiboteam/qibo",
+        "url": "https://github.com/qiboteam/qibo"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/qiboteam--qibo-2f98679c4a738d5a59de17eccd4712659d52a461",
+      "task_id": "import-cc1df89014a5aa7ffbf043fa"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/qiboteam--qibo-2f98679c4a73",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1332,
+            "file_sha256": "a17b1cec63746180374ed0aa968fb23d44b0d4b848769e5e1d39fbd5c1df5612",
+            "path": "src/qibo/models/circuit.py",
+            "start_line": 1287
+          },
+          {
+            "end_line": 1343,
+            "file_sha256": "a17b1cec63746180374ed0aa968fb23d44b0d4b848769e5e1d39fbd5c1df5612",
+            "path": "src/qibo/models/circuit.py",
+            "start_line": 1339
+          },
+          {
+            "end_line": 37,
+            "file_sha256": "22ed8aa234e2a8248d008af86b1bc457a554ea7eb665b68a58389a6e07e93038",
+            "path": "src/qibo/gates/gates.py",
+            "start_line": 7
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where are the visual symbols used for representing quantum gates in circuit text drawing defined?",
+      "question_sha256": "50cbe9689f494de76f9c0c8fdc9767c578d3275fbdc1a465d56b4da1108e7c2b",
+      "reference_answer": "The visual symbols used for representing quantum gates in circuit text drawing are primarily defined in the labels dictionary within the draw() method of the Circuit class in src/qibo/models/circuit.py lines 1287-1332. This dictionary provides a comprehensive mapping from gate names to their corresponding display symbols, including basic gates like 'h' to 'H', 'x' to 'X', controlled gates like 'cx' to 'X', swap gates like 'swap' to 'x', and specialized symbols like 'iswap' to 'i' and 'fsim' to 'f'. The dictionary also includes symbols for noise channels such as 'PauliNoiseChannel' to 'PN' and 'DepolarizingChannel' to 'D', as well as callback gates like 'EntanglementEntropy' to 'EE'. When a gate is encountered that is not present in this labels dictionary, the system raises a NotImplementedError with a descriptive message indicating that the gate is not supported by circuit.draw, as implemented in src/qibo/models/circuit.py lines 1339-1343. While there is a separate QASM_GATES constant in src/qibo/gates/gates.py lines 7-37, this serves a different purpose for QASM format compatibility and gate name standardization rather than for visual circuit drawing symbols.",
+      "reference_sha256": "38d1286a4b6d8690f72f00a5f5602acedf6e0616b6b997b4a16c0cca70e25799",
+      "repository": {
+        "commit": "2f98679c4a738d5a59de17eccd4712659d52a461",
+        "family_id": "qiboteam/qibo",
+        "url": "https://github.com/qiboteam/qibo"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/qiboteam--qibo-2f98679c4a738d5a59de17eccd4712659d52a461",
+      "task_id": "import-d078774399d983aaa3d8cf59"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/qiboteam--qibo-2f98679c4a73",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 165,
+            "file_sha256": "2379c816c8f842eb5cb42e81bd12d68bb7e5cdae33f71887b197d3e415582188",
+            "path": "src/qibo/symbols.py",
+            "start_line": 138
+          },
+          {
+            "end_line": 135,
+            "file_sha256": "86c29115bbb8d1c23cfa779d448dc225afb0f7189ee9fab924cf4d33c57e64b5",
+            "path": "src/qibo/hamiltonians/hamiltonians.py",
+            "start_line": 113
+          },
+          {
+            "end_line": 237,
+            "file_sha256": "1f11e66d6cfbf96a16f3b91b388a485f08c789ca3c1a96ffed50d56dd2d8e8ba",
+            "path": "src/qibo/callbacks.py",
+            "start_line": 209
+          },
+          {
+            "end_line": 289,
+            "file_sha256": "7830850bd89192d656b35481df12a12d018c518a814987aecdaeca2ea60e82e6",
+            "path": "examples/reuploading_classifier/qlassifier.py",
+            "start_line": 218
+          },
+          {
+            "end_line": 256,
+            "file_sha256": "2ae0147513f1a0071410359a233db2fe94635b7ad18766dbc6aa3f7f895621c8",
+            "path": "examples/reuploading_classifier/datasets.py",
+            "start_line": 227
+          },
+          {
+            "end_line": 224,
+            "file_sha256": "2ae0147513f1a0071410359a233db2fe94635b7ad18766dbc6aa3f7f895621c8",
+            "path": "examples/reuploading_classifier/datasets.py",
+            "start_line": 139
+          },
+          {
+            "end_line": 60,
+            "file_sha256": "c693ca3ea5aef01e50ac6348746f7f81934f23a446781e5deb712e51bd81f25e",
+            "path": "setup.py",
+            "start_line": 60
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "6067fc12766583d59e8a6d060e0b30f30ff499f29ea5221c1327232ea269c8ba",
+            "kind": "file_reference",
+            "line_count": 329,
+            "path": "src/qibo/quantum_info/metrics.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does Qibo's visualization module coordinate between quantum state analysis and matplotlib-based rendering when generating Bloch sphere representations for qubit state visualization?",
+      "question_sha256": "f50a29c8cc3faafd5691b4342f2750c2de711cf1055ff55e3228088380750d2a",
+      "reference_answer": "Qibo does not implement a centralized visualization module with functions like ui.plot_state or ui.visualize_state. Instead, the architecture implements Bloch sphere visualization through example-level code that directly coordinates quantum state analysis with matplotlib rendering.\n\n**Quantum State Analysis Layer**\n\nThe quantum_info module (src/qibo/quantum_info/metrics.py) provides functions for analyzing quantum states:\n- `purity(state)` (lines 6-32): Computes the purity of a quantum state as Tr(rho^2)\n- `fidelity(state, target)` (lines 185-234): Computes fidelity between two quantum states\n- `entropy(state)` (lines 35-96): Computes von-Neumann entropy\n\nFor Bloch vector computation, Qibo provides Pauli operator symbols (X, Y, Z) in src/qibo/symbols.py (lines 138-165). These are subclasses of PauliSymbol that represent Pauli operators and can be used in Hamiltonians. Expectation value calculation is available through the `expectation` method in hamiltonians.py (lines 113-135) and the Energy callback (src/qibo/callbacks.py lines 209-237), enabling computation of Pauli expectation values needed for Bloch sphere coordinates.\n\n**Bloch Sphere Rendering**\n\nThe matplotlib rendering is implemented in the reuploading classifier example. The `paint_world_map` method in examples/reuploading_classifier/qlassifier.py (lines 218-289) visualizes quantum states on a 2D projection of the Bloch sphere:\n- It executes circuits and extracts state vectors (lines 231-236)\n- Computes angular coordinates from state amplitudes: latitude from |state[0]|^2 - |state[1]|^2 and longitude from the relative phase\n- Uses coordinate transformation functions `laea_x` and `laea_y` from datasets.py (lines 227-256) implementing a Hammer-like projection\n\nThe `world_map_template` function in datasets.py (lines 139-224) creates the 2D Bloch sphere template with latitude/longitude grid lines and labels for basis states (|0>, |1>, |+>, |->).\n\n**Integration**\n\nThis example-based approach requires users to implement their own visualization logic using the provided state analysis tools and matplotlib, which is included as a core dependency (setup.py line 60).",
+      "reference_sha256": "656f34cddecf1ab890f434d296875772ddbda48431d86acc6d8dd10ff8b12bdf",
+      "repository": {
+        "commit": "2f98679c4a738d5a59de17eccd4712659d52a461",
+        "family_id": "qiboteam/qibo",
+        "url": "https://github.com/qiboteam/qibo"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/qiboteam--qibo-2f98679c4a738d5a59de17eccd4712659d52a461",
+      "task_id": "import-e7cb77758d6799b228189299"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/qiboteam--qibo-2f98679c4a73",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 453,
+            "file_sha256": "eb19d4baadd84d633ae524647916ab345634e9672ea9850941268e6e457fecb9",
+            "path": "src/qibo/backends/numpy.py",
+            "start_line": 443
+          },
+          {
+            "end_line": 151,
+            "file_sha256": "34e37c93fb7c71fcac15e960c74c0f69da46b5cf918160af94676ad79c26c41f",
+            "path": "src/qibo/states.py",
+            "start_line": 92
+          },
+          {
+            "end_line": 521,
+            "file_sha256": "eb19d4baadd84d633ae524647916ab345634e9672ea9850941268e6e457fecb9",
+            "path": "src/qibo/backends/numpy.py",
+            "start_line": 518
+          },
+          {
+            "end_line": 565,
+            "file_sha256": "eb19d4baadd84d633ae524647916ab345634e9672ea9850941268e6e457fecb9",
+            "path": "src/qibo/backends/numpy.py",
+            "start_line": 558
+          },
+          {
+            "end_line": 221,
+            "file_sha256": "34e37c93fb7c71fcac15e960c74c0f69da46b5cf918160af94676ad79c26c41f",
+            "path": "src/qibo/states.py",
+            "start_line": 159
+          },
+          {
+            "end_line": 556,
+            "file_sha256": "eb19d4baadd84d633ae524647916ab345634e9672ea9850941268e6e457fecb9",
+            "path": "src/qibo/backends/numpy.py",
+            "start_line": 546
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 247,
+            "line_count": 246,
+            "path": "src/qibo/states.py",
+            "reason": "line_range_out_of_bounds",
+            "reference": "src/qibo/states.py",
+            "resolved_path": "src/qibo/states.py",
+            "start_line": 6
+          }
+        ]
+      },
+      "question": "Where does measurement data flow from quantum state tensors through probability calculations to final measurement outcomes in qibo's backend architecture?",
+      "question_sha256": "1161343c548fd0ecb52258a3027ca7c6eecf557ef6729b4808f96a6ae6970e3b",
+      "reference_answer": "Measurement data flows through a well-structured three-tier architecture in qibo. The CircuitResult class (src/qibo/states.py: lines 6-247) orchestrates the entire measurement pipeline through its probabilities(), samples(), and frequencies() methods, implementing intelligent caching with _samples and _frequencies attributes (lines 15-16) to avoid redundant computations.\n\nThe probabilities() method (lines 84-90) calls the backend's circuit_result_probabilities() function. In NumpyBackend (src/qibo/backends/numpy.py: lines 443-453), this method extracts the quantum state tensor via circuit_result_tensor() (line 447) and delegates to calculate_probabilities() (lines 497-502). This core method computes measurement probabilities by calculating |amplitude|^2 for each amplitude (line 500: self.np.abs(state) ** 2), reshaping the state into a tensor with explicit qubit dimensions, and performing partial traces over unmeasured qubits using numpy.sum() operations (line 501).\n\nThe samples() method (src/qibo/states.py: lines 92-151) builds on probabilities by calling the backend's sample_shots() method (src/qibo/backends/numpy.py: lines 518-521), which uses np.random.choice() for discrete sampling according to the probability distribution. If bitflip noise is configured (detected via has_bitflip_noise() at line 117), the apply_bitflips() method (src/qibo/backends/numpy.py: lines 558-565) applies probabilistic bit-flip errors to the noiseless samples using random number generation.\n\nFinally, the frequencies() method (src/qibo/states.py: lines 159-221) either calls sample_frequencies() (src/qibo/backends/numpy.py: lines 546-556) for direct frequency sampling or calculate_frequencies() (lines 535-538) to aggregate existing samples using numpy.unique() with return_counts=True, producing collections.Counter objects.\n\nThe complete flow path is: quantum state tensor -> |amplitude|^2 calculation -> partial trace over unmeasured qubits -> random sampling via np.random.choice -> optional bitflip noise application -> frequency aggregation via numpy.unique.",
+      "reference_sha256": "022d2415c9950ef13771aea6e2e5ba3a5fc53eb99e42dd67029cb15fe149b42f",
+      "repository": {
+        "commit": "2f98679c4a738d5a59de17eccd4712659d52a461",
+        "family_id": "qiboteam/qibo",
+        "url": "https://github.com/qiboteam/qibo"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/qiboteam--qibo-2f98679c4a738d5a59de17eccd4712659d52a461",
+      "task_id": "import-f9889bcfcbea187db7dad418"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/qiboteam--qibo-2f98679c4a73",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 60,
+            "file_sha256": "278ac2e084cb1b93cbe4939435233f4cc51cb8015982df495dd2e58a1269334b",
+            "path": "src/qibo/models/qft.py",
+            "start_line": 60
+          },
+          {
+            "end_line": 76,
+            "file_sha256": "278ac2e084cb1b93cbe4939435233f4cc51cb8015982df495dd2e58a1269334b",
+            "path": "src/qibo/models/qft.py",
+            "start_line": 71
+          },
+          {
+            "end_line": 48,
+            "file_sha256": "278ac2e084cb1b93cbe4939435233f4cc51cb8015982df495dd2e58a1269334b",
+            "path": "src/qibo/models/qft.py",
+            "start_line": 44
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "29c319ca35420226461d9434d38960e2c95f07449b405e17767777c05e6f4a06",
+            "kind": "file_reference",
+            "line_count": 329,
+            "path": "src/qibo/models/distcircuit.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the distributed Quantum Fourier Transform implementation optimize gate ordering to minimize multi-device communication overhead compared to the standard QFT algorithm?",
+      "question_sha256": "5814a5bc787ef693a74539afdab4e0db3e9daf7c288297447abd7c07ed5bcf3c",
+      "reference_answer": "The distributed QFT implementation optimizes communication overhead through a strategic qubit reordering scheme that differs fundamentally from the standard QFT's sequential approach. The key optimization revolves around a critical index calculation icrit = nqubits // 2 + nqubits % 2 (src/qibo/models/qft.py: line 60) that partitions the gate application strategy.\n\nFor qubits i1 < icrit, the algorithm uses the original qubit index directly (i1eff = i1), maintaining the standard QFT ordering for the first half of operations. However, for qubits i1 >= icrit, it employs a reverse mapping strategy where i1eff = nqubits - i1 - 1, effectively working backwards through the qubit space, and crucially adds a SWAP gate between the original and effective positions (src/qibo/models/qft.py: lines 71-76).\n\nThis reordering ensures that controlled operations, particularly the CU1 gates that form the core of QFT's controlled rotations, are strategically placed to minimize operations on global qubits. In the distributed quantum computing context, global qubits are those that require communication between multiple device accelerators (defined by circuit.global_qubits = range(circuit.nlocal, nqubits) at line 62), while local qubits can be processed entirely within individual devices.\n\nThe distributed circuit infrastructure (src/qibo/models/distcircuit.py) validates this optimization through the DistributedQueues.transform method (lines 248-268), which ensures no gates target global qubits directly. The create method (lines 270-329) enforces that only SWAP gates are supported for global qubits, forcing all global qubit operations to be mediated through local-global SWAP operations.\n\nThis approach contrasts sharply with the standard QFT (src/qibo/models/qft.py: lines 44-48) which applies gates in purely sequential order from qubit 0 to nqubits-1 without regard for device topology, potentially causing numerous cross-device communications when qubits span multiple accelerator devices.",
+      "reference_sha256": "8326c8d32980a220e77b2d383555a107258136287fd4052303626fd8787193a7",
+      "repository": {
+        "commit": "2f98679c4a738d5a59de17eccd4712659d52a461",
+        "family_id": "qiboteam/qibo",
+        "url": "https://github.com/qiboteam/qibo"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/qiboteam--qibo-2f98679c4a738d5a59de17eccd4712659d52a461",
+      "task_id": "import-fb4fefb659e416a151453e2c"
+    }
+  ]
+}

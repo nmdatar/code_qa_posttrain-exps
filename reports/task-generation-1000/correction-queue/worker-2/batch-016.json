@@ -1,0 +1,41 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-016.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/dwavesystems--dwave-cloud-client-88e14e9b7459",
+      "original_reference_sha256": "6f46d2c2e3407f3b26aa4e8dec2aa7a7e3ddb3508ebdf2fe288f71ce474baa8b",
+      "question": "Where does binary quadratic model data flow through the encoding, compression, and upload pipeline during problem submission to D-Wave cloud solvers?",
+      "question_sha256": "d18e9b8719c3fe793e8d8c784d016bcb41fa3881d816bb674dcfa3a60bbd4605",
+      "reference_answer": "The compressed BQM path is UnstructuredSolver.upload_bqm: it first tries a file view, then for serializable BQMs falls back to encode_problem_as_bq(..., compress=True), and passes encoded data to client.upload_problem_encoded (dwave/cloud/solver.py:418-448). The fallback converts to serializable JSON, ASCII-encodes it and zlib-compresses it (dwave/cloud/coders.py:270-303). Multipart parts are submitted through the upload-part executor (dwave/cloud/client.py:1860-1878). After upload, the solver submits a bqm-ref body using the returned problem ID (dwave/cloud/solver.py:345-356). Structured qp encoding is a separate path.",
+      "reference_sha256": "7609c01ee5348670df21f7fe2dc58807e384c1e8198adc5170da80c64f4b89cb",
+      "repository": {
+        "commit": "88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+        "family_id": "dwavesystems/dwave-cloud-client",
+        "url": "https://github.com/dwavesystems/dwave-cloud-client"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/dwavesystems--dwave-cloud-client-88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-2bbb422f934a8f7f9d482013"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/dwavesystems--dwave-cloud-client-88e14e9b7459",
+      "original_reference_sha256": "f97ba6fdeb62e8193336dc204a308b084cadc0662c931b458fdf4eb43790b489",
+      "question": "Why does the current simple token-based authentication architecture in dwave-cloud-client create scalability bottlenecks when handling concurrent API requests across multiple thread pools?",
+      "question_sha256": "4527ccdf5f990eb430baab93e47e3ed41832deda46555f1afccb5a5eed640f66",
+      "reference_answer": "create_session creates an isolated session and adds self.token as X-Auth-Token (dwave/cloud/client.py:506-530). This source shows static header-based authentication; it does not establish that sharing the same token value across sessions serializes requests or limits scalability. A missing refresh mechanism may require external credential replacement if credentials become invalid, but identifying a concurrent throughput bottleneck would require measurements and server-side behavior beyond this code.",
+      "reference_sha256": "6e94f5e609b89c87bc62ff19608100929ef91e6979b7944c1456cfdaf86dfbbf",
+      "repository": {
+        "commit": "88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+        "family_id": "dwavesystems/dwave-cloud-client",
+        "url": "https://github.com/dwavesystems/dwave-cloud-client"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/dwavesystems--dwave-cloud-client-88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-ce28a9cd8598c38c913483a8"
+    }
+  ]
+}

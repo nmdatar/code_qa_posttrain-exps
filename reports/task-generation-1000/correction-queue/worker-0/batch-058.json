@@ -1,0 +1,92 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-058.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "original_reference_sha256": "bc7a09352dc86e6298cc4df5cd367f27f4c1356ff0120955f2151ca848c4ca11",
+      "question": "Where is the function that parses argument specifications called to build the argument list for an event handler in the codebase?",
+      "question_sha256": "d779ef78905a7c18e75b1f5fff12cfbf4f73382d786c92d199d51acb7250cb06",
+      "reference_answer": "parse_args_spec is called by call_event_handler (reflex/event.py:1547) and call_event_fn (reflex/event.py:1783) to obtain handler argument Vars. Upload._update_arg_tuple_for_on_drop also calls it for the files placeholder (reflex/components/core/upload.py:432-436). The claimed direct call in reflex/utils/format.py is absent in this snapshot.",
+      "reference_sha256": "99576966a2db0bfc2e943c869369705c53c73f35dbb04ff7ef61cd1060060f2a",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-d587da4ba7f1c7fe6c32c45e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "original_reference_sha256": "c043befc2817446ab59d90015020ef2127c3fe79125996ec631648f3a2ee87ec",
+      "question": "How can the collapsible content panel component be redesigned to support runtime theming changes without breaking its memoization strategy or exposing internal style props?",
+      "question_sha256": "6769822ccb12746596099dd1a161eacf1dd37dfe01daa624367e99ecc420ff05",
+      "reference_answer": "A source-aligned design is to keep a small public theme API and map state-backed color/variant values to data attributes, with styling in CSS variables and selectors. AccordionComponent already puts color_scheme and variant into custom_attrs and excludes their original prop names (reflex/components/radix/primitives/accordion.py:52-71); selectors support inherited variants (lines29-49). Preserve the dependencies of these Vars through compilation and test runtime updates under memoization. Data attributes are still rendered attributes; their use does not by itself bypass React updates or prove memoization safety.",
+      "reference_sha256": "a4a765a529a5ba7ebaf2702fb2278d0881c8a910d491f423691e872720d52145",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-dd1545c728658d014af9ceeb"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "original_reference_sha256": "b72406b6748bfb10a14b96d956e66fe70b43d4b2508f0d414060f8fd08a8579e",
+      "question": "What is the role of the top-level state class as a subclass of the foundational state class in coordinating sub-state registration, persistence, and async propagation across state persistence manager implementations in the state management architecture?",
+      "question_sha256": "26caff1d847d1e91b0c849efbc12bbfb121243f4fa5182db3b78328821fd7a9c",
+      "reference_answer": "A root BaseState subclass anchors the state hierarchy. Subclass definition registers each child class in its parent\u2019s class_subclasses (reflex/state.py:512-520), while instance initialization optionally constructs substate instances and links their parent_state (lines418-424). These are distinct registration and construction stages. State managers provide storage/access policies; this does not mean a class named Root itself broadcasts updates or that StateManager owns BaseState event processing. The supplied answer overassigns those responsibilities and cannot establish them from root inheritance alone.",
+      "reference_sha256": "bbcecce2b94bb654e4987d81fb34152b7d9d93cf6de07c16b7ffcbaf37acf668",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e0c84419cc9e8c320d4336cf"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "original_reference_sha256": "d0bd73ae25dbc05b2c462e9cb7fa7f964b0662dd5368e8d3144799749cc14c4b",
+      "question": "Why does raising an invalid property value error during prop validation incur significant performance costs in deeply nested component hierarchies?",
+      "question_sha256": "7fa5750cb337356e02983a8e56a242ffbe098455720c172b4f53707b5dbf348f",
+      "reference_answer": "NoExtrasAllowedProps compares provided and known field names, formats the invalid and supported names, and raises InvalidPropValueError before parent initialization (reflex/components/props.py:417-441). This entails validation, formatting and ordinary exception handling work, but the code contains no recursive re-validation cascade. Deep nesting or retained tracebacks may affect a particular workload, but significant or multiplicative performance costs are not established by this source.",
+      "reference_sha256": "a53891ff805637f8c85034bb0057e7d274a107e1770c345ae7b2e48573014fda",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-ec16becc72ee5006f5014d2b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/reflex-dev--reflex-fe0f946dc0c2",
+      "original_reference_sha256": "7f44a4a0f53c5009cd00b1c7ee062580d502930ff961d693242626192c7ef576",
+      "question": "Why does increasing the backend worker process count in the production testing harness affect response latency when serving a 10 MB static file through the separate static file server?",
+      "question_sha256": "215bc8fe0380eada10e436c0b5fa20a0450660dc6bc38762405b1b77559fb5d8",
+      "reference_answer": "AppHarnessProd exports frontend files and serves them through Subdir404TCPServer with SimpleHTTPRequestHandlerCustomErrors, separately from its multi-worker backend (reflex/testing.py:1029-1058). The server class inherits socketserver.TCPServer (lines991-1025). Adding backend workers does not directly add static-server request workers. Whether static-file response latency changes due to shared resource contention requires measurement; the source alone does not establish that it worsens or that a10MB response is I/O-bound.",
+      "reference_sha256": "79fe218852599984d821de1ae07feebfa5d09f580388d46a17f229f4b08d54f0",
+      "repository": {
+        "commit": "fe0f946dc0c240c6c1e513318c21db407e191c78",
+        "family_id": "reflex-dev/reflex",
+        "url": "https://github.com/reflex-dev/reflex"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/reflex-dev--reflex-fe0f946dc0c240c6c1e513318c21db407e191c78",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-f6366f976d662a4874683b06"
+    }
+  ]
+}

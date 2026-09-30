@@ -1,0 +1,280 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-0bdb889ba31573bf3694ddf2",
+      "reference_sha256": "f08742eb3f90876e6bf982bcfaab2a15d049cff23119ac4eb88bb9514e6cb632",
+      "question_sha256": "b4b1e1f3d005542fa8e10172c2e02305d5f3cc1fe4a768063887d3adaf2968f6",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Lazy visitation avoids all unneeded frame traversal",
+          "verdict": "partially_supported",
+          "reason": "The duplicate guard applies to assignments and frame initialization; code fills missing frame metadata, not proof that normal traversal avoids all frames.",
+          "evidence": {
+            "path": "pylint/pyreverse/inspector.py",
+            "start_line": 190,
+            "end_line": 218
+          }
+        }
+      ],
+      "material_errors": [
+        "The duplicate guard applies to assignments and frame initialization; code fills missing frame metadata, not proof that normal traversal avoids all frames."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "visit_assignname first uses _handled to prevent duplicate processing across Linkers. It selects the enclosing frame or module for a global name, initializes locals_type if that frame has not yet been visited, then merges inferred types. Frame visitors themselves guard against reinitialization (pylint/pyreverse/inspector.py:137-218). This accommodates visitation order and reuse; it does not establish that all frames are otherwise skipped or quantify a speedup."
+    },
+    {
+      "task_id": "import-117f0638beb4f96968645770",
+      "reference_sha256": "6ffe409796a7492dca3730964ec4b3b2fc6f20d5c38909dba72dc2799d0caa97",
+      "question_sha256": "9b01bdf8276325a2f2f59d9e2219333e26eb8a5147d11ba2c1efec26812e72ac",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "PlantUML reads function AST metadata from methods",
+          "verdict": "supported",
+          "reason": "Iteration and returns formatting directly visible.",
+          "evidence": {
+            "path": "pylint/pyreverse/plantuml_printer.py",
+            "start_line": 66,
+            "end_line": 73
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-1a0a848fe0d53a38b00368c7",
+      "reference_sha256": "5e9bb4a5a20f7fa4e4ce0b47537807676cbb83509a643d9acb4a891f5a62dc68",
+      "question_sha256": "4e17a92f1f4440096d3aea9c8c6e4809168f1fadf3f2695f436989d5688c87c5",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Inherited descriptor exemption necessarily calls _has_data_descriptor",
+          "verdict": "contradicted",
+          "reason": "That call is nested under attrname in klass.locals; inherited class attributes can return earlier through is_class_attr.",
+          "evidence": {
+            "path": "pylint/checkers/classes/class_checker.py",
+            "start_line": 1806,
+            "end_line": 1828
+          }
+        }
+      ],
+      "material_errors": [
+        "That call is nested under attrname in klass.locals; inherited class attributes can return earlier through is_class_attr."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The regression fixture assigns through Base.attr2, a MyDescriptor implementing __get__ and __set__, on a Repro instance (tests/functional/a/assigning/assigning_non_slot.py:219-241). _check_in_slots has several exemptions: properties, class attributes, annotation-only local attributes, and locally found data descriptors (pylint/checkers/classes/class_checker.py:1806-1828). _has_data_descriptor infers an attribute and looks for __get__ and __set__ (lines 396-412), but its invocation is inside the local-attribute branch; the inherited fixture must not be described as unconditionally taking that helper path."
+    },
+    {
+      "task_id": "import-1c5442786feebda389e3b4e5",
+      "reference_sha256": "5364f5dc61ce95ce3b059296f0437594aa466d9928b5a06015079090fc5cd30e",
+      "question_sha256": "5726540805774a94f92a250796910ff1935cb398e68740013a8a5fec029e1ef7",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "from None breaks exception chain",
+          "verdict": "partially_supported",
+          "reason": "It suppresses context display, does not erase __context__; an explicit None cause is an AST Const and takes bad-cause path.",
+          "evidence": {
+            "path": "pylint/checkers/exceptions.py",
+            "start_line": 319,
+            "end_line": 373
+          }
+        }
+      ],
+      "material_errors": [
+        "It suppresses context display, does not erase __context__; an explicit None cause is an AST Const and takes bad-cause path."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "raise_catch_raise catches and prints the original exception, then raises a fresh Exception from None (tests/functional/b/broad_exception/broad_exception_raised.py:33-38). This explicitly suppresses display of implicit exception context; it does not delete the stored context. In the AST, explicit from None supplies a cause node, so visit_raise routes to _check_bad_exception_cause, which accepts a Const whose value is None (pylint/checkers/exceptions.py:319-373). The broad-exception-raised warning remains applicable to the newly raised generic Exception."
+    },
+    {
+      "task_id": "import-2505179a3385b7e8b3b70c7e",
+      "reference_sha256": "bb7e917bf467fffa819744f0717867c7551493b493c6a1268ac86090ef7e2bf7",
+      "question_sha256": "15daadd85504f0c0f695bc55e92e8f8c9428253165accfa3754a9ba372769948",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Unbounded cache keeps references alive indefinitely",
+          "verdict": "partially_supported",
+          "reason": "Retention is until clearing/cache disposal; cache relation is not bidirectional semantic lookup.",
+          "evidence": {
+            "path": "pylint/checkers/stdlib.py",
+            "start_line": 726,
+            "end_line": 766
+          }
+        }
+      ],
+      "material_errors": [
+        "Retention is until clearing/cache disposal; cache relation is not bidirectional semantic lookup."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "Caching associates a call key with a retained result, permitting repeated equivalent calls to reuse that result. On instance methods, the key includes the instance. Pylint identifies functools.cache and lru_cache(maxsize=None) and emits method-cache-max-size-none, with exemptions for enum ancestry and non-instance methods (pylint/checkers/stdlib.py:726-766). An unbounded cache can retain arguments and results while entries remain cached; clearing or discarding the cache can release those references. The source does not imply a reverse result-to-argument mapping."
+    },
+    {
+      "task_id": "import-2a77af89399925f31f9548ad",
+      "reference_sha256": "264500c9f728a963a60694d6989f6c44c5edcc8e432de97b916299412b357288",
+      "question_sha256": "91ce20f2e2cb4831b8e99aa52d8423109c1f35dce02c9cfdea6cd00e4b4e08df",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Undefined name follows first-level unpostponed self-reference",
+          "verdict": "supported",
+          "reason": "Helper returns CONTINUE without postponed evaluation; terminal check emits undefined-variable.",
+          "evidence": {
+            "path": "pylint/checkers/variables.py",
+            "start_line": 2510,
+            "end_line": 2525
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-2cd6a2da9c1f440f1a4a0ae8",
+      "reference_sha256": "5fac7d5d9a825620383921b375b75d196ac9f615ed26dfa26bd002b042155b14",
+      "question_sha256": "e5f7ee551d1b3bbf4b12b5897f2fa891b08652aa207a624a98caddb2f768c4e1",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Uncached protocol checks cause significant performance overhead",
+          "verdict": "partially_supported",
+          "reason": "Lookup repeats at this layer but source does not measure cost or prove safe cache lifetime.",
+          "evidence": {
+            "path": "pylint/checkers/utils.py",
+            "start_line": 1180,
+            "end_line": 1201
+          }
+        }
+      ],
+      "material_errors": [
+        "Lookup repeats at this layer but source does not measure cost or prove safe cache lifetime."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "supports_getitem calls _supports_protocol_method for ClassDef.__class_getitem__ (pylint/checkers/utils.py:1316-1319). The helper calls value.getattr and examines the result without its own memoization (lines 1180-1201). Repeated calls therefore repeat this helper work, but these lines do not establish the underlying lookup cost, cache behavior elsewhere, or a significant bottleneck. Memoization is a possible experiment after profiling, with a lifecycle that avoids stale results and retaining ASTs unnecessarily."
+    },
+    {
+      "task_id": "import-3b032834d5e1807693aafcb4",
+      "reference_sha256": "bfb942c09ca471cec78905ebfcca237f4bd297b6b7bf3fc88371c80867c9e9af",
+      "question_sha256": "c9f43a7ca26f1e00d2aa03af7eaa7c16b18cf589765d6345a643fc1be5e40888",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Generators excluded from no-return assignment checker",
+          "verdict": "supported",
+          "reason": "Explicit generator condition avoids return-node check.",
+          "evidence": {
+            "path": "pylint/checkers/typecheck.py",
+            "start_line": 1245,
+            "end_line": 1289
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-52f6741f1734f4c347800dbc",
+      "reference_sha256": "9db5bf8921d3dc5053213e90de3497ce1bae89c96334c16f1e8b0a531caa7fc4",
+      "question_sha256": "15e863ed9e83fa27d265655840e909f8e5c1b5ee9e77b135ca0056c5e8736059",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Concrete subclass checked for unimplemented abstract methods",
+          "verdict": "supported",
+          "reason": "Explicit abstract class skip then inherited unimplemented methods emission.",
+          "evidence": {
+            "path": "pylint/checkers/classes/class_checker.py",
+            "start_line": 2204,
+            "end_line": 2235
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-533cf8ea035081a729f35f20",
+      "reference_sha256": "faa163011533f10547bb3b339e4ea5eade3ad55df3f669cc8a3cc17d7f661811",
+      "question_sha256": "1aa04a329a1076648d7d51395128dc7b4e0fc9fd550f9c58d8ba0eaf8dda965f",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Unified instance_attrs storage drives annotation exclusion",
+          "verdict": "partially_supported",
+          "reason": "Annotation predicate actually searches class locals and bases, not the claimed instance_attrs dictionary; PEP563 assertion unsubstantiated here.",
+          "evidence": {
+            "path": "pylint/checkers/utils.py",
+            "start_line": 1731,
+            "end_line": 1752
+          }
+        }
+      ],
+      "material_errors": [
+        "Annotation predicate actually searches class locals and bases, not the claimed instance_attrs dictionary; PEP563 assertion unsubstantiated here."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The code branches on AST node types rather than introducing a separate attribute-storage architecture. is_attribute_typed_annotation checks the first local attribute binding for AssignName with an AnnAssign parent, then recursively checks inferred bases (pylint/checkers/utils.py:1731-1752). Separately, _get_all_attribute_assignments traverses Assign and AnnAssign and normalizes their different target fields before collecting AssignAttr names (pylint/checkers/typecheck.py:525-545). These support annotation-aware checks but do not prove all instance attributes share the claimed storage or guarantee postponed-annotation handling."
+    },
+    {
+      "task_id": "import-616acfb0a51760eb40b98a01",
+      "reference_sha256": "bda8f48ae3b0778572b8b5aa791ea9229d35787e6639c1ab856aa3532dd7fec1",
+      "question_sha256": "43646c804318805dc669ea811a06e2f1f5fd5a6421d364b9e7ca96109172a996",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Proposed MyString preserves str compatibility",
+          "verdict": "contradicted",
+          "reason": "Sample is a lint fixture, not formatting implementation; overriding __init__ with super().__init__(value) is invalid for this immutable subclass initialization path.",
+          "evidence": {
+            "path": "tests/functional/u/unnecessary/unnecessary_dunder_call.py",
+            "start_line": 127,
+            "end_line": 131
+          }
+        }
+      ],
+      "material_errors": [
+        "Sample is a lint fixture, not formatting implementation; overriding __init__ with super().__init__(value) is invalid for this immutable subclass initialization path."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "MyString is a minimal lint fixture: rjust only calls width.__index__ and returns no formatted string (tests/functional/u/unnecessary/unnecessary_dunder_call.py:127-131). A proposed production design should retain str inheritance and delegate formatting and built-in argument validation to super().rjust(width, fillchar), returning its result. If extra domain validation is required, put it in a helper before delegation and document any stricter behavior. No __init__ override or mutable validator instance is necessary. This proposal restores built-in formatting semantics; it is not behavior-preserving for the existing fixture."
+    },
+    {
+      "task_id": "import-623fc72e3d6724470c7b4956",
+      "reference_sha256": "382d2687b4f3c44d2a885ddc03c0d99dd3b9a09c04a79ceb6a6011b4228d2dea",
+      "question_sha256": "d07b205c931badc31b462ed9bd265fc3a8db413a0210faf41e4f28e8ac3b43cf",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Extra mandatory deepcopy argument breaks expected arity",
+          "verdict": "supported",
+          "reason": "Checker subtracts self and compares mandatory/optional arguments to protocol count.",
+          "evidence": {
+            "path": "pylint/checkers/classes/special_methods_checker.py",
+            "start_line": 197,
+            "end_line": 245
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    }
+  ]
+}

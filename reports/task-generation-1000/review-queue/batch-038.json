@@ -1,0 +1,477 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "6cd8be8aa123e0d3d9d34fa86feac7bf392f39bccdde5129830de0ea9692dd7c",
+            "kind": "file_reference",
+            "line_count": 561,
+            "path": "src/requests/cookies.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where is the delegation chain through which MockResponse.getheaders() ultimately retrieves header information, and why does the implementation appear incomplete in terms of return value handling?",
+      "question_sha256": "760dd964d0d4d09a3eb71939041f77bb05fb2b405a809264f0482669727e62a5",
+      "reference_answer": "The delegation path is in `src/requests/cookies.py`.\n\nThe `MockResponse` class (lines 103-121) wraps an `httplib.HTTPMessage` to provide the interface `http.cookiejar` expects. The delegation occurs in `getheaders()` (lines 120-121):\n\n```python\ndef getheaders(self, name):\n    self._headers.getheaders(name)\n```\n\nThe `_headers` attribute is set in `__init__` (line 115) to the `headers` parameter passed to the constructor.\n\nThe delegation chain is established in `extract_cookies_to_jar()` (lines 124-137):\n1. It receives a urllib3 `HTTPResponse` object as the `response` parameter\n2. Accesses `response._original_response.msg` (line 136), where `_original_response` is the underlying `httplib.HTTPResponse` and `.msg` is its `httplib.HTTPMessage` containing parsed headers\n3. Passes this `HTTPMessage` to `MockResponse.__init__()` (line 136), which stores it in `self._headers` (line 115)\n4. When `MockResponse.getheaders(name)` is called, it delegates to `self._headers.getheaders(name)` (line 121), which calls the standard library's `HTTPMessage.getheaders()` method\n\nSo the delegation path is: `MockResponse.getheaders()` \u2192 `self._headers.getheaders()` \u2192 `httplib.HTTPMessage.getheaders()`.\n\nNote: The implementation at line 121 is incomplete\u2014it calls `self._headers.getheaders(name)` but does not return the result. `HTTPMessage.getheaders()` returns a list of header values, but `MockResponse.getheaders()` currently returns `None` because the return value is not propagated.",
+      "reference_sha256": "1bc256c7654c4d2129e17df4633c6f5de8b2ae49fec0f7d156c71643478b12f5",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-80f76ce045575a9e5c2cea91"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 232,
+            "file_sha256": "0a5d5da449ce7f0af3ccf6e4bbe7a67a935e37846dff4ff9f08cb6c7e2464e6f",
+            "path": "src/requests/sessions.py",
+            "start_line": 223
+          },
+          {
+            "end_line": 551,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 548
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the test_transfer_enc_removal_on_redirect method specifically verify that Transfer-Encoding and Content-Type headers are removed during redirect resolution, and what would be the security or protocol implications if these headers persisted through a POST-to-GET redirect transition?",
+      "question_sha256": "f9d320ea2b22b13fe1b120c7621f053d0abbdb96271007f298de6241dd4b9a77",
+      "reference_answer": "The test method verifies that Transfer-Encoding and Content-Type headers are removed during redirect resolution to ensure compliance with HTTP standards when POST requests are converted to GET.\n\nIn the `resolve_redirects` method in `src/requests/sessions.py` (lines 223-232), when a redirect status code is NOT 307 (temporary_redirect) or 308 (permanent_redirect), the code removes Content-Length, Content-Type, and Transfer-Encoding headers and sets the request body to None:\n\n```python\nif resp.status_code not in (\n    codes.temporary_redirect,\n    codes.permanent_redirect,\n):\n    # https://github.com/psf/requests/issues/3490\n    purged_headers = (\"Content-Length\", \"Content-Type\", \"Transfer-Encoding\")\n    for header in purged_headers:\n        prepared_request.headers.pop(header, None)\n    prepared_request.body = None\n```\n\nThis removal is necessary because:\n\n1. **Method conversion**: For 301, 302, and 303 redirects, the `rebuild_method` function (lines 333-353) converts POST requests to GET requests, following RFC 7231 and browser behavior. GET requests must not have a request body per HTTP standards.\n\n2. **Header semantics**: Transfer-Encoding (specifically \"chunked\") indicates that the body is streamed in chunks when the length is unknown. Content-Type describes the media type of the request body. When the body is removed (set to None), these headers become meaningless and misleading.\n\n3. **Protocol compliance**: Sending body-related headers with a GET request (which has no body) violates HTTP semantics and can cause issues with servers, proxies, and HTTP libraries that expect GET requests to not have body-related headers.\n\n4. **Test context**: The test specifically uses a generator body (`data=(b\"x\" for x in range(1))`) which causes Transfer-Encoding: chunked to be set instead of Content-Length (as seen in `src/requests/models.py` lines 548-551). This tests the edge case where chunked encoding is used, ensuring it's properly removed during redirects.\n\nThe test verifies this behavior to ensure that when POST requests with chunked bodies are redirected and converted to GET, all body-related headers are properly cleaned up, maintaining HTTP protocol correctness.",
+      "reference_sha256": "6ce87bea4a33ec1715b4d93f1b99a2ac500a24f0d6cb452fb4359506fb8e4931",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-860809fc71bc5535bfa6c36a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 117,
+            "file_sha256": "f275f5d7781b6f5db7694b71d844e400dffa22c617f8cd9f4682c696e4c47119",
+            "path": "src/requests/adapters.py",
+            "start_line": 113
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does BaseAdapter's __init__ method invoke super().__init__() despite BaseAdapter appearing to be a root abstraction in the adapter hierarchy, and what design pattern does this choice reflect regarding future extensibility of the adapter framework?",
+      "question_sha256": "a5b209811e0a3252c774a925d2e5996f9ededeb2b4ea7909ff928174041fa87c",
+      "reference_answer": "The base transport adapter class (BaseAdapter) calls `super().__init__()` in its `__init__` method to support cooperative multiple inheritance, even though it appears to be the root of the adapter hierarchy.\n\nIn Python 3, when a class doesn't explicitly inherit from another class (like `BaseAdapter`), it implicitly inherits from `object`. Calling `super().__init__()` in `BaseAdapter.__init__()` invokes `object.__init__()`, which is essentially a no-op but follows the cooperative super() pattern.\n\nThis design enables:\n1. Multiple inheritance compatibility: if someone creates a class that inherits from both BaseAdapter and another class, the Method Resolution Order (MRO) will work correctly\n2. Future extensibility: BaseAdapter can be part of a multiple inheritance hierarchy without breaking existing code\n3. Consistency: it follows Python 3 best practices for cooperative inheritance, ensuring all classes in the inheritance chain properly call their parent initializers\n\nThis pattern is visible in the codebase at `src/requests/adapters.py` lines 113-117, where `BaseAdapter` is defined with an `__init__` that calls `super().__init__()`. The `HTTPAdapter` class (which inherits from `BaseAdapter`) also follows this pattern at line 192, calling `super().__init__()` after its own initialization logic.\n\nThis reflects the \"cooperative multiple inheritance\" or \"cooperative super()\" design pattern, which is a Python-specific best practice that ensures proper method chaining in complex inheritance scenarios.",
+      "reference_sha256": "8e44641c53d3857c4423bbc926168cd55aa374b4951240bd7a07ee9350c32139",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-8e6c3d3d1c2420ab958e4019"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "15a9092cc5edb005af6732097555515c4b82093d9394f6463c966259f83068c3",
+            "kind": "file_reference",
+            "line_count": 176,
+            "path": "tests/testserver/server.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How should the TLSServer class refactor its SSL context initialization and mutual TLS configuration to separate certificate loading concerns from verification mode setup, and what would be the architectural implications of extracting this logic into a dedicated SSLContextBuilder component?",
+      "question_sha256": "407bcefdef6d4320d692dc84130d3a845b0c3c7896825acf8473f9d24048255e",
+      "reference_answer": "Based on my exploration of the repository, the test server class that extends Server and handles TLS connections (TLSServer in `tests/testserver/server.py`) currently combines certificate loading and verification configuration in its `__init__` method (lines 138-176).\n\n**Current Implementation:**\nThe class initializes the SSL context and loads certificates in lines 161-162:\n```python\nself.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)\nself.ssl_context.load_cert_chain(self.cert_chain, keyfile=self.keyfile)\n```\n\nWhen mutual TLS is enabled (lines 165-169), it configures verification:\n```python\nif mutual_tls:\n    self.ssl_context.verify_mode = ssl.CERT_OPTIONAL\n    self.ssl_context.load_verify_locations(self.cacert)\n```\n\n**Refactoring Approach:**\nTo separate certificate loading from verification configuration, the class should:\n\n1. **Extract certificate loading into a dedicated method**: Create a method like `_load_server_certificates()` that handles lines 161-162, taking `cert_chain` and `keyfile` as parameters.\n\n2. **Extract verification configuration into a separate method**: Create a method like `_configure_client_verification()` that handles lines 168-169, taking `mutual_tls` and `cacert` as parameters.\n\n3. **Refactor `__init__` to orchestrate these methods**: The `__init__` method would call these methods in sequence, making the separation of concerns explicit.\n\n**Benefits of this refactoring:**\n- **Testability**: Each concern can be tested independently\n- **Maintainability**: Changes to certificate loading logic don't affect verification logic and vice versa\n- **Clarity**: The initialization flow becomes more readable and self-documenting\n- **Flexibility**: Future enhancements (e.g., different certificate formats, custom verification modes) can be added without modifying the core initialization logic\n\nThe SSL context would still be created in `__init__` (line 161), but the configuration steps would be delegated to focused methods, following the Single Responsibility Principle.",
+      "reference_sha256": "9e3b229f9a1a4a2734d44c805d8f49e6199b62eb7e6c4c59e2d5ead0bdff3d73",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-8ed00ecf9c50f52fe8c7d8fd"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 377,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 351
+          },
+          {
+            "end_line": 299,
+            "file_sha256": "905ef9b6a9cb72d67d31ffe19bd4d9223e1c4169cde6ec51cfca16b31e70991d",
+            "path": "src/requests/auth.py",
+            "start_line": 299
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the `prepare()` method enforce a strict ordering where `prepare_auth()` must be called after `prepare_body()` and `prepare_hooks()` must be called after `prepare_auth()`, rather than allowing these steps to be reordered or parallelized?",
+      "question_sha256": "1752fe210dc9413a9fc686d20fc9dc0e6176a0e315509d06ecd890be39c73081",
+      "reference_answer": "The authentication preparation step must follow the body preparation step because authentication schemes (particularly OAuth) require access to the fully prepared request body to generate cryptographic signatures.\n\nIn the `prepare()` method of the `PreparedRequest` class (located in `src/requests/models.py`, lines 351-377), the execution order is:\n\n1. `prepare_body(data, files, json)` (line 370) - This method:\n   - Encodes the request body (JSON, form data, or multipart)\n   - Sets the `Content-Type` header\n   - Sets the `Content-Length` header based on the body\n   - Stores the final body in `self.body`\n\n2. `prepare_auth(auth, url)` (line 371) - This method:\n   - Calls the authentication handler via `auth(self)` (line 602), passing the fully prepared request\n   - Allows the auth handler to modify the request (e.g., add Authorization headers)\n   - Recomputes `Content-Length` after auth modifications (line 608)\n\nThe code comment on lines 373-374 explicitly states: \"Note that prepare_auth must be last to enable authentication schemes such as OAuth to work on a fully prepared request.\"\n\nOAuth and similar signature-based authentication schemes need:\n- The complete request body to compute message signatures\n- The final headers (including Content-Type and Content-Length) to include in signature calculations\n- The ability to modify headers (like adding Authorization) after computing signatures\n\nIf authentication ran before body preparation, auth handlers would not have access to the final body content or headers, making it impossible to generate correct signatures. Additionally, `prepare_auth()` calls `prepare_content_length()` again after auth modifications (line 608), ensuring Content-Length remains accurate if the auth handler modifies the request body.\n\nThere is also a secondary ordering constraint: `prepare_hooks()` must follow `prepare_auth()` because authenticators can register hooks during their execution (as seen in `HTTPDigestAuth.__call__()` in `src/requests/auth.py`, line 299, which registers response hooks). If hooks were prepared before authentication, these auth-registered hooks would be lost.",
+      "reference_sha256": "528dd71863354e23ead04f25b420235eed91c1ff0070aa85bcaf46e0be24a7c4",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-8f3b3367fe7626a04434b5a1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 299,
+            "file_sha256": "5ef1d612edb55d4629fa8c3c6867bae0bf69050b951da9954927e42e48b88ff1",
+            "path": "tests/test_utils.py",
+            "start_line": 288
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "5aa53ceab677c2f842fad42359c8ed1ff1c4299c1607789609957a496e4311d4",
+            "kind": "file_reference",
+            "line_count": 1086,
+            "path": "src/requests/utils.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the control flow in TestIsValidCIDR.test_invalid branch based on the parametrized value parameter to determine which validation path is executed within the is_valid_cidr function call?",
+      "question_sha256": "ea133669708d40b589decb4bf7fa23fff9e1b019dfb6a266d9e6c67e112c11fc",
+      "reference_answer": "Control flow branches at four locations in the CIDR validation function (`is_valid_cidr` in `src/requests/utils.py`):\n\n1. Line 715: `if string_network.count(\"/\") == 1:` \u2014 branches on whether the input contains exactly one \"/\". If false, execution goes to line 728-729 (`else: return False`). This path handles inputs like \"8.8.8.8\" (no \"/\").\n\n2. Line 716-719: `try: mask = int(string_network.split(\"/\")[1])` with `except ValueError: return False` \u2014 branches on whether the part after \"/\" can be converted to an integer. If it raises `ValueError`, execution returns `False` at line 719. This path handles inputs like \"192.168.1.0/a\" (non-numeric mask).\n\n3. Line 721-722: `if mask < 1 or mask > 32: return False` \u2014 branches on whether the mask is in the valid range [1, 32]. If outside, execution returns `False` at line 722. This path handles inputs like \"192.168.1.0/128\" (mask > 32) or \"192.168.1.0/-1\" (mask < 1).\n\n4. Line 724-727: `try: socket.inet_aton(string_network.split(\"/\")[0])` with `except OSError: return False` \u2014 branches on whether the IP address part is valid. If `socket.inet_aton` raises `OSError`, execution returns `False` at line 727. This path handles inputs like \"192.168.1.999/24\" (invalid IP address format).\n\nThe parametrized test method (`test_invalid` in `tests/test_utils.py` at lines 288-299) provides five invalid values, each triggering a different branch:\n- \"8.8.8.8\" \u2192 branch 1 (no \"/\")\n- \"192.168.1.0/a\" \u2192 branch 2 (ValueError on mask conversion)\n- \"192.168.1.0/128\" \u2192 branch 3 (mask > 32)\n- \"192.168.1.0/-1\" \u2192 branch 3 (mask < 1)\n- \"192.168.1.999/24\" \u2192 branch 4 (OSError on IP validation)\n\nThese branches determine which validation path executes based on the parametrized value parameter.",
+      "reference_sha256": "64583be63fa53c8453e1d2bcc61f4bf0d50aeb50c6d68d7c9c39db257b673dea",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-9701f44e1692a89b3ac45607"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "kind": "file_reference",
+            "line_count": 1039,
+            "path": "src/requests/models.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the `prepare_body()` method raise `NotImplementedError` when both streaming data and files are provided, rather than attempting to merge or serialize them into a single multipart request?",
+      "question_sha256": "24bfac5257394edc6e0e27b8a92a05dbf32ec36441cd529687f16f50aa42f1fd",
+      "reference_answer": "The method that prepares HTTP request body data (the `prepare_body()` method in the `PreparedRequest` class, located in `src/requests/models.py`) raises `NotImplementedError` when both streaming data and files are provided because these two approaches are fundamentally incompatible at the architectural level.\n\nWhen streaming data is detected (lines 517-522), the method sets the body directly to the stream object (line 530: `body = data`). This allows the stream to be read incrementally during transmission, which is essential for memory-efficient handling of large data. The stream is used as-is, with either a `Content-Length` header (if the length is known) or `Transfer-Encoding: chunked` (if the length is unknown).\n\nIn contrast, when files are provided, the method calls `_encode_files()` (lines 137-203), which reads all file contents into memory upfront (line 191: `fdata = fp.read()`) and then uses `encode_multipart_formdata()` from urllib3 to construct a complete multipart/form-data body with proper boundaries and headers. This creates a fully serialized, in-memory representation of the multipart structure.\n\nThe incompatibility arises because:\n1. Streaming requires the body to remain a stream object that can be read incrementally without loading everything into memory\n2. Multipart encoding requires reading all file contents completely into memory to construct the multipart boundary structure\n3. You cannot simultaneously have a raw stream body AND a complete multipart-encoded body\n\nMerging them would require either:\n- Reading the entire stream into memory (defeating the purpose of streaming and potentially causing memory issues with large streams)\n- Creating a complex multipart structure that includes the stream as a part, which would require buffering and is architecturally complex\n- Implementing a streaming multipart encoder, which would be a significant architectural change\n\nThe error message \"Streamed bodies and files are mutually exclusive\" (line 545) reflects this fundamental architectural limitation. The `NotImplementedError` indicates that this combination is not supported by design, rather than being an unimplemented feature that could be added later.",
+      "reference_sha256": "2330d0c979d01af0c510428971db0bab4418cdbb8faeb411a78266faba7c06fa",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-a136b5b7d111041c2be44e91"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 475,
+            "file_sha256": "0a5d5da449ce7f0af3ccf6e4bbe7a67a935e37846dff4ff9f08cb6c7e2464e6f",
+            "path": "src/requests/sessions.py",
+            "start_line": 474
+          },
+          {
+            "end_line": 241,
+            "file_sha256": "0a5d5da449ce7f0af3ccf6e4bbe7a67a935e37846dff4ff9f08cb6c7e2464e6f",
+            "path": "src/requests/sessions.py",
+            "start_line": 241
+          },
+          {
+            "end_line": 561,
+            "file_sha256": "6cd8be8aa123e0d3d9d34fa86feac7bf392f39bccdde5129830de0ea9692dd7c",
+            "path": "src/requests/cookies.py",
+            "start_line": 542
+          },
+          {
+            "end_line": 626,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 626
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the impact of removing the `merge_cookies` function calls on the authentication flow when a session has both pre-configured cookies and request-specific cookies that need to be transmitted together?",
+      "question_sha256": "4cf75043846521994aaac548897c3ace1ac7c2079219d95f060a23e071202325",
+      "reference_answer": "Removing the function that merges pre-configured session cookies with request-specific cookies during request preparation would break the authentication flow in scenarios where both cookie types need to be transmitted together.\n\n**Current Implementation:**\n\nThe merging function (`merge_cookies`) is called in two critical locations:\n\n1. **In `prepare_request` method** (lines 474-475 in `src/requests/sessions.py`):\n   ```python\n   merged_cookies = merge_cookies(\n       merge_cookies(RequestsCookieJar(), self.cookies), cookies\n   )\n   ```\n   This merges session-level cookies (`self.cookies`) with request-specific cookies (`cookies`) before preparing the HTTP request.\n\n2. **In `resolve_redirects` method** (line 241 in `src/requests/sessions.py`):\n   ```python\n   merge_cookies(prepared_request._cookies, self.cookies)\n   ```\n   This ensures session cookies are included when following redirects.\n\n**Impact of Removal:**\n\n1. **Incomplete Cookie Transmission**: Without merging, only one set of cookies would be sent - either the session cookies OR the request-specific cookies, but not both. This would break authentication flows where:\n   - Session cookies contain persistent authentication tokens (e.g., session IDs, JWT tokens)\n   - Request-specific cookies contain additional authentication parameters or CSRF tokens\n   - Both must be present for successful authentication\n\n2. **Authentication Failures**: Many authentication mechanisms rely on multiple cookies being present simultaneously. For example:\n   - A session cookie might contain the user's authenticated session ID\n   - A request-specific cookie might contain a CSRF token or additional auth parameters\n   - Removing the merge would result in missing cookies and authentication failures\n\n3. **Redirect Handling Issues**: During redirects (line 241), session cookies wouldn't be merged with cookies extracted from redirect responses, potentially causing authentication to fail on redirected requests.\n\n4. **Loss of Cookie Precedence Logic**: The current implementation (using `overwrite=False` in `cookiejar_from_dict`) ensures that request-specific cookies can override session cookies when there are conflicts, while still preserving all non-conflicting cookies. Without merging, this precedence logic would be lost.\n\n**Technical Details:**\n\nThe `merge_cookies` function (defined in `src/requests/cookies.py` at lines 542-561) handles merging by:\n- Accepting a CookieJar and additional cookies (dict or CookieJar)\n- Using `cookiejar_from_dict` with `overwrite=False` for dictionaries, preserving existing cookies\n- Using `update()` or `set_cookie()` for CookieJar objects\n- Returning a merged CookieJar containing all cookies from both sources\n\nThis merging is essential because the `prepare_cookies` method in `PreparedRequest` (line 626 in `src/requests/models.py`) generates a single \"Cookie\" header from the merged CookieJar, and this header can only be set once per request.\n\n**Conclusion:**\n\nRemoving the cookie merging function calls would cause authentication failures in any scenario where both session-level and request-specific cookies are required, as only one set would be transmitted, breaking the authentication flow.",
+      "reference_sha256": "3ab3e837aba8ee63b8c9530b91920202fe13c1ff9588529d5bf9c92ceb3b5d52",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-aaeb63954dae3a661c8a99b0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 25,
+            "file_sha256": "9cc4329abe21b37d93a95a3901b0ab99c24486f3d487bc57965bb2ab0b252e24",
+            "path": "src/requests/_internal_utils.py",
+            "start_line": 25
+          },
+          {
+            "end_line": 712,
+            "file_sha256": "5ef1d612edb55d4629fa8c3c6867bae0bf69050b951da9954927e42e48b88ff1",
+            "path": "tests/test_utils.py",
+            "start_line": 712
+          },
+          {
+            "end_line": 41,
+            "file_sha256": "5ef1d612edb55d4629fa8c3c6867bae0bf69050b951da9954927e42e48b88ff1",
+            "path": "tests/test_utils.py",
+            "start_line": 41
+          },
+          {
+            "end_line": 27,
+            "file_sha256": "5aa53ceab677c2f842fad42359c8ed1ff1c4299c1607789609957a496e4311d4",
+            "path": "src/requests/utils.py",
+            "start_line": 27
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "9cc4329abe21b37d93a95a3901b0ab99c24486f3d487bc57965bb2ab0b252e24",
+            "kind": "file_reference",
+            "line_count": 50,
+            "path": "src/requests/_internal_utils.py"
+          },
+          {
+            "file_sha256": "0a5d5da449ce7f0af3ccf6e4bbe7a67a935e37846dff4ff9f08cb6c7e2464e6f",
+            "kind": "file_reference",
+            "line_count": 831,
+            "path": "src/requests/sessions.py"
+          },
+          {
+            "file_sha256": "6cd8be8aa123e0d3d9d34fa86feac7bf392f39bccdde5129830de0ea9692dd7c",
+            "kind": "file_reference",
+            "line_count": 561,
+            "path": "src/requests/cookies.py"
+          },
+          {
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "kind": "file_reference",
+            "line_count": 1039,
+            "path": "src/requests/models.py"
+          },
+          {
+            "file_sha256": "905ef9b6a9cb72d67d31ffe19bd4d9223e1c4169cde6ec51cfca16b31e70991d",
+            "kind": "file_reference",
+            "line_count": 314,
+            "path": "src/requests/auth.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the to_native_string function implementation located that test_to_native_string delegates to for performing the actual string conversion logic?",
+      "question_sha256": "acdab0d7ffb844ee24fff0037b1a49a66e6a230bc516843ee74363ed994cf041",
+      "reference_answer": "The function that converts string objects to native string type is located in `src/requests/_internal_utils.py` at line 25.\n\nThe implementation is:\n\n```python\ndef to_native_string(string, encoding=\"ascii\"):\n    \"\"\"Given a string object, regardless of type, returns a representation of\n    that string in the native string type, encoding and decoding where\n    necessary. This assumes ASCII unless told otherwise.\n    \"\"\"\n    if isinstance(string, builtin_str):\n        out = string\n    else:\n        out = string.decode(encoding)\n\n    return out\n```\n\nThe parametrized test validating string conversion behavior (`test_to_native_string`) is located in `tests/test_utils.py` at line 712. The test imports `to_native_string` from `requests.utils` (line 41 of `test_utils.py`), which re-exports it from `_internal_utils` for backwards compatibility (as documented in `src/requests/utils.py` at line 27: \"to_native_string is unused here, but imported here for backwards compatibility\").\n\nWhile the test imports the function through the `utils` module, the actual implementation that performs the string conversion logic is defined in `_internal_utils.py`. This module contains internal utility functions that depend on few external helpers and is used throughout the requests library for string conversion operations in modules like `sessions.py`, `cookies.py`, `models.py`, and `auth.py`.",
+      "reference_sha256": "76ec3ac9ece03753fc2ecef6f8e8ccec6c680fdc19668beed1cdeb2c5dc3805e",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-aba43394bd84208f58b18887"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 486,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 486
+          },
+          {
+            "end_line": 491,
+            "file_sha256": "0a5d5da449ce7f0af3ccf6e4bbe7a67a935e37846dff4ff9f08cb6c7e2464e6f",
+            "path": "src/requests/sessions.py",
+            "start_line": 491
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "f886e6855cf4e92fb968f499b94b6167afba0fd5ce8d1b935c739a6d8d38d573",
+            "kind": "file_reference",
+            "line_count": 99,
+            "path": "src/requests/structures.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the repeated invocation of key.lower() across __setitem__, __getitem__, and __delitem__ impact performance when CaseInsensitiveDict is used with high-frequency lookups on large datasets, and what optimization strategy could reduce this computational overhead?",
+      "question_sha256": "6e906223fd0f6d1090995baad64d3874f7120b5217c4a330447494b40a73efa2",
+      "reference_answer": "Repeated string lowercasing in the case-insensitive dictionary's item access methods impacts performance during high-frequency lookups on large datasets because:\n\n1. **String creation overhead**: Each call to `key.lower()` in `__setitem__` (line 49), `__getitem__` (line 52), and `__delitem__` (line 55) of `CaseInsensitiveDict` in `src/requests/structures.py` creates a new string object. This involves:\n   - Allocating memory for the new lowercase string\n   - Iterating through each character in the original key to convert it to lowercase\n   - Creating a new string object in memory\n\n2. **Frequency amplification**: In high-frequency scenarios (e.g., processing many HTTP requests with header lookups), these methods are called repeatedly. Each lookup operation triggers `key.lower()`, multiplying the overhead.\n\n3. **No caching mechanism**: The current implementation in `src/requests/structures.py` does not cache the lowercased keys. Every access recalculates `key.lower()`, even if the same key (in different cases) is accessed multiple times.\n\n4. **Large dataset impact**: With large datasets, the cumulative effect of:\n   - Many unique keys requiring lowercasing\n   - Repeated lookups on the same keys in different cases\n   - Memory allocation for temporary lowercase strings\n   \n   Creates a significant performance bottleneck, especially when the dictionary is used for HTTP headers (as seen in `src/requests/models.py` lines 486 and 669, and `src/requests/sessions.py` line 491), where header names may be accessed frequently during request/response processing.\n\nThe performance impact is particularly noticeable because string operations in Python involve object creation and memory allocation, which become expensive when performed millions of times in tight loops or high-throughput scenarios.",
+      "reference_sha256": "d56dc64f2bf20a2177e9be47cfbfb38f1b25a8f8469f823da4a64da6afa8aa91",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-af0bea45befe058b4862c1c4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 150,
+            "file_sha256": "8c93d2d545804ecf3a4a155468ba2b4e225bd52686ba83445a020225ea7e5646",
+            "path": "src/requests/exceptions.py",
+            "start_line": 150
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "e3168011198f0c804fb1ad8fb23a54f6bd3aca8a0afb69992874d90215915adb",
+            "kind": "file_reference",
+            "line_count": 184,
+            "path": "src/requests/__init__.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "src/requests/__init__.py",
+              "tests/__init__.py",
+              "tests/testserver/__init__.py"
+            ],
+            "end_line": null,
+            "path": "__init__.py",
+            "reason": "ambiguous_basename",
+            "reference": "__init__.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "How should the exception hierarchy in the requests library implement version validation logic to detect and handle mismatched dependency versions at runtime without breaking backward compatibility?",
+      "question_sha256": "6b4d903086e218da45d868c5f9210985d67cc8acfb556d423bae2421c444a27d",
+      "reference_answer": "Based on my exploration of the repository, the exception hierarchy in the requests library implements dependency version validation using **warnings rather than exceptions** to maintain backward compatibility. Here's how it works:\n\n**Exception/Warning Hierarchy Structure:**\nThe library has a two-tier hierarchy:\n1. **Exception hierarchy**: `RequestException` (base class inheriting from `IOError`) for runtime errors like `HTTPError`, `ConnectionError`, `Timeout`, etc.\n2. **Warning hierarchy**: `RequestsWarning` (base class inheriting from `Warning`) with `RequestsDependencyWarning` specifically for dependency version issues.\n\n**Implementation Details:**\nThe version validation is implemented in `src/requests/__init__.py` through the `check_compatibility()` function (lines 58-90). This function:\n- Validates urllib3 version (requires >= 1.21.1)\n- Validates chardet version (requires >= 3.0.2, < 6.0.0) or charset_normalizer version (requires >= 2.0.0, < 4.0.0)\n- Uses `assert` statements internally to check version compatibility\n\n**Backward Compatibility Mechanism:**\nThe key design decision is that version mismatches are handled via `warnings.warn()` with `RequestsDependencyWarning` (lines 86-89, 104, 113-118) rather than raising exceptions. This approach:\n- **Does not break execution**: Warnings don't stop program execution, allowing code to continue running even with incompatible dependency versions\n- **Provides notification**: Users are informed about version mismatches without breaking their existing code\n- **Maintains backward compatibility**: Older code that doesn't handle these exceptions continues to work\n\nThe validation is wrapped in a try/except block (lines 108-119) that catches `AssertionError` and `ValueError` from the version checking logic and converts them to warnings instead of letting them propagate as exceptions.\n\n**Architecture:**\n`RequestsDependencyWarning` is defined in `src/requests/exceptions.py` (line 150) as a subclass of `RequestsWarning`, which itself inherits from Python's built-in `Warning` class. This separates dependency version issues from runtime exceptions, allowing the library to detect and report version problems without breaking backward compatibility.\n\nThis design ensures that version validation occurs at import time (when `__init__.py` is executed) but doesn't prevent the library from being used, even with mismatched dependencies, thus maintaining backward compatibility.",
+      "reference_sha256": "08b1b260bf7bcaa188b4ba5ffa41647634ad68295dd0bb7a49fb005e47958a13",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-b348a53f091aeaf41581e3f4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 63,
+            "file_sha256": "8c93d2d545804ecf3a4a155468ba2b4e225bd52686ba83445a020225ea7e5646",
+            "path": "src/requests/exceptions.py",
+            "start_line": 63
+          },
+          {
+            "end_line": 1,
+            "file_sha256": "f275f5d7781b6f5db7694b71d844e400dffa22c617f8cd9f4682c696e4c47119",
+            "path": "src/requests/adapters.py",
+            "start_line": 1
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the ProxyError exception propagate through the exception hierarchy to influence control flow when a proxy connection failure occurs in the requests library?",
+      "question_sha256": "c49791ba0dc835b7134f24dc99c3c2f95574b22a057ff5314157ed33b5ec936c",
+      "reference_answer": "The exception class representing proxy connection failures (ProxyError) propagates through the exception inheritance chain in the following way:\n\n**Exception Inheritance Chain:**\n1. `ProxyError` inherits from `ConnectionError` (defined in `src/requests/exceptions.py` at line 63)\n2. `ConnectionError` inherits from `RequestException` (line 59)\n3. `RequestException` inherits from `IOError` (line 12)\n\nThis creates the inheritance path: `ProxyError` \u2192 `ConnectionError` \u2192 `RequestException` \u2192 `IOError`\n\n**Propagation Points in Control Flow:**\nThe exception propagates and influences execution in the `HTTPAdapter.send()` method in `src/requests/adapters.py`:\n\n1. **Primary propagation point (lines 670-671):** When a `MaxRetryError` from urllib3 occurs and its `reason` attribute is a `_ProxyError` (urllib3's proxy error), it is caught and converted to `ProxyError`:\n   ```python\n   if isinstance(e.reason, _ProxyError):\n       raise ProxyError(e, request=request)\n   ```\n\n2. **Secondary propagation point (lines 682-683):** When urllib3's `_ProxyError` is caught directly (not wrapped in MaxRetryError), it is also converted to `ProxyError`:\n   ```python\n   except _ProxyError as e:\n       raise ProxyError(e)\n   ```\n\n**Influence on Execution:**\nBecause of the inheritance chain, the exception can be caught at multiple levels:\n- Catching `ProxyError` specifically handles only proxy-related failures\n- Catching `ConnectionError` handles all connection errors including proxy failures\n- Catching `RequestException` handles all requests-related exceptions including proxy failures\n- Catching `IOError` handles all I/O errors including proxy failures\n\nThis hierarchical structure allows callers to choose their desired level of error handling granularity. When a proxy connection cannot be established, urllib3 raises its `_ProxyError`, which is then translated to requests' `ProxyError` in the adapter layer, and it propagates up through the inheritance chain, allowing handlers at any level of the chain to intercept and handle the error appropriately.",
+      "reference_sha256": "1b304a3248c603a078e314e7dfd75c28cd8b3d6cb113f1df0027d457b0498fa8",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-c0c0e3ccdd8a6e0f1043fa81"
+    }
+  ]
+}

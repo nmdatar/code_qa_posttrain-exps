@@ -1,0 +1,420 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 35,
+            "file_sha256": "81eadbb5c5814eac877494036688da3ede3dfdc2953257acf7dc13a22f6168d0",
+            "path": "lib/matplotlib/_api/__init__.py",
+            "start_line": 32
+          },
+          {
+            "end_line": 370,
+            "file_sha256": "df8395306765d9b93f98d6b2e867836a9b2b0786cf5b39a26103309c4331afde",
+            "path": "lib/matplotlib/gridspec.py",
+            "start_line": 370
+          },
+          {
+            "end_line": 163,
+            "file_sha256": "79280d6b2df4e465fa4d5a2bb9860bded559ca1fc7409be0ef59f953f0a92ab3",
+            "path": "lib/matplotlib/artist.py",
+            "start_line": 163
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why would using a singleton pattern versus repeatedly instantiating the _Unset class throughout matplotlib's codebase impact memory overhead in scenarios with thousands of default parameter checks?",
+      "question_sha256": "ce86676739c099912a4ef8f444656ff3d69717d98d54d10ab3d6498076bcdb3c",
+      "reference_answer": "Using a single shared instance (singleton) versus creating new instances each time significantly reduces memory overhead when there are many parameter checks.\n\nIn matplotlib's implementation, `_Unset` is a sentinel class defined in `lib/matplotlib/_api/__init__.py` (lines 32-35). It's used as a default parameter value when `None` cannot be used because the code needs to distinguish between `None` passed explicitly and a parameter not provided.\n\nThe current implementation uses a singleton pattern:\n```python\nclass _Unset:\n    def __repr__(self):\n        return \"<UNSET>\"\nUNSET = _Unset()\n```\n\nThis single instance (`UNSET`) is reused across the codebase. For example, in `gridspec.py` (line 370), the `update()` method uses `_UNSET` as default values for multiple parameters:\n```python\ndef update(self, *, left=_UNSET, bottom=_UNSET, right=_UNSET, top=_UNSET,\n           wspace=_UNSET, hspace=_UNSET):\n```\n\nMemory impact:\n1. Singleton approach: Only one `_Unset` instance exists in memory, regardless of how many function calls or parameter checks occur. Each function parameter with `default=_api.UNSET` stores a reference to the same object.\n\n2. Repeated instantiation: If `_Unset()` were called each time (e.g., `def foo(arg=_Unset())`), each function call would create a new instance. With thousands of parameter checks, this would create thousands of separate objects, each consuming memory for:\n   - Object header/metadata\n   - Instance dictionary (even if empty)\n   - Reference overhead\n\nThe singleton pattern ensures that all default parameter references point to the same object, minimizing memory usage. This is especially important in matplotlib where functions like `Artist.set()` dynamically generate signatures with `_api.UNSET` defaults for many properties (see `artist.py` line 163), potentially creating hundreds of parameter definitions that all reference the same singleton instance.\n\nAdditionally, using `is` comparisons (e.g., `if left is not _UNSET:`) is more efficient with singletons because identity checks are faster than equality checks, and the singleton guarantees that the same object identity is used throughout the codebase.",
+      "reference_sha256": "b444f9f0c016ec7ba391739b134f13f022f799e187a4639c1ea2000bc87e56e2",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-d1ac8a8041fcf21ed9326cc4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 702,
+            "file_sha256": "b42c57eef2348ccaffe04892e152b6eb5298a63bc673c90e03584da4fbcea2da",
+            "path": "lib/matplotlib/font_manager.py",
+            "start_line": 682
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "06d4dd6cf3f3e498b88c5c6d3f608238083582056b12000959f1b66dc7e67c39",
+            "kind": "file_reference",
+            "line_count": 1369,
+            "path": "lib/matplotlib/legend.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the Legend class implement a multi-layered validation strategy to handle conflicting parameters like title_fontsize and title_fontproperties, and what design pattern could be applied to generalize this validation logic across similar parameter conflicts?",
+      "question_sha256": "1da576c8e5eb4c7c6a37e9ec2d4046bbcdfc48119a9da713f01b42da2b81a5d6",
+      "reference_answer": "The matplotlib legend drawing class (`Legend` in `./lib/matplotlib/legend.py`) implements a multi-layered validation strategy in its `__init__` method (lines 555-569) to handle conflicts between title font size and font properties parameters.\n\nThe validation strategy consists of four layers:\n\n1. **Explicit conflict detection** (lines 556-559): If both `title_fontsize` and `title_fontproperties` are provided (not None), a `ValueError` is raised with the message: \"title_fontsize and title_fontproperties can't be specified at the same time. Only use one of them.\"\n\n2. **Type-based normalization** (line 560): The `title_fontproperties` parameter is converted to a `FontProperties` object using `FontProperties._from_any()`, which handles multiple input types (None, FontProperties instance, PathLike, string, or dict) as defined in `./lib/matplotlib/font_manager.py` (lines 682-702).\n\n3. **Conditional size assignment with fallback hierarchy** (lines 561-569):\n   - If `title_fontproperties` is a dict and doesn't contain a \"size\" key, the size is taken from `mpl.rcParams[\"legend.title_fontsize\"]` (lines 561-564)\n   - Else if `title_fontsize` is not None, it is applied to the FontProperties object (lines 565-566)\n   - Else if `title_fontproperties` is not already a FontProperties instance (i.e., it was None or a string), the size defaults to `mpl.rcParams[\"legend.title_fontsize\"]` (lines 567-569)\n\n4. **Final application** (line 571): The validated FontProperties object is passed to `self.set_title()`.\n\nThis strategy ensures:\n- Mutual exclusivity: both parameters cannot be used simultaneously\n- Type flexibility: accepts dict, FontProperties, string, or None\n- Graceful fallback: uses rcParams when parameters are missing\n- Priority ordering: dict size > explicit title_fontsize > rcParams\n\nThe same pattern is used for the regular legend font properties (`prop` and `fontsize` parameters) at lines 429-434, demonstrating consistency in the codebase.",
+      "reference_sha256": "3495b6f9ff779c2f894031e393d0678440532bac574661c5de90fed3c854722f",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-d21d4d665ec323728c21f7cc"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 492,
+            "file_sha256": "59e57bd925db0fae2b1b544b52cc1db6a1c9b30e5420fd321cd17150d067997a",
+            "path": "lib/matplotlib/backends/backend_svg.py",
+            "start_line": 491
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the _make_flip_transform method consistently apply a vertical flip transformation, and how does this design choice relate to the coordinate system mismatch between matplotlib and SVG?",
+      "question_sha256": "cb5761027d06d853e80a3414c65a70e608f3a0bc8a4e9ba8926276a3cc071949",
+      "reference_answer": "The method `_make_flip_transform` in the `RendererSVG` class (defined at lines 491-492 in `lib/matplotlib/backends/backend_svg.py`) consistently applies a vertical flip transformation to resolve a coordinate system mismatch between matplotlib and SVG.\n\n**The Coordinate System Mismatch:**\n- Matplotlib uses a mathematical coordinate system with the origin at the bottom-left, where y increases upward.\n- SVG uses a screen-based coordinate system with the origin at the top-left, where y increases downward.\n\n**The Transformation:**\nThe method implements:\n```python\ndef _make_flip_transform(self, transform):\n    return transform + Affine2D().scale(1, -1).translate(0, self.height)\n```\n\nThis transformation:\n1. Scales by `(1, -1)` to flip the y-axis (multiplies y by -1)\n2. Translates by `(0, self.height)` to shift the flipped coordinates back into the visible canvas area\n\n**Consistent Application:**\nThe method is consistently used throughout the SVG renderer whenever coordinate transforms need to be converted from matplotlib's coordinate system to SVG's:\n- In `draw_path` (line 679): Applied to path transforms before converting to SVG path data\n- In `draw_markers` (line 721): Applied to marker position transforms\n- In `_get_clip_attrs` (line 609): Applied to clip path transforms\n- In `draw_gouraud_triangles` (line 905): Applied to triangle transforms\n\n**Design Rationale:**\nThis consistent application ensures all graphical elements (paths, markers, clip paths, gradients) are correctly positioned in the SVG output. Without this transformation, all elements would appear vertically inverted because matplotlib's y=0 (bottom) would map to SVG's y=0 (top), and matplotlib's y=height (top) would map to SVG's y=height (bottom).\n\nThe `flipy()` method in the same class (line 1291-1293) returns `True`, indicating that the SVG backend requires y-values to increase from top to bottom, confirming the need for this coordinate system conversion.\n\nAdditional evidence of this coordinate system mismatch can be seen in manual coordinate adjustments elsewhere in the code, such as:\n- Line 613: `y = self.height-(y+h)` for clip rectangles\n- Line 1179: `ay = self.height - ay` for text anchor positions\n- Line 785: `'y': _short_float_fmt(self.height - yo)` for path collection markers\n\nThese manual adjustments complement the `_make_flip_transform` method, ensuring consistent coordinate conversion throughout the SVG rendering pipeline.",
+      "reference_sha256": "75919e4ea8b759927b2b24ed20463751156db55fd74e051cd7b5df0d1cc14099",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-d6f3aa5c4d34fdfc95715ab3"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2299,
+            "file_sha256": "0508d74651cf5f6b79dcce0ec46a37119b10be7cc85d0a240225c578d52cc329",
+            "path": "lib/matplotlib/backends/backend_pdf.py",
+            "start_line": 2299
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the semantic contract established by the LaTeX preamble configuration in test_font_bitstream_charter between the text rendering pipeline and the PDF backend's glyph subsetting mechanism?",
+      "question_sha256": "6f4af02098220bda49dcb3b00ca5371c2a2063b6d0461e2413d15c760f0d6b38",
+      "reference_answer": "The font encoding package configuration in the test that renders Bitstream Charter establishes a T1 (8-bit) encoding mapping scheme between input text characters and DVI glyph codes, which the character tracking system uses for font subsetting.\n\nSpecifically, when the test sets `text.latex.preamble` with `\\usepackage[T1]{fontenc}`, this configuration:\n\n1. **Establishes the encoding scheme**: The T1 font encoding maps Unicode input characters (like \"\u00e5\u00fc\u0161\" in the test) to 8-bit byte codes (0-255) in the DVI file. This encoding supports accented European characters and ligatures that would not be available in the default 7-bit encoding.\n\n2. **Affects DVI glyph representation**: When LaTeX processes text with T1 encoding, characters are represented as single-byte glyph codes in the DVI file. For example, the character \"\u00e5\" is encoded as a specific byte value according to the T1 encoding table.\n\n3. **Enables character tracking**: In the PDF backend's `draw_tex` method (line 2299 in `backend_pdf.py`), the system tracks characters using:\n   ```python\n   self.file._character_tracker.track(dvifont, chr(glyph))\n   ```\n   where `glyph` is the byte value from the DVI file. The `chr(glyph)` conversion relies on the T1 encoding to correctly map the byte code back to the intended character.\n\n4. **Determines font subsetting**: When embedding fonts (line 1029), the subsetting process uses the tracked characters:\n   ```python\n   chars = frozenset(self._character_tracker.used[dvifont.fname])\n   t1font = t1font.subset(chars, self._get_subset_prefix(chars))\n   ```\n   The font encoding from `pdftex.map` (accessed in `_embedTeXFont`, line 1020-1022) determines how these tracked characters map to actual glyphs in the Type-1 font file.\n\n5. **Handles encoding transformations**: The font embedding process (lines 1019-1025) applies encoding changes from the pdftex.map file, ensuring that the subsetted font's encoding matches what was used during DVI generation.\n\nThe contract ensures that: (a) input characters are correctly mapped to DVI glyph codes according to T1 encoding, (b) these glyph codes can be reliably converted back to characters for tracking, and (c) the tracked characters correctly identify which glyphs to include in the subsetted font. Without this encoding contract, characters like \"\u00e5\u00fc\u0161\" or ligatures like \"fi\" and \"ffl\" would not be correctly tracked and subsetted, leading to missing glyphs in the PDF output.",
+      "reference_sha256": "81b99ef5ee54e0cd9b2c8a2782f99f596c62a38f9e776e33613b5ba39221280f",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-dad0d5035ff9e67ef150d1d8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1538,
+            "file_sha256": "b4ad68e20532635f2e1f108c7e154d73e6ade41aac1cc632742cbe723b82f7ac",
+            "path": "lib/matplotlib/lines.py",
+            "start_line": 1499
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where in the AxLine class is the coordinate transformation logic applied to reconcile between data coordinates and display coordinates before computing the line endpoints?",
+      "question_sha256": "6d403b9e6adaaf22480d179183b38ef872d815ddaa99ca78ed5c5e52d2510d6e",
+      "reference_answer": "The coordinate transformation logic that reconciles between data coordinates and display coordinates before computing the line endpoints is applied in the `get_transform()` method of the AxLine class, located at lines 1499-1538 in `lib/matplotlib/lines.py`.\n\nSpecifically, the reconciliation occurs at line 1501:\n```python\npoints_transform = self._transform - ax.transData + ax.transScale\n```\n\nThis line creates a composite transform (`points_transform`) that reconciles the coordinate systems by:\n- Starting with `self._transform` (which may be in various coordinate systems based on user input)\n- Subtracting `ax.transData` (the transform from data coordinates to display coordinates)\n- Adding `ax.transScale` (the transform that handles axis scaling)\n\nThis `points_transform` is then applied to the input coordinates at:\n- Lines 1505-1506: When two points (`xy1` and `xy2`) are provided, both are transformed using `points_transform.transform([self._xy1, self._xy2])`\n- Line 1519: When one point and a slope are provided, the single point is transformed using `points_transform.transform(self._xy1)`\n\nAfter this coordinate reconciliation, the method computes the line endpoints (lines 1521-1536) by finding intersections with the view limits, using the transformed coordinates to determine where the infinite line should start and stop within the visible axes area.\n\nThe `get_transform()` method is called dynamically at draw time (as mentioned in the class docstring), ensuring that the coordinate transformation always reflects the current state of the axes transforms.\n</start_of_answer>",
+      "reference_sha256": "d3568934127fd69caffe439d62c5651db19fa11db4c647060603f091f8dc39b7",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-db94b4129abf44c0751880c9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "1eda2e809789c5ff2615002c56281813243078442f4b63532125212960b0a5da",
+            "kind": "file_reference",
+            "line_count": 767,
+            "path": "lib/matplotlib/streamplot.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the architectural pattern of StreamMask's trajectory recording and rollback mechanism that decouples the concerns of spatial discretization from streamline collision detection, and what architectural implications does this separation have for handling concurrent or adaptive trajectory generation?",
+      "question_sha256": "b65f95f37b3bed0ee423d6168fde5c3b6811fb9b6b797d7a9af293bebb519023",
+      "reference_answer": "The architectural pattern is a **tentative recording with rollback** mechanism that separates trajectory state tracking from spatial collision detection.\n\n**Core Components:**\n\n1. **Trajectory Recording**: The mask class maintains a private list (`_traj`) that records all discrete mask cells visited during streamline integration. When a trajectory starts via `_start_trajectory()`, it initializes an empty list. As the integration progresses, `_update_trajectory()` appends each visited cell coordinate `(ym, xm)` to this list while simultaneously marking that cell as occupied in the spatial mask array (`_mask[ym, xm] = 1`).\n\n2. **Spatial Discretization**: The mask maintains a discrete grid (`_mask`) representing spatial regions. The grid resolution (determined by density parameter, defaulting to 30x30) controls streamline spacing. Each cell can be in one of two states: 0 (unoccupied, available for streamlines) or 1 (occupied, blocked).\n\n3. **Collision Detection**: Collision detection occurs in `_update_trajectory()` by checking if `self[ym, xm] == 0` before allowing a trajectory to enter a cell. If a cell is already occupied and `broken_streamlines=True`, it raises `InvalidIndexError` to terminate the trajectory.\n\n4. **Rollback Mechanism**: The `_undo_trajectory()` method iterates through the recorded trajectory list (`_traj`) and sets `self._mask[t] = 0` for each previously visited cell, effectively rolling back all changes made during that trajectory's integration. This is called when a trajectory is rejected (e.g., when it's shorter than `minlength` in the `integrate()` function at line 556).\n\n**Decoupling Achieved:**\n\nThe decoupling is achieved by maintaining two separate data structures:\n- **`_traj`**: A list that records the sequence of cells visited (trajectory state)\n- **`_mask`**: A 2D array that maintains the committed spatial state (spatial discretization)\n\nThe collision detection logic (checking `_mask` values) is independent of the trajectory recording mechanism (`_traj` list). This allows trajectories to be tentatively recorded and then completely rolled back if rejected, without affecting the spatial state of other trajectories.\n\n**Architectural Benefits:**\n\nThis pattern enables:\n- **Atomic trajectory operations**: A trajectory can be fully integrated, evaluated, and then either committed (by keeping the mask changes) or rolled back (via `_undo_trajectory()`)\n- **Clean separation of concerns**: The spatial discretization grid (`_mask`) serves as the collision detection mechanism, while the trajectory list (`_traj`) serves as the undo log\n- **Support for trajectory rejection**: Short or invalid trajectories can be completely undone without leaving partial state in the mask\n\nThe pattern is implemented in `lib/matplotlib/streamplot.py` in the `StreamMask` class (lines 427-479), with the rollback mechanism at lines 458-461 and trajectory recording at lines 453-456 and 463-478.",
+      "reference_sha256": "587246a76f3ea2ee2397de9c920f0ed09642600ac10a7d74691ea38d24d0cd16",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-dc384d10f392758f98771746"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 3338,
+            "file_sha256": "ae456ebf9c4a4ec1ded6d88029c1ab834c87db91369b3982ee2c027c5b053b68",
+            "path": "lib/matplotlib/backend_bases.py",
+            "start_line": 3336
+          },
+          {
+            "end_line": 529,
+            "file_sha256": "964716ddc10a740490e2f0fa5470545ef6506441af8f9b9e9c2560e1f1e87ff8",
+            "path": "lib/matplotlib/backends/backend_gtk4.py",
+            "start_line": 528
+          },
+          {
+            "end_line": 147,
+            "file_sha256": "45085e08efdc40195a5ac60c6c09acc2ed143ca53b6e62d32392c4160a2d9250",
+            "path": "lib/matplotlib/backend_managers.py",
+            "start_line": 140
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the separation of concerns maintained by the ToolbarGTK4 class between UI state management and event handling through its set_message method within the broader GTK4 backend architecture?",
+      "question_sha256": "74fec7a8c9f23f0fbfef83e838b1de50ca79bc899accd853394668739f101642",
+      "reference_answer": "The separation is: event handling is in the base class (ToolContainerBase), while UI state updates are in the GTK4-specific implementation (ToolbarGTK4.set_message).\n\nEvent handling (ToolContainerBase):\n- In `__init__` (lines 3336-3338 in `backend_bases.py`), it connects to the toolmanager's 'tool_message_event' via `toolmanager.toolmanager_connect('tool_message_event', lambda event: self.set_message(event.message))`.\n- This listens for ToolManagerMessageEvent and routes the message to the UI update method.\n- The base class handles event subscription and routing, not UI updates.\n\nUI state management (ToolbarGTK4.set_message):\n- The method (lines 528-529 in `backend_gtk4.py`) is: `def set_message(self, s): self._message.set_label(s)`.\n- It updates the Gtk.Label (`self._message`) that displays messages in the toolbar.\n- It is a pure UI update with no event handling logic.\n\nArchitecture:\n- ToolManager emits 'tool_message_event' via `message_event()` (lines 140-147 in `backend_managers.py`).\n- ToolContainerBase subscribes to these events and calls `set_message()`.\n- ToolbarGTK4.set_message() updates the visual state.\n\nThis keeps event handling (base class) separate from UI state management (backend-specific implementation), allowing different backends to implement their own UI updates while sharing the same event handling pattern.",
+      "reference_sha256": "356d082fa7a299658310234c847839fce5d8b35155e14fc0a409eeb233c99df9",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-e4b7685a734ffe6530a95c52"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 3480,
+            "file_sha256": "c2adf64628996196a992274308207c30e4e155ecf0653989636f4876d6c571af",
+            "path": "lib/matplotlib/colors.py",
+            "start_line": 3479
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the LightSource class coordinate the transformation of azimuth and elevation angles through the direction property to ensure correct light vector computation across different blend modes that depend on this directional information?",
+      "question_sha256": "87e91d68a23137636c3991045a23781c34913bc8a236b96a34e2dd975382a7d8",
+      "reference_answer": "The class that creates light sources from angular positions (LightSource) transforms angular coordinates through its unit vector property (direction) to compute illumination for color blending methods as follows:\n\n1. **Angular Input Storage**: The class stores azimuth and elevation angles (in degrees) as instance attributes `azdeg` and `altdeg` during initialization (lines 3479-3480 in `lib/matplotlib/colors.py`).\n\n2. **Unit Vector Transformation**: The `direction` property (lines 3486-3497) performs the coordinate transformation:\n   - Converts azimuth from degrees clockwise from North to radians counterclockwise from East: `az = np.radians(90 - self.azdeg)`\n   - Converts elevation to radians: `alt = np.radians(self.altdeg)`\n   - Computes a 3D unit vector: `[np.cos(az) * np.cos(alt), np.sin(az) * np.cos(alt), np.sin(alt)]`\n   This transforms the angular representation into a Cartesian unit vector pointing toward the light source.\n\n3. **Illumination Computation**: The unit vector is used in `shade_normals` (line 3578) to compute illumination intensity via dot product: `intensity = normals.dot(self.direction)`. This calculates how much each surface normal faces the light source, producing values between -1 and 1, which are then normalized to 0-1 range.\n\n4. **Blend Mode Application**: The computed intensity is passed to color blending methods (`blend_hsv`, `blend_overlay`, `blend_soft_light`) in `shade_rgb` (lines 3726-3732). Each blend mode uses this directional illumination information differently:\n   - `blend_hsv` adjusts HSV saturation and value based on intensity (lines 3748-3820)\n   - `blend_overlay` uses overlay blending formula (lines 3841-3859)\n   - `blend_soft_light` uses the \"pegtop\" soft light formula (lines 3822-3839)\n\nThe coordination ensures that all blend modes receive consistent directional information derived from the same angular-to-vector transformation, maintaining correct light vector computation across different blending techniques.",
+      "reference_sha256": "e84c64d34b5ee10f3ac592f66b9cabe52279f26d623d52a842d94c88c6b0e96a",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-ed81278ad36885d8a1106b93"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the architectural separation enforced by the TestLogLocator test suite between the tick locator's core logarithmic computation logic and its integration with matplotlib's axis scaling system, particularly when handling edge cases like polar projections and shared axes?",
+      "question_sha256": "5fab1194df361b0f543e49bf572e57d60be7ab37c9d6c1bb144af57052bf1603",
+      "reference_answer": "The test suite enforces a clear architectural separation between pure computation logic and coordinate system integration in the logarithmic tick placement implementation.\n\n**Core Computation Logic (Pure Logic):**\nThe core computation is implemented in the `tick_values(vmin, vmax)` method, which can operate independently of any axis object. This method:\n- Takes explicit `vmin` and `vmax` parameters directly\n- Performs pure mathematical computation for logarithmic tick placement (calculating decades, strides, offsets, subsampling)\n- Works standalone when `self.axis is None`, using default values (e.g., `numticks=9`)\n- Can optionally query axis information when available (via `self.axis.get_tick_space()`, `self.axis.get_minpos()`) but doesn't require it\n\n**Integration Layer:**\nThe integration with matplotlib's coordinate system is handled through the `__call__()` method, which:\n- Retrieves view intervals from the axis: `vmin, vmax = self.axis.get_view_interval()`\n- Delegates to the core computation: `return self.tick_values(vmin, vmax)`\n- Acts as a bridge between matplotlib's axis abstraction and the pure computation logic\n\n**Edge Case Handling:**\nThe separation allows edge cases to be handled at the integration layer while keeping core logic pure:\n\n1. **Circular coordinate systems (polar axes)**: The test `test_polar_axes` (lines 342-349) verifies that polar axes work correctly. The core `tick_values()` method remains unchanged; the integration layer handles polar-specific view intervals through `get_view_interval()`.\n\n2. **Synchronized axis groups (shared axes)**: The test `test_multiple_shared_axes` (lines 395-406) ensures shared axes maintain synchronized ticks. The integration layer handles this in the `nonsingular()` method (lines 2558-2559) by querying all shared axes: `minpos = min(axis.get_minpos() for axis in self.axis._get_shared_axis())`, while the core computation logic remains independent.\n\n**Test Suite Enforcement:**\nThe test suite enforces this separation by:\n- Testing core logic directly: `test_basic` (lines 330-340) calls `tick_values()` directly with explicit parameters, no axis required\n- Testing integration separately: `test_polar_axes` and `test_multiple_shared_axes` test through actual axis objects\n- This allows the core algorithmic logic to be tested and validated independently from integration concerns\n\nThis architectural pattern ensures the logarithmic computation algorithm can be understood, tested, and potentially reused independently, while integration concerns (axis types, shared axes, view intervals) are handled at a separate layer.",
+      "reference_sha256": "b355343ea6bf489def4e696b9034f3493f8e69a0919a2ce176440ad7ce2551db",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-f24c5d73a319fbd681b7e092"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "193ed41e402d1ed9d97325741b11ed50bf534eb7bd7638bb43aa9ec728b80145",
+            "kind": "file_reference",
+            "line_count": 1010,
+            "path": "lib/matplotlib/backends/backend_pgf.py"
+          },
+          {
+            "file_sha256": "5a519d653873e6e43ec7cf87aa931c0792169988a37e53420bead5360bf3d32c",
+            "kind": "file_reference",
+            "line_count": 402,
+            "path": "lib/matplotlib/tests/test_backend_pgf.py"
+          },
+          {
+            "file_sha256": "676b8be6411fd47db5b7b9b722c19f28a53278f855a666ddac316b1e6b5ac338",
+            "kind": "file_reference",
+            "line_count": 470,
+            "path": "lib/matplotlib/testing/decorators.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where in the codebase are the lower-level helper functions that test_pdflatex delegates to for configuring the PGF backend and rendering the test figure?",
+      "question_sha256": "bf4bc848790dc85cf7eeacef042ff4c5885a7d3f1da451cdffe64981c89eee9d",
+      "reference_answer": "The lower-level helper functions that the PDF LaTeX compilation test delegates to for configuring the LaTeX graphics backend and rendering test figures are located in `./lib/matplotlib/backends/backend_pgf.py`.\n\nThe test function (`test_pdflatex` in `test_backend_pgf.py`) uses the `@image_comparison` decorator, which wraps the test and calls `_ImageComparisonBase.compare()` (in `lib/matplotlib/testing/decorators.py`). This method calls `fig.savefig()`, which triggers the PGF backend's rendering pipeline.\n\nThe main helper functions in `backend_pgf.py` are:\n\n1. **Configuration functions:**\n   - `_get_preamble()` (line 39): Builds the LaTeX preamble from rcParams, including font size settings, custom preamble, and font configuration for the PGF backend.\n\n2. **Rendering functions:**\n   - `_print_pgf_to_fh()` (line 757, method of `FigureCanvasPgf`): Renders the figure to PGF format by creating a pgfpicture environment, initializing a `RendererPgf`, and calling `self.figure.draw(renderer)`.\n   - `print_pgf()` (line 813): Wraps `_print_pgf_to_fh()` and handles file I/O.\n   - `print_pdf()` (line 823): Compiles the PGF output to PDF using the configured LaTeX system (pdflatex, xelatex, or lualatex).\n\n3. **Rendering helper functions:**\n   - `_writeln()` (line 96): Writes lines to the file handle with proper TeX formatting (appends `%\\n` to prevent spurious spaces).\n   - `_escape_and_apply_props()` (line 103): Escapes text for LaTeX and applies font properties (family, size, style, weight) as TeX commands.\n   - `_metadata_to_str()` (line 148): Converts metadata key-value pairs to hyperref-compatible format.\n\n4. **Renderer class methods:**\n   - `RendererPgf` (line 366): The renderer that translates drawing instructions into PGF commands. Methods include:\n     - `_print_pgf_clip()` (line 478): Handles clipping rectangles and paths\n     - `_print_pgf_path_styles()` (line 498): Sets line styles, colors, opacity, and dash patterns\n     - `_print_pgf_path()` (line 549): Converts matplotlib paths to PGF path commands\n     - `draw_path()`, `draw_text()`, `draw_image()`, etc.: Render different figure elements\n\n5. **LaTeX management:**\n   - `LatexManager` (line 198): Manages the LaTeX subprocess for text metrics. Methods include:\n     - `_build_latex_header()` (line 206): Constructs the LaTeX document header\n     - `get_width_height_descent()` (line 311): Gets text metrics from LaTeX\n\nThe flow is: test function \u2192 `@image_comparison` decorator \u2192 `fig.savefig()` \u2192 `FigureCanvasPgf.print_pdf()` \u2192 `print_pgf()` \u2192 `_print_pgf_to_fh()` \u2192 `RendererPgf` methods \u2192 helper functions like `_get_preamble()`, `_writeln()`, and `_escape_and_apply_props()`.",
+      "reference_sha256": "ede6a11f7b686d637eb6be6f9fc286746239d2b3b49b74c46236e61c60ff7200",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-fee4ece64bcde6a3a67c6001"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/matplotlib--matplotlib-a5e1f6086e92",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 503,
+            "file_sha256": "b18a9752c160b21d99ff7d085ec7566cba4ce8d53eac552dc9a36bba46c0da4e",
+            "path": "lib/matplotlib/text.py",
+            "start_line": 454
+          },
+          {
+            "end_line": 1338,
+            "file_sha256": "b4b9c3ed8c666554c1817726ce0bf127628174d7ef8594a68c07d4c1560f0fdd",
+            "path": "lib/matplotlib/axis.py",
+            "start_line": 1333
+          },
+          {
+            "end_line": 1422,
+            "file_sha256": "b4b9c3ed8c666554c1817726ce0bf127628174d7ef8594a68c07d4c1560f0fdd",
+            "path": "lib/matplotlib/axis.py",
+            "start_line": 1400
+          },
+          {
+            "end_line": 1408,
+            "file_sha256": "b4b9c3ed8c666554c1817726ce0bf127628174d7ef8594a68c07d4c1560f0fdd",
+            "path": "lib/matplotlib/axis.py",
+            "start_line": 1407
+          },
+          {
+            "end_line": 1389,
+            "file_sha256": "b4b9c3ed8c666554c1817726ce0bf127628174d7ef8594a68c07d4c1560f0fdd",
+            "path": "lib/matplotlib/axis.py",
+            "start_line": 1340
+          },
+          {
+            "end_line": 1359,
+            "file_sha256": "b4b9c3ed8c666554c1817726ce0bf127628174d7ef8594a68c07d4c1560f0fdd",
+            "path": "lib/matplotlib/axis.py",
+            "start_line": 1359
+          },
+          {
+            "end_line": 2248,
+            "file_sha256": "b4b9c3ed8c666554c1817726ce0bf127628174d7ef8594a68c07d4c1560f0fdd",
+            "path": "lib/matplotlib/axis.py",
+            "start_line": 2227
+          },
+          {
+            "end_line": 2245,
+            "file_sha256": "b4b9c3ed8c666554c1817726ce0bf127628174d7ef8594a68c07d4c1560f0fdd",
+            "path": "lib/matplotlib/axis.py",
+            "start_line": 2245
+          },
+          {
+            "end_line": 1004,
+            "file_sha256": "c01ea6c0d6bdda5b732014b6d19ac85d772fab1a1ad288c3a25b0f57cfe6df7e",
+            "path": "lib/matplotlib/axes/_base.py",
+            "start_line": 979
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "b18a9752c160b21d99ff7d085ec7566cba4ce8d53eac552dc9a36bba46c0da4e",
+            "kind": "file_reference",
+            "line_count": 2075,
+            "path": "lib/matplotlib/text.py"
+          },
+          {
+            "file_sha256": "b4b9c3ed8c666554c1817726ce0bf127628174d7ef8594a68c07d4c1560f0fdd",
+            "kind": "file_reference",
+            "line_count": 2828,
+            "path": "lib/matplotlib/axis.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where is the logic that determines how ticklabel offsets are calculated based on vertical and horizontal alignment properties, and which methods invoke this calculation during the rendering pipeline?",
+      "question_sha256": "b63336bf860805a79a4d82ed7bb81169eacf47c54ad83cdd4c66fef3ee8d6af4",
+      "reference_answer": "The logic that calculates ticklabel offsets based on vertical and horizontal alignment properties is located in the `get_window_extent` method of the `Text` class in `lib/matplotlib/text.py`, specifically in lines 454-503.\n\nThe core calculation occurs within `get_window_extent` where it computes `offsetx` and `offsety` based on the text's horizontal alignment (`halign`) and vertical alignment (`valign`) properties:\n\n```454:503:lib/matplotlib/text.py\n        halign = self._horizontalalignment\n        valign = self._verticalalignment\n\n        rotation_mode = self.get_rotation_mode()\n        if rotation_mode != \"anchor\":\n            angle = self.get_rotation()\n            if rotation_mode == 'xtick':\n                halign = self._ha_for_angle(angle)\n            elif rotation_mode == 'ytick':\n                valign = self._va_for_angle(angle)\n            # compute the text location in display coords and the offsets\n            # necessary to align the bbox with that location\n            if halign == 'center':\n                offsetx = (xmin + xmax) / 2\n            elif halign == 'right':\n                offsetx = xmax\n            else:\n                offsetx = xmin\n\n            if valign == 'center':\n                offsety = (ymin + ymax) / 2\n            elif valign == 'top':\n                offsety = ymax\n            elif valign == 'baseline':\n                offsety = ymin + descent\n            elif valign == 'center_baseline':\n                offsety = ymin + height - baseline / 2.0\n            else:\n                offsety = ymin\n```\n\nThis method adjusts the bounding box position by subtracting these offsets (lines 507-508), effectively positioning the text according to its alignment properties.\n\nDuring the rendering pipeline, this calculation is invoked through the following call chain:\n\n1. **`_get_ticklabel_bboxes`** (in `lib/matplotlib/axis.py`, line 1333-1338): This method calls `get_window_extent` on each tick label's `label1` and `label2` text objects:\n```1333:1338:lib/matplotlib/axis.py\n    def _get_ticklabel_bboxes(self, ticks, renderer):\n        \"\"\"Return lists of bboxes for ticks' label1's and label2's.\"\"\"\n        return ([tick.label1.get_window_extent(renderer)\n                 for tick in ticks if tick.label1.get_visible()],\n                [tick.label2.get_window_extent(renderer)\n                 for tick in ticks if tick.label2.get_visible()])\n```\n\n2. **`draw`** (in `lib/matplotlib/axis.py`, line 1400-1422): The main rendering method calls `_get_ticklabel_bboxes` at line 1408 to get bounding boxes before drawing:\n```1407:1408:lib/matplotlib/axis.py\n        ticks_to_draw = self._update_ticks()\n        tlb1, tlb2 = self._get_ticklabel_bboxes(ticks_to_draw, renderer)\n```\n\n3. **`get_tightbbox`** (in `lib/matplotlib/axis.py`, line 1340-1389): Called during layout calculations, it invokes `_get_ticklabel_bboxes` at line 1359:\n```1359:1359:lib/matplotlib/axis.py\n        tlb1, tlb2 = self._get_ticklabel_bboxes(ticks_to_draw, renderer)\n```\n\n4. **`_get_tick_boxes_siblings`** (in `lib/matplotlib/axis.py`, line 2227-2248): Used for aligning labels across multiple axes, it calls `_get_ticklabel_bboxes` on sibling axes at line 2245:\n```2245:2245:lib/matplotlib/axis.py\n            tlb, tlb2 = axis._get_ticklabel_bboxes(ticks_to_draw, renderer)\n```\n\nThe alignment properties themselves are set when tick labels are initialized through the `_get_text1_transform` and `_get_text2_transform` methods (in `lib/matplotlib/axis.py`), which retrieve alignment values from `get_xaxis_text1_transform` and `get_yaxis_text1_transform` in `lib/matplotlib/axes/_base.py` (lines 979-1004 and 1061-1086). These methods return the vertical and horizontal alignment values along with the transform, which are then applied to the tick label text objects.",
+      "reference_sha256": "c79fa6aed4afd0a1ae390603780c6dd2ca11fc02a13de4d52ae5a5e7ab21959b",
+      "repository": {
+        "commit": "a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+        "family_id": "matplotlib/matplotlib",
+        "url": "https://github.com/matplotlib/matplotlib"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/matplotlib--matplotlib-a5e1f6086e92d5cc0a23f85685d03d85b89a8395",
+      "task_id": "import-ff92be4e5f68ed7fd1bd2c84"
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-068.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "3e23ae91880ff6264d201074365e3241c84eed959c0db0d0a07f6bf594a41ca8",
+      "question": "Where does the MRO in the enum class inheriting from both a non-enum mixin and the standard enum base affect which data attributes from the non-enum mixin are accessible versus shadowed by the standard enum base's internal mechanisms?",
+      "question_sha256": "1458be3dafb4e6ce11a6e2a7ac27e8a995949ff533298465cce60ea600060f56",
+      "reference_answer": "_filter_enum_dict walks nontrivial parents in MRO order, collects eligible names, and queries their actual value on enum_class (sphinx/ext/autodoc/importer.py:130-149). It excludes native Enum names unless a candidate was found in a mixin/data type (sphinx/ext/autodoc/importer.py:151-160). This preserves eligible mixin overrides for documentation; it does not alter Python's runtime MRO or prevent shadowing itself. Runtime lookup has already selected the value returned by attrgetter.",
+      "reference_sha256": "bcb3aa9521f0e9fa969d98efabbf7d7314affe0b42842e7f36cab5bc906e6d28",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-c2f8736c27259528da652f3b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "90ac97851bbab0ff6f7b6c76935d2f9346155c99aa3f24beebd30331ce0479fc",
+      "question": "Why would removing the inherited greeting method from the enum mixin class affect the method resolution order for classes depending on its documented behavior in the automated documentation test suite?",
+      "question_sha256": "399ef76ec0440c18ae6820b9f940cf7bfdd08747da6d67ebdf7396e3b3a8d6fc",
+      "reference_answer": "Greeter defines say_hello with the inherited docstring, and EnumClassWithMixinTypeInherit inherits it (tests/roots/test-ext-autodoc/target/enums.py:80-105); further enum fixtures also inherit Greeter. Removing that method would leave it absent for descendants without overrides and change inherited-member documentation. It does not change their MRO or break the inheritance chain: the same ordered classes are searched, but Greeter no longer supplies that name.",
+      "reference_sha256": "12b7f0a5c4682c1d7eb873285da7d8e8ddd583d0276ee7ae9a4efab0644d21cf",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-cf44ec3f13ea25c152faad43"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "4d830632acd13c59c5c97493bd17da69f8a599530c0ed9e41b7077c78bb3c4cd",
+      "question": "What is the integration mechanism between the test function that validates glossary term reference consistency and the translation processing transform system?",
+      "question_sha256": "58eebbc2ee7662bb201b4cf00c63a10577ada18c58d825d19f552cbb5c94f3f3",
+      "reference_answer": "The build test checks translated output and an i18n.inconsistent_references warning listing original and translated term sources (tests/test_intl/test_intl.py:345-365). _NodeUpdater.update_pending_xrefs gathers all pending_xref nodes in original and translated content and compares counts (sphinx/transforms/i18n.py:338-351); compare_references warns on unequal lengths unless noqa (sphinx/transforms/i18n.py:131-147). The std/term special case occurs afterward in reference-key mapping (sphinx/transforms/i18n.py:353-376), not as a filter on the counted references.",
+      "reference_sha256": "46f8dc9a92a43e3645c8b0161b5547d8e6159c35d891f04cd80ecbc1da8d2b1a",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-d610f8d6b01ec25ced763be9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "05869a2c012bc6055d8e179d6260be3a99cc6ce6f2b270012d7993b9ed921c25",
+      "question": "What is the algorithmic approach used by the test function that validates parsing of type delimiters in Napoleon-style docstrings to correctly nest and structure document tree nodes for types representing multiple possible values?",
+      "question_sha256": "75780f5c77a46bb40ee7c9aa147e1ab01f587df69ad5c720e84beca37f57e65e",
+      "reference_answer": "These tests supply reStructuredText :param: and :type: fields directly to restructuredtext.parse, including list of str and str or float or int (tests/test_domains/test_domain_py_fields.py:395-405,441-451). PyXrefMixin.make_xrefs splits type targets by delimiter regex, preserves delimiters, and creates cross-references for type names (sphinx/domains/python/_object.py:110-139). The tests assert the resulting parameter/type node sequence and nesting (tests/test_domains/test_domain_py_fields.py:408-436). They validate Napoleon-style delimiter support in Python-domain fields, not a mandatory preceding Napoleon tokenizer execution.",
+      "reference_sha256": "ca35c6198a76f7aa9cb04c9ce3e11ab89a5a7d119dbcfdad5ce6409730f88e5a",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e7628fedacb9831e50931b53"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "original_reference_sha256": "35b4e4422c696e24d020a65717bf578340e8c67ee511cc4f86272d92d78ee7cb",
+      "question": "What is the dependency of the hash implementation in the C++ postfix member-of-pointer operator AST node class on the nested name attribute's hashability?",
+      "question_sha256": "d7cdfc329db51d2c9f3f66a4e594cac74033c09b160c05e7b209e3e08ce72326",
+      "reference_answer": "ASTPostfixMemberOfPointer.__hash__ delegates to hash(self.name) (sphinx/domains/cpp/_ast.py:774-785). ASTNestedName stores names and templates as supplied lists and attempts hash((self.names, self.templates, self.rooted)) (sphinx/domains/cpp/_ast.py:217-237). With those ordinary lists, hashing raises TypeError even if every element is hashable. Thus the delegation exposes a real hashability limitation in this pin; defining __hash__ alone does not make these instances successfully hashable.",
+      "reference_sha256": "d6aa640649b3da9ebe23a7ba8a1b18c0ae38f53c58cf280614457721319f3d9c",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e85fccc0f30798376009433e"
+    }
+  ]
+}

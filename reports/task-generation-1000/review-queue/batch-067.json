@@ -1,0 +1,590 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 160,
+            "file_sha256": "deb092ba56a25412d5e7cd7f5ee59e3f1d77e11a7965c6419d866b6fd570d0ad",
+            "path": "sphinx/pycode/__init__.py",
+            "start_line": 136
+          },
+          {
+            "end_line": 486,
+            "file_sha256": "1ebf008bc7331ea452abaf86242f63c6c113bc0f5a6fd6ee64389648c001bb6d",
+            "path": "sphinx/pycode/parser.py",
+            "start_line": 234
+          },
+          {
+            "end_line": 563,
+            "file_sha256": "1ebf008bc7331ea452abaf86242f63c6c113bc0f5a6fd6ee64389648c001bb6d",
+            "path": "sphinx/pycode/parser.py",
+            "start_line": 489
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "1ebf008bc7331ea452abaf86242f63c6c113bc0f5a6fd6ee64389648c001bb6d",
+            "kind": "file_reference",
+            "line_count": 602,
+            "path": "sphinx/pycode/parser.py"
+          },
+          {
+            "file_sha256": "5d046eded94ab4e463e30686fdc8d0039a1032bcaa4b815d8d61f3e570d7dc99",
+            "kind": "file_reference",
+            "line_count": 417,
+            "path": "sphinx/ext/viewcode.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where would the source code analysis process determine whether a function with no parameters, calls, or control flow statements serves as an actual execution component or merely a documentation-only element in the module's code processing workflow?",
+      "question_sha256": "ae6ca1c1fcd79b01da3f3f5e7bc78e0812a7f1f9107ab5fe5a5616551d5c79d8",
+      "reference_answer": "The source code analysis process that determines whether a function with no parameters, calls, or control flow statements serves as an actual execution component or merely a documentation-only element occurs in the **`ModuleAnalyzer.analyze()` method** located in `sphinx/pycode/__init__.py` (lines 136-160).\n\nThis analysis happens through the following components:\n\n1. **Primary Analysis Location**: The `ModuleAnalyzer.analyze()` method (line 136) calls `Parser.parse()` (line 142-143) from `sphinx/pycode/parser.py`, which performs the actual code parsing and analysis.\n\n2. **Function Definition Detection**: The `Parser` class uses two main components:\n   - **`VariableCommentPicker`** (lines 234-486 in `parser.py`): An AST visitor that processes function definitions via `visit_FunctionDef()` (line 468), which visits function nodes and their bodies but doesn't distinguish between empty and non-empty functions.\n   - **`DefinitionFinder`** (lines 489-563 in `parser.py`): A token-based parser that locates function definitions via `parse_definition('def')` (line 525-526) and records their locations in `self.definitions`.\n\n3. **Usage Tracking**: The distinction between execution components and documentation-only elements is tracked in the **`viewcode` extension** (`sphinx/ext/viewcode.py`). The `has_tag()` function (lines 120-147) uses `ModuleAnalyzer.find_tags()` to locate functions and maintains a `used` dictionary (line 144) that tracks which functions are actually referenced in documentation. Functions present in `tags` but not in `used` would be considered documentation-only.\n\n4. **Analysis Flow**: When `ModuleAnalyzer.analyze()` is called:\n   - It creates a `Parser` instance with the source code (line 142)\n   - The parser uses AST parsing to visit function definitions (via `VariableCommentPicker.visit_FunctionDef()`)\n   - It uses token-based parsing to find definition locations (via `DefinitionFinder.parse()`)\n   - The results are stored in `self.tags` (function definitions) and `self.tagorder` (definition order)\n   - The `viewcode` extension then tracks which of these functions are actually \"used\" (referenced) vs just defined\n\nThe actual determination of whether a function is an execution component or documentation artifact would occur when the analysis results are consumed by extensions like `viewcode`, which tracks function usage through the `used` dictionary. An empty function (with no parameters, calls, or control flow) that appears in `tags` but is never referenced would be treated as documentation-only, while one that is referenced would be considered part of the execution workflow.",
+      "reference_sha256": "963a6c83c99cf690919a165dbaf368e91749b5870f088052dbb323dd4bb2fdc5",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-8a1b4bc29f4fbb3746430985"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 224,
+            "file_sha256": "98d1d93ad2560aed528904e5bd01dfcbe92ef7ee9abee30f407cdb8ef26d297a",
+            "path": "sphinx/domains/python/__init__.py",
+            "start_line": 216
+          },
+          {
+            "end_line": 434,
+            "file_sha256": "22b9a3056e87209730b55755104d72e9982030812dcd0e283aa279c12da6d18b",
+            "path": "sphinx/domains/python/_object.py",
+            "start_line": 434
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "d64d5b13d390d1b7d3ddb1e7dca43fc6607a2afff73ab6c10ca6f787f2faf86a",
+            "kind": "file_reference",
+            "line_count": 239,
+            "path": "sphinx/locale/__init__.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the interaction mechanism between the conditional logic that checks the object type attribute in the index text generation method and the translation system that produces semantically different index entries for class-like objects in the Python documentation domain?",
+      "question_sha256": "c7afaae2f94d1fdea5d6e9f775458b01dd4c04ce4d27f5c60ede5842173651c0",
+      "reference_answer": "The interaction mechanism works as follows:\n\nIn the Python domain, the `PyClasslike` class (used for both `class` and `exception` directives) implements `get_index_text()` with conditional logic based on `self.objtype` (lines 216-224 in `sphinx/domains/python/__init__.py`):\n\n```python\ndef get_index_text(self, modname: str, name_cls: tuple[str, str]) -> str:\n    if self.objtype == 'class':\n        if not modname:\n            return _('%s (built-in class)') % name_cls[0]\n        return _('%s (class in %s)') % (name_cls[0], modname)\n    elif self.objtype == 'exception':\n        return name_cls[0]\n    else:\n        return ''\n```\n\nThe internationalization system uses `_()` from `sphinx.locale` (defined in `sphinx/locale/__init__.py`), which is a translation function that returns a `_TranslationProxy` object. When converted to string (during index generation), it calls the translator's `gettext()` method to produce localized text based on the configured language.\n\nThe semantic difference:\n- For `objtype == 'class'`: The method returns internationalized strings like \"MyClass (class in mymodule)\" or \"MyClass (built-in class)\", which are translatable and provide contextual information\n- For `objtype == 'exception'`: The method returns just the bare name \"MyException\" without internationalization or context\n\nThis conditional logic means that classes get descriptive, translatable index entries that include module context, while exceptions get minimal, non-translatable entries. The interaction occurs when `add_target_and_index()` calls `get_index_text()` (line 434 in `sphinx/domains/python/_object.py`) and appends the result to `self.indexnode['entries']`, where the translation proxy is converted to a string based on the current language setting.\n</start_of_answer>",
+      "reference_sha256": "480217ecedac31f5942969c6aab9caf284efc8a0522efa9f9e9c372aa41741fa",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-8fadaa46ebcbc01e44c5e1a0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 98,
+            "file_sha256": "4ae5190b0601ffb5bb53d8cc4a3af6b7b137ea127e50504b42a4d46ac9aa5f49",
+            "path": "sphinx/highlighting.py",
+            "start_line": 98
+          },
+          {
+            "end_line": 247,
+            "file_sha256": "1b2e710f461933ff0f5ad94e0211b470381e3028f99c284c43eeee881b0d85c6",
+            "path": "sphinx/builders/html/__init__.py",
+            "start_line": 247
+          },
+          {
+            "end_line": 276,
+            "file_sha256": "3a79fbb660206118bd1e26f3c3da66a89b5e64bc4805a9527d5e3bd8ab00efa1",
+            "path": "sphinx/builders/latex/__init__.py",
+            "start_line": 276
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the formatter-returning method in the highlighting bridge class select which formatter class to instantiate based on the destination format?",
+      "question_sha256": "a42e84d6e9cc2f9c1115eda8fb870f9538fa0aae8e623d742a4b40b9a258b51b",
+      "reference_answer": "The formatter selection happens during initialization of the highlighting bridge class, not directly in the formatter-returning method. The method itself instantiates the formatter class that was already selected.\n\n**Location and Structure:**\nThe highlighting bridge class is defined in `sphinx/highlighting.py` at line 98. It has two class attributes that define the available formatters:\n- `html_formatter = HtmlFormatter[str]` (line 101)\n- `latex_formatter = LatexFormatter[str]` (line 102)\n\n**Selection Mechanism:**\nDuring `__init__` (lines 104-119), the class receives a `dest` parameter (destination format) with a default value of `'html'`. The selection logic is:\n\n```python\nif dest == 'html':\n    self.formatter: type[Formatter[str]] = self.html_formatter\nelse:\n    self.formatter = self.latex_formatter\n    self.formatter_args['commandprefix'] = 'PYG'\n```\n\nIf `dest == 'html'`, it assigns `self.html_formatter` (which is `HtmlFormatter`) to `self.formatter`. Otherwise, it assigns `self.latex_formatter` (which is `LatexFormatter`) to `self.formatter`. For LaTeX, it also adds a `commandprefix` argument set to `'PYG'`.\n\n**The get_formatter Method:**\nThe formatter-returning method (lines 132-134) does not perform the selection itself. It instantiates the formatter class that was already selected during initialization:\n\n```python\ndef get_formatter(self, **kwargs: Any) -> Formatter[str]:\n    kwargs.update(self.formatter_args)\n    return self.formatter(**kwargs)\n```\n\nIt merges any provided keyword arguments with the pre-configured `formatter_args` (which includes the style and, for LaTeX, the commandprefix), then instantiates and returns the formatter class stored in `self.formatter`.\n\n**Usage in the Codebase:**\n- HTML builders instantiate it with `PygmentsBridge('html', style)` (see `sphinx/builders/html/__init__.py` line 247)\n- LaTeX builders instantiate it with `PygmentsBridge('latex', self.config.pygments_style)` (see `sphinx/builders/latex/__init__.py` line 276)\n\nThe determination is made once during object initialization based on the destination format string, and the formatter-returning method simply creates an instance of the pre-selected formatter class.",
+      "reference_sha256": "1c22944ab2a17a9b00e2dd776b02efaa801e5a2df74d7267cdcb05f169d3e4b2",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-93990936cb40a5b0c2b44781"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 233,
+            "file_sha256": "84e67b529f86d7c25c3ca1fd1c56dd2374306d0aa179f29ef6829e349a1c31a0",
+            "path": "sphinx/util/cfamily.py",
+            "start_line": 230
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the equality comparison method in the class representing user-defined parenthesized attributes implement guard clauses to handle type mismatches before performing equality comparison?",
+      "question_sha256": "2b93a0bad398169e13fc465f2fc7872d7558b47307ed420ed6018e1c66ca500e",
+      "reference_answer": "The equality comparison method in the class representing user-defined parenthesized attributes (`ASTParenAttribute`) implements guard clauses using an `isinstance` type check before performing the actual equality comparison.\n\nLocated in `sphinx/util/cfamily.py` at lines 230-233, the `__eq__` method implementation is:\n\n```python\ndef __eq__(self, other: object) -> bool:\n    if not isinstance(other, ASTParenAttribute):\n        return NotImplemented\n    return self.id == other.id and self.arg == other.arg\n```\n\nThe guard clause is the `if not isinstance(other, ASTParenAttribute): return NotImplemented` statement on lines 231-232. This guard clause:\n\n1. **Checks type compatibility first**: Before attempting any attribute access or comparison, it verifies that the `other` parameter is an instance of `ASTParenAttribute` using Python's `isinstance()` function.\n\n2. **Returns `NotImplemented` for type mismatches**: If the type check fails (i.e., `other` is not an `ASTParenAttribute` instance), the method immediately returns `NotImplemented` rather than raising an error or performing invalid comparisons. This follows Python's standard protocol for rich comparison methods, allowing the interpreter to try the reflected operation (e.g., `other.__eq__(self)`) or fall back to default behavior.\n\n3. **Prevents attribute access errors**: By checking the type first, the guard clause ensures that the subsequent code (`self.id == other.id and self.arg == other.arg`) only executes when `other` is guaranteed to have the `id` and `arg` attributes, preventing `AttributeError` exceptions.\n\n4. **Enables safe equality comparison**: Only after the guard clause passes (when `other` is confirmed to be an `ASTParenAttribute` instance) does the method proceed to compare the `id` and `arg` attributes of both objects.\n\nThis pattern is consistent with other attribute classes in the same file (e.g., `ASTIdAttribute` at line 208-211, `ASTCPPAttribute` at line 146-149), all of which use the same guard clause pattern with `isinstance` checks and `NotImplemented` returns for type mismatches.",
+      "reference_sha256": "901be28ada9910c9a0cbc8a43b341ef0926b3cc73354ee0c9eb8b7c5028ac24e",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-96e05f6078a9243ca7183ae5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 896,
+            "file_sha256": "8d35613a91d8f19a84c8a41806dc6f992e4878448325405f613d31954c73902e",
+            "path": "sphinx/util/docutils.py",
+            "start_line": 837
+          },
+          {
+            "end_line": 75,
+            "file_sha256": "ea06366a6d7755c53605d5e6031fe370cb95939d51c5ae3db5885bcfdaa421b7",
+            "path": "sphinx/testing/util.py",
+            "start_line": 31
+          },
+          {
+            "end_line": 894,
+            "file_sha256": "8d35613a91d8f19a84c8a41806dc6f992e4878448325405f613d31954c73902e",
+            "path": "sphinx/util/docutils.py",
+            "start_line": 894
+          },
+          {
+            "end_line": 46,
+            "file_sha256": "4bf9c6c295663e3efeff0b2697290b074c8f27f18c0c20681d2cdffd567b2bfe",
+            "path": "sphinx/testing/restructuredtext.py",
+            "start_line": 35
+          },
+          {
+            "end_line": 55,
+            "file_sha256": "ea06366a6d7755c53605d5e6031fe370cb95939d51c5ae3db5885bcfdaa421b7",
+            "path": "sphinx/testing/util.py",
+            "start_line": 34
+          },
+          {
+            "end_line": 879,
+            "file_sha256": "4d4ee932b3f08a1ee5a52fd4c8568bbf07bcd7e7f46c165654070426090f997e",
+            "path": "tests/test_domains/test_domain_py.py",
+            "start_line": 850
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "4bf9c6c295663e3efeff0b2697290b074c8f27f18c0c20681d2cdffd567b2bfe",
+            "kind": "file_reference",
+            "line_count": 46,
+            "path": "sphinx/testing/restructuredtext.py"
+          },
+          {
+            "file_sha256": "4d4ee932b3f08a1ee5a52fd4c8568bbf07bcd7e7f46c165654070426090f997e",
+            "kind": "file_reference",
+            "line_count": 1808,
+            "path": "tests/test_domains/test_domain_py.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why would repeated calls to the reStructuredText parsing function that performs full document transformation cycles and multiple recursive tree validation assertions impact test execution performance when scaling across hundreds of similar domain parsing scenarios?",
+      "question_sha256": "cf6b123c768b369eea1febf23bc91d828ca533fce5b1a17bc55566e5b9df5ba3",
+      "reference_answer": "Repeated calls to the reStructuredText parsing function and multiple recursive tree validation assertions impact test execution performance when scaling across hundreds of similar domain parsing scenarios due to several compounding factors:\n\n**1. Full Document Transformation Cycles in Each Parse Call**\n\nEach call to `restructuredtext.parse()` (implemented in `sphinx/testing/restructuredtext.py`) performs a complete parsing and transformation cycle:\n\n- **Parser Creation**: Creates a new `RSTParser` instance and configures it with the application's config, environment, and registry\n- **Document Creation**: Creates a new `nodes.document` with a new `LoggingReporter` and settings\n- **Transformer Setup**: Creates a new `SphinxTransformer` instance and adds all registered transforms (reader transforms, domain-specific transforms, and parser transforms)\n- **Full Parsing**: Calls `parser.parse(content, document)` to build the document tree\n- **Transform Application**: Executes `transformer.apply_transforms()`, which runs all registered transforms sequentially\n\nThe `_parse_str_to_doctree()` function (in `sphinx/util/docutils.py:837-896`) shows that each parse operation:\n- Sets up the entire document infrastructure\n- Parses the content into an abstract syntax tree\n- Applies all transforms (which can include domain processing, reference resolution, and other expensive operations)\n\n**2. Recursive Tree Traversal in Assertions**\n\nThe `assert_node()` function (in `sphinx/testing/util.py:31-75`) recursively traverses document trees to validate structure:\n\n- **Recursive Validation**: When checking lists or tuples of expected nodes, it recursively calls itself on child nodes, traversing the entire subtree\n- **Multiple Traversals**: Each `assert_node()` call may traverse the same tree structure multiple times (once for type checking, once for attribute validation, and recursively for child nodes)\n- **No Caching**: There's no memoization or caching of validation results, so identical tree structures are validated repeatedly\n\n**3. Scaling Effects**\n\nWhen scaled to hundreds of similar domain parsing scenarios:\n\n- **Linear Multiplication**: Each test case calls `restructuredtext.parse()` at least once, and often multiple times (as seen in `tests/test_domains/test_domain_py.py` where tests call it 3-4 times per test function)\n- **Cumulative Transform Cost**: Each parse applies all transforms, even for similar inputs. Domain-specific transforms (like Python domain processing) run for every parse, regardless of whether the input is similar to previous parses\n- **Redundant Tree Traversals**: Multiple `assert_node()` calls per test (often 3-10+ calls per test function) traverse overlapping tree structures repeatedly\n- **No Shared State Optimization**: Each parse creates fresh document and transformer instances, preventing reuse of parsed structures or cached transform results\n\n**4. Specific Performance Bottlenecks**\n\nFrom the code analysis:\n\n- **Transform Application** (`sphinx/util/docutils.py:894`): `transformer.apply_transforms()` runs all registered transforms sequentially, which can include expensive operations like domain object resolution, cross-reference processing, and index generation\n- **Environment State Management** (`sphinx/testing/restructuredtext.py:35-46`): Each parse updates `env.current_document.docname`, which may trigger environment state checks\n- **Recursive Assertion Overhead** (`sphinx/testing/util.py:34-55`): The recursive nature of `assert_node()` means that validating a tree with N nodes may require O(N) or more operations, and this is repeated for each assertion call\n\n**Example from Test Code**\n\nIn `tests/test_domains/test_domain_py.py:850-879`, a single test function calls `restructuredtext.parse()` three times and `assert_node()` six times. When this pattern is repeated across hundreds of similar domain parsing scenarios, the cumulative cost becomes significant because:\n- Each parse does full transformation work\n- Each assertion traverses tree structures\n- There's no batching or optimization for similar inputs\n\nThe performance impact is therefore due to the combination of expensive per-call operations (full parsing and transformation) and repeated tree traversals (multiple assertions per test), which compound linearly when scaling to hundreds of test scenarios.",
+      "reference_sha256": "e37683572622b2274c3e443e270b7c71459ceb59dc43308cedd2800bbdcdb12f",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-9802de50f1c951e1213e045a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 87,
+            "file_sha256": "b555197434dabf3463dba155c14a6f90443d5a5bc2b3de430609fbde04714ff7",
+            "path": "doc/extdev/markupapi.rst",
+            "start_line": 85
+          },
+          {
+            "end_line": 90,
+            "file_sha256": "cd48b0d8a198ca2a164fd6a421ee50ac8a40bea0e9742b26a278f11c8faa903c",
+            "path": "doc/development/tutorials/extending_syntax.rst",
+            "start_line": 90
+          },
+          {
+            "end_line": 25,
+            "file_sha256": "dfb0ed006097cd0ceeb09931d5926063b2de8af9a158a49c81b611ce85da9aeb",
+            "path": "doc/development/tutorials/examples/helloworld.py",
+            "start_line": 23
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the contract established by the return value of the required method in the tutorial example directive class between the directive implementation and the document tree processing pipeline?",
+      "question_sha256": "b5ace5551e453d3961d7b3faf2a6762a7e597921e15fc1f87537f23d0f0c3653",
+      "reference_answer": "The contract established by the return value of the `run` method in `HelloDirective` (and all directives) is that it must return a list of block-level docutils nodes that will be inserted into the document tree at the point where the directive was encountered, and these nodes will be processed by Sphinx's document tree processing pipeline.\n\nSpecifically, the contract requires:\n\n1. **Return type**: The method must return `list[nodes.Node]` (or `list[Node]`), containing block-level docutils nodes. This is documented in `doc/extdev/markupapi.rst` (lines 85-87): \"This method must process the directive arguments, options and content, and return a list of Docutils/Sphinx nodes that will be inserted into the document tree at the point where the directive was encountered.\"\n\n2. **Node level constraint**: The nodes must be block-level nodes (not inline nodes), as stated in `doc/development/tutorials/extending_syntax.rst` (line 90): \"returns a list of block-level docutils nodes to be processed by Sphinx.\" This is because directives are block-level elements in reStructuredText, and the document tree structure requires that block-level nodes (like paragraphs, sections, tables) be children of the document node, while inline nodes (like text, emphasis) must be children of block-level nodes.\n\n3. **Insertion point**: The returned nodes are inserted into the document tree at the exact location where the directive was encountered during parsing, replacing the directive invocation in the AST.\n\n4. **Processing guarantee**: Once inserted, these nodes become part of the document tree and will be processed by Sphinx's pipeline, including:\n   - Transform phases (post-transforms, etc.)\n   - Builder-specific processing\n   - Cross-reference resolution\n   - Output generation (HTML, LaTeX, etc.)\n\nIn the `HelloDirective` example (`doc/development/tutorials/examples/helloworld.py`, lines 23-25), the implementation returns `[paragraph_node]`, which is a single block-level paragraph node. This node will be inserted into the document tree and processed like any other content node.\n\nThis contract ensures that directive implementations can reliably contribute structured content to the document tree, and that Sphinx's processing pipeline can handle all nodes uniformly, regardless of whether they originated from standard reStructuredText markup or custom directives.",
+      "reference_sha256": "37f1c2d7fbc5efbe80187ffcdd98aae7d4ba413e9f53b9a1c1e16922f4a08c76",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-9af5bd08ca046158c470a2b2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2200,
+            "file_sha256": "6cf8d4574006c7c3fddf7c28a361703575497b5054b5e7b92df73de1381f3286",
+            "path": "sphinx/writers/latex.py",
+            "start_line": 2200
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "3c77fd12895eb063be9cdfbae2e4e262ab17f427781b9ad8777ee9c4c7f9bb2c",
+            "kind": "file_reference",
+            "line_count": 44,
+            "path": "sphinx/builders/latex/nodes.py"
+          },
+          {
+            "file_sha256": "8d35613a91d8f19a84c8a41806dc6f992e4878448325405f613d31954c73902e",
+            "kind": "file_reference",
+            "line_count": 914,
+            "path": "sphinx/util/docutils.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the custom LaTeX node class that wraps literal blocks with captions and inherits from the docutils container node class cause performance degradation during document traversal when the container's node visitation mechanism performs redundant type checking on every child node?",
+      "question_sha256": "1967ffc06b0de3342b63e9addc55e381b538d202f35bf417ba05b83a4b670625",
+      "reference_answer": "Based on my exploration of the Sphinx codebase, the performance degradation occurs due to method resolution overhead during node dispatch and redundant type checking in the visitor pattern implementation.\n\n**Inheritance Structure:**\nThe `captioned_literal_block` class (defined in `sphinx/builders/latex/nodes.py`) inherits from `nodes.container` with an empty body - it's essentially a marker class. During document traversal, when the LaTeX writer's `walkabout()` method visits nodes, it uses the `dispatch_visit()` method in `SphinxTranslator` (found in `sphinx/util/docutils.py`).\n\n**Method Resolution Overhead:**\nThe `dispatch_visit()` method (lines 772-786) iterates through the node's Method Resolution Order (MRO) to find the appropriate visitor method:\n\n```python\nfor node_class in node.__class__.__mro__:\n    method = getattr(self, 'visit_%s' % node_class.__name__, None)\n    if method:\n        method(node)\n        break\n```\n\nFor `captioned_literal_block` nodes, the MRO includes both `captioned_literal_block` and `nodes.container`. This means the dispatch mechanism must check multiple classes in the inheritance chain, performing `getattr()` lookups for each class name in the MRO until it finds a matching `visit_*` method. While `visit_captioned_literal_block()` exists (line 2200 in `sphinx/writers/latex.py`), the MRO traversal still incurs overhead.\n\n**Redundant Type Checking:**\nThe codebase contains multiple `isinstance()` checks on parent nodes. For example, in `visit_literal_block()` (line 2213) and `visit_caption()` (line 1765), there are checks like `isinstance(node.parent, captioned_literal_block)`. Since `captioned_literal_block` inherits from `nodes.container`, any `isinstance(node.parent, nodes.container)` check would also match `captioned_literal_block` instances, potentially leading to redundant type checks when both conditions are evaluated.\n\n**Performance Impact:**\nDuring document traversal, `walkabout()` recursively visits all nodes in the document tree. Container nodes automatically visit all their children. In large-scale documentation builds with many `captioned_literal_block` nodes, the cumulative overhead from:\n1. MRO traversal during dispatch for each node visit\n2. Multiple `getattr()` calls per node\n3. Redundant type checking when visiting child nodes\n\nmultiplies across thousands of nodes, causing measurable performance degradation. The `captioned_literal_block` class serves primarily as a type marker (its visit/depart methods are no-ops), but the inheritance hierarchy forces the dispatch system to traverse the MRO on every visit.",
+      "reference_sha256": "918117281d7a49c2c39116108fcf6b35f990e8be0460726dd42ffd0845b00904",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-acf27031026a9e7b6bdfe2ac"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "4ce59cd6b1552c597e54f4750dd0c1bcb2d74bf7e3b3a0fcc41499ac8a0cec17",
+            "kind": "file_reference",
+            "line_count": 1431,
+            "path": "sphinx/ext/napoleon/docstring.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does the method that exhausts all remaining lines coordinate with the deque-based iterator state management to ensure complete line consumption without causing state inconsistencies in the Google-style docstring parser?",
+      "question_sha256": "4e4aa8917ac2fdf84819b5a607f7f010dc49473907bd6bf0ceec4a50bc88ef80",
+      "reference_answer": "The method that exhausts all remaining lines (`_consume_to_end`) coordinates with the deque-based iterator state management through a simple while-loop pattern that checks the deque's emptiness before each iteration.\n\nImplementation details (from `sphinx/ext/napoleon/docstring.py`):\n\n1. The iterator structure: `_lines` is a `Deque` instance (a subclass of `collections.deque`) initialized in `__init__` at line 364: `self._lines = Deque(map(str.rstrip, lines))`. The `Deque` class (lines 57-75) provides a `next()` method that calls `popleft()` and raises `StopIteration` when empty.\n\n2. The exhaustion mechanism: `_consume_to_end` (lines 567-571) uses:\n   ```python\n   def _consume_to_end(self) -> list[str]:\n       lines = []\n       while self._lines:\n           lines.append(self._lines.next())\n       return lines\n   ```\n\n3. State management coordination:\n   - The `while self._lines:` check uses the deque's truthiness (empty deque is falsy).\n   - Each iteration calls `self._lines.next()`, which removes the leftmost element via `popleft()`.\n   - The loop continues until `self._lines` is empty, ensuring all lines are consumed.\n\n4. Preventing state inconsistencies:\n   - The emptiness check prevents calling `next()` on an empty deque (which would raise `StopIteration`).\n   - The deque is fully exhausted, leaving no remaining elements that could cause inconsistencies.\n   - This pattern is used in `_consume_inline_attribute` (line 524) when parsing attribute docstrings, ensuring all remaining content is consumed after processing the first line.\n\n5. Context of use: This method is specifically called in `_consume_inline_attribute` (line 518-526) when parsing attribute docstrings, where after processing the first line with type/description, all remaining lines need to be consumed to complete the attribute description.\n\nThe coordination ensures that the iterator state is consistently managed: the deque is fully exhausted, preventing any leftover state that could interfere with subsequent parsing operations or cause inconsistencies in the parser's internal state.",
+      "reference_sha256": "29de05d2feb2c092941ba65cd5dce5cb7dd9dadff42a274875d950bb7c79fa47",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-addfe691d348e020fddb5945"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 190,
+            "file_sha256": "dc0dcb2b0e4f200a883898cfd3f1bae721914639accab4772903e30496cf6873",
+            "path": "sphinx/builders/_epub_base.py",
+            "start_line": 183
+          },
+          {
+            "end_line": 1104,
+            "file_sha256": "856cf8e82218174df01b5f2c68643a8d99c15c2f100ee61cefc3312c25557192",
+            "path": "sphinx/environment/__init__.py",
+            "start_line": 1097
+          },
+          {
+            "end_line": 89,
+            "file_sha256": "7179291123d094bcb246398ceaa5fb7adbde6cb6bc26a6af7440344d04d72432",
+            "path": "sphinx/builders/__init__.py",
+            "start_line": 89
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the identifier caching dictionary in the EPUB builder's generation method interact with environment pickling to ensure consistent identifier assignment across build runs while maintaining thread safety?",
+      "question_sha256": "deb294c3ffd748b5b72e7b62d212e4473eba50d3d082b3d24d41cd212de88339",
+      "reference_answer": "The identifier caching dictionary in the EPUB builder's generation method (`make_id` in `EpubBuilder`) interacts with environment pickling to ensure consistent identifier assignment across build runs through the following mechanism:\n\n**Caching Strategy:**\nThe `make_id` method in `sphinx/builders/_epub_base.py` (lines 183-190) uses a dictionary (`id_cache`) initialized in the `init()` method (line 172) to cache generated identifiers. When called with a filename, it first checks the cache. If the name is not cached, it generates a new identifier using `self.env.new_serialno('epub')`, which returns a sequential number from the environment's `current_document._serial_numbers` dictionary (see `sphinx/environment/__init__.py`, lines 1097-1104).\n\n**Serialization Mechanism:**\nThe BuildEnvironment class implements `__getstate__` and `__setstate__` methods (lines 241-253) for pickling. When the environment is pickled between builds, its state (including serial number counters) is preserved. However, the builder instance itself is not pickled\u2014it's recreated for each build invocation, which means the `id_cache` dictionary is reset in `init()`.\n\n**Consistency Across Builds:**\nConsistency is achieved through the deterministic nature of the serial number generation combined with the processing order:\n1. Within a single build, the `id_cache` ensures the same filename always gets the same ID\n2. Across builds, if files are processed in the same order, `new_serialno('epub')` generates the same sequential numbers because the environment's serial number state can be preserved through pickling\n3. The cache ensures that even if `make_id` is called multiple times for the same filename during a build, it returns the same identifier\n\n**Thread Safety:**\nThe EpubBuilder class inherits from `StandaloneHTMLBuilder`, which inherits from `Builder`. The base `Builder` class has `allow_parallel = False` (line 89 in `sphinx/builders/__init__.py`), and EpubBuilder doesn't override this. This means parallel document processing is disabled for EPUB builds, eliminating thread safety concerns for the `id_cache` dictionary. The dictionary operations (get/set) are inherently thread-safe for single-threaded access, and since parallel processing is disabled, there are no race conditions.\n\n**Interaction:**\nThe caching strategy works in conjunction with serialization because:\n- The environment's serial number state can persist across builds through pickling\n- The builder's cache ensures consistency within a build\n- The deterministic processing order (when files are processed in the same sequence) combined with cached lookups ensures that the same filenames receive the same identifiers across multiple build invocations\n\nThis design ensures that EPUB manifest and spine entries maintain stable identifiers, which is critical for EPUB file format compliance and for users who may reference specific content by ID.",
+      "reference_sha256": "b0fdfedb12c9f56524068216d6eb9829ea67fe96617d128bca9ad75f8f1a6836",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-aeb7dd01a07689a657eedb9c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1289,
+            "file_sha256": "880cfc9e4078c886c879b24cd4c7119833713195bd314b180ce37a24035421d4",
+            "path": "sphinx/ext/autodoc/_documenters.py",
+            "start_line": 1281
+          },
+          {
+            "end_line": 588,
+            "file_sha256": "f443b11c786fc7877da07517b764def967fb495489260c4c2daf4d4b1ee74935",
+            "path": "sphinx/util/inspect.py",
+            "start_line": 587
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "1221ddf0fb51d5785fe8c8fff63844bcf06c14ea82b4c9de730008c9522cc890",
+            "kind": "file_reference",
+            "line_count": 208,
+            "path": "sphinx/ext/autodoc/preserve_defaults.py"
+          },
+          {
+            "file_sha256": "f443b11c786fc7877da07517b764def967fb495489260c4c2daf4d4b1ee74935",
+            "kind": "file_reference",
+            "line_count": 1060,
+            "path": "sphinx/util/inspect.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the wrapper class for preserving default argument values in the autodoc extension module implement only initialization and representation methods, while the wrapper class for default parameter values in overload function signatures implements equality and hashing methods?",
+      "question_sha256": "d1194dd92547993b746459afc4dcda3320ff850543a9a1a0fdf07a0cea63d0f7",
+      "reference_answer": "The divergence comes from different usage contexts and requirements:\n\n**The `DefaultValue` class in `sphinx/ext/autodoc/preserve_defaults.py`** (lines 31-36):\n- Implements only `__init__` and `__repr__`\n- Used in `update_defvalue()` (lines 173, 179) to wrap string representations of default values\n- Purpose: preserve source code representations of defaults for readability in documentation\n- No comparison or hashing needed because these objects are only used for display via `__repr__` when stringifying signatures\n\n**The `DefaultValue` class in `sphinx/util/inspect.py`** (lines 581-594):\n- Implements `__init__`, `__repr__`, `__eq__`, and `__hash__`\n- Used in `signature_from_ast()` via `_define()` (line 994) to create `Parameter` objects for overload function signatures\n- Purpose: wrap default values in signatures parsed from AST nodes for overloaded functions\n\n**Why the difference:**\n1. **Equality comparison requirement**: In `merge_default_value()` (lines 1281-1289 in `_documenters.py`), there's a comparison `param.default == '...'` (line 1286). The `__eq__` method (line 587-588 in `inspect.py`) allows `DefaultValue` objects to be compared with strings: `return self.value == other`\n\n2. **Hashability requirement**: Python's `inspect.Parameter` objects are hashable (they can be used in sets/dictionaries). When a `Parameter` contains a `DefaultValue` as its `default` attribute, that `DefaultValue` must also be hashable for the `Parameter` to remain hashable. The `__hash__` method (line 590-591) makes these objects hashable: `return hash(self.value)`\n\n3. **Different use cases**: The `preserve_defaults` version is only for display purposes and doesn't participate in comparisons or hashable collections. The `inspect` version is used in `Signature` objects that may be stored in lists (like `parser.overloads` dict values), compared, or used in contexts requiring hashability.\n\nThe architectural decision separates concerns: one class handles display-only wrapping (no comparison/hashing overhead), while the other supports the full contract needed for objects used in hashable `Parameter`/`Signature` contexts where equality checks are required.",
+      "reference_sha256": "203dc2a13c7af0642469351dc4e0fe3d13f3795232faecff6584d4eadfb4b818",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-b3d1dd7177e62157bd6db590"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 137,
+            "file_sha256": "ce007efdcf49190314b3a82b2b3959bbbbaf171eea3dcae41b0bb010b57f6252",
+            "path": "sphinx/environment/collectors/asset.py",
+            "start_line": 137
+          },
+          {
+            "end_line": 39,
+            "file_sha256": "de4718648f39c03456aadc11ec65c025d5628c0834770d77a85f2411767582b7",
+            "path": "sphinx/environment/collectors/__init__.py",
+            "start_line": 31
+          },
+          {
+            "end_line": 96,
+            "file_sha256": "a00db67e882a2c1f3f6be029739d7df91748d3c5a47c8d337e8f2fbe963ad65e",
+            "path": "sphinx/util/_files.py",
+            "start_line": 64
+          },
+          {
+            "end_line": 202,
+            "file_sha256": "856cf8e82218174df01b5f2c68643a8d99c15c2f100ee61cefc3312c25557192",
+            "path": "sphinx/environment/__init__.py",
+            "start_line": 202
+          },
+          {
+            "end_line": 815,
+            "file_sha256": "1b2e710f461933ff0f5ad94e0211b470381e3028f99c284c43eeee881b0d85c6",
+            "path": "sphinx/builders/html/__init__.py",
+            "start_line": 804
+          },
+          {
+            "end_line": 434,
+            "file_sha256": "856cf8e82218174df01b5f2c68643a8d99c15c2f100ee61cefc3312c25557192",
+            "path": "sphinx/environment/__init__.py",
+            "start_line": 418
+          },
+          {
+            "end_line": 96,
+            "file_sha256": "a00db67e882a2c1f3f6be029739d7df91748d3c5a47c8d337e8f2fbe963ad65e",
+            "path": "sphinx/util/_files.py",
+            "start_line": 91
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "sphinx/environment/adapters/asset.py",
+              "sphinx/environment/collectors/asset.py"
+            ],
+            "end_line": 179,
+            "path": "asset.py",
+            "reason": "ambiguous_basename",
+            "reference": "asset.py",
+            "start_line": 179
+          },
+          {
+            "candidates": [
+              "sphinx/environment/adapters/asset.py",
+              "sphinx/environment/collectors/asset.py"
+            ],
+            "end_line": 174,
+            "path": "asset.py",
+            "reason": "ambiguous_basename",
+            "reference": "asset.py",
+            "start_line": 152
+          },
+          {
+            "candidates": [
+              "sphinx/environment/adapters/asset.py",
+              "sphinx/environment/collectors/asset.py"
+            ],
+            "end_line": 150,
+            "path": "asset.py",
+            "reason": "ambiguous_basename",
+            "reference": "asset.py",
+            "start_line": 150
+          }
+        ]
+      },
+      "question": "How does the collector class that processes downloadable file references integrate with the base collector interface that connects to Sphinx build environment events to expose download file tracking through the build environment API?",
+      "question_sha256": "3f80bc98b3051d9b8c33d067b716e437ef3e94c66a7233f7d405f9eec4b2e633",
+      "reference_answer": "The collector class that processes downloadable file references (`DownloadFileCollector`) integrates with the base collector interface (`EnvironmentCollector`) through the following mechanism:\n\n**1. Inheritance and Registration:**\n`DownloadFileCollector` inherits from `EnvironmentCollector` (defined in `sphinx/environment/collectors/asset.py:137`). When registered via `app.add_env_collector(DownloadFileCollector)` in the `setup()` function (`asset.py:179`), the base class's `enable()` method is called (`sphinx/environment/collectors/__init__.py:31-39`).\n\n**2. Event Connection:**\nThe `enable()` method connects the collector to Sphinx build environment events, including:\n- `doctree-read`: Calls `process_doc()` to process documents\n- `env-merge-info`: Calls `merge_other()` to merge data from parallel builds\n- `env-purge-doc`: Calls `clear_doc()` to remove document data\n\n**3. Download File Tracking:**\nIn `process_doc()` (`asset.py:152-174`), the collector:\n- Finds all `download_reference` nodes in the document tree\n- For local files, resolves paths using `app.env.relfn2path()`\n- Adds files to the build environment's `dlfiles` attribute via `app.env.dlfiles.add_file()`\n- The `dlfiles` attribute is a `DownloadFiles` instance (`sphinx/util/_files.py:64-96`) that maps file paths to tuples of (docnames set, destination path)\n\n**4. API Exposure:**\nThe `dlfiles` attribute is exposed on the `BuildEnvironment` object (`sphinx/environment/__init__.py:202`), making download file tracking accessible through the build environment API. Builders can access it via `env.dlfiles` (e.g., `sphinx/builders/html/__init__.py:804-815`).\n\n**5. Parallel Build Consistency:**\nDuring parallel builds, `BuildEnvironment.merge_info_from()` (`sphinx/environment/__init__.py:418-434`) emits the `env-merge-info` event, which triggers `DownloadFileCollector.merge_other()`. This method calls `env.dlfiles.merge_other(docnames, other.dlfiles)` (`asset.py:150`), which merges download file data from parallel subprocess environments by iterating through files from the other environment and adding them to the current environment for the specified docnames (`sphinx/util/_files.py:91-96`).\n\nThis integration pattern allows the collector to automatically participate in Sphinx's event-driven architecture while exposing download file tracking through the standard build environment API, with built-in support for parallel builds through the event-triggered merge mechanism.",
+      "reference_sha256": "321557ef220a03ff2230e66263539c7530b87453e55a0bee13d9ef8a6f8c2608",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-ba4bde9b48c1622df7603686"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 358,
+            "file_sha256": "5079a62f4de01310e0d781bd3b5955f652da126143ed25bc2e4406056efd6ed2",
+            "path": "sphinx/ext/napoleon/__init__.py",
+            "start_line": 358
+          },
+          {
+            "end_line": 201,
+            "file_sha256": "22b9a3056e87209730b55755104d72e9982030812dcd0e283aa279c12da6d18b",
+            "path": "sphinx/domains/python/_object.py",
+            "start_line": 201
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "5da92ffd4c6629ac3d7983c5b244b9e0a388721e60cfc6814c264c7bc4e837fe",
+            "kind": "file_reference",
+            "line_count": 510,
+            "path": "sphinx/util/docfields.py"
+          },
+          {
+            "file_sha256": "f57ff9091b0ba7f8c5abec228e34fa4fef7d5fcab2037789791cfee0e2185135",
+            "kind": "file_reference",
+            "line_count": 28,
+            "path": "tests/roots/test-ext-napoleon-paramtype/pkg/foo.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How should the mechanism that resolves parameter type annotations in docstrings be refactored to remove duplicate parsing when multiple type field tags describe the same type for keyword-only arguments?",
+      "question_sha256": "48c9e00d5458206a852794148e9546f2cc5f575330fb1038eb05980bdf7ab1ce",
+      "reference_answer": "The mechanism that resolves parameter type annotations in docstrings should be refactored in the `DocFieldTransformer` class in `sphinx/util/docfields.py`, specifically in the `_transform_step_1` method (lines 377-482).\n\nCurrent behavior:\n- The keyword field type in `sphinx/ext/napoleon/__init__.py` (line 358) accepts both `:paramtype` and `:kwtype` for keyword arguments via `typenames=('paramtype', 'kwtype')`.\n- The parameter field type in `sphinx/domains/python/_object.py` (line 201) also accepts `:paramtype` via `typenames=('paramtype', 'type')`.\n- In `_transform_step_1` (lines 441-448), when a type field is encountered, it's added to the `types` dictionary without checking if a type already exists for that parameter name.\n\nThe redundancy occurs because:\n1. Both `:paramtype` and `:kwtype` can describe the same keyword-only argument.\n2. The code processes each type field independently and stores them in the `types` dictionary.\n3. If both tags are present with identical type annotations, both are parsed and stored, even though only one is needed.\n\nRefactoring approach:\n1. In `_transform_step_1`, before adding a type to the `types` dictionary (around line 447), check if a type already exists for that `fieldarg` in the `types` dictionary for the same `typename`.\n2. If a type already exists, compare the new type content with the existing one. If they're identical, skip processing the duplicate.\n3. Alternatively, implement a priority system where `:kwtype` takes precedence over `:paramtype` for keyword arguments, or vice versa, to avoid processing both.\n\nThe test case in `tests/roots/test-ext-napoleon-paramtype/pkg/foo.py` demonstrates this scenario, where keyword-only arguments can have both `:paramtype` and `:kwtype` tags describing the same type annotation (e.g., `list[int]`), leading to redundant parsing of identical type information.\n</start_of_answer>",
+      "reference_sha256": "7d1c735ac307113629ab272f664290d30923f3bc816b0fa354a7b516d9a0101c",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-c12184a1bcbb300cb7b99a7b"
+    }
+  ]
+}

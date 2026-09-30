@@ -1,0 +1,351 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-06b33a277dc70ceda4f72a3a",
+      "reference_sha256": "6c4a96feadabf6cc26ce80367829e68e01c7f80c6313d8d91d4831bde2f87b43",
+      "question_sha256": "a93edcf2c1e0b48c5030a196f571893aa33abae5eade5da803badf1b3badc57f",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Dynamic tag returns before invalid-literal sorting",
+          "verdict": "supported",
+          "reason": "Both static and dynamic paths use Var.create; sorting and warnings only invalid literal tags.",
+          "evidence": {
+            "path": "reflex/components/lucide/icon.py",
+            "start_line": 43,
+            "end_line": 87
+          }
+        },
+        {
+          "claim": "Var.create returns existing Vars unchanged",
+          "verdict": "supported",
+          "reason": "Not always full literal/type registration processing.",
+          "evidence": {
+            "path": "reflex/vars/base.py",
+            "start_line": 699,
+            "end_line": 717
+          }
+        }
+      ],
+      "material_errors": [
+        "Conflates Python construction with rendering overhead and attributes invalid literal sorting to dynamic path; no benchmark."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "Icon.create validates and converts tag input in Python. A nonliteral string Var becomes DynamicIcon with underscores replaced by hyphens, while a literal name is normalized and mapped to a static component. Invalid literal names\u2014not the dynamic branch\u2014trigger fuzzy-match sorting and a warning (reflex/components/lucide/icon.py:43-87). DynamicIcon changes import metadata to the library\u2019s dynamic module (lines90-105). These source paths establish different construction/import behavior, but not measured rendering overhead for many icons."
+    },
+    {
+      "task_id": "import-088b8fcdc9ab5afd50c45316",
+      "reference_sha256": "9a737e4f15986da9951a0b0e532b6aed15fd0edb88f61e38b52c94a0ed45a639",
+      "question_sha256": "f612c7a7c7a790f3de88bdb9ba9f5024de9b5268043cd876b35f3203b2e48249",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "NoSSR removes own static import, retains dependency metadata and generates lazy wrapper",
+          "verdict": "supported",
+          "reason": "Placeholder renderFalse, React lazy/ClientSide imports and named export adaptation.",
+          "evidence": {
+            "path": "reflex/components/component.py",
+            "start_line": 2223,
+            "end_line": 2271
+          }
+        },
+        {
+          "claim": "ClientSide renders null until effect sets component",
+          "verdict": "supported",
+          "reason": "Mount effect gates render on client.",
+          "evidence": {
+            "path": "reflex/compiler/templates.py",
+            "start_line": 377,
+            "end_line": 385
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-0e086b202051f18807a80abf",
+      "reference_sha256": "69bc399b0a1dd498de80d3d3fccc81c859f4c827beb3d3f9afb99e4695ccdc67",
+      "question_sha256": "de71bef5f38abceb6f4d86273445eef2168fcc7f47526b0cdc344c71d625ef31",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "AppInfo bundles two references from validation",
+          "verdict": "supported",
+          "reason": "Extraction and type validation then tuple return; no synchronization or version protocol.",
+          "evidence": {
+            "path": "reflex/utils/prerequisites.py",
+            "start_line": 215,
+            "end_line": 241
+          }
+        }
+      ],
+      "material_errors": [
+        "Unsupported atomic reload consistency and mismatch-prevention guarantees."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "AppInfo is a NamedTuple with app and module fields (reflex/utils/prerequisites.py:34-38). get_and_validate_app loads the module, extracts its configured app, verifies the app type, optionally checks schema, and returns both references together (lines215-241). get_compiled_app unpacks that result (line263). This is a convenient structured return value; the container itself does not implement reload synchronization or atomic version consistency."
+    },
+    {
+      "task_id": "import-174a1eb30f948a89680d398a",
+      "reference_sha256": "8ba26c1d777821850f930148d212c64bdb625f6393755121393ee249ee738ef9",
+      "question_sha256": "1574cc665b44433043ac35b01f9d8af5d8986e014f1ca5888fa9db84379dfe20",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Deployment passes export closure to hosting deploy",
+          "verdict": "supported",
+          "reason": "Lambda forwards frontend/backend/URL/zip options to export utility.",
+          "evidence": {
+            "path": "reflex/reflex.py",
+            "start_line": 800,
+            "end_line": 822
+          }
+        },
+        {
+          "claim": "Export coordinates frontend build and packaging",
+          "verdict": "supported",
+          "reason": "Compilation/setup/build conditional frontend, zip conditional zipping.",
+          "evidence": {
+            "path": "reflex/utils/export.py",
+            "start_line": 58,
+            "end_line": 79
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-26e776dc85c824f530a3c798",
+      "reference_sha256": "3e145c22642a348dac8ba3ff7d7187c4ab3a6169231d030dc37ea1c4d5351600",
+      "question_sha256": "b3f49795957133747dc2b612df975fd723a78fcec48f8d1ec45d60143fca1693",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Reload resets app reference, detaches module states and clears cache",
+          "verdict": "supported",
+          "reason": "Recursive traversal, dirty sets, registry deletion, dependency rebuilding and cache clearing all present.",
+          "evidence": {
+            "path": "reflex/state.py",
+            "start_line": 2740,
+            "end_line": 2770
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-2eef193fac5272ba2b6fadc4",
+      "reference_sha256": "39537e9c4b7bd681054b571b93aab1d68f8f23391872a55080a6585a382e6fad",
+      "question_sha256": "13cd1879772deff9e790251705d374c481a222e1a7b18849ab0534ebfc8c95ff",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Match error has dual exception ancestry",
+          "verdict": "supported",
+          "reason": "Removing a base changes catch/isinstance relationships, hypothetical not observed handler inventory.",
+          "evidence": {
+            "path": "reflex/utils/exceptions.py",
+            "start_line": 181,
+            "end_line": 182
+          }
+        },
+        {
+          "claim": "Validation raises on incompatible component/Var return category",
+          "verdict": "supported",
+          "reason": "Generalizes first return to BaseComponent or Var then checks other cases.",
+          "evidence": {
+            "path": "reflex/components/core/match.py",
+            "start_line": 182,
+            "end_line": 215
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-30c73be47da9a60a446793de",
+      "reference_sha256": "1852f2a8678b8a785b216de710742cd608289af86453824cf276fa63178718dd",
+      "question_sha256": "ce61a1350ddaf2cc8e3bf156ddc0413b932feedf418713949e4ae4e656ba9294",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Current page test performs sequential replacement only",
+          "verdict": "supported",
+          "reason": "No lock, parallel event, or atomicity assertion.",
+          "evidence": {
+            "path": "tests/units/test_state.py",
+            "start_line": 956,
+            "end_line": 961
+          }
+        },
+        {
+          "claim": "RouterData is frozen value container, not state subclass",
+          "verdict": "supported",
+          "reason": "Creates new data with nested fields; no State inheritance.",
+          "evidence": {
+            "path": "reflex/istate/data.py",
+            "start_line": 206,
+            "end_line": 250
+          }
+        }
+      ],
+      "material_errors": [
+        "Invents concurrency proof/atomic propagation from sequential test and calls RouterData a State substate."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "test_get_current_page checks the default empty path, assigns RouterData.from_router_data for a route, and verifies the new path (tests/units/test_state.py:956-961). RouterData is a frozen dataclass whose constructor builds session/header/page data and URL/route fields (reflex/istate/data.py:206-250). This demonstrates routing-data construction and replacement, not the State design pattern, locking, or concurrent atomicity. Any production concurrency guarantees must be assessed separately from state-manager code."
+    },
+    {
+      "task_id": "import-37cfafe766a4b1e61629d49d",
+      "reference_sha256": "bded605fb934cf6a3141f99f7dc7924d50b9098445f08a9c1fe35bbce572e4ee",
+      "question_sha256": "6a1520b55d99298053cbd2ef07613131fe4dd963c02843f6b90c83c7c6436584",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Conditional render dictionary recurses into ternary operands",
+          "verdict": "supported",
+          "reason": "Both branches converted to Vars, missing false becomes literalNone.",
+          "evidence": {
+            "path": "reflex/components/component.py",
+            "start_line": 2807,
+            "end_line": 2814
+          }
+        },
+        {
+          "claim": "Component literal merges metadata from children and own vars",
+          "verdict": "supported",
+          "reason": "Includes collected VarData and component dependency.",
+          "evidence": {
+            "path": "reflex/components/component.py",
+            "start_line": 2892,
+            "end_line": 2908
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-399414cd60f51dc7925a725a",
+      "reference_sha256": "be4102c01145f631124fdbfad76aacf35f2a51b4f71ac211fe03c76c7d2a9880",
+      "question_sha256": "4ecad9d13f1b72aad1153c2b9aba5ffc059ac4a586afb8cdfcf3d6560b16b29c",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Computed descriptor dispatches frontend representation or computes cached runtime value",
+          "verdict": "supported",
+          "reason": "Class access includes state VarData and type; cache enabled path checks missing/expiry, uncached evaluates each time.",
+          "evidence": {
+            "path": "reflex/vars/base.py",
+            "start_line": 2357,
+            "end_line": 2402
+          }
+        },
+        {
+          "claim": "Dirty propagation invalidates dependent computed vars",
+          "verdict": "supported",
+          "reason": "Walks dependencies and invokes mark_dirty; caching claim applies to cache-enabled descriptors.",
+          "evidence": {
+            "path": "reflex/state.py",
+            "start_line": 1947,
+            "end_line": 1972
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-3b1585e72c884016b0904e26",
+      "reference_sha256": "959437a20a6fdce4d626b82e9e83413a11489e72bed2e733a5923a06aa09407a",
+      "question_sha256": "a6fdc3e357130b54065603a82f360d1831b53a8e17cc25e601b4504f0239c2f4",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Namespace instance call mapped to BaseList.create",
+          "verdict": "supported",
+          "reason": "Staticmethod __call__ belongs to namespace instance; List() constructs namespace, list_ns(...) creates list component.",
+          "evidence": {
+            "path": "reflex/components/radix/themes/layout/list.py",
+            "start_line": 179,
+            "end_line": 191
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-3f70fa7074ff1aebc3e4c007",
+      "reference_sha256": "917fe53d934885681f05d6ce11647ba1438dfd32135bec785e569b3c9a4c0e07",
+      "question_sha256": "50b956d7d99595ebdaa8c41bda538b363f52a774c0922c8f9441bd6e755f3af4",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "show_logs exhausts stream_logs without yielding onward",
+          "verdict": "supported",
+          "reason": "Logging/error behavior provided by underlying generator.",
+          "evidence": {
+            "path": "reflex/utils/processes.py",
+            "start_line": 391,
+            "end_line": 399
+          }
+        },
+        {
+          "claim": "Sibling wrappers consume stream with status/progress interpretation",
+          "verdict": "supported",
+          "reason": "Status uses line text, progress inspects checkpoints; output and termination changes can affect them.",
+          "evidence": {
+            "path": "reflex/utils/processes.py",
+            "start_line": 420,
+            "end_line": 451
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-4164f03b09f8585dcd52d148",
+      "reference_sha256": "5e79a063319ca30bd73c7dd20b7364e8caee6059fd8a5a6077ec3cc843cf324f",
+      "question_sha256": "e4b9be5c8529e3bfc9c331527061234bb512bc4389ac8ec55767535fc76704d5",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Without-data performs shallow dataclass replacement",
+          "verdict": "supported",
+          "reason": "No serialization, lock, or StateManager coupling shown.",
+          "evidence": {
+            "path": "reflex/vars/base.py",
+            "start_line": 1162,
+            "end_line": 1168
+          }
+        }
+      ],
+      "material_errors": [
+        "Frozen instance is not general thread safety; selective metadata preservation changes without-data contract; ungrounded StateManager integration."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "_without_data already uses dataclasses.replace(self, _var_data=None), creating a copy without serializing or evaluating the expression (reflex/vars/base.py:1162-1168). A redesign should retain that no-metadata contract and avoid eager decoding. If shared nested state or subclass fields require stronger thread-safety, audit their mutability and copy or synchronize those specific objects; frozen field assignment alone does not establish deep immutability. Preserving selected hooks/imports would be a separate API contract, and this method does not itself enter StateManager locks."
+    }
+  ]
+}

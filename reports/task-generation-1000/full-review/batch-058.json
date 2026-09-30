@@ -1,0 +1,343 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-d587da4ba7f1c7fe6c32c45e",
+      "reference_sha256": "bc7a09352dc86e6298cc4df5cd367f27f4c1356ff0120955f2151ca848c4ca11",
+      "question_sha256": "d779ef78905a7c18e75b1f5fff12cfbf4f73382d786c92d199d51acb7250cb06",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Event helpers invoke parse_args_spec",
+          "verdict": "supported",
+          "reason": "call_event_handler obtains args and annotations.",
+          "evidence": {
+            "path": "reflex/event.py",
+            "start_line": 1547,
+            "end_line": 1549
+          }
+        },
+        {
+          "claim": "Function handler parsing used for signature match",
+          "verdict": "supported",
+          "reason": "call_event_fn obtains parsed args.",
+          "evidence": {
+            "path": "reflex/event.py",
+            "start_line": 1783,
+            "end_line": 1788
+          }
+        },
+        {
+          "claim": "Upload adapts files placeholder",
+          "verdict": "supported",
+          "reason": "Additional actual call site.",
+          "evidence": {
+            "path": "reflex/components/core/upload.py",
+            "start_line": 432,
+            "end_line": 436
+          }
+        }
+      ],
+      "material_errors": [
+        "Invents direct parse_args_spec call in reflex/utils/format.py."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "parse_args_spec is called by call_event_handler (reflex/event.py:1547) and call_event_fn (reflex/event.py:1783) to obtain handler argument Vars. Upload._update_arg_tuple_for_on_drop also calls it for the files placeholder (reflex/components/core/upload.py:432-436). The claimed direct call in reflex/utils/format.py is absent in this snapshot."
+    },
+    {
+      "task_id": "import-dd1545c728658d014af9ceeb",
+      "reference_sha256": "c043befc2817446ab59d90015020ef2127c3fe79125996ec631648f3a2ee87ec",
+      "question_sha256": "6769822ccb12746596099dd1a161eacf1dd37dfe01daa624367e99ecc420ff05",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Accordion translates theme fields into custom data attrs",
+          "verdict": "supported",
+          "reason": "These are generated attributes derived from Vars; not bypassing React state/props.",
+          "evidence": {
+            "path": "reflex/components/radix/primitives/accordion.py",
+            "start_line": 52,
+            "end_line": 71
+          }
+        },
+        {
+          "claim": "Selectors allow inherited variants",
+          "verdict": "supported",
+          "reason": "CSS applies parent or explicit variant.",
+          "evidence": {
+            "path": "reflex/components/radix/primitives/accordion.py",
+            "start_line": 29,
+            "end_line": 49
+          }
+        }
+      ],
+      "material_errors": [
+        "Claims theme changes only mutate DOM outside React and therefore cannot affect memoization; no concrete redesign."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "A source-aligned design is to keep a small public theme API and map state-backed color/variant values to data attributes, with styling in CSS variables and selectors. AccordionComponent already puts color_scheme and variant into custom_attrs and excludes their original prop names (reflex/components/radix/primitives/accordion.py:52-71); selectors support inherited variants (lines29-49). Preserve the dependencies of these Vars through compilation and test runtime updates under memoization. Data attributes are still rendered attributes; their use does not by itself bypass React updates or prove memoization safety."
+    },
+    {
+      "task_id": "import-dffc20879fd6be6cf6880a8e",
+      "reference_sha256": "38ea397795e85c4dc0991404498338116681e10e0eddda3b43fc41b038070f32",
+      "question_sha256": "c5bbc99b9403ef85037b92027a16b964ae12f4b1bc1d5b919d09a3a579e37d71",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Child validation recursively traverses both Cond branches",
+          "verdict": "supported",
+          "reason": "Invalid child names trigger ValueError after inspecting branch descendants.",
+          "evidence": {
+            "path": "reflex/components/component.py",
+            "start_line": 1246,
+            "end_line": 1313
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-e0c84419cc9e8c320d4336cf",
+      "reference_sha256": "b72406b6748bfb10a14b96d956e66fe70b43d4b2508f0d414060f8fd08a8579e",
+      "question_sha256": "26caff1d847d1e91b0c849efbc12bbfb121243f4fa5182db3b78328821fd7a9c",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Subclass registration and instance substate construction are separate",
+          "verdict": "supported",
+          "reason": "Instance initialization populates substates; not __init_subclass__.",
+          "evidence": {
+            "path": "reflex/state.py",
+            "start_line": 418,
+            "end_line": 424
+          }
+        },
+        {
+          "claim": "Class hierarchy tracks registered child classes",
+          "verdict": "supported",
+          "reason": "Parent class_subclasses updated during subclass definition.",
+          "evidence": {
+            "path": "reflex/state.py",
+            "start_line": 512,
+            "end_line": 520
+          }
+        }
+      ],
+      "material_errors": [
+        "Conflates Root test fixture with framework orchestrator, class registration with instance construction, and manager persistence with State event processing/broadcast."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "A root BaseState subclass anchors the state hierarchy. Subclass definition registers each child class in its parent\u2019s class_subclasses (reflex/state.py:512-520), while instance initialization optionally constructs substate instances and links their parent_state (lines418-424). These are distinct registration and construction stages. State managers provide storage/access policies; this does not mean a class named Root itself broadcasts updates or that StateManager owns BaseState event processing. The supplied answer overassigns those responsibilities and cannot establish them from root inheritance alone."
+    },
+    {
+      "task_id": "import-e6ef956ec154045a5be5d414",
+      "reference_sha256": "6c397cbb9f1ce699e2bf6e4721061c147a01f1781fa3ec3502e9168b72c5ad4f",
+      "question_sha256": "a4632da7eb5a03d1f9ceb963178db54a30d7679bee621699b9918a41e2ed847d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Iterable template emits null-safe array map expression",
+          "verdict": "supported",
+          "reason": "Renders child templates and maps runtime iterable with argument/index variables.",
+          "evidence": {
+            "path": "reflex/compiler/templates.py",
+            "start_line": 85,
+            "end_line": 89
+          }
+        },
+        {
+          "claim": "Iteration component supplies missing React key",
+          "verdict": "supported",
+          "reason": "Default index key assigned earlier, not inside template function itself.",
+          "evidence": {
+            "path": "reflex/components/tags/iter_tag.py",
+            "start_line": 102,
+            "end_line": 116
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-ea68e78279d46049de59264d",
+      "reference_sha256": "f543ac149d242620b5433860883da8ba92afeb3dc5742ba853f5d61cb42db188",
+      "question_sha256": "a7662c8153e116517c5c73527a5c6310383cd8fd800578085ee872974040af73",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Tracker detects get_state bytecode and tracks result local",
+          "verdict": "supported",
+          "reason": "Switches mode and attributes state access through tracked locals.",
+          "evidence": {
+            "path": "reflex/vars/dep_tracking.py",
+            "start_line": 110,
+            "end_line": 125
+          }
+        },
+        {
+          "claim": "State class resolved statically from globals/closure",
+          "verdict": "supported",
+          "reason": "STORE_FAST records class after validation; does not run state retrieval.",
+          "evidence": {
+            "path": "reflex/vars/dep_tracking.py",
+            "start_line": 195,
+            "end_line": 224
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-ec16becc72ee5006f5014d2b",
+      "reference_sha256": "d0bd73ae25dbc05b2c462e9cb7fa7f964b0662dd5368e8d3144799749cc14c4b",
+      "question_sha256": "7fa5750cb337356e02983a8e56a242ffbe098455720c172b4f53707b5dbf348f",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Invalid props are set difference and formatted immediate exception",
+          "verdict": "supported",
+          "reason": "No recursive cascade, cleanup or retry mechanism in this validation.",
+          "evidence": {
+            "path": "reflex/components/props.py",
+            "start_line": 417,
+            "end_line": 441
+          }
+        }
+      ],
+      "material_errors": [
+        "Invents multiplicative validation cascade and significant cost without measurements."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "NoExtrasAllowedProps compares provided and known field names, formats the invalid and supported names, and raises InvalidPropValueError before parent initialization (reflex/components/props.py:417-441). This entails validation, formatting and ordinary exception handling work, but the code contains no recursive re-validation cascade. Deep nesting or retained tracebacks may affect a particular workload, but significant or multiplicative performance costs are not established by this source."
+    },
+    {
+      "task_id": "import-eda14b04336e2b4a8475797d",
+      "reference_sha256": "cd892c757077f80506f4ecf96544cf5d4a6aeca7eee1e4cad1d90e563b4fc5c0",
+      "question_sha256": "0e80528f161b291b3e0ac76c1f3507ce1350537b7e05649b67329bd96c9deb30",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "DialogTrigger disables recursive memoization",
+          "verdict": "supported",
+          "reason": "Configuration applies to compiler traversal.",
+          "evidence": {
+            "path": "reflex/components/radix/themes/components/dialog.py",
+            "start_line": 32,
+            "end_line": 37
+          }
+        },
+        {
+          "claim": "Compile skips children but still considers component memoization",
+          "verdict": "supported",
+          "reason": "Recursive guard wraps child traversal only; exact-tag preservation rationale documented by MemoizationLeaf.",
+          "evidence": {
+            "path": "reflex/components/component.py",
+            "start_line": 2680,
+            "end_line": 2707
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-f6366f976d662a4874683b06",
+      "reference_sha256": "7f44a4a0f53c5009cd00b1c7ee062580d502930ff961d693242626192c7ef576",
+      "question_sha256": "215bc8fe0380eada10e436c0b5fa20a0450660dc6bc38762405b1b77559fb5d8",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Production harness serves static frontend on distinct TCPServer",
+          "verdict": "supported",
+          "reason": "Separate synchronous frontend serving established, no measured latency effects.",
+          "evidence": {
+            "path": "reflex/testing.py",
+            "start_line": 1029,
+            "end_line": 1058
+          }
+        }
+      ],
+      "material_errors": [
+        "Asserts contention and bottleneck caused by increasing workers without evidence for the10MB workload."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "AppHarnessProd exports frontend files and serves them through Subdir404TCPServer with SimpleHTTPRequestHandlerCustomErrors, separately from its multi-worker backend (reflex/testing.py:1029-1058). The server class inherits socketserver.TCPServer (lines991-1025). Adding backend workers does not directly add static-server request workers. Whether static-file response latency changes due to shared resource contention requires measurement; the source alone does not establish that it worsens or that a10MB response is I/O-bound."
+    },
+    {
+      "task_id": "import-fbb1c6f6cd50f3383decac05",
+      "reference_sha256": "2bcd15e554ee941914c6af94b492c853731dd1af1355859e15adcdd51d7d0ac8",
+      "question_sha256": "d81e49fb44aad9c04d51aaac2f27ed14b417d5ead871ed32581b34daa39ac9d2",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Dropdown trigger independently defines as_child,parent constraint and memoization",
+          "verdict": "supported",
+          "reason": "as_child doc describes element substitution; parent validation and recursiveFalse are separate configuration.",
+          "evidence": {
+            "path": "reflex/components/radix/themes/components/dropdown_menu.py",
+            "start_line": 55,
+            "end_line": 67
+          }
+        },
+        {
+          "claim": "Compilation honors recursiveFalse regardless of as_child",
+          "verdict": "supported",
+          "reason": "Child traversal skipped, own memoization considered.",
+          "evidence": {
+            "path": "reflex/components/component.py",
+            "start_line": 2689,
+            "end_line": 2699
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-fd85682d5c82b5283d601f3b",
+      "reference_sha256": "eea8e0619559052c07b5a14a6c6d26329ef88b216f43d5a1e7f98691c150f0e1",
+      "question_sha256": "56dff2ae357803c8a646aecd814553608f5c00c68b6c5b9b4e05e4a73596108d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Immutable mutation wrapper checks controlling state before delegation",
+          "verdict": "supported",
+          "reason": "Recursively uses same base wrapper; immutable guard raises before super._mark_dirty.",
+          "evidence": {
+            "path": "reflex/istate/proxy.py",
+            "start_line": 723,
+            "end_line": 762
+          }
+        },
+        {
+          "claim": "Mutability can inherit parent proxy state",
+          "verdict": "supported",
+          "reason": "Context manager semantics tied to StateProxy mutability.",
+          "evidence": {
+            "path": "reflex/istate/proxy.py",
+            "start_line": 86,
+            "end_line": 99
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

@@ -1,0 +1,280 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-5081c7a07cb61102da8ceaa2",
+      "reference_sha256": "9fee78db747eb668c934ae22568fcf663462988cb9f98132786604b5e97428f1",
+      "question_sha256": "3b6a2164b9e1fd9c950be747c894b2fc5aee059df009b2b16946fa06babae57b",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "No caching and decomposition on every equivalence check",
+          "verdict": "contradicted",
+          "reason": "_physical_type_id is explicitly cached; repeated calls do not imply repeated decomposition. Runtime cost is not measured.",
+          "evidence": {
+            "path": "astropy/units/core.py",
+            "start_line": 675,
+            "end_line": 684
+          }
+        }
+      ],
+      "material_errors": [
+        "_physical_type_id is explicitly cached; repeated calls do not imply repeated decomposition. Runtime cost is not measured."
+      ],
+      "citation_corrections": [],
+      "notes": "Source read directly; no repository code executed. Performance and intent claims limited to source evidence.",
+      "corrected_reference_answer": "The decorator resolves allowed targets and checks arg.unit.is_equivalent until one matches (astropy/units/decorators.py:27-39,52-70). is_equivalent normalizes equivalencies and resolves the other Unit (astropy/units/core.py:984-1003). These are per-call operations, but physical type IDs are cached (astropy/units/core.py:675-684); the source does not establish a numeric overhead or an expensive decomposition on every invocation. Registry copying is avoided when equivalencies are empty (astropy/units/decorators.py:307-313)."
+    },
+    {
+      "task_id": "import-5165facb15a380e5e20dda95",
+      "reference_sha256": "2fa993d0c082b1cfddcf34b7cead4bbfc5cbabf8edd65811debd1fb7a96b1206",
+      "question_sha256": "049eef253879461835cd8caafc2d5f95539579e154cc8d140d73826a6c9d90bf",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Mask assignment uses a separate view sharing storage",
+          "verdict": "supported",
+          "reason": "Same-shape compatible masks use mask.view() without copying, explicitly to isolate shape changes.",
+          "evidence": {
+            "path": "astropy/utils/masked/core.py",
+            "start_line": 284,
+            "end_line": 301
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Source read directly; no repository code executed. Performance and intent claims limited to source evidence."
+    },
+    {
+      "task_id": "import-51908f53409ef8e2456cb935",
+      "reference_sha256": "9ee818ed20787c26e576f1fe4364d2a08b7ec119020d11e8bb2dbd15e9efe308",
+      "question_sha256": "63675c3cec768c04e8cf2441a7740f33888cb366b0569c61dd0d6a97de10ee63",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Binary serialization allocates a buffer each time",
+          "verdict": "supported",
+          "reason": "Allocation and full base64 serialization are explicit; neither their measured cost nor allocation being dominant is established. Class setup is shared rather than repeated by every inherited test.",
+          "evidence": {
+            "path": "astropy/io/votable/tree.py",
+            "start_line": 3460,
+            "end_line": 3495
+          }
+        }
+      ],
+      "material_errors": [
+        "Allocation and full base64 serialization are explicit; neither their measured cost nor allocation being dominant is established. Class setup is shared rather than repeated by every inherited test."
+      ],
+      "citation_corrections": [],
+      "notes": "Source read directly; no repository code executed. Performance and intent claims limited to source evidence.",
+      "corrected_reference_answer": "Each binary table serialization allocates a BytesIO, appends converter output, and base64-encodes its complete contents (astropy/io/votable/tree.py:3460-3495). The test setups additionally create an output BytesIO and parse it after serialization, and test_null_integer_binary serializes again (astropy/io/votable/tests/test_vo.py:748-805). This entails buffer allocation and encoding work, but these sources do not measure the cost or establish that constructing BytesIO dominates it; class setup is not run once per inherited test."
+    },
+    {
+      "task_id": "import-58cadb2010d3a9d51b537cf3",
+      "reference_sha256": "748bab21d20924333ccb933af7e8c27cb27411bdfbb38b70cc331a76e3438bcc",
+      "question_sha256": "f5a1d35e2515e7ea574ecbab4f5ac8de16ef081cecbb42d6898d245bef6ff576",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Enabling auto_download itself prevents all IERS-B loading",
+          "verdict": "contradicted",
+          "reason": "Test setup says this intent, but downloaded IERS-A reading also substitutes IERS-B; proposed call-chain explanation does not prove avoidance.",
+          "evidence": {
+            "path": "astropy/utils/iers/iers.py",
+            "start_line": 960,
+            "end_line": 968
+          }
+        }
+      ],
+      "material_errors": [
+        "Test setup says this intent, but downloaded IERS-A reading also substitutes IERS-B; proposed call-chain explanation does not prove avoidance."
+      ],
+      "citation_corrections": [],
+      "notes": "Source read directly; no repository code executed. Performance and intent claims limited to source evidence.",
+      "corrected_reference_answer": "TestRemoteURLs.setup_class sets iers.conf.auto_download = True, with a comment that this is needed so IERS_B will not be loaded and cause failures; teardown restores False (astropy/utils/iers/tests/test_leap_second.py:206-214). This describes the test configuration change, not a general guarantee that IERS-B can never load: IERS_Auto._substitute_iers_b explicitly calls IERS_B.open (astropy/utils/iers/iers.py:960-968)."
+    },
+    {
+      "task_id": "import-604accc461f6f7df4411ffcc",
+      "reference_sha256": "734378cc744e7487d161d6c95c8911766d40bed0deea233504a7f0c04bf45c1f",
+      "question_sha256": "976e6639643481a3eca78a6bdc18561360d3d7e33ec51952595cfaa4026d4649",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Scalar conversions gate on dimensionless units and index protocol",
+          "verdict": "supported",
+          "reason": "float/int convert to dimensionless_unscaled; index requires unity plus value.__index__; item preserves Quantity.",
+          "evidence": {
+            "path": "astropy/units/quantity.py",
+            "start_line": 1325,
+            "end_line": 1358
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Source read directly; no repository code executed. Performance and intent claims limited to source evidence."
+    },
+    {
+      "task_id": "import-610bfed3ebb2260ac674efff",
+      "reference_sha256": "3da1c1cb7b1614582b0c36d61fdd36c4d4f96cb386b90cb10e302aaf383337ba",
+      "question_sha256": "11790bfd3adfc33ab16190b22b99df36c42e7f9d82be2dbe760c0aefe281bfbd",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Controlled vocabulary applies to every namespace and colons originated in 1.2",
+          "verdict": "contradicted",
+          "reason": "Vocabulary checks apply only to ivoa; colon documentation explicitly says earlier versions. Main version flag behavior is correct.",
+          "evidence": {
+            "path": "astropy/io/votable/ucd.py",
+            "start_line": 72,
+            "end_line": 150
+          }
+        }
+      ],
+      "material_errors": [
+        "Vocabulary checks apply only to ivoa; colon documentation explicitly says earlier versions. Main version flag behavior is correct."
+      ],
+      "citation_corrections": [],
+      "notes": "Source read directly; no repository code executed. Performance and intent claims limited to source evidence.",
+      "corrected_reference_answer": "When version_1_1_or_later is enabled, check_ucd passes the version_1_2_or_later flag to controlled-vocabulary and colon parsing options (astropy/io/votable/tree.py:366-378). The parser documents controlled vocabulary as required by VOTable 1.2; for the ivoa namespace it checks primary and secondary word roles. Other namespaces are not checked against that vocabulary (astropy/io/votable/ucd.py:80-87,134-150). Colon support is enabled here, but this does not show that namespaces were introduced in 1.2."
+    },
+    {
+      "task_id": "import-614e8b37e92c057f02250d82",
+      "reference_sha256": "b47abbeed802d3a414fb4726268b124a851dafc5ec421c7a14efd86cb7f7702c",
+      "question_sha256": "90e0f577005265a172163463f2f26289b1bcaf63cd1a892f12f81c780e368750",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "All arithmetic and output formats retain the two-part precision",
+          "verdict": "contradicted",
+          "reason": "The multi-component path preserves the remainder but the single-unit format explicitly adds jd1+jd2; universal guarantee is too broad.",
+          "evidence": {
+            "path": "astropy/time/formats.py",
+            "start_line": 2440,
+            "end_line": 2470
+          }
+        }
+      ],
+      "material_errors": [
+        "The multi-component path preserves the remainder but the single-unit format explicitly adds jd1+jd2; universal guarantee is too broad."
+      ],
+      "citation_corrections": [],
+      "notes": "Source read directly; no repository code executed. Performance and intent claims limited to source evidence.",
+      "corrected_reference_answer": "The two parts retain small fractional contributions alongside large day counts. set_jds separates years/days from hour/minute/second terms and normalizes them using day_frac (astropy/time/formats.py:2424-2428), whose result is an integer and fractional remainder (astropy/time/utils.py:19-27). Multi-component output uses two_sum and its remainder before extracting hours, minutes, and seconds (astropy/time/formats.py:2460-2470). This reduces precision loss; it does not guarantee exactness in every output format, since single-unit output sums the two parts (astropy/time/formats.py:2440-2453)."
+    },
+    {
+      "task_id": "import-661d7757d93ae62508d09dd2",
+      "reference_sha256": "705b34dff3c1746db25d5be972efb69540918b131c257e4bb5d55883f0a6f8d4",
+      "question_sha256": "53fdcc492039b904e49711ef506e02c44a57723150491d47e3efec9d713b15bc",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "binoutput converts values according to self.format",
+          "verdict": "supported",
+          "reason": "The format configures size and binary parsing; output itself only swaps and emits existing value bytes, not a dtype cast.",
+          "evidence": {
+            "path": "astropy/io/votable/converters.py",
+            "start_line": 823,
+            "end_line": 828
+          }
+        }
+      ],
+      "material_errors": [
+        "The format configures size and binary parsing; output itself only swaps and emits existing value bytes, not a dtype cast."
+      ],
+      "citation_corrections": [],
+      "notes": "Source read directly; no repository code executed. Performance and intent claims limited to source evidence.",
+      "corrected_reference_answer": "FloatComplex declares format=\"c8\", a pair of single-precision components (astropy/io/votable/converters.py:1097-1103). Numeric initialization derives an 8-byte size and >c8 binary-read dtype (astropy/io/votable/converters.py:706-720). The inherited binoutput returns null bytes for a mask; otherwise it ensures big-endian byte order and calls value.tobytes() (astropy/io/votable/converters.py:823-828). It relies on the incoming NumPy value having the appropriate dtype; binoutput does not itself cast through self.format."
+    },
+    {
+      "task_id": "import-66f5ff46a671ef64baa2528e",
+      "reference_sha256": "eb654859bb8dec839503837382f137ecefbc09c3ebb3efba33487e281a265237",
+      "question_sha256": "f4a9fe2a97a1976141ea8829fe08cf341ebc67a70d5d21ce96e83943de9cae8e",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Fitter base and SLSQP constraint processing locations",
+          "verdict": "supported",
+          "reason": "Fitter is declared at fitting.py:293; optimizer formats bounds and passes equality/inequality constraints.",
+          "evidence": {
+            "path": "astropy/modeling/optimizers.py",
+            "start_line": 152,
+            "end_line": 175
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Source read directly; no repository code executed. Performance and intent claims limited to source evidence."
+    },
+    {
+      "task_id": "import-6af0b4540b3975856c3368f8",
+      "reference_sha256": "8a5b0ec67337e0a805e3d6b01ab9331e0a996a97d0c029f5e0e27cd88569fe42",
+      "question_sha256": "53560869ffcdde532cd5f4467dcea78e9dc9403de8ed0942f140534f33e43ced",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Function returns a CartesianDifferential object",
+          "verdict": "contradicted",
+          "reason": "It returns a replicated coordinate frame with Cartesian representation/differential types, not the differential object itself.",
+          "evidence": {
+            "path": "astropy/coordinates/spectral_coordinate.py",
+            "start_line": 103,
+            "end_line": 124
+          }
+        }
+      ],
+      "material_errors": [
+        "It returns a replicated coordinate frame with Cartesian representation/differential types, not the differential object itself."
+      ],
+      "citation_corrections": [],
+      "notes": "Source read directly; no repository code executed. Performance and intent claims limited to source evidence.",
+      "corrected_reference_answer": "The function returns a coordinate frame, not a bare CartesianDifferential. It transforms both inputs to ICRS, attaches the reference Cartesian differentials to the original ICRS position, then transforms that coordinate to velocity_reference when preserve_observer_frame is False. The returned frame uses CartesianRepresentation and CartesianDifferential (astropy/coordinates/spectral_coordinate.py:103-124). Its differential describes motion co-moving with the reference while retaining the original spatial location (astropy/coordinates/spectral_coordinate.py:80-87)."
+    },
+    {
+      "task_id": "import-6caf0d79919029b2e7f3e26e",
+      "reference_sha256": "ec6b747cb1165d09ccda1c68add468f542db339a4012df77a6401dc2f6f626ec",
+      "question_sha256": "71fd05dbb6d3579edad55db29e82fed3f119e56460987ade027f1b1c06508c37",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "An explicit None return annotation bypasses return validation/conversion",
+          "verdict": "supported",
+          "reason": "None is in valid_empty and return_ is returned unchanged.",
+          "evidence": {
+            "path": "astropy/units/decorators.py",
+            "start_line": 319,
+            "end_line": 342
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Source read directly; no repository code executed. Performance and intent claims limited to source evidence."
+    },
+    {
+      "task_id": "import-72aff38709772db5f23e0772",
+      "reference_sha256": "91bf8fe2dced78274156287a19fab9487235560b9630cffa5b7fcb0d91a90210",
+      "question_sha256": "7ce28ac0654a3efbc8d56b7f09adb970bc30e1c987bbcb58cb0cd0d87fb70e21",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "sip_compute shifts pixels by crpix before evaluating polynomials",
+          "verdict": "supported",
+          "reason": "x/y are assigned shifted inputs immediately before polynomial evaluation; sip_pix2deltas calls sip_compute.",
+          "evidence": {
+            "path": "astropy/wcs/src/sip.c",
+            "start_line": 225,
+            "end_line": 278
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Source read directly; no repository code executed. Performance and intent claims limited to source evidence."
+    }
+  ]
+}

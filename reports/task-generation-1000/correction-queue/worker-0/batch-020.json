@@ -1,0 +1,58 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-020.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/getsentry--responses-3e029949c8f3",
+      "original_reference_sha256": "370a5eafd23fb631e9eecb4513010f6fe1d6bb3e31f3db86857a75bf0b563b85",
+      "question": "Where is the package version identifier defined and accessible to users at runtime in the responses library?",
+      "question_sha256": "9f7fa53489367b47a8dc70663d318e626dc90a295b691505c8e28fa89e80e1a6",
+      "reference_answer": "The distribution version is declared as 0.14.0 in setup.py:60-63 and the bump script edits that declaration (scripts/bump-version.sh:19). This snapshot does not expose responses.__version__. For an installed distribution, importlib.metadata.version(\"responses\") queries installed metadata; its result depends on which distribution is installed, and source inspection alone does not verify a runtime result.",
+      "reference_sha256": "28e10c1df7f20737bdb9461be2b014ad2f8fa513d96f46ee23d7dcf115412e45",
+      "repository": {
+        "commit": "3e029949c8f3c1b3b2b48f9e437fedd7cf27746d",
+        "family_id": "getsentry/responses",
+        "url": "https://github.com/getsentry/responses"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/getsentry--responses-3e029949c8f3c1b3b2b48f9e437fedd7cf27746d",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-43814e069dd5ffd151fa4b4e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/getsentry--responses-3e029949c8f3",
+      "original_reference_sha256": "84275c3e04467846ac8ab9802c8f89a70ce24f3853b737bfe452f1ac85fe6654",
+      "question": "Why does the setuptools-based packaging configuration in this library create dependency resolution performance bottlenecks when installed alongside popular packages like boto3?",
+      "question_sha256": "ad2575ec9a1980d0dec4ef14bbf831e15cd95aeaae490a46ee66e13a9e9b1f2c",
+      "reference_answer": "setup.py declares requests>=2.0, urllib3>=1.25.10 and six plus conditional legacy dependencies (setup.py:22-28). These constraints alone do not demonstrate a dependency-resolution bottleneck with boto3. Runtime urllib3 import fallbacks do not add dependency constraints or participate in pip candidate resolution. A causal diagnosis requires the actual package versions and resolver logs; neither the asserted bottleneck nor its proposed three causes is established by this source.",
+      "reference_sha256": "e05f0d3905ec5c8898448292cd277c71dc9ba7481ad6ca7f4eeb524a7212b093",
+      "repository": {
+        "commit": "3e029949c8f3c1b3b2b48f9e437fedd7cf27746d",
+        "family_id": "getsentry/responses",
+        "url": "https://github.com/getsentry/responses"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/getsentry--responses-3e029949c8f3c1b3b2b48f9e437fedd7cf27746d",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-6d623641cda9478bc8cf4147"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/getsentry--responses-3e029949c8f3",
+      "original_reference_sha256": "505e50977d1031cad3034dd0fd6331b696d1246cf3a4398fac292f9b12b0e3f5",
+      "question": "Why does the responses library implement different default behaviors for `assert_all_requests_are_fired` between the context manager and decorator usage patterns?",
+      "question_sha256": "707decbb5d86ffc2b7e526867533a09b6bbd0f5c74f32730cfb862e12c17e51c",
+      "reference_answer": "RequestsMock defaults assert_all_requests_are_fired to True (responses/__init__.py:529-538), while module default mock explicitly sets False (responses/__init__.py:843). The decorator uses get_wrapped, whose generated body enters with responses, so it shares the same stop/reset lifecycle as context-manager usage (responses/__init__.py:152-155,692-703). stop checks uncalled registrations when assertions are enabled and no active exception suppresses them (responses/__init__.py:808-822). The source establishes different configuration defaults, not the asserted necessity to avoid cross-test leakage.",
+      "reference_sha256": "81327b107b334e5d8aca0050ddde73744d0a1b097a0aeb83943340e1940f543d",
+      "repository": {
+        "commit": "3e029949c8f3c1b3b2b48f9e437fedd7cf27746d",
+        "family_id": "getsentry/responses",
+        "url": "https://github.com/getsentry/responses"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/getsentry--responses-3e029949c8f3c1b3b2b48f9e437fedd7cf27746d",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-ddc215339f517816dd6a81b3"
+    }
+  ]
+}

@@ -1,0 +1,253 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-c2f8736c27259528da652f3b",
+      "reference_sha256": "3e23ae91880ff6264d201074365e3241c84eed959c0db0d0a07f6bf594a41ca8",
+      "question_sha256": "1458be3dafb4e6ce11a6e2a7ac27e8a995949ff533298465cce60ea600060f56",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Enum filtering prevents runtime shadowing",
+          "verdict": "partially_supported",
+          "reason": "Candidate tracking affects documented member inclusion, not Python runtime MRO/attribute lookup itself.",
+          "evidence": {
+            "path": "sphinx/ext/autodoc/importer.py",
+            "start_line": 130,
+            "end_line": 160
+          }
+        }
+      ],
+      "material_errors": [
+        "Candidate tracking affects documented member inclusion, not Python runtime MRO/attribute lookup itself."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "_filter_enum_dict walks nontrivial parents in MRO order, collects eligible names, and queries their actual value on enum_class (sphinx/ext/autodoc/importer.py:130-149). It excludes native Enum names unless a candidate was found in a mixin/data type (sphinx/ext/autodoc/importer.py:151-160). This preserves eligible mixin overrides for documentation; it does not alter Python's runtime MRO or prevent shadowing itself. Runtime lookup has already selected the value returned by attrgetter."
+    },
+    {
+      "task_id": "import-c8badd167b4069c2d42edd6f",
+      "reference_sha256": "b24c2ffbaac5537fba0e883ec8c8aeebee8ba2fd5709ee3f6c3f14064ccbd3db",
+      "question_sha256": "3e63a4213abffaddcaf76836696966031e2fb6079539cfaaad1bb3434a2ba7f8",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Footnote newline before parent visitation",
+          "verdict": "supported",
+          "reason": "ensure_eol invoked before super visitor, normalizing buffer line termination.",
+          "evidence": {
+            "path": "sphinx/writers/manpage.py",
+            "start_line": 250,
+            "end_line": 253
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-cf44ec3f13ea25c152faad43",
+      "reference_sha256": "90ac97851bbab0ff6f7b6c76935d2f9346155c99aa3f24beebd30331ce0479fc",
+      "question_sha256": "399ef76ec0440c18ae6820b9f940cf7bfdd08747da6d67ebdf7396e3b3a8d6fc",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Removing greeting changes MRO",
+          "verdict": "partially_supported",
+          "reason": "Removing method changes lookup result and documented members, not class linearization or inheritance chain.",
+          "evidence": {
+            "path": "tests/roots/test-ext-autodoc/target/enums.py",
+            "start_line": 80,
+            "end_line": 105
+          }
+        }
+      ],
+      "material_errors": [
+        "Removing method changes lookup result and documented members, not class linearization or inheritance chain."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "Greeter defines say_hello with the inherited docstring, and EnumClassWithMixinTypeInherit inherits it (tests/roots/test-ext-autodoc/target/enums.py:80-105); further enum fixtures also inherit Greeter. Removing that method would leave it absent for descendants without overrides and change inherited-member documentation. It does not change their MRO or break the inheritance chain: the same ordered classes are searched, but Greeter no longer supplies that name."
+    },
+    {
+      "task_id": "import-d5934922ed879f794ac6f274",
+      "reference_sha256": "1fe1a8437d93787191a60b5d37ff1785973b41b57ab7ec5302575d799c2d7d62",
+      "question_sha256": "5e0ebb96774cf810aabb9df71bfef2e939e70463d59057f85f42077c6c0a1c00",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Class alias skips member documentation",
+          "verdict": "supported",
+          "reason": "Alias content and doc_as_attr guard are explicit; property106-111 compares documented name and actual name.",
+          "evidence": {
+            "path": "sphinx/ext/autodoc/_documenters.py",
+            "start_line": 1801,
+            "end_line": 1813
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-d610f8d6b01ec25ced763be9",
+      "reference_sha256": "4d830632acd13c59c5c97493bd17da69f8a599530c0ed9e41b7077c78bb3c4cd",
+      "question_sha256": "58eebbc2ee7662bb201b4cf00c63a10577ada18c58d825d19f552cbb5c94f3f3",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Translation comparison filters only glossary refs",
+          "verdict": "partially_supported",
+          "reason": "Comparison counts all pending_xrefs, not only std term; term exclusion applies later to attribute restoration.",
+          "evidence": {
+            "path": "sphinx/transforms/i18n.py",
+            "start_line": 338,
+            "end_line": 376
+          }
+        }
+      ],
+      "material_errors": [
+        "Comparison counts all pending_xrefs, not only std term; term exclusion applies later to attribute restoration."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "The build test checks translated output and an i18n.inconsistent_references warning listing original and translated term sources (tests/test_intl/test_intl.py:345-365). _NodeUpdater.update_pending_xrefs gathers all pending_xref nodes in original and translated content and compares counts (sphinx/transforms/i18n.py:338-351); compare_references warns on unequal lengths unless noqa (sphinx/transforms/i18n.py:131-147). The std/term special case occurs afterward in reference-key mapping (sphinx/transforms/i18n.py:353-376), not as a filter on the counted references."
+    },
+    {
+      "task_id": "import-d7d4bc9b12e09644708c604d",
+      "reference_sha256": "35bf4de82aad4df85564a1651fc863b0b1e6e9c8d1b6696fcdb07f320820cd0a",
+      "question_sha256": "6dbeefdbe021e86dbf3f2f61def7f1644357d448a93155d8e2d069cbab6c2955",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Descriptor dynamic private attribute lookup",
+          "verdict": "supported",
+          "reason": "__set_name__ stores underscore-prefixed name; __get__ returns descriptor on class access and getattr value on instance. Prefixing is not Python name mangling.",
+          "evidence": {
+            "path": "sphinx/util/_pathlib.py",
+            "start_line": 150,
+            "end_line": 169
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-e7628fedacb9831e50931b53",
+      "reference_sha256": "05869a2c012bc6055d8e179d6260be3a99cc6ce6f2b270012d7993b9ed921c25",
+      "question_sha256": "75780f5c77a46bb40ee7c9aa147e1ab01f587df69ad5c720e84beca37f57e65e",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Napoleon test runs full Napoleon token pipeline",
+          "verdict": "partially_supported",
+          "reason": "Tests directly parse reStructuredText type fields; they do not invoke demonstrated Napoleon conversion chain.",
+          "evidence": {
+            "path": "tests/test_domains/test_domain_py_fields.py",
+            "start_line": 395,
+            "end_line": 405
+          }
+        }
+      ],
+      "material_errors": [
+        "Tests directly parse reStructuredText type fields; they do not invoke demonstrated Napoleon conversion chain."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "These tests supply reStructuredText :param: and :type: fields directly to restructuredtext.parse, including list of str and str or float or int (tests/test_domains/test_domain_py_fields.py:395-405,441-451). PyXrefMixin.make_xrefs splits type targets by delimiter regex, preserves delimiters, and creates cross-references for type names (sphinx/domains/python/_object.py:110-139). The tests assert the resulting parameter/type node sequence and nesting (tests/test_domains/test_domain_py_fields.py:408-436). They validate Napoleon-style delimiter support in Python-domain fields, not a mandatory preceding Napoleon tokenizer execution."
+    },
+    {
+      "task_id": "import-e85fccc0f30798376009433e",
+      "reference_sha256": "35b4e4422c696e24d020a65717bf578340e8c67ee511cc4f86272d92d78ee7cb",
+      "question_sha256": "d7cdfc329db51d2c9f3f66a4e594cac74033c09b160c05e7b209e3e08ce72326",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Lists hashable when elements hashable",
+          "verdict": "unsupported",
+          "reason": "Lists are unhashable regardless of their elements; stored lists make current nested-name hash fail.",
+          "evidence": {
+            "path": "sphinx/domains/cpp/_ast.py",
+            "start_line": 217,
+            "end_line": 237
+          }
+        }
+      ],
+      "material_errors": [
+        "Lists are unhashable regardless of their elements; stored lists make current nested-name hash fail."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "ASTPostfixMemberOfPointer.__hash__ delegates to hash(self.name) (sphinx/domains/cpp/_ast.py:774-785). ASTNestedName stores names and templates as supplied lists and attempts hash((self.names, self.templates, self.rooted)) (sphinx/domains/cpp/_ast.py:217-237). With those ordinary lists, hashing raises TypeError even if every element is hashable. Thus the delegation exposes a real hashability limitation in this pin; defining __hash__ alone does not make these instances successfully hashable."
+    },
+    {
+      "task_id": "import-ea2fa37eac6acfbeb930734b",
+      "reference_sha256": "c0d5e1d427d87234c6614775d1bbb2c6ca7fad279ff352a717cc799057703573",
+      "question_sha256": "43c1c5fe9c1cae9bf70a9bf2726ed66ae9a9ab140c05063bdb713b2b545193e0",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Texinfo init versus writing setup",
+          "verdict": "supported",
+          "reason": "init only empties state; prepare_writing reads config and validates document names against environment.",
+          "evidence": {
+            "path": "sphinx/builders/texinfo.py",
+            "start_line": 52,
+            "end_line": 90
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-eb497b80d5bcc8de9a2b1a58",
+      "reference_sha256": "8c27bb0ebe1a84795a60cd5113c0188591a4f0166c8307d2574d77bd698b2b88",
+      "question_sha256": "e2c7241936528ef1c5798da1ba675bc6d7102dabf00bc60d8253f3b2ab092c92",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Cast parse fallback restores position",
+          "verdict": "supported",
+          "reason": "On DefinitionError resets saved pos then unary parse; combines errors if both fail.",
+          "evidence": {
+            "path": "sphinx/domains/cpp/_parser.py",
+            "start_line": 646,
+            "end_line": 670
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-f91a9955d806d1a664a5fd06",
+      "reference_sha256": "e023979e9e85d3878e86230a505603ff95b12d29e4e0caa8abd07ef89266275c",
+      "question_sha256": "0f5618dc99ac152f4c8d2d7a8fec22e8f3b6c3800e793ead6c74cd16ef836a6b",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Empty sentinel inheritance",
+          "verdict": "supported",
+          "reason": "Base provides immutability/name/union operators/pickle rejection; Empty adds always-false membership. No runtime uniqueness cache implied by creation.",
+          "evidence": {
+            "path": "sphinx/ext/autodoc/_sentinels.py",
+            "start_line": 8,
+            "end_line": 56
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    }
+  ]
+}

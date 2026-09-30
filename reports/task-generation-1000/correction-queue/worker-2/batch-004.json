@@ -1,0 +1,92 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 2,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-004.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "original_reference_sha256": "65c87a76590d42f3c5967d36afbc902d64a5eaffce83817191bcaff01c26d770",
+      "question": "Why does the test mixin class for verifying cosmology read/write operations through HTML table format exist to ensure the integrity of converting cosmology instances to HTML tables when default values defined in cosmology class parameters must compensate for columns absent from the HTML table during reading?",
+      "question_sha256": "5bc856dd883b76110112cf9f41c456f8c0c297554b1cf61607cca086e13be14a",
+      "reference_answer": "ReadWriteHTMLTestMixin tests that deleting the Tcmb0 column and reading with the cosmology class supplies that parameter\u2019s class default (astropy/cosmology/_src/tests/io/test_html.py:144-175). It checks consistency among three class-selection routes and explicitly verifies that the result differs from the original because Tcmb0 and m_nu change. This supports defaults for omitted optional parameters, not recovery of arbitrary missing required data.",
+      "reference_sha256": "224e9e32ca3d75c37905716b32e1c79bcf72a14a39491f6a8cb5329d5b523815",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-c59dfd91bb122c33e16f882c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "original_reference_sha256": "26f462a0d2c9e1827f24e020617b86a5c90f24b7c78a59985d1b39d0298c85ca",
+      "question": "What attributes must be implemented by the object type tested in the test class that verifies compatibility with numpy's shape, size, and dimensionality inspection functions to satisfy the dependencies of those functions?",
+      "question_sha256": "b9b0cf5a3fcd6f4c8edaf593d580cd0bd91ca0069a5732ada0c3136ce150a69b",
+      "reference_answer": "TestShapeInformation checks that the masked array self.ma exposes shape (2, 3), size 6 and ndim 2 through np.shape, np.size and np.ndim (astropy/utils/masked/tests/test_function_helpers.py:76-84). These tests establish the three observable results, not a requirement that the object separately implement abstract ShapedLikeNDArray properties.",
+      "reference_sha256": "dff2cd18e7ea4b0918c29bf512b916784f3efdefc41a6d7742e89427738f07b2",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-d27197a76126b6144cd7e98b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "original_reference_sha256": "38b447063d8037bfc5dbd16d2fd8a63e0b835e5f5336f227d6dd3631ef796686",
+      "question": "What architectural trade-offs does the base metadata container class for masked arrays introduce by delegating the mechanism for choosing serialization strategies to a runtime context manager rather than an inheritance-based approach?",
+      "question_sha256": "25c373f5ba3e9079b128ad1529b579780857c88b43184340b76a37ad6f80d1b2",
+      "reference_answer": "MaskedInfoBase initializes a per-instance serialize_method mapping when bound (astropy/utils/masked/core.py:418-434). MaskedNDArrayInfo selects by _serialize_context, emits data with an optional separate mask for data_mask or a NumPy masked array for null_value, and raises ValueError for unknown strategies (456-480). This permits format-specific runtime selection but depends on a valid context key and method value. The source does not establish a compile-time safety advantage for an inheritance alternative.",
+      "reference_sha256": "2b8648c34fd608e5bd9fbae61d9d8273cc3a334b55e2aab25d8532624186fef4",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-d7f101c84e6d0051346cbbb2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "original_reference_sha256": "5babc87884db65b1758fbc1f81da438d49671f823c9f9d9ad89652b576a805f5",
+      "question": "What modules imported in the helper module that provides Quantity-specific implementations for numpy function overrides would be affected if the numpy functions that examine array dimensions and structure were removed from the dictionary mapping numpy functions to their custom implementations?",
+      "question_sha256": "f7fdb69a570ad8c02502c3111bd55ade3495b0e3a2c6d3e815b8c2ab8db40f52",
+      "reference_answer": "The premise conflates registries: np.shape, np.size, np.ndim and the listed shape operations are in SUBCLASS_SAFE_FUNCTIONS, a set, not a dictionary of custom implementations (astropy/units/quantity_helper/function_helpers.py:60-90). Removing an entry without registering it elsewhere makes Quantity.__array_function__ use its unknown-function branch: it warns and still delegates to ndarray (astropy/units/quantity.py:1875-1928). This changes dispatch behavior for callers, not the imported modules themselves.",
+      "reference_sha256": "8889675f38cf91008b86e714c0f28795be2118b536a1c6459af9a85c24403096",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-ddf6716f26bfbf38e5f34ed4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/astropy--astropy-0a041d38fbd0",
+      "original_reference_sha256": "36e1bae539c84a19f3a61e58afeff66f6566501fb97c7081b75ac7d35dc93570",
+      "question": "How should the validation methods that orchestrate unit serialization and deserialization testing be refactored to separate the format-specific string conversion operations from the unit decomposition and scale comparison operations in the pytest test classes?",
+      "question_sha256": "c54add1b18baad69406a79ef01e6bdb74dd5b63bcff315beedfe5fc7ef03afb0",
+      "reference_answer": "Extract a roundtrip conversion helper while preserving serialization warning suppression and exactly-one deprecated-unit warning checks (astropy/units/tests/test_format.py:356-368). Extract a scale comparison helper accepting rtol; retain 1e-9 for check_roundtrip and 1e-5 for check_roundtrip_decompose. The latter must still decompose before serialization and assert the serialized text contains no double spaces (370-377). These helpers separate operations without weakening the current tests.",
+      "reference_sha256": "fae7c534d7425817e9db533cd0bfc2871201680cd8df2d7631f227f229050ab9",
+      "repository": {
+        "commit": "0a041d38fbd0014298d4cf340d9f891c4522093f",
+        "family_id": "astropy/astropy",
+        "url": "https://github.com/astropy/astropy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/astropy--astropy-0a041d38fbd0014298d4cf340d9f891c4522093f",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-ee307a6a3a7d263ea1aa3ffa"
+    }
+  ]
+}

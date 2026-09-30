@@ -1,0 +1,394 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-62b175fe5d2d4171168c4362",
+      "reference_sha256": "39d367bd44721c1200c1721fbc21301fb1f469a03d39cd6c564c3069cd835a30",
+      "question_sha256": "387bd3c1dd559189d187c263dfd8d58e00d276f99763d9ebe94a93451b302987",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Descriptor returns plain callable regardless of owner/instance",
+          "verdict": "supported",
+          "reason": "Non-data descriptor fixture stores instance at AggregateCls.a and calls returned func.",
+          "evidence": {
+            "path": "tests/functional/n/not_callable.py",
+            "start_line": 158,
+            "end_line": 178
+          }
+        },
+        {
+          "claim": "Checker suppresses descriptor not-callable in class scope",
+          "verdict": "supported",
+          "reason": "Guard requires inferred instance, known bases and descriptor locals.",
+          "evidence": {
+            "path": "pylint/checkers/typecheck.py",
+            "start_line": 1779,
+            "end_line": 1800
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-663562aa85f5980d33b86e52",
+      "reference_sha256": "4c4c52981138c1bb848af9ee6257540a564b6a9659d6cf1b1310f306e06a07c3",
+      "question_sha256": "a4b8e13fb2188e8dce558a22c937a76a500bbff5a2855dae4ae1d92e7b44ccaf",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Test creates isolated linter walker checker state",
+          "verdict": "supported",
+          "reason": "One test construction shown, no thousands-case benchmark.",
+          "evidence": {
+            "path": "tests/utils/unittest_ast_walker.py",
+            "start_line": 18,
+            "end_line": 58
+          }
+        },
+        {
+          "claim": "Walker initializes callback maps and introspects methods",
+          "verdict": "supported",
+          "reason": "Observable work does not establish bottleneck.",
+          "evidence": {
+            "path": "pylint/utils/ast_walker.py",
+            "start_line": 28,
+            "end_line": 69
+          }
+        }
+      ],
+      "material_errors": [
+        "Unmeasured bottleneck and thousands-of-cases performance premise."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "The test constructs fresh mutable linter, walker, and checker state, registers callbacks, and walks a parsed module (tests/utils/unittest_ast_walker.py:18-58). ASTWalker initialization creates callback maps; add_checker scans dir(checker), filters visit/leave methods by enabled messages, and optionally registers defaults (pylint/utils/ast_walker.py:28-69). Repeating this incurs setup work, but the source does not establish significant degradation or a bottleneck across thousands of tests; that requires measurement."
+    },
+    {
+      "task_id": "import-72d85443ca2d9caa2dd90758",
+      "reference_sha256": "4bc30535f7319fb8b00a960918bd0bf64bf5f690d93558a5acfc1fb1fcde9b17",
+      "question_sha256": "1278474efbe783735f841476dbb82449c60e9aa6a0b169a82b74c5943bc5c80d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Documentation example returns even item or prints after loop completion",
+          "verdict": "supported",
+          "reason": "Named example file and unnecessary else match.",
+          "evidence": {
+            "path": "doc/data/messages/u/useless-else-on-loop/bad.py",
+            "start_line": 1,
+            "end_line": 6
+          }
+        },
+        {
+          "claim": "Checker flags else without early break",
+          "verdict": "supported",
+          "reason": "orelse and no early exit trigger message.",
+          "evidence": {
+            "path": "pylint/checkers/base/basic_error_checker.py",
+            "start_line": 477,
+            "end_line": 487
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-7bf646ef24fe854870baa488",
+      "reference_sha256": "f29fdcfecb75f4a5fe4c273b979526a014e7178fc2710a5da502d89b19d961ec",
+      "question_sha256": "b8ff08523e0a0bc900eef1e995e8d21abbd029cdd541d1fe588b233c32ca6788",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "NamedTuple fixtures exercise union syntax with and without postponed annotations",
+          "verdict": "supported",
+          "reason": "Annotation syntax accepted while runtime forms retain expected warnings.",
+          "evidence": {
+            "path": "tests/functional/a/alternative/alternative_union_syntax_py37.py",
+            "start_line": 14,
+            "end_line": 61
+          }
+        },
+        {
+          "claim": "Older version fixture expects unsupported operator in NamedTuple fields",
+          "verdict": "supported",
+          "reason": "Positive/negative distinction supports PEP604 test purpose.",
+          "evidence": {
+            "path": "tests/functional/a/alternative/alternative_union_syntax_error.py",
+            "start_line": 53,
+            "end_line": 61
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-7cfe9cbd7568ff28b7cc98f8",
+      "reference_sha256": "560244d7f47b6d691a64183b4e3a3ff3c2512d6e6aa09171f5decf5131d585bc",
+      "question_sha256": "d7f01e5805c13c712a3896d0afd076f57679b9b74ef84a7110db30addc41c37c",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Coords is defined in class before method annotation",
+          "verdict": "supported",
+          "reason": "Annotation evaluated in definition context, not method local execution scope.",
+          "evidence": {
+            "path": "tests/functional/u/used/used_before_assignment_type_annotations.py",
+            "start_line": 77,
+            "end_line": 90
+          }
+        },
+        {
+          "claim": "Checker special cases earlier class-scope annotation definition",
+          "verdict": "supported",
+          "reason": "Uses definition line and enclosing frame; not generic importing module guarantee.",
+          "evidence": {
+            "path": "pylint/checkers/variables.py",
+            "start_line": 2303,
+            "end_line": 2334
+          }
+        }
+      ],
+      "material_errors": [
+        "Misstates return-annotation resolution as method-local lookup first and invents importing-module validation guarantees."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "The fixture defines Coords in MyObject\u2019s class body before def my_method(self) -> Coords, inside nested_class_as_return_annotation (tests/functional/u/used/used_before_assignment_type_annotations.py:77-90). The return annotation uses the enclosing definition context, where the prior class binding is available; the method body\u2019s local scope is not the starting point. Pylint has a special return-annotation case that checks the enclosing class locals and whether the definition precedes the method (pylint/checkers/variables.py:2303-2316). This fixture checks avoidance of a false used-before-assignment diagnostic, not a general contract for importing modules or all type checkers."
+    },
+    {
+      "task_id": "import-7e9601f2c55029f2e6026b90",
+      "reference_sha256": "3137f39d83241013d9687bb6e0eb839d85c571cc8cf9871ad9f7c7ad64118be1",
+      "question_sha256": "a3f996f0c484a1f95aa654474f03f042186f9ad327b3fa71535338bee56ca3e9",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Bar super init resolves through empty Foo to object",
+          "verdict": "supported",
+          "reason": "Foo defines no initializer; Bar explicit super marked while Baz zero-argument super unmarked.",
+          "evidence": {
+            "path": "tests/functional/s/super/super_with_arguments.py",
+            "start_line": 1,
+            "end_line": 12
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-801079e1be71efa57bf1f97f",
+      "reference_sha256": "5c6936c0f38dd6af69bd4d66f31b5009f9955432aca7d6e90fbd08e8817274c1",
+      "question_sha256": "b98758d7d8ce216cdf2cc259788528ab8830623d0dd19de8f819acbf673b0d09",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Docstyle flags leading newline",
+          "verdict": "supported",
+          "reason": "Exact initial-character check is supported but PEP257 blanket requirement not in source.",
+          "evidence": {
+            "path": "pylint/extensions/docstyle.py",
+            "start_line": 51,
+            "end_line": 61
+          }
+        },
+        {
+          "claim": "Bad fixture begins with newline",
+          "verdict": "supported",
+          "reason": "Concrete trigger.",
+          "evidence": {
+            "path": "doc/data/messages/d/docstring-first-line-empty/bad.py",
+            "start_line": 1,
+            "end_line": 9
+          }
+        }
+      ],
+      "material_errors": [
+        "Incorrectly states PEP257 universally requires multiline summary on opening quote line."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "The example\u2019s opening triple quotes are immediately followed by a newline (doc/data/messages/d/docstring-first-line-empty/bad.py:1-9). DocStringStyleChecker tests the raw docstring\u2019s first character and emits docstring-first-line-empty when it is newline (pylint/extensions/docstyle.py:51-61). This is the extension\u2019s specific style rule; its implementation does not establish that PEP257 universally forbids a multiline docstring summary on the following line."
+    },
+    {
+      "task_id": "import-8027307847d605d0e9246890",
+      "reference_sha256": "700619e2072713170f149b0ed11e91fd7c9b0d62b70e81f841af862e11aa7d5a",
+      "question_sha256": "677ce9c8696663d63bb0043f0cd7bd48845c8a30301e63ec0befba4b7b10e98a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Bad tuple-length fixture accompanies correct and ambiguous cases",
+          "verdict": "supported",
+          "reason": "Annotated three-element return isolates tuple length diagnostic.",
+          "evidence": {
+            "path": "tests/functional/i/invalid/invalid_getnewargs/invalid_getnewargs_ex_returned.py",
+            "start_line": 9,
+            "end_line": 103
+          }
+        },
+        {
+          "claim": "Checker validates tuple size then element types",
+          "verdict": "supported",
+          "reason": "Requires length2; tuple/dict checks only when inferable.",
+          "evidence": {
+            "path": "pylint/checkers/classes/special_methods_checker.py",
+            "start_line": 374,
+            "end_line": 403
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-8105484f8eb45e656f780a50",
+      "reference_sha256": "0ca6eee6f269ae92db6cd44c4731e77076496259b5911807d32ac47a49d75ae2",
+      "question_sha256": "0b167b1b86be517145e1565d4b2c95ea9e9d4bd8a0a0aef9c2c766ad62759f74",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Fixture separates early break from else yield structurally",
+          "verdict": "supported",
+          "reason": "One If in loop body, contradicting stated len-body exclusion.",
+          "evidence": {
+            "path": "tests/functional/u/use/use_yield_from.py",
+            "start_line": 42,
+            "end_line": 47
+          }
+        },
+        {
+          "claim": "Checker compares yielded name to loop target",
+          "verdict": "supported",
+          "reason": "For this fixture body length is1; differing target/value names exclude suggestion.",
+          "evidence": {
+            "path": "pylint/checkers/refactoring/refactoring_checker.py",
+            "start_line": 1164,
+            "end_line": 1186
+          }
+        }
+      ],
+      "material_errors": [
+        "Incorrectly attributes exclusion to loop body length and invents checker design rationale about testing complexity."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "A possible refactor is to accept an iterable and predicate in a helper that stops at the first true predicate result, then yield the alternative only when the helper reports exhaustion. Preserve laziness, short-circuiting, empty-iterable behavior and exception propagation. The original fixture is at tests/functional/u/use/use_yield_from.py:42-47. Independent tests can cover the predicate itself, early-stop consumption, and alternative emission on exhaustion. This is a proposed design, not implemented in the repository. The use-yield-from checker does not document this testing rationale; its guards include comparison of loop target and yielded name (pylint/checkers/refactoring/refactoring_checker.py:1164-1186)."
+    },
+    {
+      "task_id": "import-84eb8ec127206833fada12d5",
+      "reference_sha256": "2730db1def99ed6f243adebd4e173adcaf635d54149b759c0f6fa05b1535bef2",
+      "question_sha256": "3ccfe3f8c2ec82cc4092f69bfba465726802b1e35766f645a1553b8048b0c98e",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Regex filter delegates matching to subclass pattern",
+          "verdict": "supported",
+          "reason": "SphinxDirectives supplies pattern and inherits _skip.",
+          "evidence": {
+            "path": "pylint/checkers/spelling.py",
+            "start_line": 111,
+            "end_line": 142
+          }
+        },
+        {
+          "claim": "Tokenizer composes configured filter classes",
+          "verdict": "supported",
+          "reason": "List contains standard and custom filters through existing API.",
+          "evidence": {
+            "path": "pylint/checkers/spelling.py",
+            "start_line": 323,
+            "end_line": 335
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-85319bf30f135515b36162fa",
+      "reference_sha256": "f3fbfe8aa11c2fa5f196edc498ff49869251d3e19c12d234c3e4172adbc92306",
+      "question_sha256": "740ee680a32cd752ef09fbc4b19fc309dbc6bcaef7a031bc8e6eb3e8cf6df306",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Concrete protocol implementer has ellipsis init and child expected diagnostic",
+          "verdict": "supported",
+          "reason": "Explicit regression fixture supports checker behavior, not runtime necessity.",
+          "evidence": {
+            "path": "tests/functional/s/super/super_init_not_called_extensions_py310.py",
+            "start_line": 7,
+            "end_line": 22
+          }
+        },
+        {
+          "claim": "Protocol predicate checks only direct protocol bases",
+          "verdict": "supported",
+          "reason": "TestParent inherits TestProto rather than Protocol directly.",
+          "evidence": {
+            "path": "pylint/checkers/utils.py",
+            "start_line": 1679,
+            "end_line": 1699
+          }
+        },
+        {
+          "claim": "Uncalled concrete initializer produces diagnostic",
+          "verdict": "supported",
+          "reason": "Protocol exemption checked before message.",
+          "evidence": {
+            "path": "pylint/checkers/classes/class_checker.py",
+            "start_line": 2291,
+            "end_line": 2307
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-859938b31ac8420808074bdb",
+      "reference_sha256": "9634e98c6f51a8dfad00c8908e47509004888a8d24479ad1e27b90c49c3413a4",
+      "question_sha256": "7adfede2fb37c8f38571f782e5a9265486495ca79be8d8bf4eacf7956f6402d7",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Regression hierarchy contains many role bases but no query batch runtime",
+          "verdict": "supported",
+          "reason": "Fixture models class inference, not per-query performance or caching.",
+          "evidence": {
+            "path": "tests/regrtest_data/max_inferable_limit_for_classes/main.py",
+            "start_line": 1,
+            "end_line": 38
+          }
+        },
+        {
+          "claim": "StatementRole is a simple SQLRole subclass",
+          "verdict": "supported",
+          "reason": "No operations or MRO timing logic in this chain.",
+          "evidence": {
+            "path": "tests/regrtest_data/max_inferable_limit_for_classes/nodes/roles.py",
+            "start_line": 69,
+            "end_line": 74
+          }
+        }
+      ],
+      "material_errors": [
+        "Invented runtime batch bottleneck and unsupported assertion of uncached MRO computation."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "The premise is not established. StatementRole simply inherits SQLRole (tests/regrtest_data/max_inferable_limit_for_classes/nodes/roles.py:73-74). The regression fixture uses it among many bases of ColumnElement, then derives FunctionElement and months_between; the file identifies a SQLAlchemy-inspired inference issue (tests/regrtest_data/max_inferable_limit_for_classes/main.py:1-38). This can exercise static class inference, but it contains no large database-query batch benchmark and does not demonstrate repeated uncached runtime MRO computation or quantify performance."
+    }
+  ]
+}

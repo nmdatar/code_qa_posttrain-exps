@@ -1,0 +1,214 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-14cad048bf474ce991c30785",
+      "reference_sha256": "58d68e0f980bff5c438f849fe30b4d3793c99bb67718094e26b15e70f7fdbb8a",
+      "question_sha256": "744009ab946eda38aa619feefd85d05ebbeaeb37b97b6ce6d84e02bb7b7d1a41",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Action is direct argparse alias without intermediate base",
+          "verdict": "contradicted",
+          "reason": "Action is a local class inheriting LoggerProperty and ArgparseAction.",
+          "evidence": {
+            "path": "jsonargparse/_actions.py",
+            "start_line": 38,
+            "end_line": 39
+          }
+        }
+      ],
+      "material_errors": [
+        "Incorrect linear inheritance omits custom Action and LoggerProperty."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "ActionTypeHint inherits jsonargparse._actions.Action (jsonargparse/_typehints.py:152-188). That Action is a custom class with bases LoggerProperty and argparse.Action, imported as ArgparseAction (jsonargparse/_actions.py:7,38-39). ActionTypeHint adds type-hint handling and, during configured action construction, calls super().__init__(**kwargs) to retain argparse\u2019s action attributes and protocol."
+    },
+    {
+      "task_id": "import-3c226b839a191b337414c390",
+      "reference_sha256": "e294120617b0e1e0f689b0e9095d55289843500813db8489bfaec4438e5411c6",
+      "question_sha256": "c1a12726385ddc98fde8bece6efaf1e3d6b056116261bf7db5b1aa6cb9e85db4",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "ActionConfigFile.apply_config calls parse_value_or_config",
+          "verdict": "contradicted",
+          "reason": "It constructs Path then calls parse_path or parse_string and merge_config, not that helper.",
+          "evidence": {
+            "path": "jsonargparse/_actions.py",
+            "start_line": 191,
+            "end_line": 212
+          }
+        }
+      ],
+      "material_errors": [
+        "Wrong primary call chain and metadata provenance mechanism."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "ActionConfigFile.apply_config tries Path(value); on a valid path it calls parser.parse_path, otherwise it attempts inline parse_string (jsonargparse/_actions.py:191-207). parse_path enters change_to_path_dir, reads content and invokes parse_string, so relative references use the file context (jsonargparse/_core.py:546-557). apply_config then merge_config\u2019s the parsed namespace into cfg and records the path in cfg[dest] (208-212). parse_value_or_config is a separate helper and is not the direct apply_config entry path."
+    },
+    {
+      "task_id": "import-697d3ee35f66f6005c502892",
+      "reference_sha256": "c9ef168f7df14105f3491d655f67c86f1c44ae419700abcfd7ba0e7d0d8f6888",
+      "question_sha256": "c9da793d8c5ac2d4d9be97030cbdc2eec1f3cbf32b93e55327562aa70908768c",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "SignatureArguments inherits directly from object",
+          "verdict": "contradicted",
+          "reason": "It inherits LoggerProperty.",
+          "evidence": {
+            "path": "jsonargparse/_signatures.py",
+            "start_line": 37,
+            "end_line": 38
+          }
+        }
+      ],
+      "material_errors": [
+        "Hierarchy omits actual base and ArgumentLinking."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "SignatureArguments inherits LoggerProperty (jsonargparse/_signatures.py:37). ActionsContainer inherits SignatureArguments and argparse._ActionsContainer (jsonargparse/_core.py:94). ArgumentParser\u2019s declared bases are ParserDeprecations, ActionsContainer, ArgumentLinking and argparse.ArgumentParser, in that order (180). This combines signature-driven argument generation with argparse containers and linking/deprecation behavior."
+    },
+    {
+      "task_id": "import-ab3b7c4537df54e0e07fc7f7",
+      "reference_sha256": "09f97ba84ce51c83321de8a1767826929790148a59ae90311b72d44d8f307e3c",
+      "question_sha256": "9c9e454ecd27426f4820b8a6b726d0c40dd1e24159279339a129c44299705ce2",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Default files extract keyed subsection before merge",
+          "verdict": "supported",
+          "reason": "Passes key into loader and merges each file; _load_config_parser_mode selects cfg_dict.get(key,{}) at 637-641; merge clones and updates at 1303-1318.",
+          "evidence": {
+            "path": "jsonargparse/_core.py",
+            "start_line": 957,
+            "end_line": 961
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-ae7e313ea85b55938194f7fa",
+      "reference_sha256": "8bc2ebdbb330fbaa86927f94c9885923be9ea05f8bd9ba6f6d641691ec7a7ab0",
+      "question_sha256": "4d1ec1e630826bd0b7b32028e960bd3cca5569cb531776176b579bc6e5fc4a26",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Every environment variable triggers AST signature resolution and multiplicative slowdown",
+          "verdict": "unsupported",
+          "reason": "Loops registered actions and checks matching env names; not every env variable nor universally AST resolution.",
+          "evidence": {
+            "path": "jsonargparse/_core.py",
+            "start_line": 452,
+            "end_line": 480
+          }
+        }
+      ],
+      "material_errors": [
+        "Unmeasured degradation and unsupported universal O(n*m*t) claim."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "Environment loading scans registered actions, handles configured subcommands recursively, and validates matching values through _check_value_key (jsonargparse/_core.py:452-480). handle_subcommands may merge subparser environment/default namespaces and recurse further (jsonargparse/_actions.py:755-773). These paths can add work with nesting and complex values, but the source does not show that every variable re-runs AST signature analysis or establish a general complexity or measured slowdown."
+    },
+    {
+      "task_id": "import-d0937269105948d01e8d37c7",
+      "reference_sha256": "c44ad3568dba603935716efa775b3a29a6515a2884ab3d330df729ff7c34517c",
+      "question_sha256": "95679596c9baa23e11b670182a41ce74a91cb8931017393babd5dea448ea600f",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Removing timestamp resolver prevents bare mapping strings",
+          "verdict": "contradicted",
+          "reason": "Timestamp/float resolver edits are distinct; yaml_load explicitly converts all-None mapping patterns back to string.",
+          "evidence": {
+            "path": "jsonargparse/_loaders_dumpers.py",
+            "start_line": 32,
+            "end_line": 64
+          }
+        }
+      ],
+      "material_errors": [
+        "Conflates resolver modifications with post-load CLI string restoration."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "DefaultLoader removes timestamp and original float implicit resolvers, then registers a float pattern recognizing exponent-only numeric forms (jsonargparse/_loaders_dumpers.py:32-49). Separately, yaml_load restores certain all-None mappings such as Foo: or {text} to their original strings (52-64). load_value also restores scalar input text unless simple_types=True (107-115). These are distinct protections for configuration/CLI values."
+    },
+    {
+      "task_id": "import-d4dbcf1fa92b9feadbf73603",
+      "reference_sha256": "2acb7eb3cf3c19c5dfac66a43e6fd1178e9bc38f990bc9cf5359ff8a1d836163",
+      "question_sha256": "9d851a7c0f721416dd313086ec32bd21c69d110664e148e7337698b84153eb7a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Union tries subtypes and dataclass-like values use class parser",
+          "verdict": "supported",
+          "reason": "Stops at first adaptation success, aggregates exceptions otherwise; dataclass parser path at 808-825 accepts dict/Namespace.",
+          "evidence": {
+            "path": "jsonargparse/_typehints.py",
+            "start_line": 671,
+            "end_line": 682
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-db89c718c8f990426951c536",
+      "reference_sha256": "a6da1bcc6cd8c2b08aa742720953ee018bde45b38867eef2b89cafef65590dcd",
+      "question_sha256": "8773975b2b15bb0aebd8f06a71796a81196e3632acee8448525b7f5188a8001e",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Four-tier inheritance hierarchy handles dataclass frameworks",
+          "verdict": "contradicted",
+          "reason": "This is function dispatch then visitor/fallback, not an inheritance hierarchy.",
+          "evidence": {
+            "path": "jsonargparse/_parameter_resolvers.py",
+            "start_line": 905,
+            "end_line": 941
+          }
+        }
+      ],
+      "material_errors": [
+        "Confuses resolution strategy with class inheritance; specialized dispatcher does not call is_dataclass_like."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "get_signature_parameters first tries get_parameters_from_pydantic_or_attrs, otherwise uses ParametersVisitor; exceptions trigger get_parameters_by_assumptions (jsonargparse/_parameter_resolvers.py:905-941). The specialized function detects Pydantic versions/dataclasses and attrs fields and selects field-data extractors (856-902). These are dispatch and fallback strategies, not a four-tier class inheritance hierarchy."
+    },
+    {
+      "task_id": "import-dbc96c4659da71e65d10baa1",
+      "reference_sha256": "62744d69189235697ea85c5b49fa945a7ed8a3d3e8b9347aa1982076a644a8ac",
+      "question_sha256": "06bf0a633c9ad39082cca28ac5d993c2d3a71649dfeade023148cfeb921be1de",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Custom float regex recognizes exponent-like strings",
+          "verdict": "supported",
+          "reason": "Anchored pattern includes digits with e/E exponent; load_value simple_types=False can preserve original scalar strings, so automatic conversion depends on entry path.",
+          "evidence": {
+            "path": "jsonargparse/_loaders_dumpers.py",
+            "start_line": 36,
+            "end_line": 49
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

@@ -1,0 +1,391 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-45c370741c488f1730b36857",
+      "reference_sha256": "34bcfc6228a262a35d31ba9f73c83ade2d88b75f8d04909da2f8320e735518ef",
+      "question_sha256": "a8dff26fc9ffe01083dc4b993d092b366000d1de1afe9325c47ffc1b951eb4fe",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Explicit no_proxy controls bypass and nonempty return exposes environment proxies",
+          "verdict": "supported",
+          "reason": "Checks explicit value before fallback; temporarily changes environment for proxy_bypass; non-bypassed path returns getproxies.",
+          "evidence": {
+            "path": "src/requests/utils.py",
+            "start_line": 769,
+            "end_line": 825
+          }
+        }
+      ],
+      "material_errors": [
+        "Omits explicit interpretation of nonempty result and claims no global environment modification despite temporary set_environ."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "A non-None no_proxy argument supplies the bypass list instead of reading no_proxy/NO_PROXY for the initial match. The function temporarily sets lowercase no_proxy for the lower-level proxy_bypass check (src/requests/utils.py:769-813). get_environ_proxies returns {} when bypass applies, otherwise getproxies(); a nonempty result therefore means bypass did not apply and proxy configuration was available, not that a particular proxy connection has already been made (src/requests/utils.py:816-825)."
+    },
+    {
+      "task_id": "import-508b0d30c967d124813f7b1d",
+      "reference_sha256": "49910c59d303989cddea1edabdf51c4665887a203b227add4c052db831768aaa",
+      "question_sha256": "d904f8021e87caa9589db6e62ad203aa1b00db271f1a5ebfbb20977c6ff65785",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Consumed uncached response cannot be iterated again",
+          "verdict": "supported",
+          "reason": "StreamConsumedError precedes reuse selection.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 837,
+            "end_line": 850
+          }
+        },
+        {
+          "claim": "Content access joins and caches stream",
+          "verdict": "supported",
+          "reason": "Uncached consumed content raises RuntimeError.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 891,
+            "end_line": 907
+          }
+        }
+      ],
+      "material_errors": [
+        "Contradicts the guard by claiming iter_content can replay after uncached streaming."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "Response distinguishes cached body data (_content, initially False) from raw-stream exhaustion (_content_consumed). iter_content streams incrementally until consumed, but raises StreamConsumedError if consumed with no cache; it slices cached content only when materialization already occurred (src/requests/models.py:816-855). The content property joins the stream into memory and marks it consumed, or raises RuntimeError if the uncached stream was already consumed (src/requests/models.py:891-907). Streaming avoids obligatory full buffering; content access still buffers the whole body and does not guarantee bounded memory."
+    },
+    {
+      "task_id": "import-516a4679efc41a78cc0adef3",
+      "reference_sha256": "c20de2c263f829b422152ffafb97bce715ab34a53802e89b1a50cebebc03454f",
+      "question_sha256": "bb9e7c56ff8186d1537ded640b9ff847e40ea0818a8138ec3a14953a90d3655e",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Multipart validation rejects string data and combines fields/files",
+          "verdict": "supported",
+          "reason": "String guard produces tested exception; structured data converted to fields.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 137,
+            "end_line": 203
+          }
+        },
+        {
+          "claim": "Preparation selects multipart when files supplied",
+          "verdict": "supported",
+          "reason": "Calls _encode_files versus _encode_params.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 552,
+            "end_line": 570
+          }
+        },
+        {
+          "claim": "Test expects rather than prevents the error",
+          "verdict": "supported",
+          "reason": "Reference explains actual raising behavior despite question wording.",
+          "evidence": {
+            "path": "tests/test_requests.py",
+            "start_line": 914,
+            "end_line": 918
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-528b2c0d9016f69a22fea98e",
+      "reference_sha256": "1e3001a44d5307c235d957b25142fb1ec0ccd917c7b6a5530d51ea1425cc5b51",
+      "question_sha256": "21f5cb775c83641fbf4ac202c52600e6842be3c91f1dc21c493477fd7dbe97b6",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Redirect count raises TooManyRedirects with response",
+          "verdict": "supported",
+          "reason": "History excluding original request compared with configured limit.",
+          "evidence": {
+            "path": "src/requests/sessions.py",
+            "start_line": 173,
+            "end_line": 193
+          }
+        },
+        {
+          "claim": "Session.send consumes resolver generator",
+          "verdict": "supported",
+          "reason": "Allowed redirects trigger generation and evaluation.",
+          "evidence": {
+            "path": "src/requests/sessions.py",
+            "start_line": 720,
+            "end_line": 724
+          }
+        },
+        {
+          "claim": "API helper delegates via temporary Session",
+          "verdict": "supported",
+          "reason": "Session request is entry chain.",
+          "evidence": {
+            "path": "src/requests/api.py",
+            "start_line": 55,
+            "end_line": 59
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-5820941a82e48bd290697cd0",
+      "reference_sha256": "7e75a1963ba9614bb545bdc583d721150831bd24439f1dd99f27b6873233d4d3",
+      "question_sha256": "b5666bb02542ef7facb9c72dd4bf8cb0a44416501c1d30755d3ea6a2a9a76095",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Named parameter pairs match test function arguments",
+          "verdict": "supported",
+          "reason": "Decorator value/expected cases lead to parser equality assertion.",
+          "evidence": {
+            "path": "tests/test_utils.py",
+            "start_line": 566,
+            "end_line": 627
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-5c466e04c9918eb631c0cc32",
+      "reference_sha256": "c15a51ed6660252444e6f299a46a5d51780bb80a8eaf85e0df9aac753f794a54",
+      "question_sha256": "0ebe31f2c4d72540546ef1a9015a0e718b3bed39b0ef69766b227b63625bd06d",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Request resolution is conditional and may remain None",
+          "verdict": "supported",
+          "reason": "Truthy explicit request wins; response/request defaults None, falsy request falls back if attribute exists.",
+          "evidence": {
+            "path": "src/requests/exceptions.py",
+            "start_line": 17,
+            "end_line": 24
+          }
+        }
+      ],
+      "material_errors": [
+        "Always-have-context guarantee is false; backwards-compatibility design intent is not evidenced."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "RequestException pops response and request from kwargs, stores them, and fills self.request from response.request only when response is not None, self.request is falsy, and the attribute exists. It then forwards remaining arguments to the base initializer (src/requests/exceptions.py:17-24). This permits callers to supply only a response whose request was set by the adapter (src/requests/adapters.py:367-369), but does not guarantee either context object is present or prove a historical compatibility motive."
+    },
+    {
+      "task_id": "import-5dd45a2df70b293f78842f8d",
+      "reference_sha256": "1fadaea8fc2422cf9456ef72676cf0833445b9bd6c975ffcee0a2aea0a86beb3",
+      "question_sha256": "6b805933f46fc895527e0d4e58f2d7ac99811c63000165cfc048b2935029e096",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Pickle serializes attributes after consuming pending content",
+          "verdict": "supported",
+          "reason": "getstate forces content only if not consumed; setstate marks consumed and removes raw.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 711,
+            "end_line": 725
+          }
+        },
+        {
+          "claim": "Streaming or cached replay selected by consumption state",
+          "verdict": "supported",
+          "reason": "Guard rejects consumed uncached stream; otherwise slices cache or uses generator.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 839,
+            "end_line": 855
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-60f10fba4e17f899cefa26f7",
+      "reference_sha256": "308616eba7a32ad8177e48e95dd8c2e80f00a83c91805df841f48ad1f5f6b15c",
+      "question_sha256": "f6348826665dd8ac529857f36d429e36a8b7d2e17db8f5874f51f21b2299ebf6",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Response streaming error has RequestException and TypeError bases",
+          "verdict": "supported",
+          "reason": "Distinct from UnrewindableBodyError single declared base.",
+          "evidence": {
+            "path": "src/requests/exceptions.py",
+            "start_line": 127,
+            "end_line": 136
+          }
+        },
+        {
+          "claim": "Rewind validates seek and saved position",
+          "verdict": "supported",
+          "reason": "Unavailable seek/noninteger position or OSError raises request rewind error.",
+          "evidence": {
+            "path": "src/requests/utils.py",
+            "start_line": 1071,
+            "end_line": 1086
+          }
+        },
+        {
+          "claim": "Response replay guard",
+          "verdict": "supported",
+          "reason": "Consumed bool content raises StreamConsumedError.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 837,
+            "end_line": 840
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-6f8cdd07160337b5eb598b40",
+      "reference_sha256": "e06e8a2e3858709299c12a0655e68bec769570fbc4d6088dc32986ae94ab5efc",
+      "question_sha256": "4994130cbcd60db249ae1fa76e96ce65b909a87e4f9be58264127936a18a5e41",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "BOM detection precedes null-pattern detection",
+          "verdict": "supported",
+          "reason": "BOM UTF32/UTF8/UTF16 first; null patterns identify endian suffixes.",
+          "evidence": {
+            "path": "src/requests/utils.py",
+            "start_line": 955,
+            "end_line": 976
+          }
+        },
+        {
+          "claim": "Tests cover implicit encoding and explicit BOM cases",
+          "verdict": "supported",
+          "reason": "test_encoded also includes BOM-emitting codecs, so not exclusively BOM-free; central two-stage distinction remains supported.",
+          "evidence": {
+            "path": "tests/test_utils.py",
+            "start_line": 400,
+            "end_line": 427
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-777dde0184a6d7f4f0cd1b22",
+      "reference_sha256": "9ef6e7d144fa032c927f3ad05088efcadac68741619ead1e74190e59717ae62f",
+      "question_sha256": "d7a9fc2503e13b23be8576a12c05ccf5015098cf56b088042e81c7eff7ce918a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Prepared URL preserves auth component",
+          "verdict": "supported",
+          "reason": "Reconstructs netloc with auth before requoting URL.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 433,
+            "end_line": 481
+          }
+        },
+        {
+          "claim": "Authentication falls back to URL and applies handler",
+          "verdict": "supported",
+          "reason": "Extracted nonempty pair wrapped in HTTPBasicAuth.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 588,
+            "end_line": 608
+          }
+        },
+        {
+          "claim": "Extraction unquotes username and password",
+          "verdict": "supported",
+          "reason": "Parsed tuple is returned; no special credential-length branch.",
+          "evidence": {
+            "path": "src/requests/utils.py",
+            "start_line": 1008,
+            "end_line": 1021
+          }
+        },
+        {
+          "claim": "Basic auth header is set",
+          "verdict": "supported",
+          "reason": "Handler writes Authorization; any length means no local cap, not unlimited system resources.",
+          "evidence": {
+            "path": "src/requests/auth.py",
+            "start_line": 94,
+            "end_line": 96
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-7d32415b82cbe00f47ca2acb",
+      "reference_sha256": "c93f8ee82a778feecf57cdf0cd5b1351451b7f804b4a4a3afaf7efdffa971fc1",
+      "question_sha256": "b8e7f1b7073d58d865b966b90446eca509beaea2a0e7b1014acdcc950247364c",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Multipart code normalizes metadata but does not open file paths",
+          "verdict": "supported",
+          "reason": "Strings used directly; read-capable objects read; no path opening. Data not universally normalized to bytes.",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 173,
+            "end_line": 203
+          }
+        }
+      ],
+      "material_errors": [
+        "Claims file path inputs are opened/normalized as file contents and all data becomes bytes-like."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "_encode_files normalizes field/file pairs and file-value tuples of filename, object, optional content type and headers. Otherwise it guesses a filename from the object or field key. Strings/bytes/bytearrays are data directly, read-capable objects are read, None is skipped, and other objects pass through. It builds urllib3 RequestField objects, calls make_multipart, and delegates final encoding to encode_multipart_formdata (src/requests/models.py:137-203). A path string is not opened as a file by this code; it is treated as supplied data. prepare_body selects this path when files is truthy (src/requests/models.py:552-568)."
+    },
+    {
+      "task_id": "import-7f7fb5e8a5e6c2cd6981ceaa",
+      "reference_sha256": "e94291c175759924bac50d5811ac0cf596de804a2e080352655a9ddd01db561f",
+      "question_sha256": "68fdccf94194082eef671e42e7691f423ff088f79f37d7b78088d74fecfc2c01",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Relative max-age becomes absolute expires",
+          "verdict": "supported",
+          "reason": "Adds integer seconds to current time; max-age takes precedence, invalid integers raise TypeError; expires string otherwise parsed.",
+          "evidence": {
+            "path": "src/requests/cookies.py",
+            "start_line": 492,
+            "end_line": 518
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

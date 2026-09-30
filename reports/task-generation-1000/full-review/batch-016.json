@@ -1,0 +1,212 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-2bbb422f934a8f7f9d482013",
+      "reference_sha256": "6f46d2c2e3407f3b26aa4e8dec2aa7a7e3ddb3508ebdf2fe288f71ce474baa8b",
+      "question_sha256": "d18e9b8719c3fe793e8d8c784d016bcb41fa3881d816bb674dcfa3a60bbd4605",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "QP encoding feeds compressed multipart BQM pipeline",
+          "verdict": "contradicted",
+          "reason": "Unstructured upload uses fileview or compressed bq fallback, not qp coefficient encoder.",
+          "evidence": {
+            "path": "dwave/cloud/solver.py",
+            "start_line": 418,
+            "end_line": 448
+          }
+        }
+      ],
+      "material_errors": [
+        "Conflates structured qp submission and unstructured BQM upload; omits actual compression path."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "The compressed BQM path is UnstructuredSolver.upload_bqm: it first tries a file view, then for serializable BQMs falls back to encode_problem_as_bq(..., compress=True), and passes encoded data to client.upload_problem_encoded (dwave/cloud/solver.py:418-448). The fallback converts to serializable JSON, ASCII-encodes it and zlib-compresses it (dwave/cloud/coders.py:270-303). Multipart parts are submitted through the upload-part executor (dwave/cloud/client.py:1860-1878). After upload, the solver submits a bqm-ref body using the returned problem ID (dwave/cloud/solver.py:345-356). Structured qp encoding is a separate path."
+    },
+    {
+      "task_id": "import-4ac69db60f10c68bfb203dce",
+      "reference_sha256": "e121d7abdee1e4003a02ed3827038f2709f98883b909598aae5a60f4339674fd",
+      "question_sha256": "1bd5a40e99aff87df1ca0ebc0cc3dbf980add0f765edf782dc6fa174c3efcf68",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Session factory configures isolated sessions for worker threads",
+          "verdict": "supported",
+          "reason": "Explicit thread-safety note, endpoint, timeout adapters, auth, proxy and SSL configuration; worker create_session call sites verified.",
+          "evidence": {
+            "path": "dwave/cloud/client.py",
+            "start_line": 506,
+            "end_line": 539
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-6d87cb2e6c40fcbacb1155f7",
+      "reference_sha256": "f8c0e77a798ad93c35413a4b3dcfdb4ebda6d356d46672da7049356d16c9d3dc",
+      "question_sha256": "9d7db673c825ce8ddbc006fc2515cae417ba1a0a98d241a1b7796d122d5239f6",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Upload uses priority-capable pool with no explicit priorities",
+          "verdict": "supported",
+          "reason": "Submission has no priority kwarg; pool counts at 158-162 are 10 parts and 1 problem/encode. Suggested future motivation is explicitly speculative.",
+          "evidence": {
+            "path": "dwave/cloud/client.py",
+            "start_line": 1860,
+            "end_line": 1868
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-868376bc591f2713af89da07",
+      "reference_sha256": "cf2a41dc1087d72faa4a4f788d678af62ed7de817fce30ae2cee8fb49be488e4",
+      "question_sha256": "84d72819a3f0f9a933489ad7f7091d688771a659a0bfbcdde1cffc7645282100",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Travis runs coverage then uploads via coveralls",
+          "verdict": "supported",
+          "reason": "Installs tests requirements, runs coverage discovery, after_success coveralls; .coveragerc scopes package and excludes tests/envs.",
+          "evidence": {
+            "path": ".travis.yml",
+            "start_line": 40,
+            "end_line": 49
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-9cb0681e71852f70241c9c8e",
+      "reference_sha256": "7323995138516d9747ef8ab8cf046798df49f3fe90ceb622881bf4125dadec43",
+      "question_sha256": "9b8e01b4e612b419e3504e186af471f10121fe36ffe9c9c264552031e7836ed4",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Pinned client uses a single configured endpoint",
+          "verdict": "supported",
+          "reason": "BaseUrlSession derives one self.endpoint; routes found for problems and bqm multipart. Config precedence at config.py:783-785. No evidence of separate Leap/metadata client coordination here.",
+          "evidence": {
+            "path": "dwave/cloud/client.py",
+            "start_line": 506,
+            "end_line": 530
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-a1eed3ff9ae87b27f4714f00",
+      "reference_sha256": "d78ade0e22e2165fa7a893e9e16251a899d4d3d0b775455077258b10df78ba8b",
+      "question_sha256": "9bc3866b25a8c1547ae2d9405c516536e0b98e11cd1f6b88507cec75cf72758a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Priority pool is multipart, not quantum submission worker system",
+          "verdict": "supported",
+          "reason": "Submission uses Queue/thread workers while multipart part executor is priority type. Speculated optimizations are hypothetical, not measured.",
+          "evidence": {
+            "path": "dwave/cloud/client.py",
+            "start_line": 455,
+            "end_line": 501
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-c6fc3d320b32817af4deef74",
+      "reference_sha256": "c481b2ac40e25f1dd531f30f4570d3f73d0010f9e5abc90be40f34b982071118",
+      "question_sha256": "2378aed0d9df1e0c837559e4e8a6049eb003e38468586e95925e44385058a126",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Config consolidates token and session attaches header",
+          "verdict": "supported",
+          "reason": "Keyword/env/file precedence matches; X-Auth-Token set at client.py:525-526.",
+          "evidence": {
+            "path": "dwave/cloud/config.py",
+            "start_line": 781,
+            "end_line": 788
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-ce28a9cd8598c38c913483a8",
+      "reference_sha256": "f97ba6fdeb62e8193336dc204a308b084cadc0662c931b458fdf4eb43790b489",
+      "question_sha256": "4527ccdf5f990eb430baab93e47e3ed41832deda46555f1afccb5a5eed640f66",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Static shared token is demonstrated concurrency scalability bottleneck",
+          "verdict": "unsupported",
+          "reason": "Factory simply adds header to isolated session; no locking or serial auth bottleneck demonstrated.",
+          "evidence": {
+            "path": "dwave/cloud/client.py",
+            "start_line": 506,
+            "end_line": 530
+          }
+        }
+      ],
+      "material_errors": [
+        "Token expiry handling is not evidence of a throughput bottleneck or inability to rate limit."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "create_session creates an isolated session and adds self.token as X-Auth-Token (dwave/cloud/client.py:506-530). This source shows static header-based authentication; it does not establish that sharing the same token value across sessions serializes requests or limits scalability. A missing refresh mechanism may require external credential replacement if credentials become invalid, but identifying a concurrent throughput bottleneck would require measurements and server-side behavior beyond this code."
+    },
+    {
+      "task_id": "import-e674f5f0973ad2a1fb4bafd1",
+      "reference_sha256": "fa150fa02843ed1e164f260171dd6b7a4a08111d016032ffb792cbf55009e353",
+      "question_sha256": "b1231524474d4178473248949e340d13fb811a6cdd7d231fab40cdc9441338d5",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Specialized clients inherit base client independently of solver types",
+          "verdict": "supported",
+          "reason": "QPU subclass; hybrid.py:27-33 and sw.py:30-36 follow same form.",
+          "evidence": {
+            "path": "dwave/cloud/qpu.py",
+            "start_line": 39,
+            "end_line": 44
+          }
+        },
+        {
+          "claim": "Unstructured solver handles bqm/bq",
+          "verdict": "supported",
+          "reason": "Separate BaseSolver hierarchy and explicit handled types/formats.",
+          "evidence": {
+            "path": "dwave/cloud/solver.py",
+            "start_line": 256,
+            "end_line": 275
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

@@ -1,0 +1,274 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-0e50db309b5ee886e313b6a8",
+      "reference_sha256": "e67c274a1c8cb440415576888ece83bcdb584f176cee46c14e296527d82485f2",
+      "question_sha256": "2519672340a2250b791b448c423583befc2d7aff694228eef39c875f491d1de4",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Automatic OPTIONS inferred from flag and app configuration",
+          "verdict": "supported",
+          "reason": "None flag resolves view attribute then config branch; required methods merged and flag stored.",
+          "evidence": {
+            "path": "src/flask/sansio/app.py",
+            "start_line": 635,
+            "end_line": 651
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct source review, no upstream execution."
+    },
+    {
+      "task_id": "import-17b19d083f8a24102b1a2272",
+      "reference_sha256": "83ce0b45d637d55f61f92ccea64410f1c7713f65ca07e7e7aa14835d4e5672c9",
+      "question_sha256": "3b705a16066da2a229397a317858fe475c6c8f324990d389688ced0ed729b366",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "after_this_request stores callbacks in current request context and chains responses",
+          "verdict": "supported",
+          "reason": "Context dependency, mutable append and FIFO process_response at app.py:1311-1319 match; copied contexts initialize empty callback list.",
+          "evidence": {
+            "path": "src/flask/ctx.py",
+            "start_line": 140,
+            "end_line": 149
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct source review, no upstream execution."
+    },
+    {
+      "task_id": "import-1c6a7bd439189d4c0d6b3b12",
+      "reference_sha256": "3d16f21687c5bd926ac006d76af4a3604da7ce5873141e9c0dac21d269f1c19d",
+      "question_sha256": "937363755d7f5c0177a9238147f8ec74207be6b5bba7df55ec2640f7681bacc2",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Tuples directly contain themselves and recursion runs indefinitely",
+          "verdict": "partially_supported",
+          "reason": "Recursive traversal has no visited set, but ordinary tuple cannot directly self-reference; indirect cycles through mutable containers hit Python recursion limit rather than guaranteed native stack overflow.",
+          "evidence": {
+            "path": "src/flask/json/tag.py",
+            "start_line": 133,
+            "end_line": 154
+          }
+        }
+      ],
+      "material_errors": [
+        "Recursive traversal has no visited set, but ordinary tuple cannot directly self-reference; indirect cycles through mutable containers hit Python recursion limit rather than guaranteed native stack overflow."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct source review, no upstream execution.",
+      "corrected_reference_answer": "TagTuple.to_json recursively calls serializer.tag on each item; dispatch returns JSONTag.tag which calls the selected to_json (src/flask/json/tag.py:87-90,133-154,289-295). There is no cycle detection in this tagging traversal. A tuple can participate in an indirect cycle through a list/dict, causing repeated traversal and ordinarily RecursionError at Python recursion depth. Ordinary immutable tuples do not directly contain themselves; deep finite nesting is also depth-limited rather than an infinite cycle."
+    },
+    {
+      "task_id": "import-26ef1cffb0cb5dfc885e537b",
+      "reference_sha256": "e12376d81985445fbbccb826e8fcbc2d811ebf4b6abf47ac6921fc0c59023932",
+      "question_sha256": "dd1920d0aecde86dd723d52fa419daccfed37c11e417695a5a407c92b25a3342",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Invalid locate_app cases raise NoAppException through import/discovery branches",
+          "verdict": "supported",
+          "reason": "Test has eight combinations rather than stated nine, but failure semantics and dispatch are correct.",
+          "evidence": {
+            "path": "src/flask/cli.py",
+            "start_line": 241,
+            "end_line": 264
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct source review, no upstream execution."
+    },
+    {
+      "task_id": "import-300d54838daf15294cf91b02",
+      "reference_sha256": "6f430f177d741ba78b82d73636580b2e00000baac77cf92b3831dce293431e9d",
+      "question_sha256": "373bc0d9dd54c564fc992f1ff59bacd86a563be311953fcfbfa9a16796802a35",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Blueprint static serving explicitly supplies max-age for its own folder",
+          "verdict": "supported",
+          "reason": "Blueprint method duplicates app approach and explicitly computes own max age before file helper; shared setting supports consistent defaults.",
+          "evidence": {
+            "path": "src/flask/blueprints.py",
+            "start_line": 82,
+            "end_line": 99
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct source review, no upstream execution."
+    },
+    {
+      "task_id": "import-363b8ff66dd7314890a8c06f",
+      "reference_sha256": "a8d0f85d7a006bb21328eba2d8fd145e45dbcdf5895bd50a044344989ce3da6a",
+      "question_sha256": "5b0a504addf39ea30b73e32b01d00d9d6f802ebe764cc0e7a67bfd29f4672159",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Callable __html__ check ensures invocation cannot fail",
+          "verdict": "partially_supported",
+          "reason": "Callability only filters protocol candidates; callable can require arguments, raise, or be dynamic.",
+          "evidence": {
+            "path": "src/flask/json/tag.py",
+            "start_line": 181,
+            "end_line": 188
+          }
+        }
+      ],
+      "material_errors": [
+        "Callability only filters protocol candidates; callable can require arguments, raise, or be dynamic."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct source review, no upstream execution.",
+      "corrected_reference_answer": "TagMarkup.check tests whether __html__ is callable; to_json delegates to that method on the value and converts its result with str (src/flask/json/tag.py:181-185). The helper implementation belongs to the object class, not Flask. JSONTag.tag wraps the conversion under the tag key (src/flask/json/tag.py:87-90). The check does not prove the callable accepts zero arguments or cannot raise; errors from protocol invocation are not caught here."
+    },
+    {
+      "task_id": "import-4019bb0e4ec8167324c60b55",
+      "reference_sha256": "62e90271712966930ddc0ae1cf332eb65accae2baafc6a3bbb672c6e376b8cc4",
+      "question_sha256": "a6424928c1caad49c3af1b22ba696cf1c2a9cf485484fcf9667a5dd928ab9a0a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Blueprint app filters deferred once into app Jinja environment independent of URL prefix",
+          "verdict": "supported",
+          "reason": "Assignment into state.app.jinja_env.filters and record_once first-registration guard at 233-244 support mechanism.",
+          "evidence": {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 472,
+            "end_line": 475
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct source review, no upstream execution."
+    },
+    {
+      "task_id": "import-46f5ce1665470eaa3f16e1d3",
+      "reference_sha256": "0a60a0f00c8b378fa28e4d74673b2957cf4b23d8f3797c6b3010f1f2ce0f5021",
+      "question_sha256": "4821a6169ddac3742c310ace244bdd9fc3194e395698cddc3fc1831c135bcfd9",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Certificate fallback tries path then adhoc then SSLContext import",
+          "verdict": "supported",
+          "reason": "SSL availability checked first; BadParameter fallback lowercases string, checks cryptography or imports and re-raises.",
+          "evidence": {
+            "path": "src/flask/cli.py",
+            "start_line": 791,
+            "end_line": 825
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct source review, no upstream execution."
+    },
+    {
+      "task_id": "import-4e45d203c5dee43270902e1f",
+      "reference_sha256": "851ecea117793962fdb0c331a11e65951594b7befce56d09df30b759a08ba6b6",
+      "question_sha256": "8f4a13ed5e78c81e7823bbf5dd6bb8ef74fd8014e6b9d65235302b3e1fe5a829",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Read-only resource helper enforces global application-code immutability/security",
+          "verdict": "partially_supported",
+          "reason": "Helper restricts its modes but does not prevent other writes or enforce filesystem security; broad intent inferred.",
+          "evidence": {
+            "path": "src/flask/app.py",
+            "start_line": 353,
+            "end_line": 368
+          }
+        }
+      ],
+      "material_errors": [
+        "Helper restricts its modes but does not prevent other writes or enforce filesystem security; broad intent inferred."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct source review, no upstream execution.",
+      "corrected_reference_answer": "open_resource permits only r, rt and rb and opens relative to root_path (src/flask/app.py:353-361). open_instance_resource explicitly allows writes relative to instance_path (src/flask/app.py:363-368). This API distinction separates reading packaged resources from mutable instance files. It is not a filesystem security boundary and cannot prevent writes through other APIs; stronger immutability claims are not established by this method."
+    },
+    {
+      "task_id": "import-50b89d851e4a335b14cd8a4d",
+      "reference_sha256": "9c45a9295762cc8bdef349a4f7981b7fafe17d8e73f42a36a335e36c11abcfc2",
+      "question_sha256": "260c976b3d2ddb56885577000b861c821c5ea50b9771eac23666c9a51beb78f9",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Roundtrip of one random UUID equals a separately generated uuid4",
+          "verdict": "partially_supported",
+          "reason": "Conversion mechanism correct but sample compares independent random UUIDs, not same input.",
+          "evidence": {
+            "path": "src/flask/json/tag.py",
+            "start_line": 191,
+            "end_line": 202
+          }
+        }
+      ],
+      "material_errors": [
+        "Conversion mechanism correct but sample compares independent random UUIDs, not same input."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct source review, no upstream execution.",
+      "corrected_reference_answer": "TagUUID recognizes UUID instances, serializes value.hex under the \" u\" tag and reconstructs UUID(value) (src/flask/json/tag.py:191-202). TaggedJSONSerializer tags before dumping and recursively untags after loading (src/flask/json/tag.py:289-327), preserving UUID value/type through JSON. A valid roundtrip check uses u=uuid4(); s.loads(s.dumps(u)) == u, not a second uuid4() call."
+    },
+    {
+      "task_id": "import-510b7119ee691aaff96faf14",
+      "reference_sha256": "d45e5492894e672a43bab205d71a4f1cbd17f746ab7f603133708766e47e035c",
+      "question_sha256": "c22d4c2f03ed5b3c0263a47cd5fc5763988dd3106dcf070b9ae49165ca998002",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "flask help avoids application loading",
+          "verdict": "partially_supported",
+          "reason": "list_commands attempts app load for help to discover app commands; errors tolerated rather than load avoided.",
+          "evidence": {
+            "path": "src/flask/cli.py",
+            "start_line": 636,
+            "end_line": 655
+          }
+        }
+      ],
+      "material_errors": [
+        "list_commands attempts app load for help to discover app commands; errors tolerated rather than load avoided."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct source review, no upstream execution.",
+      "corrected_reference_answer": "ScriptInfo starts with _loaded_app=None and load_app reuses a cached app (src/flask/cli.py:331-339). FlaskGroup looks up built-in/plugin commands before loading app-defined commands (src/flask/cli.py:609-634), permitting discovery when app loading fails. However, help command listing does attempt to load the app and catches failures while retaining built-ins (src/flask/cli.py:636-655). Lazy loading provides controlled timing and reuse; it does not mean every help request avoids imports."
+    },
+    {
+      "task_id": "import-562008386b1d3ae2a7a1f402",
+      "reference_sha256": "a348cb8b7347f627f8087438394320fcf3f0aab48d25abade99eaf9ed9f92c09",
+      "question_sha256": "c0d7ccd6318cef157bf9b42f51282a2e105ebaf58b22d4cd2db6b8cd6ef6146d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Blueprint names exclude dots reserved for endpoint hierarchy",
+          "verdict": "supported",
+          "reason": "Explicit validation and prefix-based endpoint construction support rationale; impossible resolution is overbroad but delimiter invariant correct.",
+          "evidence": {
+            "path": "src/flask/sansio/blueprints.py",
+            "start_line": 195,
+            "end_line": 199
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct source review, no upstream execution."
+    }
+  ]
+}

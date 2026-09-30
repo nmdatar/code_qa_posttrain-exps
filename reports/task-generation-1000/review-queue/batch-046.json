@@ -1,0 +1,885 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 165,
+            "file_sha256": "8a90d474a2c17a2954d1e6b89a158cca6afd1310f1817c7a38f76facfa9e4b25",
+            "path": "tests/functional/n/not_callable.py",
+            "start_line": 163
+          },
+          {
+            "end_line": 1800,
+            "file_sha256": "3f186aa53840acd0fea31537e1b8e0763109fc9f8e13461d356ff6f6ca493842",
+            "path": "pylint/checkers/typecheck.py",
+            "start_line": 1797
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the descriptor protocol implementation in the test descriptor class's get method interact with Python's attribute resolution mechanism when accessed through different ownership contexts?",
+      "question_sha256": "387bd3c1dd559189d187c263dfd8d58e00d276f99763d9ebe94a93451b302987",
+      "reference_answer": "Based on my exploration of the pylint repository, the descriptor protocol implementation in the test descriptor class (located in `tests/functional/n/not_callable.py` at lines 163-165) works as follows:\n\nThe `ADescriptor` class implements the descriptor protocol with a `__get__` method that accepts `instance` and `owner` parameters:\n\n```python\nclass ADescriptor:\n    def __get__(self, instance, owner):\n        return func\n```\n\nWhen this descriptor is used as a class attribute in `AggregateCls` and accessed via `AggregateCls().a()`, Python's attribute resolution mechanism follows these steps:\n\n1. **Attribute Lookup**: When `AggregateCls().a` is accessed, Python's attribute resolution mechanism first checks the instance's `__dict__`, then the class's `__dict__`, where it finds the `ADescriptor` instance.\n\n2. **Descriptor Invocation**: Since `ADescriptor` implements `__get__`, Python automatically invokes `ADescriptor.__get__(self, instance, owner)`, where:\n   - `self` is the `ADescriptor` instance stored as the class attribute\n   - `instance` is the `AggregateCls` instance (or `None` if accessed via the class itself)\n   - `owner` is the `AggregateCls` class object\n\n3. **Return Value**: The `__get__` method returns the `func` function object, which is then callable via `AggregateCls().a()`.\n\n4. **Ownership Context Behavior**: The `instance` parameter reflects the ownership context:\n   - When accessed via an instance (`AggregateCls().a`), `instance` is the instance object\n   - When accessed via the class (`AggregateCls.a`), `instance` is `None`\n   - The `owner` parameter always refers to the class that owns the descriptor\n\n5. **Pylint's Handling**: Pylint specifically ignores not-callable checks for descriptors because, as noted in the test file comments (lines 175-179), \"astroid can't process descriptors correctly so pylint needs to ignore not-callable for them right now.\" This is implemented in `pylint/checkers/typecheck.py` at lines 1797-1800, where pylint checks if `\"__get__\"` is in the inferred call's locals and skips the not-callable check if it is.\n\nThe descriptor protocol allows the returned function to be accessed and called, but the function itself is not bound to the instance\u2014it's returned as a plain function object, which can then be called directly.",
+      "reference_sha256": "39d367bd44721c1200c1721fbc21301fb1f469a03d39cd6c564c3069cd835a30",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-62b175fe5d2d4171168c4362"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 48,
+            "file_sha256": "6e582e6580b0766936d33db60749999b0e05c49c73079457d8cfe33e139f2486",
+            "path": "pylint/utils/ast_walker.py",
+            "start_line": 48
+          },
+          {
+            "end_line": 58,
+            "file_sha256": "58d89b01d5b06a27f45b037e7a573227dfa16e626e0697c053a31c2732bfb220",
+            "path": "tests/utils/unittest_ast_walker.py",
+            "start_line": 50
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "6e582e6580b0766936d33db60749999b0e05c49c73079457d8cfe33e139f2486",
+            "kind": "file_reference",
+            "line_count": 102,
+            "path": "pylint/utils/ast_walker.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does repeatedly instantiating the mock linter, AST walker, and test checker in the message filtering decorator test method degrade performance across thousands of similar test cases?",
+      "question_sha256": "a4b8e13fb2188e8dce558a22c937a76a500bbff5a2855dae4ae1d92e7b44ccaf",
+      "reference_answer": "Repeated instantiation of these objects in the test degrades performance due to:\n\n1. MockLinter instantiation: Each test creates a new `MockLinter` with a message dictionary. While lightweight, this adds overhead when repeated thousands of times.\n\n2. ASTWalker instantiation: Creating a new `ASTWalker` (in `pylint/utils/ast_walker.py`) initializes:\n   - `defaultdict` structures for `visit_events` and `leave_events` (lines 32-33)\n   - Other instance variables\n   This setup cost accumulates across many tests.\n\n3. Checker instantiation and registration: Creating a new `Checker` and calling `walker.add_checker(checker)` triggers introspection via `dir(checker)` (line 48 in `ast_walker.py`), which:\n   - Iterates through all attributes and methods\n   - Checks each method for `visit_*` and `leave_*` patterns\n   - Calls `_is_method_enabled()` for each method (which checks message enablement)\n   - Potentially iterates through `nodes.ALL_NODE_CLASSES` if `visit_default` exists (lines 66-69)\n\n4. Accumulated overhead: When this pattern repeats across thousands of tests, the per-test overhead (object creation, introspection, data structure initialization) compounds, slowing the suite.\n\nThe test in `tests/utils/unittest_ast_walker.py` (lines 50-58) creates all three objects fresh for each run. At scale, this repeated setup/teardown becomes a bottleneck, especially the `dir()` introspection in `add_checker()`.",
+      "reference_sha256": "4c4c52981138c1bb848af9ee6257540a564b6a9659d6cf1b1310f306e06a07c3",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-663562aa85f5980d33b86e52"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "27475ca0c83be4d2d331532de9c03503dd8d7814030e473739cbcdaee2f5ad30",
+            "kind": "file_reference",
+            "line_count": 6,
+            "path": "doc/data/messages/u/useless-else-on-loop/bad.py"
+          },
+          {
+            "file_sha256": "47acef28342badc1e5b39ef04ca0e5f5a68ef08c20a12c86c2c78d8115726855",
+            "kind": "file_reference",
+            "line_count": 589,
+            "path": "pylint/checkers/base/basic_error_checker.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "doc/data/messages/a/abstract-class-instantiated/good.py",
+              "doc/data/messages/a/access-member-before-definition/good.py",
+              "doc/data/messages/a/anomalous-unicode-escape-in-string/good.py",
+              "doc/data/messages/a/arguments-out-of-order/good.py",
+              "doc/data/messages/a/arguments-renamed/good.py",
+              "doc/data/messages/a/assert-on-string-literal/good.py",
+              "doc/data/messages/a/assert-on-tuple/good.py",
+              "doc/data/messages/a/assigning-non-slot/good.py",
+              "doc/data/messages/a/assignment-from-no-return/good.py",
+              "doc/data/messages/a/assignment-from-none/good.py",
+              "doc/data/messages/a/attribute-defined-outside-init/good.py",
+              "doc/data/messages/a/await-outside-async/good.py",
+              "doc/data/messages/b/bad-builtin/good.py",
+              "doc/data/messages/b/bad-classmethod-argument/good.py",
+              "doc/data/messages/b/bad-docstring-quotes/good.py",
+              "doc/data/messages/b/bad-dunder-name/good.py",
+              "doc/data/messages/b/bad-except-order/good.py",
+              "doc/data/messages/b/bad-exception-cause/good.py",
+              "doc/data/messages/b/bad-file-encoding/good.py",
+              "doc/data/messages/b/bad-format-character/good.py",
+              "doc/data/messages/b/bad-format-string-key/good.py",
+              "doc/data/messages/b/bad-format-string/good.py",
+              "doc/data/messages/b/bad-indentation/good.py",
+              "doc/data/messages/b/bad-inline-option/good.py",
+              "doc/data/messages/b/bad-mcs-classmethod-argument/good.py",
+              "doc/data/messages/b/bad-mcs-method-argument/good.py",
+              "doc/data/messages/b/bad-open-mode/good.py",
+              "doc/data/messages/b/bad-reversed-sequence/good.py",
+              "doc/data/messages/b/bad-staticmethod-argument/good.py",
+              "doc/data/messages/b/bad-string-format-type/good.py",
+              "doc/data/messages/b/bad-super-call/good.py",
+              "doc/data/messages/b/bad-thread-instantiation/good.py",
+              "doc/data/messages/b/bare-except/good.py",
+              "doc/data/messages/b/bidirectional-unicode/good.py",
+              "doc/data/messages/b/binary-op-exception/good.py",
+              "doc/data/messages/b/boolean-datetime/good.py",
+              "doc/data/messages/b/break-in-finally/good.py",
+              "doc/data/messages/b/broad-exception-caught/good.py",
+              "doc/data/messages/b/broad-exception-raised/good.py",
+              "doc/data/messages/b/broken-collections-callable/good.py",
+              "doc/data/messages/b/broken-noreturn/good.py",
+              "doc/data/messages/c/c-extension-no-member/good.py",
+              "doc/data/messages/c/catching-non-exception/good.py",
+              "doc/data/messages/c/chained-comparison/good.py",
+              "doc/data/messages/c/class-variable-slots-conflict/good.py",
+              "doc/data/messages/c/comparison-of-constants/good.py",
+              "doc/data/messages/c/comparison-with-callable/good.py",
+              "doc/data/messages/c/comparison-with-itself/good.py",
+              "doc/data/messages/c/condition-evals-to-constant/good.py",
+              "doc/data/messages/c/confusing-consecutive-elif/good.py",
+              "doc/data/messages/c/confusing-with-statement/good.py",
+              "doc/data/messages/c/consider-alternative-union-syntax/good.py",
+              "doc/data/messages/c/consider-iterating-dictionary/good.py",
+              "doc/data/messages/c/consider-merging-isinstance/good.py",
+              "doc/data/messages/c/consider-refactoring-into-while-condition/good.py",
+              "doc/data/messages/c/consider-swap-variables/good.py",
+              "doc/data/messages/c/consider-ternary-expression/good.py",
+              "doc/data/messages/c/consider-using-alias/good.py",
+              "doc/data/messages/c/consider-using-assignment-expr/good.py",
+              "doc/data/messages/c/consider-using-augmented-assign/good.py",
+              "doc/data/messages/c/consider-using-dict-comprehension/good.py",
+              "doc/data/messages/c/consider-using-dict-items/good.py",
+              "doc/data/messages/c/consider-using-enumerate/good.py",
+              "doc/data/messages/c/consider-using-f-string/good.py",
+              "doc/data/messages/c/consider-using-from-import/good.py",
+              "doc/data/messages/c/consider-using-generator/good.py",
+              "doc/data/messages/c/consider-using-get/good.py",
+              "doc/data/messages/c/consider-using-in/good.py",
+              "doc/data/messages/c/consider-using-join/good.py",
+              "doc/data/messages/c/consider-using-max-builtin/good.py",
+              "doc/data/messages/c/consider-using-min-builtin/good.py",
+              "doc/data/messages/c/consider-using-namedtuple-or-dataclass/good.py",
+              "doc/data/messages/c/consider-using-set-comprehension/good.py",
+              "doc/data/messages/c/consider-using-sys-exit/good.py",
+              "doc/data/messages/c/consider-using-ternary/good.py",
+              "doc/data/messages/c/consider-using-tuple/good.py",
+              "doc/data/messages/c/consider-using-with/good.py",
+              "doc/data/messages/c/contextmanager-generator-missing-cleanup/good.py",
+              "doc/data/messages/c/continue-in-finally/good.py",
+              "doc/data/messages/c/cyclic-import/good.py",
+              "doc/data/messages/d/dangerous-default-value/good.py",
+              "doc/data/messages/d/declare-non-slot/good.py",
+              "doc/data/messages/d/deprecated-argument/good.py",
+              "doc/data/messages/d/deprecated-attribute/good.py",
+              "doc/data/messages/d/deprecated-class/good.py",
+              "doc/data/messages/d/deprecated-decorator/good.py",
+              "doc/data/messages/d/deprecated-method/good.py",
+              "doc/data/messages/d/deprecated-module/good.py",
+              "doc/data/messages/d/deprecated-pragma/good.py",
+              "doc/data/messages/d/deprecated-typing-alias/good.py",
+              "doc/data/messages/d/dict-init-mutate/good.py",
+              "doc/data/messages/d/dict-iter-missing-items/good.py",
+              "doc/data/messages/d/differing-param-doc/good.py",
+              "doc/data/messages/d/differing-type-doc/good.py",
+              "doc/data/messages/d/disallowed-name/good.py",
+              "doc/data/messages/d/docstring-first-line-empty/good.py",
+              "doc/data/messages/d/duplicate-argument-name/good.py",
+              "doc/data/messages/d/duplicate-bases/good.py",
+              "doc/data/messages/d/duplicate-except/good.py",
+              "doc/data/messages/d/duplicate-key/good.py",
+              "doc/data/messages/d/duplicate-string-formatting-argument/good.py",
+              "doc/data/messages/d/duplicate-value/good.py",
+              "doc/data/messages/e/else-if-used/good.py",
+              "doc/data/messages/e/empty-comment/good.py",
+              "doc/data/messages/e/empty-docstring/good.py",
+              "doc/data/messages/e/eq-without-hash/good.py",
+              "doc/data/messages/e/eval-used/good.py",
+              "doc/data/messages/e/exec-used/good.py",
+              "doc/data/messages/e/expression-not-assigned/good.py",
+              "doc/data/messages/f/f-string-without-interpolation/good.py",
+              "doc/data/messages/f/file-ignored/good.py",
+              "doc/data/messages/f/forgotten-debug-statement/good.py",
+              "doc/data/messages/f/format-needs-mapping/good.py",
+              "doc/data/messages/f/format-string-without-interpolation/good.py",
+              "doc/data/messages/f/function-redefined/good.py",
+              "doc/data/messages/g/global-at-module-level/good.py",
+              "doc/data/messages/g/global-statement/good.py",
+              "doc/data/messages/g/global-variable-not-assigned/good.py",
+              "doc/data/messages/g/global-variable-undefined/good.py",
+              "doc/data/messages/i/implicit-flag-alias/good.py",
+              "doc/data/messages/i/import-error/good.py",
+              "doc/data/messages/i/import-outside-toplevel/good.py",
+              "doc/data/messages/i/import-private-name/good.py",
+              "doc/data/messages/i/inconsistent-mro/good.py",
+              "doc/data/messages/i/inconsistent-quotes/good.py",
+              "doc/data/messages/i/inconsistent-return-statements/good.py",
+              "doc/data/messages/i/inherit-non-class/good.py",
+              "doc/data/messages/i/init-is-generator/good.py",
+              "doc/data/messages/i/invalid-all-format/good.py",
+              "doc/data/messages/i/invalid-all-object/good.py",
+              "doc/data/messages/i/invalid-bool-returned/good.py",
+              "doc/data/messages/i/invalid-bytes-returned/good.py",
+              "doc/data/messages/i/invalid-character-backspace/good.py",
+              "doc/data/messages/i/invalid-character-carriage-return/good.py",
+              "doc/data/messages/i/invalid-character-esc/good.py",
+              "doc/data/messages/i/invalid-character-nul/good.py",
+              "doc/data/messages/i/invalid-character-sub/good.py",
+              "doc/data/messages/i/invalid-character-zero-width-space/good.py",
+              "doc/data/messages/i/invalid-class-object/good.py",
+              "doc/data/messages/i/invalid-enum-extension/good.py",
+              "doc/data/messages/i/invalid-envvar-default/good.py",
+              "doc/data/messages/i/invalid-envvar-value/good.py",
+              "doc/data/messages/i/invalid-field-call/good.py",
+              "doc/data/messages/i/invalid-format-index/good.py",
+              "doc/data/messages/i/invalid-format-returned/good.py",
+              "doc/data/messages/i/invalid-getnewargs-ex-returned/good.py",
+              "doc/data/messages/i/invalid-getnewargs-returned/good.py",
+              "doc/data/messages/i/invalid-hash-returned/good.py",
+              "doc/data/messages/i/invalid-index-returned/good.py",
+              "doc/data/messages/i/invalid-length-hint-returned/good.py",
+              "doc/data/messages/i/invalid-length-returned/good.py",
+              "doc/data/messages/i/invalid-metaclass/good.py",
+              "doc/data/messages/i/invalid-name/good.py",
+              "doc/data/messages/i/invalid-overridden-method/good.py",
+              "doc/data/messages/i/invalid-repr-returned/good.py",
+              "doc/data/messages/i/invalid-sequence-index/good.py",
+              "doc/data/messages/i/invalid-slice-index/good.py",
+              "doc/data/messages/i/invalid-slice-step/good.py",
+              "doc/data/messages/i/invalid-slots-object/good.py",
+              "doc/data/messages/i/invalid-slots/good.py",
+              "doc/data/messages/i/invalid-star-assignment-target/good.py",
+              "doc/data/messages/i/invalid-str-returned/good.py",
+              "doc/data/messages/i/invalid-unary-operand-type/good.py",
+              "doc/data/messages/i/isinstance-second-argument-not-valid-type/good.py",
+              "doc/data/messages/k/keyword-arg-before-vararg/good.py",
+              "doc/data/messages/k/kwarg-superseded-by-positional-arg/good.py",
+              "doc/data/messages/l/line-too-long/good.py",
+              "doc/data/messages/l/literal-comparison/good.py",
+              "doc/data/messages/l/locally-disabled/good.py",
+              "doc/data/messages/l/logging-format-interpolation/good.py",
+              "doc/data/messages/l/logging-format-truncated/good.py",
+              "doc/data/messages/l/logging-fstring-interpolation/good.py",
+              "doc/data/messages/l/logging-not-lazy/good.py",
+              "doc/data/messages/l/logging-too-few-args/good.py",
+              "doc/data/messages/l/logging-too-many-args/good.py",
+              "doc/data/messages/l/logging-unsupported-format/good.py",
+              "doc/data/messages/l/lost-exception/good.py",
+              "doc/data/messages/m/magic-value-comparison/good.py",
+              "doc/data/messages/m/method-cache-max-size-none/good.py",
+              "doc/data/messages/m/method-hidden/good.py",
+              "doc/data/messages/m/misplaced-bare-raise/good.py",
+              "doc/data/messages/m/misplaced-comparison-constant/good.py",
+              "doc/data/messages/m/misplaced-format-function/good.py",
+              "doc/data/messages/m/misplaced-future/good.py",
+              "doc/data/messages/m/missing-any-param-doc/good.py",
+              "doc/data/messages/m/missing-class-docstring/good.py",
+              "doc/data/messages/m/missing-format-argument-key/good.py",
+              "doc/data/messages/m/missing-format-attribute/good.py",
+              "doc/data/messages/m/missing-format-string-key/good.py",
+              "doc/data/messages/m/missing-function-docstring/good.py",
+              "doc/data/messages/m/missing-kwoa/good.py",
+              "doc/data/messages/m/missing-module-docstring/good.py",
+              "doc/data/messages/m/missing-param-doc/good.py",
+              "doc/data/messages/m/missing-parentheses-for-call-in-test/good.py",
+              "doc/data/messages/m/missing-raises-doc/good.py",
+              "doc/data/messages/m/missing-return-doc/good.py",
+              "doc/data/messages/m/missing-return-type-doc/good.py",
+              "doc/data/messages/m/missing-timeout/good.py",
+              "doc/data/messages/m/missing-type-doc/good.py",
+              "doc/data/messages/m/missing-yield-doc/good.py",
+              "doc/data/messages/m/missing-yield-type-doc/good.py",
+              "doc/data/messages/m/modified-iterating-dict/good.py",
+              "doc/data/messages/m/modified-iterating-list/good.py",
+              "doc/data/messages/m/modified-iterating-set/good.py",
+              "doc/data/messages/m/multiple-constructor-doc/good.py",
+              "doc/data/messages/m/multiple-imports/good.py",
+              "doc/data/messages/m/multiple-statements/good.py",
+              "doc/data/messages/n/named-expr-without-context/good.py",
+              "doc/data/messages/n/nan-comparison/good.py",
+              "doc/data/messages/n/nested-min-max/good.py",
+              "doc/data/messages/n/no-classmethod-decorator/good.py",
+              "doc/data/messages/n/no-else-break/good.py",
+              "doc/data/messages/n/no-else-continue/good.py",
+              "doc/data/messages/n/no-else-raise/good.py",
+              "doc/data/messages/n/no-else-return/good.py",
+              "doc/data/messages/n/no-member/good.py",
+              "doc/data/messages/n/no-method-argument/good.py",
+              "doc/data/messages/n/no-name-in-module/good.py",
+              "doc/data/messages/n/no-self-argument/good.py",
+              "doc/data/messages/n/no-staticmethod-decorator/good.py",
+              "doc/data/messages/n/no-value-for-parameter/good.py",
+              "doc/data/messages/n/non-ascii-module-import/good.py",
+              "doc/data/messages/n/non-ascii-name/good.py",
+              "doc/data/messages/n/non-iterator-returned/good.py",
+              "doc/data/messages/n/non-parent-init-called/good.py",
+              "doc/data/messages/n/non-str-assignment-to-dunder-name/good.py",
+              "doc/data/messages/n/nonexistent-operator/good.py",
+              "doc/data/messages/n/nonlocal-and-global/good.py",
+              "doc/data/messages/n/nonlocal-without-binding/good.py",
+              "doc/data/messages/n/not-a-mapping/good.py",
+              "doc/data/messages/n/not-an-iterable/good.py",
+              "doc/data/messages/n/not-async-context-manager/good.py",
+              "doc/data/messages/n/not-callable/good.py",
+              "doc/data/messages/n/not-context-manager/good.py",
+              "doc/data/messages/n/not-in-loop/good.py",
+              "doc/data/messages/n/notimplemented-raised/good.py",
+              "doc/data/messages/o/overridden-final-method/good.py",
+              "doc/data/messages/p/pointless-exception-statement/good.py",
+              "doc/data/messages/p/pointless-statement/good.py",
+              "doc/data/messages/p/pointless-string-statement/good.py",
+              "doc/data/messages/p/positional-only-arguments-expected/good.py",
+              "doc/data/messages/p/possibly-unused-variable/good.py",
+              "doc/data/messages/p/possibly-used-before-assignment/good.py",
+              "doc/data/messages/p/potential-index-error/good.py",
+              "doc/data/messages/p/prefer-typing-namedtuple/good.py",
+              "doc/data/messages/p/preferred-module/good.py",
+              "doc/data/messages/p/property-with-parameters/good.py",
+              "doc/data/messages/p/protected-access/good.py",
+              "doc/data/messages/r/raise-missing-from/good.py",
+              "doc/data/messages/r/raising-bad-type/good.py",
+              "doc/data/messages/r/raising-format-tuple/good.py",
+              "doc/data/messages/r/raising-non-exception/good.py",
+              "doc/data/messages/r/redeclared-assigned-name/good.py",
+              "doc/data/messages/r/redefined-argument-from-local/good.py",
+              "doc/data/messages/r/redefined-builtin/good.py",
+              "doc/data/messages/r/redefined-loop-name/good.py",
+              "doc/data/messages/r/redefined-outer-name/good.py",
+              "doc/data/messages/r/redefined-slots-in-subclass/good.py",
+              "doc/data/messages/r/redefined-variable-type/good.py",
+              "doc/data/messages/r/redundant-returns-doc/good.py",
+              "doc/data/messages/r/redundant-typehint-argument/good.py",
+              "doc/data/messages/r/redundant-u-string-prefix/good.py",
+              "doc/data/messages/r/redundant-unittest-assert/good.py",
+              "doc/data/messages/r/redundant-yields-doc/good.py",
+              "doc/data/messages/r/reimported/good.py",
+              "doc/data/messages/r/repeated-keyword/good.py",
+              "doc/data/messages/r/return-arg-in-generator/good.py",
+              "doc/data/messages/r/return-in-finally/good.py",
+              "doc/data/messages/r/return-in-init/good.py",
+              "doc/data/messages/r/return-outside-function/good.py",
+              "doc/data/messages/s/self-assigning-variable/good.py",
+              "doc/data/messages/s/self-cls-assignment/good.py",
+              "doc/data/messages/s/shadowed-import/good.py",
+              "doc/data/messages/s/shallow-copy-environ/good.py",
+              "doc/data/messages/s/signature-differs/good.py",
+              "doc/data/messages/s/simplifiable-condition/good.py",
+              "doc/data/messages/s/simplifiable-if-expression/good.py",
+              "doc/data/messages/s/simplifiable-if-statement/good.py",
+              "doc/data/messages/s/simplify-boolean-expression/good.py",
+              "doc/data/messages/s/single-string-used-for-slots/good.py",
+              "doc/data/messages/s/singledispatch-method/good.py",
+              "doc/data/messages/s/singledispatchmethod-function/good.py",
+              "doc/data/messages/s/singleton-comparison/good.py",
+              "doc/data/messages/s/star-needs-assignment-target/good.py",
+              "doc/data/messages/s/subclassed-final-class/good.py",
+              "doc/data/messages/s/subprocess-popen-preexec-fn/good.py",
+              "doc/data/messages/s/subprocess-run-check/good.py",
+              "doc/data/messages/s/super-init-not-called/good.py",
+              "doc/data/messages/s/super-with-arguments/good.py",
+              "doc/data/messages/s/super-without-brackets/good.py",
+              "doc/data/messages/s/suppressed-message/good.py",
+              "doc/data/messages/s/syntax-error/good.py",
+              "doc/data/messages/t/too-complex/good.py",
+              "doc/data/messages/t/too-few-format-args/good.py",
+              "doc/data/messages/t/too-many-ancestors/good.py",
+              "doc/data/messages/t/too-many-arguments/good.py",
+              "doc/data/messages/t/too-many-boolean-expressions/good.py",
+              "doc/data/messages/t/too-many-branches/good.py",
+              "doc/data/messages/t/too-many-format-args/good.py",
+              "doc/data/messages/t/too-many-function-args/good.py",
+              "doc/data/messages/t/too-many-instance-attributes/good.py",
+              "doc/data/messages/t/too-many-locals/good.py",
+              "doc/data/messages/t/too-many-nested-blocks/good.py",
+              "doc/data/messages/t/too-many-positional-arguments/good.py",
+              "doc/data/messages/t/too-many-public-methods/good.py",
+              "doc/data/messages/t/too-many-return-statements/good.py",
+              "doc/data/messages/t/too-many-star-expressions/good.py",
+              "doc/data/messages/t/too-many-statements/good.py",
+              "doc/data/messages/t/too-many-try-statements/good.py",
+              "doc/data/messages/t/trailing-comma-tuple/good.py",
+              "doc/data/messages/t/trailing-newlines/good.py",
+              "doc/data/messages/t/trailing-whitespace/good.py",
+              "doc/data/messages/t/truncated-format-string/good.py",
+              "doc/data/messages/t/typevar-double-variance/good.py",
+              "doc/data/messages/t/typevar-name-incorrect-variance/good.py",
+              "doc/data/messages/t/typevar-name-mismatch/good.py",
+              "doc/data/messages/u/unbalanced-dict-unpacking/good.py",
+              "doc/data/messages/u/unbalanced-tuple-unpacking/good.py",
+              "doc/data/messages/u/undefined-all-variable/good.py",
+              "doc/data/messages/u/undefined-loop-variable/good.py",
+              "doc/data/messages/u/undefined-variable/good.py",
+              "doc/data/messages/u/unexpected-keyword-arg/good.py",
+              "doc/data/messages/u/unexpected-line-ending-format/good.py",
+              "doc/data/messages/u/unexpected-special-method-signature/good.py",
+              "doc/data/messages/u/ungrouped-imports/good.py",
+              "doc/data/messages/u/unhashable-member/good.py",
+              "doc/data/messages/u/unidiomatic-typecheck/good.py",
+              "doc/data/messages/u/unknown-option-value/good.py",
+              "doc/data/messages/u/unnecessary-comprehension/good.py",
+              "doc/data/messages/u/unnecessary-default-type-args/good.py",
+              "doc/data/messages/u/unnecessary-dict-index-lookup/good.py",
+              "doc/data/messages/u/unnecessary-direct-lambda-call/good.py",
+              "doc/data/messages/u/unnecessary-dunder-call/good.py",
+              "doc/data/messages/u/unnecessary-ellipsis/good.py",
+              "doc/data/messages/u/unnecessary-lambda-assignment/good.py",
+              "doc/data/messages/u/unnecessary-list-index-lookup/good.py",
+              "doc/data/messages/u/unnecessary-pass/good.py",
+              "doc/data/messages/u/unnecessary-semicolon/good.py",
+              "doc/data/messages/u/unpacking-non-sequence/good.py",
+              "doc/data/messages/u/unreachable/good.py",
+              "doc/data/messages/u/unrecognized-inline-option/good.py",
+              "doc/data/messages/u/unspecified-encoding/good.py",
+              "doc/data/messages/u/unsubscriptable-object/good.py",
+              "doc/data/messages/u/unsupported-assignment-operation/good.py",
+              "doc/data/messages/u/unsupported-binary-operation/good.py",
+              "doc/data/messages/u/unsupported-delete-operation/good.py",
+              "doc/data/messages/u/unsupported-membership-test/good.py",
+              "doc/data/messages/u/unused-argument/good.py",
+              "doc/data/messages/u/unused-format-string-key/good.py",
+              "doc/data/messages/u/unused-import/good.py",
+              "doc/data/messages/u/unused-private-member/good.py",
+              "doc/data/messages/u/unused-variable/good.py",
+              "doc/data/messages/u/unused-wildcard-import/good.py",
+              "doc/data/messages/u/use-a-generator/good.py",
+              "doc/data/messages/u/use-implicit-booleaness-not-comparison-to-string/good.py",
+              "doc/data/messages/u/use-implicit-booleaness-not-comparison-to-zero/good.py",
+              "doc/data/messages/u/use-implicit-booleaness-not-comparison/good.py",
+              "doc/data/messages/u/use-implicit-booleaness-not-len/good.py",
+              "doc/data/messages/u/use-list-literal/good.py",
+              "doc/data/messages/u/use-maxsplit-arg/good.py",
+              "doc/data/messages/u/use-set-for-membership/good.py",
+              "doc/data/messages/u/use-symbolic-message-instead/good.py",
+              "doc/data/messages/u/use-yield-from/good.py",
+              "doc/data/messages/u/used-before-assignment/good.py",
+              "doc/data/messages/u/used-prior-global-declaration/good.py",
+              "doc/data/messages/u/useless-else-on-loop/good.py",
+              "doc/data/messages/u/useless-import-alias/good.py",
+              "doc/data/messages/u/useless-object-inheritance/good.py",
+              "doc/data/messages/u/useless-option-value/good.py",
+              "doc/data/messages/u/useless-param-doc/good.py",
+              "doc/data/messages/u/useless-parent-delegation/good.py",
+              "doc/data/messages/u/useless-return/good.py",
+              "doc/data/messages/u/useless-suppression/good.py",
+              "doc/data/messages/u/useless-type-doc/good.py",
+              "doc/data/messages/u/useless-with-lock/good.py",
+              "doc/data/messages/u/using-assignment-expression-in-unsupported-version/good.py",
+              "doc/data/messages/u/using-constant-test/good.py",
+              "doc/data/messages/u/using-exception-groups-in-unsupported-version/good.py",
+              "doc/data/messages/u/using-f-string-in-unsupported-version/good.py",
+              "doc/data/messages/u/using-final-decorator-in-unsupported-version/good.py",
+              "doc/data/messages/u/using-generic-type-syntax-in-unsupported-version/good.py",
+              "doc/data/messages/u/using-positional-only-args-in-unsupported-version/good.py",
+              "doc/data/messages/w/while-used/good.py",
+              "doc/data/messages/w/wildcard-import/good.py",
+              "doc/data/messages/w/wrong-exception-operation/good.py",
+              "doc/data/messages/w/wrong-import-order/good.py",
+              "doc/data/messages/w/wrong-import-position/good.py",
+              "doc/data/messages/w/wrong-spelling-in-comment/good.py",
+              "doc/data/messages/w/wrong-spelling-in-docstring/good.py",
+              "doc/data/messages/y/yield-inside-async-function/good.py",
+              "doc/data/messages/y/yield-outside-function/good.py",
+              "tests/regrtest_data/encoding/good.py"
+            ],
+            "end_line": null,
+            "path": "good.py",
+            "reason": "ambiguous_basename",
+            "reference": "good.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "Where is the example function that searches for even numbers using a loop with an else clause defined in the documentation directory for the checker message category that flags loops with else clauses lacking break statements?",
+      "question_sha256": "1278474efbe783735f841476dbb82449c60e9aa6a0b169a82b74c5943bc5c80d",
+      "reference_answer": "The example function that searches for even numbers using a loop with an else clause is defined in `./doc/data/messages/u/useless-else-on-loop/bad.py`.\n\nThe function demonstrates a problematic pattern where a `for` loop has an `else` clause but uses a `return` statement instead of a `break` statement. The function's control flow structure directly relates to the checker's documented purpose: the `useless-else-on-loop` checker (message code W0120) detects loops with `else` clauses that don't have `break` statements, because the `else` clause on a loop only makes semantic sense when combined with a `break` statement that can exit the loop early.\n\nIn this specific function:\n- The loop iterates through numbers and returns immediately when an even number is found\n- If no even number is found, the loop completes normally and the `else` clause executes\n- However, since there's no `break` statement, the `else` clause is considered useless - the code inside it could simply be placed after the loop without the `else` keyword\n\nThe checker implementation in `pylint/checkers/base/basic_error_checker.py` uses the `_check_else_on_loop` method (lines 477-487) which calls `_loop_exits_early` (lines 47-67) to determine if a loop contains a `break` statement that exits the loop (not just an inner loop). If a loop has an `else` clause but no such `break` statement exists, the checker flags it as useless.\n\nThe corresponding \"good\" example in `good.py` shows the corrected version where the `else` clause is removed and the print statement is simply placed after the loop, demonstrating the recommended pattern.",
+      "reference_sha256": "4bc30535f7319fb8b00a960918bd0bf64bf5f690d93558a5acfc1fb1fcde9b17",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-72d85443ca2d9caa2dd90758"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2048,
+            "file_sha256": "3f186aa53840acd0fea31537e1b8e0763109fc9f8e13461d356ff6f6ca493842",
+            "path": "pylint/checkers/typecheck.py",
+            "start_line": 1954
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "99db4ad530bc516a06d9ecd841b9de7aa0c2befcf1e6d9592a817d1f43469461",
+            "kind": "file_reference",
+            "line_count": 106,
+            "path": "tests/functional/a/alternative/alternative_union_syntax.py"
+          },
+          {
+            "file_sha256": "9d98a149c12b016174bedd1ce6da439cce2836e111a709d5831c04c82ebea708",
+            "kind": "file_reference",
+            "line_count": 138,
+            "path": "tests/functional/a/alternative/alternative_union_syntax_error.py"
+          },
+          {
+            "file_sha256": "636ef66dd7ff2b8e6418ebd72cc3cf05914c83588a6fa45961bbe7e3ba5e70d6",
+            "kind": "file_reference",
+            "line_count": 97,
+            "path": "tests/functional/a/alternative/alternative_union_syntax_py37.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the NamedTuple test class in the PEP 604 alternative union syntax test module use pipe operator syntax instead of typing.Union?",
+      "question_sha256": "b8ff08523e0a0bc900eef1e995e8d21abbd029cdd541d1fe588b233c32ca6788",
+      "reference_answer": "The NamedTuple test class uses pipe operator syntax (`int | str`) instead of `typing.Union[int, str]` because the test module is designed to verify pylint's handling of PEP 604 alternative union syntax.\n\nThe test module (`tests/functional/a/alternative/alternative_union_syntax.py` and related files) specifically tests:\n1. That pylint accepts the new syntax in Python 3.10+ (configured with `py-version=3.10` in `alternative_union_syntax.rc`)\n2. That pylint correctly flags it as unsupported in Python 3.8 without postponed evaluation (in `alternative_union_syntax_error.py` with `py-version=3.8`)\n3. That pylint accepts it in Python 3.8 with `from __future__ import annotations` enabled (in `alternative_union_syntax_py37.py`)\n\nUsing `typing.Union` would defeat the test's purpose, which is to verify pylint's detection and handling of the `|` operator syntax. The implementation in `pylint/checkers/typecheck.py` (lines 1954-2048) includes `_detect_unsupported_alternative_union_syntax()` that checks for `|` operators in type annotations and validates them based on Python version and postponed evaluation settings.\n\nThe test class `CustomNamedTuple3` appears in multiple test files to cover different scenarios, ensuring pylint correctly handles the new syntax across Python versions and annotation evaluation modes.",
+      "reference_sha256": "f29fdcfecb75f4a5fe4c273b979526a014e7178fc2710a5da502d89b19d961ec",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-7bf646ef24fe854870baa488"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1642,
+            "file_sha256": "b1d5dd6400d18daa9b3166ebe480b4eabf06aaafdf95335b175a1ad5b3ccba8c",
+            "path": "pylint/checkers/utils.py",
+            "start_line": 1613
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "3bdf852a07dc41b721568c4cfcd7e139c6250697f09633d37242a6b18ed1fa93",
+            "kind": "file_reference",
+            "line_count": 3493,
+            "path": "pylint/checkers/variables.py"
+          },
+          {
+            "file_sha256": "44c582efcb966e74758fe4dfb97cbd23310268fc704147272fefde8c7f4d4e3e",
+            "kind": "file_reference",
+            "line_count": 109,
+            "path": "tests/functional/u/used/used_before_assignment_type_annotations.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the scope resolution chain for the namedtuple class attribute used as return type annotation in the nested class that affects static type checking in importing modules?",
+      "question_sha256": "d7f01e5805c13c712a3896d0afd076f57679b9b74ef84a7110db30addc41c37c",
+      "reference_answer": "The scope resolution chain for the namedtuple class attribute used as a return type annotation in the nested class follows this order when resolving the name in static type checking contexts:\n\n1. **Method local scope** - The method (`my_method`) where the return annotation appears. This scope does not contain the namedtuple attribute.\n\n2. **Class scope** - The nested class (`MyObject`) where the namedtuple attribute (`Coords`) is defined as a class attribute. This is where the name is found and resolved.\n\n3. **Function scope** - The enclosing function (`nested_class_as_return_annotation`) that contains the nested class definition. This scope does not contain the namedtuple.\n\n4. **Module scope** - The module (`used_before_assignment_type_annotations`) containing the function. When other modules import from this module, they access the module-level scope.\n\n**Implementation details in pylint:**\n\nThe pylint codebase handles this scope resolution through special logic in the `VariablesChecker` class (in `pylint/checkers/variables.py`):\n\n- **Special handling for return annotations** (lines 2303-2334): When a name in a return type annotation is defined in a class scope (`defframe`), pylint checks if the class contains the function (`defframe.parent_of(frame.returns)`). If the name exists in the class's locals (`defframe.locals`), it validates that the definition appears before the method's line number to avoid false \"used-before-assignment\" warnings.\n\n- **Class scope resolution** (lines 2560-2598, `_ignore_class_scope` method): For type annotations and function definitions, pylint checks if a name exists in the class's local scope. When `in_annotation_or_default_or_decorator` is true (indicating the name is used in a type annotation), it looks in `frame.parent.scope().locals` instead of `frame.locals`, allowing proper resolution of class attributes in annotations.\n\n- **Type annotation context detection** (`pylint/checkers/utils.py`, lines 1613-1642): The `is_node_in_type_annotation_context()` function identifies when a name node is part of a return type annotation (`parent_node.returns == current_node`), enabling the special scope resolution rules.\n\n**Impact on importing modules:**\n\nWhen modules import from `used_before_assignment_type_annotations`, the scope resolution chain ensures that:\n- The namedtuple class attribute is correctly resolved from the class scope where it's defined\n- Static type checkers (and pylint) can properly validate that the return type annotation refers to a valid name\n- No false \"used-before-assignment\" or \"undefined-variable\" warnings are raised, since the name resolution correctly finds the class attribute in the class scope before the method scope\n\nThis pattern is specifically tested in the repository (test file at `tests/functional/u/used/used_before_assignment_type_annotations.py`, function `nested_class_as_return_annotation`, lines 77-90) and addresses GitHub issue #5568, demonstrating that pylint correctly handles this scope resolution scenario.",
+      "reference_sha256": "560244d7f47b6d691a64183b4e3a3ff3c2512d6e6aa09171f5decf5131d585bc",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-7cfe9cbd7568ff28b7cc98f8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "b9b9fe47253b7e6af93569e777ded25e8ac5f9b6105a2aeb8022b68987682d79",
+            "kind": "file_reference",
+            "line_count": 35,
+            "path": "tests/functional/s/super/super_with_arguments.py"
+          },
+          {
+            "file_sha256": "f3e45b53e9a9de0977a36c0c71963e1735cb25230cae4564a4fb2999616ba193",
+            "kind": "file_reference",
+            "line_count": 2466,
+            "path": "pylint/checkers/refactoring/refactoring_checker.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Where is the initialization logic that the child class's initialization method delegates to through the parent class delegation mechanism?",
+      "question_sha256": "a3f996f0c484a1f95aa654474f03f042186f9ad327b3fa71535338bee56ca3e9",
+      "reference_answer": "Based on my exploration of the repository, the initialization logic that the child class's initialization method delegates to is located in the base class `object` from Python's built-in class hierarchy.\n\nIn the test file `./tests/functional/s/super/super_with_arguments.py`, the inheritance structure is:\n\n```python\nclass Foo:\n    pass\n\nclass Bar(Foo):\n    def __init__(self):\n        super(Bar, self).__init__()  # [super-with-arguments]\n```\n\nWhen `Bar.__init__` calls `super(Bar, self).__init__()`, the method resolution order (MRO) follows this chain:\n1. `Bar.__init__` is called\n2. `super(Bar, self).__init__()` resolves to the next class in the MRO after `Bar`, which is `Foo`\n3. Since `Foo` does not define an `__init__` method, Python's inheritance mechanism continues up the hierarchy\n4. The actual implementation is found in `object.__init__`, which is the ultimate base class for all Python classes\n\nThe initialization logic is therefore located in Python's built-in `object` class, specifically in `object.__init__()`. This is the default no-argument initializer that all classes inherit from if they don't define their own `__init__` method.\n\nPylint's refactoring checker (in `./pylint/checkers/refactoring/refactoring_checker.py`) detects this pattern and suggests using Python 3 style `super()` without arguments (line 1219), as the explicit class and self arguments are redundant when the class context is clear.",
+      "reference_sha256": "3137f39d83241013d9687bb6e0eb839d85c571cc8cf9871ad9f7c7ad64118be1",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-7e9601f2c55029f2e6026b90"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "8f57d3db03111f85faf0fa3682cd6389919492233679d26b25dc70e0e46cb38c",
+            "kind": "file_reference",
+            "line_count": 9,
+            "path": "doc/data/messages/d/docstring-first-line-empty/bad.py"
+          },
+          {
+            "file_sha256": "c21e52df5027e9f601e9926edd10211ae1d374c6e03ba4ab7f15a2538e38f41a",
+            "kind": "file_reference",
+            "line_count": 89,
+            "path": "pylint/extensions/docstyle.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the example function's docstring structure that starts with a blank line relate to the empty first line validation rule in the docstring style checker extension module?",
+      "question_sha256": "b98758d7d8ce216cdf2cc259788528ab8830623d0dd19de8f819acbf673b0d09",
+      "reference_answer": "The example function's docstring structure relates to the empty first line validation rule because the function demonstrates the exact violation pattern that the rule detects and flags.\n\nThe example function in `doc/data/messages/d/docstring-first-line-empty/bad.py` has a docstring that starts with a blank line:\n\n```python\ndef foo():  # [docstring-first-line-empty]\n    \"\"\"\n    Lorem Ipsum is simply dummy text...\n```\n\nThe docstring begins with `\"\"\"` on line 2, followed immediately by a newline, with the actual content starting on line 3. This structure violates PEP 257, which states that docstrings should start with the text content on the same line as the opening quotes, not on a separate line.\n\nThe empty first line validation rule is implemented in the `DocStringStyleChecker` class in `pylint/extensions/docstyle.py`. The rule's detection logic (lines 54-61) checks if the docstring's first character is a newline:\n\n```python\ndocstring = node.doc_node.value if node.doc_node else None\nif docstring and docstring[0] == \"\\n\":\n    self.add_message(\n        \"docstring-first-line-empty\",\n        node=node,\n        args=(node_type,),\n        confidence=HIGH,\n    )\n```\n\nWhen the docstring starts with `\"\\n\"`, it means the first line after the opening quotes is empty, which is exactly what the example function demonstrates. The rule flags this as a violation because PEP 257 requires docstrings to begin with the summary text immediately after the opening triple quotes, not on a new line.\n\nThe relationship is direct: the example function's docstring structure (blank first line) is the precise pattern that triggers the rule's validation check, making it a concrete example of the violation the rule is designed to catch.",
+      "reference_sha256": "5c6936c0f38dd6af69bd4d66f31b5009f9955432aca7d6e90fbd08e8817274c1",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-801079e1be71efa57bf1f97f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "f1c95c78a1a73360dbd1275a9e333eb47f318c7e18ace8b77e1c5c588595becf",
+            "kind": "file_reference",
+            "line_count": 403,
+            "path": "pylint/checkers/classes/special_methods_checker.py"
+          },
+          {
+            "file_sha256": "c5254f9added00d0b8eb492ed6d6a94d6515975912c5218ee71cb629aff5a1b9",
+            "kind": "file_reference",
+            "line_count": 103,
+            "path": "tests/functional/i/invalid/invalid_getnewargs/invalid_getnewargs_ex_returned.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does the test class that intentionally violates the protocol by returning a three-element tuple instead of the required two-element tuple exist alongside correct implementations in the same test module?",
+      "question_sha256": "677ce9c8696663d63bb0043f0cd7bd48845c8a30301e63ec0befba4b7b10e98a",
+      "reference_answer": "The test class exists alongside correct implementations in the same test module to follow a comprehensive testing pattern that validates both positive and negative cases for the protocol checker.\n\nThe `__getnewargs_ex__` protocol requires methods to return exactly a two-element tuple `(tuple, dict)` where the first element is a tuple of positional arguments and the second is a dictionary of keyword arguments. The checker implementation in `pylint/checkers/classes/special_methods_checker.py` validates this at line 387 by checking `if len(inferred.elts) != 2:`.\n\nThe test file `tests/functional/i/invalid/invalid_getnewargs/invalid_getnewargs_ex_returned.py` follows a consistent pattern found throughout pylint's functional tests:\n- **Good examples** (`FirstGoodGetNewArgsEx`, `SecondGoodGetNewArgsEx`, `ThirdGoodGetNewArgsEx`, `FourthGoodGetNewArgsEx`) demonstrate correct implementations that should NOT trigger the `invalid-getnewargs-ex-returned` error\n- **Bad examples** (`FirstBadGetNewArgsEx`, `SecondBadGetNewArgsEx`, `ThirdBadGetNewArgsEx`, etc.) demonstrate various violation patterns that SHOULD trigger the error\n- **Ambiguous cases** (`AmbigousGetNewArgsEx`, `AnotherAmbiguousGetNewArgsEx`) test edge cases with uninferable values\n\nThis pattern ensures the checker:\n1. **Correctly identifies violations** - the bad examples test that the checker catches protocol violations (wrong return type, wrong tuple length, wrong element types)\n2. **Does not produce false positives** - the good examples ensure valid code is not incorrectly flagged\n3. **Covers edge cases** - ambiguous cases test behavior with uninferable values\n\nThe specific class that returns a three-element tuple tests the length validation logic in the checker, ensuring it correctly identifies when the tuple has the wrong number of elements (should be 2, but this returns 3). This comprehensive approach of testing both positive and negative cases together is a standard validation testing pattern that ensures the checker is both sensitive (catches violations) and specific (doesn't flag valid code).",
+      "reference_sha256": "700619e2072713170f149b0ed11e91fd7c9b0d62b70e81f841af862e11aa7d5a",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-8027307847d605d0e9246890"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 47,
+            "file_sha256": "acb02f06ad9d92e4df55a4996c85647dd162ba783bd3f048acac7c7dc444589e",
+            "path": "tests/functional/u/use/use_yield_from.py",
+            "start_line": 42
+          },
+          {
+            "end_line": 1186,
+            "file_sha256": "f3e45b53e9a9de0977a36c0c71963e1735cb25230cae4564a4fb2999616ba193",
+            "path": "pylint/checkers/refactoring/refactoring_checker.py",
+            "start_line": 1164
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "8c2af5e9ab10c67ce75cfe531117f5a5151de58debda2ae9057dfbb5cbecfc5a",
+            "kind": "file_reference",
+            "line_count": 6,
+            "path": "doc/data/messages/t/too-many-public-methods/details.rst"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How should the termination predicate evaluation within the iteration loop be decoupled from the iterable consumption mechanism to enable independent testing of the termination predicate evaluation and the alternative path value emission?",
+      "question_sha256": "0b167b1b86be517145e1565d4b2c95ea9e9d4bd8a0a0aef9c2c766ad62759f74",
+      "reference_answer": "Based on my exploration of the pylint repository, the question refers to the `for_else_yield` function pattern found in `tests/functional/u/use/use_yield_from.py` (lines 42-47). This function demonstrates a for-else loop with a break condition and a yield in the else clause:\n\n```python\ndef for_else_yield(gen, something):\n    for item in gen():\n        if shazam(item):\n            break\n    else:\n        yield something\n```\n\nCurrently, this implementation tightly couples three concerns:\n1. The generator invocation (`gen()`)\n2. The break condition evaluation (`shazam(item)`)\n3. The else-clause yield behavior (`yield something`)\n\nTo decouple these for independent testing, you could refactor by:\n\n1. **Extracting the termination predicate**: Move the break condition logic (`shazam(item)`) into a separate, testable function or make it a parameter:\n   ```python\n   def for_else_yield(gen, something, should_break=None):\n       should_break = should_break or (lambda item: shazam(item))\n       for item in gen():\n           if should_break(item):\n               break\n       else:\n           yield something\n   ```\n\n2. **Separating iteration from condition evaluation**: Create a helper function that handles the iteration and condition checking separately from the generator invocation:\n   ```python\n   def _check_termination_condition(iterable, predicate):\n       for item in iterable:\n           if predicate(item):\n               return True, item\n       return False, None\n   \n   def for_else_yield(gen, something, predicate=None):\n       predicate = predicate or shazam\n       terminated_early, _ = _check_termination_condition(gen(), predicate)\n       if not terminated_early:\n           yield something\n   ```\n\n3. **Using a generator factory pattern**: Separate the generator creation from the iteration logic:\n   ```python\n   def for_else_yield(generator_factory, something, break_predicate):\n       items = generator_factory()\n       for item in items:\n           if break_predicate(item):\n               break\n       else:\n           yield something\n   ```\n\nThe pylint codebase's `visit_yield` method in `refactoring_checker.py` (lines 1164-1186) already demonstrates awareness of for-else patterns with yields, as it specifically excludes cases where `len(loop_node.body) != 1`, which would include the `for_else_yield` pattern with its break statement. This suggests the codebase recognizes the complexity of testing such patterns when control flow is tightly coupled.\n\nThe key insight is that by making the termination predicate and generator invocation independently injectable/testable, you can:\n- Test the break condition logic in isolation (with mock iterables)\n- Test the else-clause yield behavior independently (by controlling whether the loop breaks)\n- Test the generator invocation separately (by providing different generator functions)\n\nThis decoupling aligns with the single-responsibility principle referenced in the codebase (see `doc/data/messages/t/too-many-public-methods/details.rst`) and enables more granular unit testing of each component.",
+      "reference_sha256": "0ca6eee6f269ae92db6cd44c4731e77076496259b5911807d32ac47a49d75ae2",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-8105484f8eb45e656f780a50"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 117,
+            "file_sha256": "569710050f499392c144fc03980ec69bf93b8ec987e4cff406c106dbac6ea9db",
+            "path": "pylint/checkers/spelling.py",
+            "start_line": 116
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the filter class that skips Sphinx documentation directive patterns inherit its pattern-based filtering mechanism from the base filter class that provides pattern-based word skipping, enabling the spelling validation system to dynamically compose multiple word filtering components without modifying the external tokenization library interface?",
+      "question_sha256": "3ccfe3f8c2ec82cc4092f69bfba465726802b1e35766f645a1553b8048b0c98e",
+      "reference_answer": "The filter class that skips Sphinx documentation directive patterns (SphinxDirectives) inherits from the base filter class that provides pattern-based word skipping (RegExFilter), which implements a template method pattern. RegExFilter defines a `_skip()` method (lines 116-117 in `pylint/checkers/spelling.py`) that uses a class attribute `_pattern` to match words against a regular expression. SphinxDirectives only needs to define its `_pattern` attribute (line 142) with the regex `r\"^(:([a-z]+)){1,2}:`([^`]+)(`)?\"` to match Sphinx directives like `:class:`BaseQuery``, and it automatically inherits the `_skip()` implementation.\n\nThis inheritance mechanism enables dynamic composition because the spelling validation system (SpellingChecker) can pass multiple filter classes as a list to the external tokenization library's `get_tokenizer()` function (lines 323-335). The filters are composed at lines 326-334, including EmailFilter, URLFilter, WikiWordFilter, WordsWithDigitsFilter, WordsWithUnderscores, CamelCasedWord, and SphinxDirectives. Each filter class implements the same `Filter` interface from the `enchant.tokenize` library (imported at line 27), which requires only a `_skip()` method.\n\nBy using inheritance through RegExFilter, new pattern-based filters can be created by simply defining a `_pattern` attribute without reimplementing the matching logic. This allows the spelling checker to extend functionality (add new word filtering components) without modifying the external tokenization library interface (`enchant.tokenize.Filter` and `get_tokenizer`), maintaining compatibility with the third-party library's API contract. The composition happens dynamically at runtime when `get_tokenizer()` is called with the filter list, and each filter's `_skip()` method is invoked by the tokenizer to determine whether words should be excluded from spelling checks.",
+      "reference_sha256": "2730db1def99ed6f243adebd4e173adcaf635d54149b759c0f6fa05b1535bef2",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-84eb8ec127206833fada12d5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2297,
+            "file_sha256": "233b4d19610a473837b4306fd937d3e618c3dfda5be2fb964559024b6e3a0a73",
+            "path": "pylint/checkers/classes/class_checker.py",
+            "start_line": 2297
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "02f54f4297c52ce5494b6b71b4c6ade3f75316fac3a988fb907168a1f59a8118",
+            "kind": "file_reference",
+            "line_count": 22,
+            "path": "tests/functional/s/super/super_init_not_called_extensions_py310.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "pylint/checkers/utils.py",
+              "pylint/config/_pylint_config/utils.py",
+              "pylint/config/utils.py",
+              "pylint/lint/utils.py",
+              "pylint/pyreverse/utils.py",
+              "pylint/testutils/utils.py",
+              "pylint/utils/utils.py"
+            ],
+            "end_line": 1699,
+            "path": "utils.py",
+            "reason": "ambiguous_basename",
+            "reference": "utils.py",
+            "start_line": 1679
+          }
+        ]
+      },
+      "question": "What are the semantic implications of a concrete class implementing a typing protocol having an empty __init__ method body containing only ellipsis for protocol conformance while still requiring calls in the inheritance chain?",
+      "question_sha256": "740ee680a32cd752ef09fbc4b19fc309dbc6bcaef7a031bc8e6eb3e8cf6df306",
+      "reference_answer": "The semantic implications center on the distinction between protocol classes and concrete classes that implement protocols in pylint's `super-init-not-called` checker.\n\nIn the codebase (`tests/functional/s/super/super_init_not_called_extensions_py310.py`), `TestParent` is a concrete class implementing `TestProto` (a Protocol from `typing_extensions`). Its `__init__` contains only ellipsis (`...`), which serves as a protocol conformance placeholder.\n\nKey semantic implications:\n\n1. Protocol exemption doesn't apply: The checker's protocol exemption (line 2297 in `class_checker.py`: `if utils.is_protocol_class(klass): return`) only applies when the parent class itself is a Protocol. Since `TestParent` is a concrete class implementing a protocol (not a protocol itself), it doesn't qualify for this exemption. The `is_protocol_class` function (lines 1679-1699 in `utils.py`) checks if a class inherits from `typing.Protocol` or `typing_extensions.Protocol`, which `TestParent` does not.\n\n2. Empty __init__ still requires invocation: Even though the `__init__` body is empty (only ellipsis), it's still considered a non-abstract method that should be called in the inheritance chain. The `_ancestors_to_call` function (lines 2428-2445) excludes abstract methods (`if init_node.is_abstract(): continue`) but includes non-abstract methods with empty bodies. An ellipsis-only body is not considered abstract.\n\n3. Inheritance chain semantics: When `TestChild` inherits from `TestParent`, pylint expects `TestChild.__init__` to call `TestParent.__init__()` to maintain proper initialization chain semantics, even if the parent's `__init__` does nothing. This ensures the inheritance contract is honored, regardless of whether the method has actual implementation.\n\n4. Protocol conformance vs. inheritance requirements: The ellipsis satisfies the protocol's structural typing requirements (making `TestParent` conform to `TestProto`), but it doesn't exempt the class from inheritance chain obligations. Protocol conformance is about structural typing, while `super-init-not-called` is about inheritance semantics.\n\nThe test case demonstrates this: `TestChild.__init__` triggers the `super-init-not-called` warning (line 21) because it doesn't call `TestParent.__init__()`, even though that method is empty. This shows that empty `__init__` methods with ellipsis in protocol-implementing concrete classes create a semantic gap: they satisfy protocol requirements but still need explicit invocation in inheritance chains.",
+      "reference_sha256": "f3fbfe8aa11c2fa5f196edc498ff49869251d3e19c12d234c3e4172adbc92306",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-85319bf30f135515b36162fa"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 931,
+            "file_sha256": "233b4d19610a473837b4306fd937d3e618c3dfda5be2fb964559024b6e3a0a73",
+            "path": "pylint/checkers/classes/class_checker.py",
+            "start_line": 931
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "f495d2c935671ce67a794c0994f137ee4dcc1c4c453aff0ef438cd0cd35479b6",
+            "kind": "file_reference",
+            "line_count": 82,
+            "path": "tests/regrtest_data/max_inferable_limit_for_classes/nodes/roles.py"
+          },
+          {
+            "file_sha256": "233b4d19610a473837b4306fd937d3e618c3dfda5be2fb964559024b6e3a0a73",
+            "kind": "file_reference",
+            "line_count": 2445,
+            "path": "pylint/checkers/classes/class_checker.py"
+          },
+          {
+            "file_sha256": "d854af0d5449fe9c449d86148b56bac182471c6cd6173dbb959909deb44488d1",
+            "kind": "file_reference",
+            "line_count": 38,
+            "path": "tests/regrtest_data/max_inferable_limit_for_classes/main.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the inheritance chain from the base role class through the statement role class impact method resolution order computation performance when processing large batches of database query statement instances?",
+      "question_sha256": "7adfede2fb37c8f38571f782e5a9265486495ca79be8d8bf4eacf7956f6402d7",
+      "reference_answer": "Based on my exploration of the pylint repository, the inheritance chain from SQLRole through StatementRole impacts method resolution order (MRO) computation performance when processing large batches of SQL statement objects due to several factors:\n\n1. **Repeated MRO Computations**: The codebase shows multiple locations where `mro()` is called during class checking (e.g., in `class_checker.py` at lines 931, 1782, and 1789). Each call to `mro()` must traverse the entire inheritance hierarchy, and with complex role-based inheritance patterns (as seen in the test case at `tests/regrtest_data/max_inferable_limit_for_classes/nodes/roles.py`), this creates deep inheritance chains that require extensive traversal.\n\n2. **Complex Inheritance Structure**: The role hierarchy creates multiple inheritance paths. For example, `StatementRole` inherits from `SQLRole`, but classes like `ColumnElement` inherit from multiple role classes including `StatementRole`, creating a diamond inheritance pattern. When Python computes MRO using the C3 linearization algorithm, it must resolve these complex relationships, which becomes computationally expensive when repeated for many objects.\n\n3. **Type Checking Overhead**: The codebase performs numerous `isinstance()` and `is_subtype_of()` checks (found throughout `class_checker.py`), which internally traverse the MRO to determine type relationships. In the context of SQLAlchemy-style role-based inheritance, each type check must walk through the entire role hierarchy chain.\n\n4. **No Caching of MRO Results**: While the codebase shows some caching mechanisms (e.g., for `slots()` at line 1791), the MRO computation itself appears to be recalculated each time `node.mro()` is called, without memoization for frequently accessed class hierarchies.\n\n5. **Batch Processing Amplification**: When processing large batches, the overhead compounds because each object in the batch triggers these expensive MRO computations. The test case at `tests/regrtest_data/max_inferable_limit_for_classes/main.py` demonstrates this issue, where SQLAlchemy's intricate class hierarchy becomes \"uninferable\" with the standard `max_inferred` limit of 100, indicating the computational complexity.\n\nThe specific performance bottleneck occurs in methods like `_check_consistent_mro()` (line 928) and `_check_in_slots()` (line 1765), where `klass.mro()` is called and must traverse through the StatementRole \u2192 SQLRole chain and all intermediate role classes, creating a multiplicative effect when applied to many objects.",
+      "reference_sha256": "9634e98c6f51a8dfad00c8908e47509004888a8d24479ad1e27b90c49c3413a4",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-859938b31ac8420808074bdb"
+    }
+  ]
+}

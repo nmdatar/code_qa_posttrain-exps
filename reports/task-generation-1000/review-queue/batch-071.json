@@ -1,0 +1,528 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 935,
+            "file_sha256": "fddd3207366f5fa7856d20eb0c5d049c44f7de4459a25350141fe7f78fc6a848",
+            "path": "src/sqlfluff/dialects/dialect_hive.py",
+            "start_line": 896
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where in the Hive dialect function parsing class do grammar rules prevent ambiguity between the row keyword used as a function name versus type constructor?",
+      "question_sha256": "1d17d28f544a4c223d728b2c6249415a8d67ef99bda8cf40a347852168d2c53c",
+      "reference_answer": "The grammar rules that prevent ambiguity between the row keyword used as a function name versus a type constructor are located in the `match_grammar` definition of the FunctionSegment class in the Hive dialect file (`dialect_hive.py`, lines 896-935).\n\nThe disambiguation is achieved through a specific sequence pattern placed as the second option in the `OneOf` grammar structure (lines 906-921). This sequence requires an exact pattern:\n\n1. **StringParser for ROW as function name** (line 909): `StringParser(\"ROW\", KeywordSegment, type=\"function_name\")` - This explicitly parses the first ROW keyword as a function name, casting it to the function_name type to avoid linting rule exceptions.\n\n2. **RowFunctionContentsSegment** (line 910): `Ref(\"RowFunctionContentsSegment\")` - This handles the bracketed function arguments containing the row values.\n\n3. **Required AS keyword** (line 911): The literal `\"AS\"` keyword must appear between the function call and the type constructor.\n\n4. **Second ROW keyword** (line 912): Another literal `\"ROW\"` keyword that serves as the type constructor.\n\n5. **Bracketed type definition** (lines 913-920): A `Bracketed` segment containing a `Delimited` sequence of field name and datatype pairs, which distinguishes this from a regular function call.\n\nThe key disambiguation mechanisms are:\n\n- **Ordering in OneOf**: The specific row type casting sequence (lines 906-921) is placed before the general function sequence (lines 922-934), ensuring the parser tries the more specific pattern first.\n\n- **Required AS ROW pattern**: The mandatory `\"AS\"` followed by `\"ROW\"` creates a unique signature that cannot be confused with a regular function call like `ROW(...)`.\n\n- **Type definition structure**: The second bracketed segment must contain field name and datatype pairs (via `SingleIdentifierGrammar` and `DatatypeSegment`), not arbitrary expressions, further distinguishing it from function arguments.\n\nThis grammar structure ensures that syntax like `cast(row(val1, val2) as row(a integer, b integer))` is correctly parsed, with the first `ROW` recognized as a function name and the second `ROW` recognized as a type constructor, without ambiguity.",
+      "reference_sha256": "36a2ead63957933743d6349a8fc5387171c7ad069330d8a5f714d81c58e8af78",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-887e0169f5cf34c4373be9f5"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 605,
+            "file_sha256": "e91afe3d3270ffe8b4657b330a2a84b67c8fbe6cff6a726499d06e72a7566af3",
+            "path": "src/sqlfluff/utils/reflow/sequence.py",
+            "start_line": 602
+          },
+          {
+            "end_line": 637,
+            "file_sha256": "e91afe3d3270ffe8b4657b330a2a84b67c8fbe6cff6a726499d06e72a7566af3",
+            "path": "src/sqlfluff/utils/reflow/sequence.py",
+            "start_line": 634
+          },
+          {
+            "end_line": 191,
+            "file_sha256": "aeab6a4f9c01f6e239c1561db6205f3bcf251311030a81fb6608d8f960326a19",
+            "path": "src/sqlfluff/rules/structure/ST04.py",
+            "start_line": 191
+          },
+          {
+            "end_line": 1613,
+            "file_sha256": "e201337b4374007d08a3f35bf0c6e712622f71bcc8016542a5a701da4f3a0c4f",
+            "path": "src/sqlfluff/utils/reflow/reindent.py",
+            "start_line": 1613
+          },
+          {
+            "end_line": 2156,
+            "file_sha256": "e201337b4374007d08a3f35bf0c6e712622f71bcc8016542a5a701da4f3a0c4f",
+            "path": "src/sqlfluff/utils/reflow/reindent.py",
+            "start_line": 2156
+          },
+          {
+            "end_line": 734,
+            "file_sha256": "e201337b4374007d08a3f35bf0c6e712622f71bcc8016542a5a701da4f3a0c4f",
+            "path": "src/sqlfluff/utils/reflow/reindent.py",
+            "start_line": 734
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "src/sqlfluff/core/parser/grammar/sequence.py",
+              "src/sqlfluff/utils/reflow/sequence.py"
+            ],
+            "end_line": null,
+            "path": "sequence.py",
+            "reason": "ambiguous_basename",
+            "reference": "sequence.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": "What would be the propagation path through the whitespace reformatting utility's indentation checking workflow if the indent unit string generator were modified to accept an additional parameter for custom indent strings?",
+      "question_sha256": "8ecc9160d5e6afe7cc7bd7afa2ba22097d0d1e933676265f82372b9e53a54da1",
+      "reference_answer": "If the function that generates indent unit strings were modified to accept an additional parameter for custom indent strings, the propagation path through the indentation checking workflow would be as follows:\n\n**Entry Points:**\n1. **`ReflowSequence.reindent()` method** (in `src/sqlfluff/utils/reflow/sequence.py`, lines 602-605): Calls the generator to create `single_indent`, then passes it to `lint_indent_points()`.\n\n2. **`ReflowSequence.break_long_lines()` method** (in `src/sqlfluff/utils/reflow/sequence.py`, lines 634-637): Calls the generator to create `single_indent`, then passes it to `lint_line_length()`.\n\n3. **`Rule_ST04._get_indentation()` method** (in `src/sqlfluff/rules/structure/ST04.py`, line 191): Calls the generator directly to calculate indentation strings for nested CASE statement fixes.\n\n**Primary Propagation Path (Indentation Checking):**\n- `lint_indent_points()` (in `src/sqlfluff/utils/reflow/reindent.py`, line 1613) receives `single_indent` as a parameter and passes it to `_lint_line_buffer_indents()` (line 1680).\n- `_lint_line_buffer_indents()` (line 1524) receives `single_indent` and distributes it to three helper functions:\n  - `_lint_line_starting_indent()` (line 1211) - uses `single_indent` at line 1230 to calculate `desired_starting_indent = desired_indent_units * single_indent`\n  - `_lint_line_untaken_positive_indents()` (line 1315) - uses `single_indent` at lines 1326 and 1396 to calculate desired indents for positive indent corrections\n  - `_lint_line_untaken_negative_indents()` (line 1418) - uses `single_indent` at line 1504 to calculate desired indents for negative indent corrections\n\n**Secondary Propagation Path (Line Length Checking):**\n- `lint_line_length()` (in `src/sqlfluff/utils/reflow/reindent.py`, line 2156) receives `single_indent` as a parameter and uses it when breaking long lines to calculate appropriate indentation for newly inserted line breaks.\n\n**Required Changes:**\nAll call sites would need to be updated to pass the new parameter:\n- Two locations in `ReflowSequence` methods (lines 602-605 and 634-637 in `sequence.py`)\n- One location in `Rule_ST04` (line 191 in `ST04.py`)\n- The function signature itself (line 734 in `reindent.py`)\n\nThe parameter would then propagate through the call chain: `lint_indent_points()` \u2192 `_lint_line_buffer_indents()` \u2192 the three helper functions (`_lint_line_starting_indent()`, `_lint_line_untaken_positive_indents()`, `_lint_line_untaken_negative_indents()`), and also to `lint_line_length()` for line breaking operations.",
+      "reference_sha256": "46b1d5451ece19a488a391859aee60b26b3c760601f4ed0549e15a60a9d7138b",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-892c962a8c7a05aa0c90835c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 228,
+            "file_sha256": "5d478307425cd8f46a2dc69ca5a318940d83c6277063efd36a9b7dccb7928de9",
+            "path": "src/sqlfluff/core/linter/linter.py",
+            "start_line": 173
+          },
+          {
+            "end_line": 281,
+            "file_sha256": "5d478307425cd8f46a2dc69ca5a318940d83c6277063efd36a9b7dccb7928de9",
+            "path": "src/sqlfluff/core/linter/linter.py",
+            "start_line": 231
+          },
+          {
+            "end_line": 777,
+            "file_sha256": "5d478307425cd8f46a2dc69ca5a318940d83c6277063efd36a9b7dccb7928de9",
+            "path": "src/sqlfluff/core/linter/linter.py",
+            "start_line": 631
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "91f14d9adc344c52d2ae383f21f435e4c7f7e231822fd2adc07c0ca2250bf642",
+            "kind": "file_reference",
+            "line_count": 129,
+            "path": "src/sqlfluff/core/linter/common.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "src/sqlfluff/core/dialects/common.py",
+              "src/sqlfluff/core/linter/common.py",
+              "src/sqlfluff/core/parser/segments/common.py",
+              "src/sqlfluff/core/templaters/builtins/common.py"
+            ],
+            "end_line": 116,
+            "path": "common.py",
+            "reason": "ambiguous_basename",
+            "reference": "common.py",
+            "start_line": 104
+          },
+          {
+            "candidates": [
+              "src/sqlfluff/core/dialects/common.py",
+              "src/sqlfluff/core/linter/common.py",
+              "src/sqlfluff/core/parser/segments/common.py",
+              "src/sqlfluff/core/templaters/builtins/common.py"
+            ],
+            "end_line": 64,
+            "path": "common.py",
+            "reason": "ambiguous_basename",
+            "reference": "common.py",
+            "start_line": 62
+          }
+        ]
+      },
+      "question": " What is the architectural design of the NamedTuple storing parsing results with an optional parse tree field enabling graceful degradation when parsing fails at different pipeline stages?",
+      "question_sha256": "a8ab19444bd79918292c5271afe5c15ca7a2a4e491797b665a147ac623fcdb5b",
+      "reference_answer": "The architectural design uses a NamedTuple (`ParsedVariant` in `src/sqlfluff/core/linter/common.py`) with an optional `tree` field (type `Optional[BaseSegment]`) to enable graceful degradation during the compilation pipeline.\n\n**Structure:**\nThe `ParsedVariant` NamedTuple contains:\n- `templated_file`: The templated file (can be None if templating fails)\n- `tree`: Optional parse tree (None if parsing fails)\n- `lexing_violations`: List of lexing errors\n- `parsing_violations`: List of parsing errors\n\n**Graceful Degradation Mechanism:**\n1. **Templating stage**: If templating fails, `templated_file` can be None, but a `ParsedVariant` may still be created with violations recorded.\n\n2. **Lexing stage**: If lexing fails (see `_lex_templated_file` in `linter.py:173-228`), tokens are None, so `tree` remains None, but violations are captured.\n\n3. **Parsing stage**: If parsing fails (see `_parse_tokens` in `linter.py:231-281`), `tree` is set to None, but the `ParsedVariant` is still created with parsing violations recorded.\n\n4. **Linting stage**: The linter continues processing even when `tree` is None. In `lint_parsed` (linter.py:631-777), when no valid root variant exists (all variants have `tree=None`), the linter still:\n   - Processes violations from templating/parsing failures\n   - Applies ignore masks from source code (noqa comments)\n   - Returns a `LintedFile` with collected violations\n\n**Key Methods:**\n- `root_variant()` (common.py:104-116): Returns the first variant with a non-None `tree`, or None if all parsing failed. This allows the linter to skip linting when no valid tree exists but still process violations.\n\n- `violations()` (common.py:62-64): Combines lexing and parsing violations, allowing error collection even when parsing fails.\n\nThis design allows SQLFluff to continue processing and report errors at each stage (templating, lexing, parsing) even when later stages fail, rather than stopping at the first failure.",
+      "reference_sha256": "a84a872cbe955d6e5956301108f2dc662788fdbd1f1639ac8d2d287ca8a27e13",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-9b7f614e174db3236d68bd50"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 55,
+            "file_sha256": "8db959902c3f0a5c51ae0f4434a0cb8c0184abce904d5f10d8a9c50c88bb622a",
+            "path": "src/sqlfluff/utils/reflow/config.py",
+            "start_line": 39
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the method that merges configuration values in the spacing configuration dataclass handle precedence when multiple configuration sources provide conflicting values for spacing attributes?",
+      "question_sha256": "007f5ef1817446f255d1b7c48b5a36658ae0263dfde8aea754a905892b18b83a",
+      "reference_answer": "The method that merges configuration values in the spacing configuration dataclass (the `incorporate` method in `BlockConfig`) handles precedence using a cascading `or` operator pattern that establishes a three-tier hierarchy for each spacing attribute.\n\n**Precedence Order (highest to lowest):**\n1. **Direct method parameters** - Values passed directly as keyword arguments (e.g., `before`, `after`, `within`, `line_position`, `keyword_line_position`)\n2. **Configuration dictionary values** - Values retrieved from the `config` parameter dictionary using `.get()` with `None` as default\n3. **Existing instance values** - Current values stored in the dataclass instance attributes (e.g., `self.spacing_before`, `self.spacing_after`)\n\n**Implementation Details:**\nThe precedence is implemented in lines 39-55 of `src/sqlfluff/utils/reflow/config.py` using the pattern:\n```python\nself.spacing_before = (\n    before or config.get(\"spacing_before\", None) or self.spacing_before\n)\n```\n\nThe `or` operator evaluates left-to-right and uses the first truthy value, effectively skipping `None` or empty string values and falling back to the next source in the hierarchy.\n\n**Multiple Configuration Sources:**\nWhen `get_block_config` calls `incorporate` multiple times (as seen in lines 162, 168, and 178), each call can override previous values. The method is called:\n1. First with parent segment configurations (for `before`/`after` attributes only when at segment boundaries)\n2. Then with the segment's own configuration dictionary (which can override parent values)\n\nThis means later `incorporate` calls can override earlier ones, but within a single `incorporate` call, the three-tier precedence (parameter > config dict > existing value) is enforced.\n\n**Special Handling for keyword_line_position_exclusions:**\nFor the `keyword_line_position_exclusions` parameter (lines 56-61), the same precedence applies, but the final value is processed through `split_comma_separated_string`, which converts comma-separated strings to lists. If all sources are falsy, it defaults to an empty list `[]`.",
+      "reference_sha256": "9fed3c96c1cbb4fca73908284b0034d81d4e6455bd30a65e0394cdb0774b676d",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-9f6a34e2a62a12135e9b52ed"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 81,
+            "file_sha256": "c51d3c985192afda9732d1bc04f110f3ae358d0964dff421a14dbd01cee92f28",
+            "path": "src/sqlfluff/rules/jinja/JJ01.py",
+            "start_line": 76
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the method in the jinja padding rule that partitions tag whitespace determine boundaries between opening markers and content when modifier characters are present?",
+      "question_sha256": "b5a6c4605f0d416ca21fc05575cdec767d358c8c58b3700ee4d2d407f7c1be2f",
+      "reference_answer": "The method that partitions tag whitespace in the jinja padding rule determines boundaries between opening tag markers and content when Jinja modifier characters are present at lines 76-81 in `src/sqlfluff/rules/jinja/JJ01.py`, within the `_get_whitespace_ends` static method of the `Rule_JJ01` class.\n\nThe precise sequence of string slicing operations that enables this differentiation is:\n\n1. **Initial slicing (lines 70-72)**: \n   - `main = s[2:-2]` - extracts the content between the tag markers (removes first 2 and last 2 characters)\n   - `pre = s[:2]` - captures the initial opening tag marker (e.g., `{{` or `{%`)\n   - `post = s[-2:]` - captures the initial closing tag marker (e.g., `}}` or `%}`)\n\n2. **Opening modifier detection (lines 76-78)**:\n   - Checks if `main[0]` is in `modifier_chars` (which contains `[\"+\", \"-\"]`)\n   - If a modifier is present: `main = main[1:]` removes the modifier from the beginning of main\n   - Then `pre = s[:3]` extends the opening boundary to include the modifier (e.g., `{%+` or `{{-`)\n\n3. **Closing modifier detection (lines 79-81)**:\n   - Checks if `main[-1]` is in `modifier_chars`\n   - If a modifier is present: `main = main[:-1]` removes the modifier from the end of main\n   - Then `post = s[-3:]` extends the closing boundary to include the modifier (e.g., `-%}` or `+}}`)\n\nThis sequence allows the function to correctly identify that modifier characters (`+` or `-`) are part of the tag markers rather than part of the inner content, adjusting the boundaries accordingly. For example, with input `'{%+if a + b is True     -%}'`, the function correctly identifies `{%+` as the opening marker and `-%}` as the closing marker, separating them from the inner content `'if a + b is True'`.",
+      "reference_sha256": "29ec37cebf3880713e2992d61c5d60d984dd0e3a5661a32b2bbe78e3dea2464d",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-9ff163b78e5dbc3df37a03f4"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 312,
+            "file_sha256": "061e806b7db9a82048272d16e72ff5494525d6ab86352ebbc473c1092a507164",
+            "path": "src/sqlfluff/core/templaters/jinja.py",
+            "start_line": 242
+          },
+          {
+            "end_line": 42,
+            "file_sha256": "0177298f6178b7c7b76cac3b504341a3940750936d9c55c2049153cf5f1df958",
+            "path": "docs/source/production/security.rst",
+            "start_line": 38
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How should the function that dynamically imports user-provided Python modules from configuration in the Jinja templater be redesigned to enforce security boundaries and prevent arbitrary code execution?",
+      "question_sha256": "4ba8dd51116c6da4ee5a8daa0beac5cebd283930e33d8a0ef92e14310bb0f6f7",
+      "reference_answer": "Based on my exploration of the repository, the function that dynamically imports user-provided Python modules from configuration in the Jinja templater (`_extract_libraries_from_config` in `src/sqlfluff/core/templaters/jinja.py`, lines 242-312) currently has a significant security vulnerability: it executes arbitrary Python code without any sandboxing or validation.\n\n**Current Implementation Issues:**\n\n1. **Direct Code Execution**: The function uses `importlib.util.module_from_spec()` and `spec.loader.exec_module(module)` (line 289) to directly execute any Python code found in the user-provided `library_path` configuration. This happens without any restrictions, allowing arbitrary code execution.\n\n2. **No Validation**: There's no validation of:\n   - Which modules can be imported\n   - What operations the imported modules can perform\n   - Whether the modules contain malicious code\n   - Path traversal restrictions\n\n3. **No Sandboxing**: While the Jinja environment itself uses `SandboxedEnvironment` (line 390), the library loading occurs before template rendering and is not subject to Jinja's sandbox restrictions. The imported modules are added directly to `sys.modules` (line 287) and then exposed to the Jinja context (lines 522-523).\n\n**Security Documentation Acknowledgment:**\n\nThe repository's security documentation (`docs/source/production/security.rst`, lines 38-42) explicitly acknowledges this risk, stating that users can \"bring arbitrary python methods into sqlfluff via the `library_path`\" and recommends disabling this feature entirely in secure environments using `--library-path none` or config overrides.\n\n**Recommended Redesign Approaches:**\n\n1. **Whitelist-Based Module Loading**: Implement a whitelist of allowed module names or patterns that can be imported, preventing arbitrary module execution.\n\n2. **AST Analysis**: Before executing modules, parse and analyze the Abstract Syntax Tree (AST) to detect and block dangerous operations (file I/O, network access, system calls, etc.).\n\n3. **Restricted Execution Environment**: Use Python's `restrictedpy` or similar sandboxing libraries to execute modules in a restricted environment that limits available builtins and modules.\n\n4. **Module Validation**: Require modules to declare their intended exports and validate that they only expose expected functions/classes, blocking access to internal implementation details.\n\n5. **Path Restrictions**: Enforce strict path validation to prevent directory traversal attacks and ensure libraries can only be loaded from explicitly allowed directories.\n\n6. **Optional Secure Mode**: Add a configuration flag that enables strict security mode, where library loading is either disabled or heavily restricted, while maintaining backward compatibility for trusted environments.\n\nThe current architecture prioritizes flexibility over security, which is appropriate for trusted environments but creates risks when users can control the `library_path` configuration value, especially in scenarios where SQL files or config files can be edited by untrusted users.",
+      "reference_sha256": "0be9f691fef1468c91aeb3ca59f3d95f019a811696fd0074762977ac7ad49378",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-a024a3c06872fce52cb804ad"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 3522,
+            "file_sha256": "cf7142fd7a7cdda1b6dc61610ecd6a6d3cc244988e11c3ee814a7ee6aabd0b3b",
+            "path": "src/sqlfluff/dialects/dialect_ansi.py",
+            "start_line": 3511
+          },
+          {
+            "end_line": 478,
+            "file_sha256": "cf7142fd7a7cdda1b6dc61610ecd6a6d3cc244988e11c3ee814a7ee6aabd0b3b",
+            "path": "src/sqlfluff/dialects/dialect_ansi.py",
+            "start_line": 478
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "src/sqlfluff/core/parser/grammar/sequence.py",
+              "src/sqlfluff/utils/reflow/sequence.py"
+            ],
+            "end_line": 214,
+            "path": "sequence.py",
+            "reason": "ambiguous_basename",
+            "reference": "sequence.py",
+            "start_line": 117
+          },
+          {
+            "candidates": [
+              "src/sqlfluff/core/dialects/base.py",
+              "src/sqlfluff/core/parser/grammar/base.py",
+              "src/sqlfluff/core/parser/segments/base.py",
+              "src/sqlfluff/core/rules/base.py",
+              "src/sqlfluff/core/templaters/base.py"
+            ],
+            "end_line": 398,
+            "path": "base.py",
+            "reason": "ambiguous_basename",
+            "reference": "base.py",
+            "start_line": 322
+          }
+        ]
+      },
+      "question": "How does the DROP VIEW statement grammar's pattern matching attribute handle optional IF EXISTS and drop behavior clauses across SQL dialects?",
+      "question_sha256": "a1ccbe683996681e7a4004299a499e73bb0cce34acd608a8ffa9e628211a1fd7",
+      "reference_answer": "The DROP VIEW statement grammar's pattern matching attribute uses a `Sequence` grammar that processes optional clauses through its matching algorithm. The implementation is defined in the `DropViewStatementSegment` class in `dialect_ansi.py` (lines 3511-3522).\n\nThe `match_grammar` attribute is structured as:\n```python\nmatch_grammar: Matchable = Sequence(\n    \"DROP\",\n    \"VIEW\",\n    Ref(\"IfExistsGrammar\", optional=True),\n    Ref(\"TableReferenceSegment\"),\n    Ref(\"DropBehaviorGrammar\", optional=True),\n)\n```\n\nThe `Sequence.match()` method (in `sequence.py`, lines 117-214) handles optional elements by checking `elem.is_optional()` for each element. When the parser encounters an optional element:\n1. If segments remain and the element matches, it consumes those segments.\n2. If no segments remain or the element doesn't match, and `is_optional()` returns `True`, the sequence continues to the next element without failing.\n\nThe `IfExistsGrammar` is defined as `Sequence(\"IF\", \"EXISTS\")` (line 478 in `dialect_ansi.py`), and `DropBehaviorGrammar` is defined as `OneOf(\"RESTRICT\", \"CASCADE\", optional=True)` (line 687). When these are referenced with `Ref(\"IfExistsGrammar\", optional=True)` and `Ref(\"DropBehaviorGrammar\", optional=True)`, the `Ref` class (in `base.py`, lines 322-398) passes the `optional=True` parameter to its base class, making the entire grammar element optional.\n\nThis allows the grammar to match DROP VIEW statements in multiple forms:\n- `DROP VIEW view_name;` (without optional clauses)\n- `DROP VIEW IF EXISTS view_name;` (with IF EXISTS)\n- `DROP VIEW view_name CASCADE;` (with drop behavior)\n- `DROP VIEW IF EXISTS view_name RESTRICT;` (with both optional clauses)\n\nDifferent SQL dialects can override `DropViewStatementSegment` to customize the grammar (e.g., PostgreSQL adds `Delimited()` for multiple views, T-SQL adds delimiter grammar, ClickHouse adds cluster and sync clauses), but they all inherit the same optional clause handling mechanism from the base `Sequence` matching logic.",
+      "reference_sha256": "e243142e5789bd20badff9cacb6cff1f93474014c32151a1871f739ad0aed2ea",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-a2e2753b66b478645da990ce"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 157,
+            "file_sha256": "fc3e0b4561730dc15931c727adc34a083e4c78d11248aa7ce9d47c87097691fc",
+            "path": "src/sqlfluff/rules/layout/LT09.py",
+            "start_line": 109
+          },
+          {
+            "end_line": 550,
+            "file_sha256": "e5e3670aa9f89dc50012344b815c2ed9a1b394ca75bbf6ce4919bdfe66ae9a88",
+            "path": "src/sqlfluff/core/rules/base.py",
+            "start_line": 480
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why would repeatedly instantiating the NamedTuple that stores select clause target information in the layout rule during SQL linting cause performance degradation?",
+      "question_sha256": "c3cabfeefd5947eba9de1b408f7e362b0c9e8e851d3383baa0d95099f52d2ca2",
+      "reference_answer": "Repeatedly instantiating the NamedTuple that stores select clause target information in the layout rule during SQL linting causes performance degradation due to:\n\n1. **High frequency of instantiation**: The `SelectTargetsInfo` NamedTuple is created in the `_get_indexes()` static method (lines 109-157 in `src/sqlfluff/rules/layout/LT09.py`), which is called from `_eval()` (line 89) for every `select_clause` segment encountered during linting. The rule uses `SegmentSeekerCrawler({\"select_clause\"})` (line 83), which recursively searches the parse tree and yields a `RuleContext` for each matching segment. In large SQL files with many SELECT statements, this can result in hundreds or thousands of NamedTuple instantiations.\n\n2. **Memory allocation overhead**: Each `SelectTargetsInfo` instantiation (lines 148-157) allocates memory for 8 fields:\n   - `select_idx: int`\n   - `first_new_line_idx: int`\n   - `first_select_target_idx: int`\n   - `first_whitespace_idx: int`\n   - `comment_after_select_idx: int`\n   - `select_targets: Sequence[BaseSegment]` (potentially large sequence)\n   - `from_segment: Optional[BaseSegment]`\n   - `pre_from_whitespace: list[BaseSegment]` (created via `list(pre_from_whitespace)`)\n\n3. **Computational work per instantiation**: Before creating the NamedTuple, `_get_indexes()` performs expensive operations:\n   - Multiple `FunctionalContext` segment traversals and selections\n   - Finding indices through `children.find()` calls\n   - Creating lists from segment sequences (line 156: `list(pre_from_whitespace)`)\n   - These operations are repeated for every SELECT clause, even when the information could potentially be cached or reused.\n\n4. **Rule evaluation pattern**: The `BaseRule.crawl()` method (in `src/sqlfluff/core/rules/base.py`, lines 480-550) iterates through all matching segments and calls `_eval()` for each one. There's no caching mechanism for the `SelectTargetsInfo` data structure, so identical computations are repeated for similar SELECT clauses.\n\n5. **Memory allocation patterns**: The pattern of creating many short-lived NamedTuple objects can lead to:\n   - Increased garbage collection pressure as Python's memory manager must track and free these objects\n   - Memory fragmentation from frequent allocations and deallocations\n   - Reduced CPU cache efficiency due to scattered memory access patterns\n   - Overall reduced throughput when processing large SQL files with many SELECT statements\n\nThe performance impact is particularly noticeable during large-scale SQL parsing operations where the linter processes many files or files with complex nested queries containing multiple SELECT clauses, as each clause triggers a full recomputation and allocation cycle.",
+      "reference_sha256": "ee45595426868a5229cc35c8d0576a204909ae89d82e7deff2d94f08c2d921f0",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-a9fc9efa3e7bbf21ae1eb14d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 734,
+            "file_sha256": "eabb6cb7a7a0a478aa950064a5b950ecc8fad832e01296d645bbc7a58d891899",
+            "path": "src/sqlfluff/dialects/dialect_bigquery.py",
+            "start_line": 714
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "90fde010ed446dccaa67d3cc18f9d9755ca45b473da3168e4e9666bcc27322e6",
+            "kind": "file_reference",
+            "line_count": 588,
+            "path": "src/sqlfluff/core/parser/grammar/sequence.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "src/sqlfluff/core/parser/grammar/sequence.py",
+              "src/sqlfluff/utils/reflow/sequence.py"
+            ],
+            "end_line": 371,
+            "path": "sequence.py",
+            "reason": "ambiguous_basename",
+            "reference": "sequence.py",
+            "start_line": 117
+          }
+        ]
+      },
+      "question": "Where does the BigQuery FOR-IN-DO statement segment's grammar pattern control the parsing sequence from the query statement grammar through the nested loop body segment?",
+      "question_sha256": "a0ac2d03cbfb726e632f70d17b32c302fb478f0183500215046252c060a2acd8",
+      "reference_answer": "The BigQuery FOR-IN-DO statement segment's grammar pattern controls the parsing sequence in the `Sequence.match()` method within `src/sqlfluff/core/parser/grammar/sequence.py`. \n\nThe `ForInStatementSegment` class (defined at lines 714-734 in `src/sqlfluff/dialects/dialect_bigquery.py`) has a `match_grammar` that is a `Sequence` containing these elements in order:\n1. \"FOR\" keyword\n2. Identifier\n3. \"IN\" keyword  \n4. Indent\n5. `Ref(\"SelectableGrammar\")` - the query statement grammar\n6. Dedent\n7. \"DO\" keyword\n8. Indent\n9. `Ref(\"ForInStatementsSegment\")` - the nested loop body segment\n10. Dedent\n11. \"END\" keyword\n12. \"FOR\" keyword\n\nThe control flow occurs in `Sequence.match()` (lines 117-371 in `sequence.py`), which iterates through elements sequentially (line 163: `for elem in self._elements:`). For each element, it calls `elem.match()` (line 237) and only proceeds to the next element if the current match succeeds. This sequential matching enforces that:\n\n- The `SelectableGrammar` (query statement) must be successfully parsed first (at position 726 in the sequence)\n- Only after the query grammar match succeeds does the parser advance to match `ForInStatementsSegment` (at position 730)\n- If the `SelectableGrammar` fails to match, the entire `ForInStatementSegment` match fails, preventing the loop body segment from being parsed\n\nThe `ForInStatementsSegment` itself (lines 694-711) uses an `AnyNumberOf` grammar with `terminators=[Sequence(\"END\", \"FOR\")]` and `reset_terminators=True`, meaning it matches statements until encountering \"END FOR\", but this matching only occurs if the preceding `SelectableGrammar` match in the parent sequence succeeded.\n\nThus, the parsing flow is controlled by the sequential element matching in the `Sequence` class, which ensures the query statement grammar is extracted/parsed before the loop body statements segment can be processed.",
+      "reference_sha256": "d1f957b3fafe7bcafdae675111e678c706e5ee063057d3ce93f52554758887e6",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-b2e1c03e21b3142015d8113a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1038,
+            "file_sha256": "1a621c19602563902518eb5ac10ba6bd3871238f6e1a9c893ac2d4a0ce1e0a94",
+            "path": "src/sqlfluff/core/parser/segments/base.py",
+            "start_line": 1038
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the early exit check using the cached subtree type set intersection prevent performance degradation in the recursive segment search method when traversing deeply nested trees with irrelevant branches?",
+      "question_sha256": "f07c0f2cb4768a608aebce2be8f0cd92a25ed13d8ff61afc023167f51061857e",
+      "reference_answer": "The early exit check prevents performance degradation by avoiding unnecessary recursive traversal of subtrees that don't contain the target segment types.\n\n**How it works:**\n\nThe check at line 1038 in `./src/sqlfluff/core/parser/segments/base.py` uses:\n\n```python\nif not self.descendant_type_set.intersection(seg_type):\n    # Terminate iteration.\n    return None\n```\n\n**Key components:**\n\n1. **`descendant_type_set`** (lines 329-341): A `@cached_property` that returns a frozenset of all segment types present anywhere in the subtree. It's computed recursively by combining `descendant_type_set` and `class_types` from all child segments.\n\n2. **Intersection check**: Before recursing into child segments, the method checks if any of the target segment types (`seg_type`) exist in the subtree by computing the intersection. If the intersection is empty, no target types exist in that branch.\n\n**Performance benefit:**\n\nWithout this check, `recursive_crawl()` would recursively traverse every branch of the tree, even when target segment types don't exist in those branches. This results in O(n) traversal of irrelevant subtrees.\n\nWith the check:\n- If a subtree doesn't contain target types, the entire subtree is skipped with a single set intersection operation (O(k) where k is the number of target types)\n- This avoids O(m) recursive traversal where m is the number of segments in the irrelevant subtree\n- For deeply nested trees with many irrelevant branches, this prevents exponential performance degradation\n\n**Example scenario:**\nWhen searching for `\"select_statement\"` segments in a tree containing large irrelevant branches (e.g., complex expressions, string literals), the check allows skipping entire expression subtrees that don't contain select statements, rather than recursively visiting every segment within those expressions.\n\nThe optimization is especially effective because `descendant_type_set` is cached, so the intersection check is fast (O(k) set operation) compared to the recursive traversal it prevents (O(m) where m can be very large for deeply nested irrelevant branches).",
+      "reference_sha256": "6700ad33df66378686133ba9c5f7415d0b89da8674deb135b7c06f2d19241ba2",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-b47190d3a7f08a607a84569b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 3107,
+            "file_sha256": "eabb6cb7a7a0a478aa950064a5b950ecc8fad832e01296d645bbc7a58d891899",
+            "path": "src/sqlfluff/dialects/dialect_bigquery.py",
+            "start_line": 3091
+          },
+          {
+            "end_line": 655,
+            "file_sha256": "eabb6cb7a7a0a478aa950064a5b950ecc8fad832e01296d645bbc7a58d891899",
+            "path": "src/sqlfluff/dialects/dialect_bigquery.py",
+            "start_line": 655
+          },
+          {
+            "end_line": 50,
+            "file_sha256": "eabb6cb7a7a0a478aa950064a5b950ecc8fad832e01296d645bbc7a58d891899",
+            "path": "src/sqlfluff/dialects/dialect_bigquery.py",
+            "start_line": 50
+          },
+          {
+            "end_line": 9,
+            "file_sha256": "e0deb8581e58dd2db79046cdc4b23602468d640996af68a848979f67c46483ed",
+            "path": "test/fixtures/dialects/bigquery/drop_various_resources.sql",
+            "start_line": 9
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the statement segment class that defines the grammar pattern for parsing DROP SEARCH INDEX statements enable BigQuery dialect-specific SQL parsing and validation in the sqlfluff framework?",
+      "question_sha256": "ee819bb0cc5001f2b2950b8cace5b33a551149ac24060a5bad6a8bdb6308b304",
+      "reference_answer": "The statement segment class that defines the grammar pattern for parsing DROP SEARCH INDEX statements enables BigQuery dialect-specific SQL parsing and validation in the sqlfluff framework through the following mechanism:\n\n**1. Grammar Definition and Parsing Capability**\n\nThe class (`DropSearchIndexStatementSegment`) extends `BaseSegment` and defines a `match_grammar` that specifies the syntax pattern for `DROP SEARCH INDEX` statements (lines 3091-3107 in `src/sqlfluff/dialects/dialect_bigquery.py`). This grammar pattern matches the sequence: `DROP SEARCH INDEX [IF EXISTS] <index_reference> ON <table_reference>`, which is BigQuery-specific syntax not present in standard ANSI SQL.\n\n**2. Integration into Statement Parsing**\n\nThe class is included in the `StatementSegment.match_grammar` (line 655 of `dialect_bigquery.py`), which serves as the main entry point for parsing SQL statements in the BigQuery dialect. When sqlfluff parses SQL code, it attempts to match input against all statement segments defined in `StatementSegment.match_grammar`. By including this segment, the parser can recognize and successfully parse `DROP SEARCH INDEX` statements that would otherwise fail or be misinterpreted.\n\n**3. Enabling Validation and Linting**\n\nOnce SQL is successfully parsed into structured segments, sqlfluff can:\n- **Validate syntax correctness**: The parsed segment structure allows sqlfluff to verify that the statement follows the correct BigQuery syntax\n- **Apply linting rules**: Rules can target the specific segment type (`drop_search_index_statement`) to check for style, best practices, and potential issues\n- **Enable auto-fixing**: The structured representation allows sqlfluff to automatically fix formatting and syntax issues\n- **Support dialect-specific features**: The framework can distinguish between different statement types and apply appropriate validation logic\n\n**4. Dialect Extension Pattern**\n\nThis follows sqlfluff's dialect extension pattern where the BigQuery dialect (which extends the ANSI dialect, as shown in line 50 of `dialect_bigquery.py`) adds dialect-specific statement segments to support BigQuery's unique SQL features. Without this segment class, sqlfluff would not be able to parse, validate, or lint `DROP SEARCH INDEX` statements, limiting its usefulness for BigQuery SQL codebases.\n\n**5. Test Evidence**\n\nThe functionality is validated through test fixtures (e.g., `test/fixtures/dialects/bigquery/drop_various_resources.sql` line 9), which demonstrates that sqlfluff can successfully parse and process `DROP SEARCH INDEX IF EXISTS example_index ON example_dataset.example_table;` statements.\n\nIn summary, this statement segment class serves the broader purpose by making BigQuery-specific SQL syntax parseable and validatable within sqlfluff's framework, enabling comprehensive SQL linting and formatting for BigQuery codebases.",
+      "reference_sha256": "4749eb69741808b738c1f234518f04ee11680958bdc04791a96934752e0bce3c",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-b5bc934fd5189ab25b53562b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 384,
+            "file_sha256": "e16396adee14663803372ba184326f38028b9a030328c23a9fc554e92422aa5d",
+            "path": "test/core/config/fluffconfig_test.py",
+            "start_line": 362
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "da2c1ebb2e533f34ae42c95a85aac753278782a0e0cb46c47c6f27efd1cf45d6",
+            "kind": "file_reference",
+            "line_count": 732,
+            "path": "src/sqlfluff/core/config/fluffconfig.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What coordination mechanism between the method that scans raw SQL files for inline configuration directives and the rule reference expansion process ensures that inline file directives override both string-based rule specifications and their corresponding internal list representations?",
+      "question_sha256": "05a4ff91ed8795a8b107acb784832afb38d48efda94013981fb3a4a95e3cafe2",
+      "reference_answer": "The coordination mechanism is implemented in `process_raw_file_for_config` in `src/sqlfluff/core/config/fluffconfig.py`. It ensures inline file directives override both string-based rule specifications and their internal list representations through a two-step process:\n\n1. **Processing inline directives**: The method scans the raw SQL file line by line for inline configuration directives (lines starting with `-- sqlfluff` or `--sqlfluff`). For each directive found, it calls `process_inline_config`, which parses the directive, validates it, and sets the config value using `set_value`. This updates the string-based rule specifications (the \"rules\" and \"exclude_rules\" config keys).\n\n2. **Updating internal list representations**: After processing all inline config directives, the method calls `_handle_comma_separated_values()` (line 732). This method converts comma-separated string values from \"rules\" and \"exclude_rules\" keys into list representations stored in \"rule_allowlist\" and \"rule_denylist\" respectively. This ensures that any inline directive changes to \"rules\" or \"exclude_rules\" are immediately reflected in the internal list representations.\n\nThe coordination is achieved by the sequential execution: inline directives are processed first (updating string values), then `_handle_comma_separated_values()` is called to synchronize the internal list representations. This ensures that when `get_rulepack` is later called (which reads from \"rule_allowlist\" and \"rule_denylist\" and expands them using `_expand_rule_refs`), it uses the values from the inline directives rather than the original configuration.\n\nThis is demonstrated in the test `test__process_raw_file_for_config` (lines 362-384 in `test/core/config/fluffconfig_test.py`), which shows that after processing inline directives, both the string-based specifications (\"rules\" and \"exclude_rules\") and the internal list representations (\"rule_allowlist\" and \"rule_denylist\") are updated to reflect the inline directive values.",
+      "reference_sha256": "2100e9f078f4586e0e0cd570ebd67c7024c62a34d05d9d55e8832bbcc124d29d",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-b7ad5de2757dedec24b6e416"
+    }
+  ]
+}

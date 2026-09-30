@@ -1,0 +1,247 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-b8a5cb138ed333fb99423b5b",
+      "reference_sha256": "ac5c45f2535288a7cdc837072db6b7e0b5fbdc724fd454a43ec8c7166cdc1eaf",
+      "question_sha256": "947a9311103125330784823ec3e631ad88ef2dac56c3aea2a28f6048f7941205",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "OuterRef resolves nested reference by unwrapping, otherwise creates ResolvedOuterRef",
+          "verdict": "supported",
+          "reason": "Exact branch matches reference.",
+          "evidence": {
+            "path": "django/db/models/expressions.py",
+            "start_line": 977,
+            "end_line": 984
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct central-claim source review; no repository code execution."
+    },
+    {
+      "task_id": "import-bbc35ab4545cc68ce86781fd",
+      "reference_sha256": "f6161b79e6393813d039221b6a65f5f23d681795475c15089323c36eadf87f09",
+      "question_sha256": "45478adfaec532e0a40d827f54f856b434f7eff9a12d6e5155a0c97d2cd8e580",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Cursor lifecycle tests and psycopg3 client binding compatibility",
+          "verdict": "supported",
+          "reason": "The binding test runs default and explicit client binding successfully, and expects ProgrammingError with server-side binding; earlier lifecycle cases were separately inspected.",
+          "evidence": {
+            "path": "tests/backends/postgresql/test_server_side_cursors.py",
+            "start_line": 133,
+            "end_line": 156
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct central-claim source review; no repository code execution."
+    },
+    {
+      "task_id": "import-c26272d937aa5a311f14a871",
+      "reference_sha256": "4c53b7a1ead27ae23506893924826ad782618e0b40fefa238857f3a165ad6c59",
+      "question_sha256": "b4280f9376ad61042f012bbbae96f24750694b28f7c82e32433cc0e8134186ad",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Readonly checks ensure callable signature safety through two-tier validation",
+          "verdict": "contradicted",
+          "reason": "Check only accepts callable/attribute/field; invocation TypeError is not an explicit runtime validation layer and does not guarantee safety.",
+          "evidence": {
+            "path": "django/contrib/admin/checks.py",
+            "start_line": 792,
+            "end_line": 818
+          }
+        }
+      ],
+      "material_errors": [
+        "Check only accepts callable/attribute/field; invocation TypeError is not an explicit runtime validation layer and does not guarantee safety."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct central-claim source review; no repository code execution.",
+      "corrected_reference_answer": "_check_readonly_fields_item accepts callable entries directly, or names present on ModelAdmin/model, or model metadata fields (django/contrib/admin/checks.py:792-818). admin.display adds metadata and returns the same function (django/contrib/admin/decorators.py:58-77). No signature validation occurs here; a named decorated method passes attribute lookup, while a directly supplied function passes callable(). At rendering, lookup_field invokes it, so incompatible signatures may still raise a runtime TypeError (django/contrib/admin/utils.py:296-305)."
+    },
+    {
+      "task_id": "import-c92230120383eae96a30dd23",
+      "reference_sha256": "47694ca8ea54aa212b391054edaa84489813a486a65f4b95a1ff104187a675ef",
+      "question_sha256": "12a94ee8433f47f92d2168e15aa542510cbe8618629d883e88ceb5c65bd5f2b1",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Detail tests vary lookup and repeat context/template assertions",
+          "verdict": "supported",
+          "reason": "Primary/custom primary/slug/custom slug/both cases assert object and author and common template. Calling it cross-product is descriptive, not a framework mechanism.",
+          "evidence": {
+            "path": "tests/generic_views/test_detail.py",
+            "start_line": 46,
+            "end_line": 121
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct central-claim source review; no repository code execution."
+    },
+    {
+      "task_id": "import-ca41edc641b1afc8b30dc72c",
+      "reference_sha256": "f660196fb4b65444fae6aaffa9e45742cd41f2628061f950ae0226956fc7bd45",
+      "question_sha256": "687559955b56eed791193859501160c264cf115d8abe9eaf04a627f3847d3d8a",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "TypeError from method body propagates through template resolution",
+          "verdict": "supported",
+          "reason": "Signature.bind distinguishes argument mismatch; otherwise re-raise and outer handler only silences marked exceptions.",
+          "evidence": {
+            "path": "django/template/base.py",
+            "start_line": 932,
+            "end_line": 965
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct central-claim source review; no repository code execution."
+    },
+    {
+      "task_id": "import-da8100e8fae1a82c11c8b794",
+      "reference_sha256": "cd10e799bc4d25558b3326f9dadbc57e372aa35ec660d11dfe45e9d72bb32758",
+      "question_sha256": "582d878b100dd303ad6a2a8f81b295cb3c1b3ae46215a49a370c38e4306c6952",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Force save flags control SQL, not automatic model validation",
+          "verdict": "supported",
+          "reason": "No-PK forced update rejected and force flags govern update/insert; mutual exclusion at 829-830. Minimal Counter uses standard fields.",
+          "evidence": {
+            "path": "django/db/models/base.py",
+            "start_line": 1065,
+            "end_line": 1104
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct central-claim source review; no repository code execution."
+    },
+    {
+      "task_id": "import-e365c91c4187b2b238f16eb7",
+      "reference_sha256": "5981899b396d1e0e64556c7fecb7e095ebb15888bcc22836ee86450c0a8eb128",
+      "question_sha256": "3e173d7ecf4030a5e4fb4065e88b7b2f92879abb60a853cc5b685cfcdb86e062",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Article migration uses router then creates tablespace-backed model",
+          "verdict": "contradicted",
+          "reason": "Article is managed=False, omitted in reference; normal migrations do not create this model even if router permits.",
+          "evidence": {
+            "path": "tests/model_options/models/tablespaces.py",
+            "start_line": 33,
+            "end_line": 44
+          }
+        }
+      ],
+      "material_errors": [
+        "Article is managed=False, omitted in reference; normal migrations do not create this model even if router permits."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct central-claim source review; no repository code execution.",
+      "corrected_reference_answer": "Article specifies model tablespace tbl_tbsp and idx_tbsp on code and reviewers, but is managed=False (tests/model_options/models/tablespaces.py:33-44), so normal migrations do not create its table. For migratable models, CreateModel checks allow_migrate_model before schema_editor.create_model (django/db/migrations/operations/models.py:97-100); unmanaged models are excluded by Options.can_migrate (django/db/models/options.py:387-400). Index tablespace resolution uses explicit/field settings, DEFAULT_INDEX_TABLESPACE, then model tablespace (django/db/backends/base/schema.py:1521-1531). Backend SQL support and pre-existing tablespaces remain separate database concerns."
+    },
+    {
+      "task_id": "import-f428a78e12d9f2a124055c61",
+      "reference_sha256": "534c6ed89d714dd24f3ccfdc0ba64583a267cfc0a34c0ff3623e761ad8c9bd4a",
+      "question_sha256": "a9058e134c4147329ce33efa522628ec3dda5eaaa142ff90224a3eb4476f477a",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "History URL passes three HTML escaping stages",
+          "verdict": "contradicted",
+          "reason": "URL as-variable branch returns before escaping; simple tag performs escaping and writes directly, no extra VariableNode stage.",
+          "evidence": {
+            "path": "django/template/defaulttags.py",
+            "start_line": 489,
+            "end_line": 495
+          }
+        }
+      ],
+      "material_errors": [
+        "URL as-variable branch returns before escaping; simple tag performs escaping and writes directly, no extra VariableNode stage."
+      ],
+      "citation_corrections": [],
+      "notes": "Direct central-claim source review; no repository code execution.",
+      "corrected_reference_answer": "The template quotes original.pk with admin_urlquote, reverses the history route into history_url, then renders add_preserved_filters directly inside href (django/contrib/admin/templates/admin/change_form_object_tools.html:4-5). Admin quoting translates problematic path characters (django/contrib/admin/utils.py:89-96). The url tag with as history_url stores the reversed URL without conditional_escape (django/template/defaulttags.py:489-495). add_preserved_filters adjusts the query string, and SimpleNode.render conditionally HTML-escapes its output once (django/template/library.py:319-327). There is no extra variable-render escaping stage for this tag output."
+    },
+    {
+      "task_id": "import-f53cee9eafc6c47d9bfbfc65",
+      "reference_sha256": "2d4719ab6f7d5f1c2690f5141afb9e964b41e802fe54965e36ab10b1df96ae4c",
+      "question_sha256": "dca2f61dbe1db05e5ea48134e98c4f74987381979f15497c41b50fd26f9dba8d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Post-save permission chooses changelist with filters or index",
+          "verdict": "supported",
+          "reason": "Exact branches and shared add/change entry points match.",
+          "evidence": {
+            "path": "django/contrib/admin/options.py",
+            "start_line": 1561,
+            "end_line": 1587
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct central-claim source review; no repository code execution."
+    },
+    {
+      "task_id": "import-fc0130ae6027c6688a59ddfe",
+      "reference_sha256": "6a6ba6fff611f02b30acc7f54bef97e7fc425c7465873f2da42c84a61619c218",
+      "question_sha256": "38b9a622b40fb54b2bb76ce3536508232fd70bb7a903c6983a763bad9c7b957c",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "ModelMultipleChoiceField invokes inherited validator loop explicitly",
+          "verdict": "supported",
+          "reason": "After preparing and checking values calls run_validators(value); optional empty selection exits before validators.",
+          "evidence": {
+            "path": "django/forms/models.py",
+            "start_line": 1628,
+            "end_line": 1643
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct central-claim source review; no repository code execution."
+    },
+    {
+      "task_id": "import-ff17202cb3b894fcc69ab84b",
+      "reference_sha256": "36cbe0fb31faa13e92836f6a71c23240b458a681afb9d946470bcd493bb8fee9",
+      "question_sha256": "5e599558ea8a6cabea0eedd47d53a850183883184f445d28e9c0b2f49090c7a3",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Cache middleware initialization supplies backend prefix and timeout precedence",
+          "verdict": "supported",
+          "reason": "Settings initialize fields; response uses page timeout then max-age then default and same cache/prefix used by fetch.",
+          "evidence": {
+            "path": "django/middleware/cache.py",
+            "start_line": 71,
+            "end_line": 123
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Direct central-claim source review; no repository code execution."
+    }
+  ]
+}

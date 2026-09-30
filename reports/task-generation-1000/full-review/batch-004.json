@@ -1,0 +1,293 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-bd53ab03b249b3dc193a655d",
+      "reference_sha256": "3d4cdea31045df72ab049a999c0a50b562211511fb02d9e98d39504358a120de",
+      "question_sha256": "c73494f7bec13171b232adaf4173e08ee1efe8b059bd6567aca9cd7d159ce7bd",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "out_subfmt clears caches of linked instances",
+          "verdict": "supported",
+          "reason": "Weak dictionary members have cache cleared; setter at 878-882 deletes cache and replication links at 1429-1430.",
+          "evidence": {
+            "path": "astropy/time/core.py",
+            "start_line": 1731,
+            "end_line": 1763
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-c59dfd91bb122c33e16f882c",
+      "reference_sha256": "65c87a76590d42f3c5967d36afbc902d64a5eaffce83817191bcaff01c26d770",
+      "question_sha256": "5bc856dd883b76110112cf9f41c456f8c0c297554b1cf61607cca086e13be14a",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Missing Tcmb0 uses default",
+          "verdict": "supported",
+          "reason": "Test deletes Tcmb0 and checks default; explicitly asserts reconstructed object differs.",
+          "evidence": {
+            "path": "astropy/cosmology/_src/tests/io/test_html.py",
+            "start_line": 144,
+            "end_line": 175
+          }
+        },
+        {
+          "claim": "Any incomplete table always reconstructs valid cosmology",
+          "verdict": "unsupported",
+          "reason": "Test covers one defaulted parameter, not arbitrary missing required parameters.",
+          "evidence": {
+            "path": "astropy/cosmology/_src/tests/io/test_html.py",
+            "start_line": 164,
+            "end_line": 175
+          }
+        }
+      ],
+      "material_errors": [
+        "Overgeneralizes defaults to always reconstructing incomplete tables and invents causes of missing columns."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "ReadWriteHTMLTestMixin tests that deleting the Tcmb0 column and reading with the cosmology class supplies that parameter\u2019s class default (astropy/cosmology/_src/tests/io/test_html.py:144-175). It checks consistency among three class-selection routes and explicitly verifies that the result differs from the original because Tcmb0 and m_nu change. This supports defaults for omitted optional parameters, not recovery of arbitrary missing required data."
+    },
+    {
+      "task_id": "import-d01ea5c9cd8cdb0aebee8ed5",
+      "reference_sha256": "7f603b0b64f5ed5b273ca52a713ee711203f5db428be23ae5ad9640b3167fa0b",
+      "question_sha256": "a2f30291a63db1e9081f709717da3037da73c18d629c23e606c70742f79ad098",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Three cached properties compute H0-derived values in fixed units",
+          "verdict": "supported",
+          "reason": "cached_property decorates h, hubble_time and hubble_distance; formulas and units match.",
+          "evidence": {
+            "path": "astropy/cosmology/_src/traits/hubble.py",
+            "start_line": 46,
+            "end_line": 59
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-d27197a76126b6144cd7e98b",
+      "reference_sha256": "26f462a0d2c9e1827f24e020617b86a5c90f24b7c78a59985d1b39d0298c85ca",
+      "question_sha256": "b9b0cf5a3fcd6f4c8edaf593d580cd0bd91ca0069a5732ada0c3136ce150a69b",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "TestShapeInformation depends on ShapedLikeNDArray abstract properties",
+          "verdict": "unsupported",
+          "reason": "Actual test uses self.ma masked array and checks NumPy results; it does not test the named mixin contract.",
+          "evidence": {
+            "path": "astropy/utils/masked/tests/test_function_helpers.py",
+            "start_line": 76,
+            "end_line": 84
+          }
+        }
+      ],
+      "material_errors": [
+        "Conflates masked-array tests with a different shape-method mixin."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "TestShapeInformation checks that the masked array self.ma exposes shape (2, 3), size 6 and ndim 2 through np.shape, np.size and np.ndim (astropy/utils/masked/tests/test_function_helpers.py:76-84). These tests establish the three observable results, not a requirement that the object separately implement abstract ShapedLikeNDArray properties."
+    },
+    {
+      "task_id": "import-d7f101c84e6d0051346cbbb2",
+      "reference_sha256": "38b447063d8037bfc5dbd16d2fd8a63e0b835e5f5336f227d6dd3631ef796686",
+      "question_sha256": "25c373f5ba3e9079b128ad1529b579780857c88b43184340b76a37ad6f80d1b2",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Context selects representation at runtime",
+          "verdict": "supported",
+          "reason": "Bound info gets strategy dictionary; representation indexes by context and rejects unknown strategies.",
+          "evidence": {
+            "path": "astropy/utils/masked/core.py",
+            "start_line": 418,
+            "end_line": 480
+          }
+        },
+        {
+          "claim": "Context trades away compile-time safety relative to inheritance",
+          "verdict": "unsupported",
+          "reason": "Code supplies no statically checked inheritance alternative; claim is not established.",
+          "evidence": {
+            "path": "astropy/utils/masked/core.py",
+            "start_line": 418,
+            "end_line": 480
+          }
+        }
+      ],
+      "material_errors": [
+        "Unsupported compile-time safety comparison and author-intent claims."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "MaskedInfoBase initializes a per-instance serialize_method mapping when bound (astropy/utils/masked/core.py:418-434). MaskedNDArrayInfo selects by _serialize_context, emits data with an optional separate mask for data_mask or a NumPy masked array for null_value, and raises ValueError for unknown strategies (456-480). This permits format-specific runtime selection but depends on a valid context key and method value. The source does not establish a compile-time safety advantage for an inheritance alternative."
+    },
+    {
+      "task_id": "import-d8e02a75060e81cf7fc2779f",
+      "reference_sha256": "30d8e2a1548aa64c4208dd898508c74b55b302679531ce3c4f742cf0954257f7",
+      "question_sha256": "092999cdfa581d08bb0d69452951af87fa470049db8a312e8245be0b9d6c49bb",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "State preparation copies only mixins",
+          "verdict": "supported",
+          "reason": "Conditional exactly matches; col_copy preserves info and fixes copied indices at column.py:85-94.",
+          "evidence": {
+            "path": "astropy/table/table.py",
+            "start_line": 965,
+            "end_line": 970
+          }
+        },
+        {
+          "claim": "BaseColumn pickle protocol includes column metadata",
+          "verdict": "supported",
+          "reason": "Adds names, unit, format, description, meta and indices to state.",
+          "evidence": {
+            "path": "astropy/table/column.py",
+            "start_line": 676,
+            "end_line": 696
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-ddf6716f26bfbf38e5f34ed4",
+      "reference_sha256": "5babc87884db65b1758fbc1f81da438d49671f823c9f9d9ad89652b576a805f5",
+      "question_sha256": "f7fdb69a570ad8c02502c3111bd55ade3495b0e3a2c6d3e815b8c2ab8db40f52",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Removal disables imports or necessarily breaks NumPy calls",
+          "verdict": "unsupported",
+          "reason": "Unknown functions warn then delegate to ndarray, so import-level impact cannot be inferred.",
+          "evidence": {
+            "path": "astropy/units/quantity.py",
+            "start_line": 1875,
+            "end_line": 1928
+          }
+        },
+        {
+          "claim": "SUBCLASS_SAFE_FUNCTIONS is a dictionary of custom overrides",
+          "verdict": "contradicted",
+          "reason": "It is a set distinct from helper and dispatch dictionaries.",
+          "evidence": {
+            "path": "astropy/units/quantity_helper/function_helpers.py",
+            "start_line": 60,
+            "end_line": 90
+          }
+        }
+      ],
+      "material_errors": [
+        "Misidentifies registry type and speculates about effects on imported modules."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "The premise conflates registries: np.shape, np.size, np.ndim and the listed shape operations are in SUBCLASS_SAFE_FUNCTIONS, a set, not a dictionary of custom implementations (astropy/units/quantity_helper/function_helpers.py:60-90). Removing an entry without registering it elsewhere makes Quantity.__array_function__ use its unknown-function branch: it warns and still delegates to ndarray (astropy/units/quantity.py:1875-1928). This changes dispatch behavior for callers, not the imported modules themselves."
+    },
+    {
+      "task_id": "import-de9df829f44b37f0367ada9f",
+      "reference_sha256": "98941c9642c6a152ebec646dcc91e752cacb3c31d5fac6d35162efd1604c2e53",
+      "question_sha256": "e0a8b05cda83b4dcb4cac2b68c2d3ac65f32bd0f30a2439f80deefb81e3632d4",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "At-prefixed filename is opened without containment validation",
+          "verdict": "supported",
+          "reason": "Strips prefix, checks existence, opens, catches OSError; no directory boundary enforced.",
+          "evidence": {
+            "path": "astropy/io/fits/scripts/fitsdiff.py",
+            "start_line": 73,
+            "end_line": 92
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-e12319366043679f0dd335e5",
+      "reference_sha256": "a5c991ee108d8adf29e88e8df205c05530e2cc9b7ea23a48efbca95c5223247d",
+      "question_sha256": "673da6d11abe2a7c425c270590fc508e6c61649bcdef0dd40ac51c5634026f5b",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Second loop appends extras after predefined keys",
+          "verdict": "supported",
+          "reason": "Sorts first, builds defined-order fields then remaining sorted tuples, and replaces list in-place.",
+          "evidence": {
+            "path": "astropy/table/meta.py",
+            "start_line": 18,
+            "end_line": 35
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-ee307a6a3a7d263ea1aa3ffa",
+      "reference_sha256": "36e1bae539c84a19f3a61e58afeff66f6566501fb97c7081b75ac7d35dc93570",
+      "question_sha256": "c54add1b18baad69406a79ef01e6bdb74dd5b63bcff315beedfe5fc7ef03afb0",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Proposed refactoring preserves validation semantics",
+          "verdict": "contradicted",
+          "reason": "Proposal drops deprecated-unit warning assertion and whitespace check, and must preserve two distinct tolerances.",
+          "evidence": {
+            "path": "astropy/units/tests/test_format.py",
+            "start_line": 356,
+            "end_line": 377
+          }
+        }
+      ],
+      "material_errors": [
+        "Refactor example drops material existing assertions and warning handling."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "Extract a roundtrip conversion helper while preserving serialization warning suppression and exactly-one deprecated-unit warning checks (astropy/units/tests/test_format.py:356-368). Extract a scale comparison helper accepting rtol; retain 1e-9 for check_roundtrip and 1e-5 for check_roundtrip_decompose. The latter must still decompose before serialization and assert the serialized text contains no double spaces (370-377). These helpers separate operations without weakening the current tests."
+    },
+    {
+      "task_id": "import-f24c3207edd6d605f448fa9b",
+      "reference_sha256": "6b0f5c529af154fa8db63333120b400b823e31f5771dae8b4ac97b77f3bfb29e",
+      "question_sha256": "c3c10faab5166cfa94daae448ded7452d39da4fc874fe714375029a03381f872",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Entry failure restores prior path and reraises",
+          "verdict": "supported",
+          "reason": "Captures previous class value; catches Exception around path lookup; exit restores too. Atomicity here means rollback, not thread synchronization.",
+          "evidence": {
+            "path": "astropy/config/paths.py",
+            "start_line": 123,
+            "end_line": 150
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    }
+  ]
+}

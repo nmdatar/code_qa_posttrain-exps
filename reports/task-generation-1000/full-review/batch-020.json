@@ -1,0 +1,205 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-43814e069dd5ffd151fa4b4e",
+      "reference_sha256": "370a5eafd23fb631e9eecb4513010f6fe1d6bb3e31f3db86857a75bf0b563b85",
+      "question_sha256": "9f7fa53489367b47a8dc70663d318e626dc90a295b691505c8e28fa89e80e1a6",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Installed metadata methods successfully return pinned version",
+          "verdict": "unverified",
+          "reason": "Source defines 0.14.0 but installed metadata/runtime result was not tested and depends on installation.",
+          "evidence": {
+            "path": "setup.py",
+            "start_line": 60,
+            "end_line": 63
+          }
+        }
+      ],
+      "material_errors": [
+        "Source defines 0.14.0 but installed metadata/runtime result was not tested and depends on installation."
+      ],
+      "citation_corrections": [],
+      "notes": "Static review; no repository imports or execution; installed runtime behavior not claimed tested.",
+      "corrected_reference_answer": "The distribution version is declared as 0.14.0 in setup.py:60-63 and the bump script edits that declaration (scripts/bump-version.sh:19). This snapshot does not expose responses.__version__. For an installed distribution, importlib.metadata.version(\"responses\") queries installed metadata; its result depends on which distribution is installed, and source inspection alone does not verify a runtime result."
+    },
+    {
+      "task_id": "import-60e6806998a5b6a20cbebdd7",
+      "reference_sha256": "ba64db41a92ddfb47377d010cfa5b68fac3f7fc931e6b80e358da16047d6979c",
+      "question_sha256": "4a5b80c6904d18ec431dcab525445f6f27fa2c0411362937b1082dc73899affb",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Callback contract is static and runtime stores/invokes without signature inspection",
+          "verdict": "supported",
+          "reason": "Callback assigned directly, invoked with request, exception result/body raised, tuple otherwise unpacked; stub declares callback type.",
+          "evidence": {
+            "path": "responses/__init__.py",
+            "start_line": 443,
+            "end_line": 467
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static review; no repository imports or execution; installed runtime behavior not claimed tested."
+    },
+    {
+      "task_id": "import-6d623641cda9478bc8cf4147",
+      "reference_sha256": "84275c3e04467846ac8ab9802c8f89a70ce24f3853b737bfe452f1ac85fe6654",
+      "question_sha256": "ad2575ec9a1980d0dec4ef14bbf831e15cd95aeaae490a46ee66e13a9e9b1f2c",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Runtime import fallbacks cause dependency resolver bottleneck",
+          "verdict": "contradicted",
+          "reason": "Requirements lack upper bounds, but no benchmark/resolver trace establishes bottleneck; runtime import fallback does not alter resolver metadata.",
+          "evidence": {
+            "path": "setup.py",
+            "start_line": 22,
+            "end_line": 28
+          }
+        }
+      ],
+      "material_errors": [
+        "Requirements lack upper bounds, but no benchmark/resolver trace establishes bottleneck; runtime import fallback does not alter resolver metadata."
+      ],
+      "citation_corrections": [],
+      "notes": "Static review; no repository imports or execution; installed runtime behavior not claimed tested.",
+      "corrected_reference_answer": "setup.py declares requests>=2.0, urllib3>=1.25.10 and six plus conditional legacy dependencies (setup.py:22-28). These constraints alone do not demonstrate a dependency-resolution bottleneck with boto3. Runtime urllib3 import fallbacks do not add dependency constraints or participate in pip candidate resolution. A causal diagnosis requires the actual package versions and resolver logs; neither the asserted bottleneck nor its proposed three causes is established by this source."
+    },
+    {
+      "task_id": "import-79731e26e56a687a34e7b564",
+      "reference_sha256": "1cac0773f3f0789b43a95c9dc567ba668165d3bcb230b33335a0dd535e614c38",
+      "question_sha256": "ed3be29d677c8e4917241b028b63413c08d1c96fd095916267229899a88fef39",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Dynamic wrapper introspection and context-manager patching preserve fixture compatibility",
+          "verdict": "supported",
+          "reason": "Template wraps func inside with responses; inspect metadata, six.exec and update_wrapper implement described mechanism, with wrapped-function fallback.",
+          "evidence": {
+            "path": "responses/__init__.py",
+            "start_line": 152,
+            "end_line": 203
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static review; no repository imports or execution; installed runtime behavior not claimed tested."
+    },
+    {
+      "task_id": "import-9bf889d14b884ea533ee5165",
+      "reference_sha256": "902e85b23052dc449d3a8308ba4b91310d55b635bbf05c2df4fa8a6f95a9ba6d",
+      "question_sha256": "57894e81e40c3e5fdbbe1d8ebd5ef4c74b467d19e1aab996baee2de1835daf06",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "BaseResponse merges content_type then user headers with extend",
+          "verdict": "supported",
+          "reason": "Merge sequence permits duplicates; CallbackResponse explicitly removes Content-Type before extending callback headers at 469-483.",
+          "evidence": {
+            "path": "responses/__init__.py",
+            "start_line": 338,
+            "end_line": 344
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static review; no repository imports or execution; installed runtime behavior not claimed tested."
+    },
+    {
+      "task_id": "import-af585e7dd651662a56afa2ec",
+      "reference_sha256": "adc8a7a36251ff33a23304f34b00305eb9e7b99021781719901cff316b98bc79",
+      "question_sha256": "ca072601f65575dfa76ee552be1e1c5bb44112daaf5bfd1349672173e30a7882",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "get_wrapped preserves argspec for fixture injection and special-cases wrapped functions",
+          "verdict": "supported",
+          "reason": "Code and explicit pytest comment match; dynamic generation has limitations beyond ordinary signatures, so exact universal signature guarantees would be too broad.",
+          "evidence": {
+            "path": "responses/__init__.py",
+            "start_line": 159,
+            "end_line": 203
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static review; no repository imports or execution; installed runtime behavior not claimed tested."
+    },
+    {
+      "task_id": "import-d9c2edd973b0296deb92af7e",
+      "reference_sha256": "aad579eec529b46d25b1772f7b2611cb51410fa47aed23fa4cabcfd3c89f9b59",
+      "question_sha256": "02a3ae6ac1639f35044f7de76e6d3d41fe7ceb39172d479f2bee6abda479ddfd",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Matching composes method/URL/custom predicates then registry selection",
+          "verdict": "supported",
+          "reason": "Early failure in method URL or custom matcher; _find_match selects first and pops only if second match is found.",
+          "evidence": {
+            "path": "responses/__init__.py",
+            "start_line": 329,
+            "end_line": 360
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static review; no repository imports or execution; installed runtime behavior not claimed tested."
+    },
+    {
+      "task_id": "import-ddc215339f517816dd6a81b3",
+      "reference_sha256": "505e50977d1031cad3034dd0fd6331b696d1246cf3a4398fac292f9b12b0e3f5",
+      "question_sha256": "707decbb5d86ffc2b7e526867533a09b6bbd0f5c74f32730cfb862e12c17e51c",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Different defaults are needed because decorators cannot reset shared mock across tests",
+          "verdict": "contradicted",
+          "reason": "Decorator wrapper uses same context manager lifecycle; __exit__ resets after normal stop, so claimed difference in isolation is false.",
+          "evidence": {
+            "path": "responses/__init__.py",
+            "start_line": 692,
+            "end_line": 703
+          }
+        }
+      ],
+      "material_errors": [
+        "Decorator wrapper uses same context manager lifecycle; __exit__ resets after normal stop, so claimed difference in isolation is false."
+      ],
+      "citation_corrections": [],
+      "notes": "Static review; no repository imports or execution; installed runtime behavior not claimed tested.",
+      "corrected_reference_answer": "RequestsMock defaults assert_all_requests_are_fired to True (responses/__init__.py:529-538), while module default mock explicitly sets False (responses/__init__.py:843). The decorator uses get_wrapped, whose generated body enters with responses, so it shares the same stop/reset lifecycle as context-manager usage (responses/__init__.py:152-155,692-703). stop checks uncalled registrations when assertions are enabled and no active exception suppresses them (responses/__init__.py:808-822). The source establishes different configuration defaults, not the asserted necessity to avoid cross-test leakage."
+    },
+    {
+      "task_id": "import-f01dd79388c9936697bf7309",
+      "reference_sha256": "76a7ce0f3d76ba6f40ec146b34dcf6b7b4eb2b2001c23d6c46a58e9049e2daf6",
+      "question_sha256": "4414296d07bbb7de14e033d7f19ae6a5193cb3ec8964c1672ccd07658d1cac7b",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "URL matching selects normalized string comparison or regex match",
+          "verdict": "supported",
+          "reason": "Strict matching sorts parsed query pairs and compares URL first three components; nonstrict ignores query and regex matches directly.",
+          "evidence": {
+            "path": "responses/__init__.py",
+            "start_line": 288,
+            "end_line": 327
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static review; no repository imports or execution; installed runtime behavior not claimed tested."
+    }
+  ]
+}

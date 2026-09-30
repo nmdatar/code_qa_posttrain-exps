@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "id": "repo-qa-generation-v2",
+  "purpose": "Parallel task generation: three new mechanisms per existing verified repository environment",
+  "split_assignment_policy": "Assign family before final task generation. Development-only until human reference review; never training exports.",
+  "families": [
+    {
+      "family_id": "pydantic-ecosystem",
+      "repository": "https://github.com/pydantic/pydantic",
+      "commit": "bb6da4cfbb1f559885ea2fa207ec93853bfeac64",
+      "split": "development",
+      "spec": "examples/dataset_sources/pydantic-generation-v2.json",
+      "bundle": "data/generated/pydantic-generation-v2",
+      "reuse_environment_from": "data/generated/pydantic-v1"
+    },
+    {
+      "family_id": "tanstack-query",
+      "repository": "https://github.com/TanStack/query",
+      "commit": "fd96529f3e0b748874be4655516caecc5d6a0521",
+      "split": "development",
+      "spec": "examples/dataset_sources/tanstack-query-generation-v2-reviewed.json",
+      "bundle": "data/generated/tanstack-query-generation-v2-reviewed",
+      "reuse_environment_from": "data/generated/tanstack-query-v1"
+    },
+    {
+      "family_id": "sqlalchemy",
+      "repository": "https://github.com/sqlalchemy/sqlalchemy",
+      "commit": "749086adb0cc5b966aa3854712f16e213b979310",
+      "split": "development",
+      "spec": "examples/dataset_sources/sqlalchemy-generation-v2-reviewed.json",
+      "bundle": "data/generated/sqlalchemy-generation-v2-reviewed",
+      "reuse_environment_from": "data/generated/sqlalchemy-v1"
+    }
+  ],
+  "backend": "modal",
+  "budgets": {
+    "latency_seconds": 1200,
+    "compute_units": 100000,
+    "max_tool_calls": 40,
+    "max_output_tokens": 6000,
+    "max_submission_bytes": 64000
+  },
+  "benchmark_audit": "reports/task-sourcing/benchmark-audit.json",
+  "admission": {
+    "training_eligible": false,
+    "human_reviewed": false,
+    "gold_status": "draft"
+  },
+  "release": "data/releases/repo-qa-generation-v2",
+  "family_assignment_provenance": "Unchanged from development-batch.json; assigned before this generation round"
+}

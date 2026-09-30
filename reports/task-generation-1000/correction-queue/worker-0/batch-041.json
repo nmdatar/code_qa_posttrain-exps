@@ -1,0 +1,92 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-041.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "original_reference_sha256": "68acb74d49959fefb00f8bdc80a00740fefba8bb2d5664c2b39251f61fc77b55",
+      "question": "What is the architectural role of the test_dataset_caching skip decorator in the multi-backend testing hierarchy, and how does it reflect fundamental differences in the data access layer between eager and lazy evaluation strategies?",
+      "question_sha256": "6597a04971f8124cf1443fe618bd75795ceecbb5edc6942f05679b7c6237f693",
+      "reference_answer": "DatasetIOBase.test_dataset_caching checks that accessing values changes MemoryCachedArray data to in-memory, while cache=False CopyOnWriteArray remains uncached (xarray/tests/test_backends.py:532-544). Dask-backed subclasses skip that inherited contract (xarray/tests/test_backends.py:2311-2324). The Dask-specific test confirms values access does not make the stored variable in-memory (xarray/tests/test_backends.py:5179-5184). Both paths may begin lazy; the distinction is whether materialization is retained by the variable, not whether values can trigger computation.",
+      "reference_sha256": "229d37bce551aa92b5c3405a69847b3a73303a40489f01779edf9ade173e9201",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-36260be563ab9a1bfac856a0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "original_reference_sha256": "18c63a09e4eecdaab1a5eac6e458261ab41dfd30f1fddede663fc39a707c3cbe",
+      "question": "Where does the cumprod function's data flow handle the propagation of NaN values through the cumulative product computation when skipna transitions from True to False, and what intermediate state changes occur in the numeric_only filtering before the reduce operation executes?",
+      "question_sha256": "6a998ccc7984fec2a3ce4e405de3f4c8b317ed1a4702dba90de0fdebf4d4b663",
+      "reference_answer": "_create_nan_agg_method selects nanops.nancumprod for truthy skipna or eligible dtypes with skipna=None; skipna=False selects the array namespace cumprod, allowing NaNs to propagate (xarray/core/duck_array_ops.py:508-527). Dataset.reduce iterates variables, retains unaffected coordinates, excludes extension-array data, and reduces each eligible variable immediately into the result dictionary. Its condition allows variables with no reduced dimensions, or numeric_only=False, or numeric/boolean dtype (xarray/core/dataset.py:6787-6819). Thus changing skipna changes the computation, not a prior materialized numeric-only filtering stage.",
+      "reference_sha256": "5f4a2070c2bf3726d2b8b913fa8459a746aa7d28a7b6eaae9695ecf4f2d644ab",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-39d95e9396abbd507c034b6a"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "original_reference_sha256": "5c2e34bae47625152a79dd57d6ea700b2dd0b803003c8f2243132fba56101bd9",
+      "question": "How does H5NetCDFStore handle group access differently when initialized with a pre-opened h5netcdf.File object versus the group parameter, and what potential data consistency issues could arise from these two initialization patterns?",
+      "question_sha256": "b0f7d92586fb284fea753ed7610eeccc6bbe06ae1291de6a9191b916dba35e44",
+      "reference_answer": "With a pre-opened File or Group and no group argument, H5NetCDFStore derives root and group path. With an explicit group argument it requires exactly h5netcdf.File, otherwise raises ValueError; both paths wrap the root in DummyFileManager (xarray/backends/h5netcdf_.py:112-135). find_root_and_group walks parents and constructs an absolute group path (xarray/backends/common.py:222-229). Access resolves that path from the managed root (xarray/backends/h5netcdf_.py:195-204). Choosing a different path selects different data, and both patterns depend on a usable root handle; the source does not demonstrate distinct stale-reference consistency bugs or supported group reparenting.",
+      "reference_sha256": "af718f4759381454cfcd31bc46b2844dc98b3b72ee6f6691642927c4b2f65a78",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-6070dbef5616f9b0e1b81356"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "original_reference_sha256": "661afa5d2438394e5500df958824ff7b8c90ebffd600c1e52631d5d10959b7ac",
+      "question": "What are the external module dependencies that TestGetItem relies upon to validate the correctness of DataTree indexing operations, and how do these dependencies constrain the test's ability to verify equivalence?",
+      "question_sha256": "4db40113b933967fa7915ec8ff425f0caa245b324894ea0b708f39932e5c5619",
+      "reference_answer": "TestGetItem uses xarray DataTree/Dataset constructors and assert_identical, with pytest.raises and xfail for error/unsupported cases (xarray/tests/test_datatree.py:281-333). NumPy and pandas support xarray generally, but these tests use simple list-valued data rather than directly exercising their full index semantics. assert_identical dispatches to each object's identical method (xarray/testing/assertions.py:185-195); Dataset compatibility compares coordinate-name sets and variable mappings (xarray/core/dataset.py:1438-1448). It does not call Dataset.indexes there, so a universal pandas-coercion restriction is not established. Coverage is constrained by these fixtures and the two expected-failure cases, and equality means xarray's identical contract rather than Python object identity except for the explicit self-index test.",
+      "reference_sha256": "4a05cff4af8e6b77db2a5af0e8011161651be5b369569a924ee094671168931a",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-63788ad64cc80e41936988fb"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pydata--xarray-40119bf35c53",
+      "original_reference_sha256": "9d844d357bb1b903789dbdbd905c6c354a81e159e881de8d27c24da9eded562a",
+      "question": "Where does the conditional invocation of the _on_evict callback within _enforce_size_limit's control flow affect the data state transitions of evicted cache entries, and what implicit ordering constraints does the popitem(last=False) operation impose on the sequence of data transformations?",
+      "question_sha256": "fe47d3e27832d8cc6ef2f6df1cc4b72e4c73921e0512f34f2332edf86713ed7a",
+      "reference_answer": "_enforce_size_limit removes the first OrderedDict entry and then invokes on_evict if present before the next loop iteration (xarray/backends/lru_cache.py:60-65). __getitem__ moves accessed keys to the end (xarray/backends/lru_cache.py:53-58), so eviction is least-recently-used order, not insertion FIFO. The callback receives an already removed key/value; it can perform cleanup. If it raises, removal has happened and the loop does not proceed normally, so cleanup completion is not unconditional.",
+      "reference_sha256": "abe39e1716f03146c784fb3e58316451bb06137bb62d9111569fbd4c984d45b5",
+      "repository": {
+        "commit": "40119bf35c53fc222934894d842cfc07b2e264bf",
+        "family_id": "pydata/xarray",
+        "url": "https://github.com/pydata/xarray"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydata--xarray-40119bf35c53fc222934894d842cfc07b2e264bf",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-6499bff264a4ce5471ce2427"
+    }
+  ]
+}

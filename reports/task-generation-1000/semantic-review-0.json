@@ -1,0 +1,673 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "purposive sample not all1000",
+  "tasks": [
+    {
+      "task_id": "import-49ba4958e42790048ef24166",
+      "reference_sha256": "ad3292bbb5d2c54c5f4e73a4a8624bfb118a0906d0646484e62bc4cb66ffc91f",
+      "question_sha256": "993d98f8855178c11c49a54f792f67689e4efac56f489148857b516c94c825ec",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Recipe precedes custom frequencies and generator fallback",
+          "verdict": "supported",
+          "evidence": {
+            "path": "pennylane/gradients/parameter_shift.py",
+            "start_line": 246,
+            "end_line": 286
+          },
+          "reason": "Both docstring and actual branches establish this exact selection order."
+        },
+        {
+          "claim": "Default frequencies infer from a generator without further assumptions",
+          "verdict": "qualified",
+          "evidence": {
+            "path": "pennylane/operation.py",
+            "start_line": 1739,
+            "end_line": 1769
+          },
+          "reason": "Inference is restricted to num_params == 1; missing recipes become one None per parameter."
+        },
+        {
+          "claim": "Answer supplies inheritance hierarchy",
+          "verdict": "incomplete",
+          "evidence": {
+            "path": "pennylane/operation.py",
+            "start_line": 1608,
+            "end_line": 1624
+          },
+          "reason": "Operation inherits Operator; reference discusses selection precedence but does not actually state this inheritance."
+        }
+      ],
+      "material_errors": [
+        "Missing single-parameter restriction on automatic generator inference and requested Operation/Operator hierarchy."
+      ],
+      "citation_corrections": [],
+      "notes": "Question is answerable but conflates class inheritance with recipe-selection priority. Static source inspection only; no repository code executed.",
+      "corrected_reference_answer": "Operations inherit Operation, which inherits Operator (pennylane/operation.py:1608-1624); Operator derives from abc.ABC (pennylane/operation.py:391). Recipe selection is explicit control flow, not Python method-resolution ordering: _get_operation_recipe first uses a non-None parameter grad_recipe, otherwise accesses parameter_frequencies and generates a shift rule (pennylane/gradients/parameter_shift.py:246-286). The default parameter_frequencies implementation uses generator eigenvalue differences only for single-parameter operations, and raises ParameterFrequenciesUndefinedError otherwise or when the generator is undefined (pennylane/operation.py:1739-1761). _get_operation_recipe translates that exception into OperatorPropertyUndefined."
+    },
+    {
+      "task_id": "import-3d933c0b7aa19317881b8fc2",
+      "reference_sha256": "7fbb5ee211c42eb0aa8bdd8298a6380f447c2e77459a954951048eef487c9404",
+      "question_sha256": "249f0c190e500183f4daef5897051632796cdc3c0910b96adb54f46f739070da",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Overrides are loaded with their own path context before main image initialization",
+          "verdict": "supported",
+          "evidence": {
+            "path": "cekit/generator/base.py",
+            "start_line": 45,
+            "end_line": 64
+          },
+          "reason": "Override loading is in the constructor, followed by main image loading and application in init."
+        },
+        {
+          "claim": "skip_merging preserves image identity fields throughout overrides",
+          "verdict": "contradicted",
+          "evidence": {
+            "path": "cekit/descriptor/image.py",
+            "start_line": 176,
+            "end_line": 190
+          },
+          "reason": "apply_image_overrides explicitly replaces name, version, base and description."
+        },
+        {
+          "claim": "Recursive merging skips configured keys",
+          "verdict": "supported",
+          "evidence": {
+            "path": "cekit/descriptor/base.py",
+            "start_line": 140,
+            "end_line": 163
+          },
+          "reason": "Generic merging skips keys, fills missing keys and merges nested descriptors/lists; it is not a blanket identity protection for override application."
+        }
+      ],
+      "material_errors": [
+        "Central claim that skip_merging preserves image name/version/description through overrides is false.",
+        "Loading overrides is performed before init, in the constructor."
+      ],
+      "citation_corrections": [],
+      "notes": "Question is answerable; generic merge policy must be distinguished from explicit override application. Static source inspection only; no repository code executed.",
+      "corrected_reference_answer": "Config.configure loads configparser configuration and applies selected CLI settings separately (cekit/config.py:16-40). Generator constructs Overrides objects using each override path's absolute parent directory, then init loads the main Image and calls apply_image_overrides (cekit/generator/base.py:45-64). Overrides inherits Image but initializes Descriptor with the override schema and prepares nested descriptors with its artifact directory (cekit/descriptor/overrides.py:9-18; cekit/descriptor/image.py:52-63). Image.apply_image_overrides processes overrides in order and explicitly replaces name, version, base and description when supplied (cekit/descriptor/image.py:176-190). Generic _merge_descriptors respects skip_merging while filling missing fields and merging nested descriptors and lists; that does not protect identity fields from explicit overrides (cekit/descriptor/base.py:140-163). tools.load_descriptor accepts inline YAML-compatible data, including JSON, or reads a file when the parsed input is a string (cekit/tools.py:29-53)."
+    },
+    {
+      "task_id": "import-25976163f78e3175f9ece212",
+      "reference_sha256": "944dbac5e7ce7c0d9207095f2dca1562669b3185bd04143160055313a2419caa",
+      "question_sha256": "f9f826d9ae523f1399b9e2a3ed48e44ce3c3589fb9f00bf7e4f29a0519890343",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "APIClient selects adapters by normalized endpoint scheme",
+          "verdict": "supported",
+          "evidence": {
+            "path": "docker/api/client.py",
+            "start_line": 136,
+            "end_line": 190
+          },
+          "reason": "Mounts Unix, npipe and SSH adapters, with TLS setup in the ordinary HTTP branch."
+        },
+        {
+          "claim": "Different transports make direct HTTP requests impossible",
+          "verdict": "overstated",
+          "evidence": {
+            "path": "docker/transport/sshconn.py",
+            "start_line": 102,
+            "end_line": 121
+          },
+          "reason": "SSHConnection still subclasses HTTPConnection; the transport changes how the HTTP byte stream reaches the daemon."
+        },
+        {
+          "claim": "Local Unix communication uses AF_UNIX",
+          "verdict": "supported",
+          "evidence": {
+            "path": "docker/transport/unixconn.py",
+            "start_line": 27,
+            "end_line": 37
+          },
+          "reason": "Socket is AF_UNIX and response handling is HTTPResponse."
+        }
+      ],
+      "material_errors": [
+        "Reference conflates application protocol with transport and overstates impossibility: HTTP remains the API protocol and ordinary TCP endpoints use standard session handling."
+      ],
+      "citation_corrections": [],
+      "notes": "Why-question is answerable as architectural inference, not proven historical intent. Static source inspection only; no repository code executed.",
+      "corrected_reference_answer": "APIClient inherits requests.Session and adapts how HTTP reaches the daemon (docker/api/client.py:47-60). parse_host normalizes TCP endpoints to http/https and Unix endpoints to http+unix (docker/utils/utils.py:284-300). APIClient then mounts adapters for Unix sockets, Windows named pipes and SSH; ordinary HTTP/TLS remains supported (docker/api/client.py:143-190). Unix connections use AF_UNIX (docker/transport/unixconn.py:27-37), named-pipe connections use NpipeSocket (docker/transport/npipeconn.py:18-29), and SSH carries the HTTP connection through docker system dial-stdio (docker/transport/sshconn.py:102-121). The observed benefit is a common request interface over these transports, rather than replacing HTTP itself."
+    },
+    {
+      "task_id": "import-36bb2877fb98daa82b44ec54",
+      "reference_sha256": "27da3b2b019a4c92a5236fd0c7c440ac3e4e552afe5af5b3198ba86bffc56dfd",
+      "question_sha256": "2e4842cb1d5c18f769753aa3e80f4c070f372106303dcfb08679018e1025caa2",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "System session context and per-resource overrides coordinate session selection",
+          "verdict": "supported",
+          "evidence": {
+            "path": "frictionless/system.py",
+            "start_line": 293,
+            "end_line": 325
+          },
+          "reason": "Returns context session when present, otherwise creates a new remote-plugin session; context prevents nesting."
+        },
+        {
+          "claim": "Resource control prefers explicit session",
+          "verdict": "supported",
+          "evidence": {
+            "path": "frictionless/plugins/remote/control.py",
+            "start_line": 39,
+            "end_line": 47
+          },
+          "reason": "Explicit httpSession precedes system.get_http_session."
+        },
+        {
+          "claim": "Loader obtains session and byte stream streams GET responses",
+          "verdict": "supported",
+          "evidence": {
+            "path": "frictionless/plugins/remote/loader.py",
+            "start_line": 19,
+            "end_line": 29
+          },
+          "reason": "Loader obtains resource control session and passes it into RemoteByteStream."
+        },
+        {
+          "claim": "Seekable HTTP stream",
+          "verdict": "qualified",
+          "evidence": {
+            "path": "frictionless/plugins/remote/loader.py",
+            "start_line": 92,
+            "end_line": 99
+          },
+          "reason": "Streaming GET is implemented here; seek supports only resetting to offset zero."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [
+        {
+          "original": "frictionless/plugins/remote/loader.py:44-99 for RemoteLoader session acquisition",
+          "corrected": "frictionless/plugins/remote/loader.py:19-29"
+        },
+        {
+          "original": "frictionless/plugins/remote/loader.py:20 for streaming GET",
+          "corrected": "frictionless/plugins/remote/loader.py:92-99"
+        }
+      ],
+      "notes": "Core answer supported. Seekable should not imply arbitrary HTTP range seeks. Default sessions are newly created outside an active context; no general session cache is promised. Static source inspection only; no repository code executed."
+    },
+    {
+      "task_id": "import-1469913538e10f11cffe5452",
+      "reference_sha256": "2d010b749e4565fb5be36122ec6ad8104e4a738fa9be2a5773c411792819e0ff",
+      "question_sha256": "b6e6f56625a2d0e25915e61d2b396af2b52d8a1cb9410f95d3355b2d02dd3bca",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "UnitRegistry combines System, Context and NonMultiplicative registries",
+          "verdict": "supported",
+          "evidence": {
+            "path": "pint/registry.py",
+            "start_line": 2195,
+            "end_line": 2196
+          },
+          "reason": "Declared bases establish the stated cooperative diamond MRO with their common BaseRegistry."
+        },
+        {
+          "claim": "Context conversion transforms along a path then delegates",
+          "verdict": "supported",
+          "evidence": {
+            "path": "pint/registry.py",
+            "start_line": 1901,
+            "end_line": 1917
+          },
+          "reason": "Context transformations precede super()._convert, resolving to nonmultiplicative handling on UnitRegistry."
+        },
+        {
+          "claim": "Nonmultiplicative layer delegates simple conversions",
+          "verdict": "supported",
+          "evidence": {
+            "path": "pint/registry.py",
+            "start_line": 1517,
+            "end_line": 1526
+          },
+          "reason": "No-offset path calls super; offset path checks dimensions and performs specialized work."
+        },
+        {
+          "claim": "Dynamic Group/System classes retain registry",
+          "verdict": "supported",
+          "evidence": {
+            "path": "pint/systems.py",
+            "start_line": 455,
+            "end_line": 466
+          },
+          "reason": "Both factory functions bind _REGISTRY to the supplied registry."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Answerable statically. The sentence about composing system rules into _convert is loose: SystemRegistry has no _convert override; the actual conversion method chain starts at ContextRegistry. MRO and overall composition claims remain supported. Static source inspection only; no repository code executed."
+    },
+    {
+      "task_id": "import-2c86794d0260171bd2aeee8e",
+      "reference_sha256": "c5a0a6d3025646f64b85cbac2eb658d1de58b57fb1990488d8c6045e58fc5397",
+      "question_sha256": "bfc65789246893a4bd1b99d5902ae23159050d4acf06bfa965cba3197388e3a3",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Globals, counter increment and reset occur in annotation.py",
+          "verdict": "supported",
+          "evidence": {
+            "path": "pybryt/annotations/annotation.py",
+            "start_line": 10,
+            "end_line": 12
+          },
+          "reason": "All three module globals are declared here; inspected initialization 49-64 and reset 108-117 confirm changes."
+        },
+        {
+          "claim": "Tracking uses name-index mapping, limit and child removal",
+          "verdict": "supported",
+          "evidence": {
+            "path": "pybryt/annotations/annotation.py",
+            "start_line": 76,
+            "end_line": 96
+          },
+          "reason": "Actual mapping uses self.name; limit and removal mean not every constructed annotation remains tracked."
+        },
+        {
+          "claim": "Complexity measurement disables annotation/value tracking",
+          "verdict": "supported",
+          "evidence": {
+            "path": "pybryt/execution/complexity.py",
+            "start_line": 73,
+            "end_line": 86
+          },
+          "reason": "Context entry and exit toggle the flag; tracing.py:98-100 checks it before collecting values."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Answerable statically. The opening all-instances wording is qualified by the later limit/child-removal description. Counter increments even if tracking is disabled; reference does not claim otherwise. Static source inspection only; no repository code executed."
+    },
+    {
+      "task_id": "import-0fbd91ed5764b08d8d0458c1",
+      "reference_sha256": "c2c21ea014c7219867514e0a7deb7d8eb9412f37de3a66c7aa8f06c51783e71d",
+      "question_sha256": "e31b5613aa5cf424326d5e6039df02eb5ec6f25921fa4e69f8d6cac3f6a91f2b",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Inst, Stmt, Terminator, Expr hierarchy and roles",
+          "verdict": "supported",
+          "evidence": {
+            "path": "numba/core/ir.py",
+            "start_line": 302,
+            "end_line": 370
+          },
+          "reason": "Class declarations and docstrings directly establish the categories."
+        },
+        {
+          "claim": "Control flow uses Return, Jump and Branch terminators",
+          "verdict": "supported",
+          "evidence": {
+            "path": "numba/core/ir.py",
+            "start_line": 777,
+            "end_line": 843
+          },
+          "reason": "Targets and exit flags implement the described operational roles; Assign binds an AbstractRHS to Var."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Clear, statically answerable taxonomy with accurate citations; no material missing assumption or unsupported intent. Static source inspection only; no repository code executed."
+    },
+    {
+      "task_id": "import-0bba7197e5bb25f773d1da82",
+      "reference_sha256": "9abe9d8c5089ebc47eade0d3d50a3fb5125751506fa7b830a01393cb5fb69d39",
+      "question_sha256": "d3e2accc0f1c45257b59bbdcec643a3ff486be8c81575a60359deccc23dcf409",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Duplicate rel keys overwrite earlier links",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/requests/models.py",
+            "start_line": 983,
+            "end_line": 997
+          },
+          "reason": "Ordered iteration assigns resolved_links[key] = link, with rel or URL fallback."
+        },
+        {
+          "claim": "Parser preserves link processing order",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/requests/utils.py",
+            "start_line": 920,
+            "end_line": 938
+          },
+          "reason": "Splits entries in input order and appends each parsed dictionary, establishing that the last duplicate wins."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Directly answerable from source. The example follows from assignment semantics; no execution is necessary. Static source inspection only; no repository code executed."
+    },
+    {
+      "task_id": "import-0393a4ef848d1cf8eaf51897",
+      "reference_sha256": "bc4417f6e3f818f50eda6f26c99c53adf72b674653ff1b9e7dbb9ddd6ff79184",
+      "question_sha256": "55e94404a8ae75ca404f3e57d869a754be8a66dbd11c38daf1c3efa2cc8fc386",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Metaclass values property exists on Parent and Child",
+          "verdict": "supported",
+          "evidence": {
+            "path": "tests/functional/r/regression/regression_properties_in_class_context.py",
+            "start_line": 3,
+            "end_line": 24
+          },
+          "reason": "Fixture defines metaclass property and accesses it on both classes."
+        },
+        {
+          "claim": "Current fixture produces false warnings for Child.values",
+          "verdict": "contradicted",
+          "evidence": {
+            "path": "tests/functional/r/regression/regression_properties_in_class_context.txt",
+            "start_line": 1,
+            "end_line": 2
+          },
+          "reason": "Expected diagnostics contain only Child2.a_method at lines 42-43; no Child.values diagnostics. Source comments at 22-23 are stale evidence."
+        },
+        {
+          "claim": "_supports_protocol implements property attribute resolution",
+          "verdict": "contradicted",
+          "evidence": {
+            "path": "pylint/checkers/utils.py",
+            "start_line": 1266,
+            "end_line": 1283
+          },
+          "reason": "Checks protocol methods on a metaclass for a class object; it does not evaluate an arbitrary values property or infer its returned list."
+        }
+      ],
+      "material_errors": [
+        "Reference incorrectly claims current false-positive diagnostics on Child.values.",
+        "Reference confuses protocol support for a class object with descriptor/property lookup on its metaclass."
+      ],
+      "citation_corrections": [],
+      "notes": "Question is broadly worded but answerable using the fixture and static-analysis boundaries. No runtime reproduction required to identify contradiction with expected diagnostics. Static source inspection only; no repository code executed.",
+      "corrected_reference_answer": "The fixture defines Meta(type).values as a property returning a list, then accesses Parent.values and Child.values (tests/functional/r/regression/regression_properties_in_class_context.py:3-24). Because classes are instances of their metaclass, this property is available through class attribute access, including the subclass. This differs from an ordinary instance property declared on the class. Pylint attribute checking calls owner.getattr(node.attrname) through astroid (pylint/checkers/typecheck.py:1117-1123). Separately, _supports_protocol checks a metaclass when deciding whether a class object itself supports iteration or membership; it is not the property-resolution implementation (pylint/checkers/utils.py:1266-1283). Despite stale comments in the fixture, expected diagnostics report only Child2.a_method at lines 42-43, not Child.values (tests/functional/r/regression/regression_properties_in_class_context.txt:1-2)."
+    },
+    {
+      "task_id": "import-02c731a42afa11b8e9213924",
+      "reference_sha256": "7a9e2887d685e4c77cfb9616fdd34676d3d55c80ca4cf22197fbf1a78e0044c6",
+      "question_sha256": "256ec98ab6421c22c8f9cb08a8f6b5c640a45b85651c9fff323dcd4b8ca7611f",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Backend interface supplies seeding and sampling methods",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/qibo/backends/abstract.py",
+            "start_line": 253,
+            "end_line": 261
+          },
+          "reason": "Explicit contracts exist; sample_frequencies contract also at 289-292."
+        },
+        {
+          "claim": "NumPy frequencies batch calls to backend sampling",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/qibo/backends/numpy.py",
+            "start_line": 515,
+            "end_line": 556
+          },
+          "reason": "Uses random.seed, random.choice, probability normalization and configurable batch size."
+        },
+        {
+          "claim": "TensorFlow uses categorical sampling",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/qibo/backends/tensorflow.py",
+            "start_line": 267,
+            "end_line": 271
+          },
+          "reason": "This is a distinct backend RNG implementation, not a promise of identical samples."
+        },
+        {
+          "claim": "GlobalBackend guarantees reproducibility across backends",
+          "verdict": "unsupported",
+          "evidence": {
+            "path": "src/qibo/backends/__init__.py",
+            "start_line": 41,
+            "end_line": 85
+          },
+          "reason": "It selects and caches a default backend and can replace it. This does not guarantee cross-backend random-stream equivalence."
+        }
+      ],
+      "material_errors": [
+        "Question/reference do not distinguish repeatability within a seeded backend from identical samples across backends. A singleton alone does not ensure either."
+      ],
+      "citation_corrections": [],
+      "notes": "Architecture is answerable statically; exact seeded numerical sequences would require controlled backend execution, which was neither necessary nor performed. Static source inspection only; no repository code executed.",
+      "corrected_reference_answer": "Qibo exposes backend-specific seeding and sampling contracts (src/qibo/backends/abstract.py:253-261,289-292). NumPy seeds its RNG and samples with random.choice; its sample_frequencies normalizes probabilities and accumulates batches through self.sample_shots (src/qibo/backends/numpy.py:515-556). TensorflowBackend inherits NumpyBackend but overrides sampling with tf.random.categorical (src/qibo/backends/tensorflow.py:164-174,267-271). SHOT_BATCH_SIZE defaults to 2**18 (src/qibo/config.py:27-28). GlobalBackend selects and caches the default backend, and permits replacement (src/qibo/backends/__init__.py:41-85). CircuitResult delegates to that result's backend for shots or frequencies (src/qibo/states.py:113-116,183-194). These are common interfaces with backend-specific RNGs; they do not establish identical seeded outcomes across different backends."
+    },
+    {
+      "task_id": "import-00c7d5eb9ea4bac8201cd1da",
+      "reference_sha256": "fd310ca8c0eb4f7f4d0c4db73d09ac808de83050e62456f636923c10ea95b9c8",
+      "question_sha256": "c6e9e36a595d2ccf3100590ad4e1818489155846ceb5d2ff91bfa7e51e17e3a3",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Predict helper applies feature subsets and invokes predict polymorphically",
+          "verdict": "supported",
+          "evidence": {
+            "path": "sklearn/ensemble/_bagging.py",
+            "start_line": 257,
+            "end_line": 262
+          },
+          "reason": "Plain method dispatch and feature indexing; same params mapping goes to each estimator."
+        },
+        {
+          "claim": "BaseEstimator ensures predict and MetaEstimatorMixin enables routing",
+          "verdict": "contradicted",
+          "evidence": {
+            "path": "sklearn/base.py",
+            "start_line": 1126,
+            "end_line": 1134
+          },
+          "reason": "MetaEstimatorMixin is explicitly empty; BaseEstimator provides general utilities rather than a predict implementation contract."
+        },
+        {
+          "claim": "Bagging supports a heterogeneous dependency resolution mechanism",
+          "verdict": "overstated",
+          "evidence": {
+            "path": "sklearn/ensemble/_base.py",
+            "start_line": 141,
+            "end_line": 151
+          },
+          "reason": "Normal construction clones a single estimator_; no type-dependent resolution in the helper."
+        },
+        {
+          "claim": "Caller routes prediction metadata and parallelizes",
+          "verdict": "supported",
+          "evidence": {
+            "path": "sklearn/ensemble/_bagging.py",
+            "start_line": 1436,
+            "end_line": 1456
+          },
+          "reason": "process_routing runs before jobs; passed estimator.predict metadata is shared by that batch."
+        }
+      ],
+      "material_errors": [
+        "BaseEstimator does not ensure predict exists; MetaEstimatorMixin is an empty marker, not the routing implementation.",
+        "Heterogeneous base-estimator dependency resolution overstates a helper used on clones of one configured base estimator."
+      ],
+      "citation_corrections": [],
+      "notes": "Answerable by challenging the dependency-resolution premise and describing ordinary dispatch. Static source inspection only; no repository code executed.",
+      "corrected_reference_answer": "_parallel_predict_regression has no special dependency resolver: it zips estimators with their recorded feature arrays, calls estimator.predict(X[:, features], **params), and sums predictions (sklearn/ensemble/_bagging.py:257-262). Normal Bagging construction clones the configured estimator_, so differing feature subsets do not imply heterogeneous estimator classes (sklearn/ensemble/_base.py:141-151). BaggingRegressor.predict resolves optional metadata before launching Parallel/delayed jobs, passes routed estimator.predict parameters, then averages the job sums (sklearn/ensemble/_bagging.py:1436-1456). BaseEstimator supplies parameter, validation and metadata-request infrastructure, while MetaEstimatorMixin is explicitly empty; neither guarantees a predict implementation (sklearn/base.py:156-166,1126-1134). The helper relies on objects implementing predict, Python method dispatch, array indexing, and caller-prepared metadata."
+    },
+    {
+      "task_id": "import-013007e2033b14b73a3e6f27",
+      "reference_sha256": "b51f932be08a2701a89367228634e5c27af7f538dfbd15bd1bab8a9e96a9207d",
+      "question_sha256": "eff83026926ee6b8ff0883b0a63e1075adc3dead3e2a1f9b9a35c084c4f3c2eb",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Operator class references subclass ANSI object references with distinct type",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/sqlfluff/dialects/dialect_postgres.py",
+            "start_line": 1040,
+            "end_line": 1043
+          },
+          "reason": "Exact inheritance and type declaration."
+        },
+        {
+          "claim": "Inherited grammar handles qualified identifiers and exposes reference helpers",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/sqlfluff/dialects/dialect_ansi.py",
+            "start_line": 1066,
+            "end_line": 1111
+          },
+          "reason": "Delimited grammar and qualification helpers support stated parse-tree behavior."
+        },
+        {
+          "claim": "Index options use operator reference with NULLS exclusion and optional options",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/sqlfluff/dialects/dialect_postgres.py",
+            "start_line": 4057,
+            "end_line": 4105
+          },
+          "reason": "IndexElementOptions feeds IndexElement; exclusion constraints reuse IndexElement. Create-index use verified at 4452."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Why-language is an inference about reuse and parse-tree identification, not documented historical intent. Validation means structural reference inspection, not database-catalog validation. No concrete validator is claimed to exist. Static source inspection only; no repository code executed."
+    },
+    {
+      "task_id": "import-102926564e08a0459d95a35d",
+      "reference_sha256": "82674fdc4f6e5d62783608b1948ec3f73d1bac1a0d603458f5fd40be62b7f6ab",
+      "question_sha256": "768125a8526340debc8033b2724740812d1f4fae96da73a9223c9d635666ba36",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Brace expansion and split form OR-of-AND clauses with negation",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/tox/config/__init__.py",
+            "start_line": 1211,
+            "end_line": 1245
+          },
+          "reason": "Helpers explicitly partition included/excluded tokens and expand Cartesian brace combinations."
+        },
+        {
+          "claim": "Conditional handler includes payload iff any clause holds",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/tox/config/__init__.py",
+            "start_line": 1390,
+            "end_line": 1404
+          },
+          "reason": "Set inclusion plus exclusion test wrapped in any implements described boolean logic."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Question is statically answerable. Quoted regex has a redundant dot in the reference character class, but its matching semantics are unchanged; no material error. Static source inspection only; no repository code executed."
+    },
+    {
+      "task_id": "import-086304108660dbab46edcf9b",
+      "reference_sha256": "b079a06fef81fa645a5adeb7bc93b9a976e64f8b73bdfc1290833e911a1710c2",
+      "question_sha256": "a5a90fc04b24077b1f237822c7bbc385443f6b68117ed2d2960070ede2753adf",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "BigQuery adds INSERT ROW alternative to optional-column/value grammar",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/sqlfluff/dialects/dialect_bigquery.py",
+            "start_line": 2680,
+            "end_line": 2695
+          },
+          "reason": "Exact OneOf definition agrees with reference; ANSI base verified at 3154-3164."
+        },
+        {
+          "claim": "OneOf favors longest match",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/grammar/anyof.py",
+            "start_line": 250,
+            "end_line": 255
+          },
+          "reason": "Documented longest-match behavior, implemented through longest_match at 196-202."
+        },
+        {
+          "claim": "Omitting VALUES automatically uses source column references",
+          "verdict": "unsupported",
+          "evidence": {
+            "path": "src/sqlfluff/dialects/dialect_bigquery.py",
+            "start_line": 2686,
+            "end_line": 2695
+          },
+          "reason": "A parser accepting optional syntax does not define SQL execution semantics; no source-column fallback is implemented by this segment."
+        }
+      ],
+      "material_errors": [
+        "Reference infers database execution semantics from permissive parser grammar, especially the unsupported claim that omitting VALUES uses source references."
+      ],
+      "citation_corrections": [
+        {
+          "original": "/src/sqlfluff/dialects/dialect_bigquery.py",
+          "corrected": "src/sqlfluff/dialects/dialect_bigquery.py"
+        },
+        {
+          "original": "/src/sqlfluff/core/parser/match_algorithms.py",
+          "corrected": "src/sqlfluff/core/parser/match_algorithms.py"
+        }
+      ],
+      "notes": "Leading slashes are repository-root notation, not absent source. SQL execution semantics need external specification or a narrower answer; no repository execution needed for the grammar question. Static source inspection only; no repository code executed.",
+      "corrected_reference_answer": "At the parser level, BigQuery MergeInsertClauseSegment adds a distinct Sequence(\"INSERT\", \"ROW\") alternative. The other alternative parses INSERT with optional column-list and ValuesClauseSegment components (src/sqlfluff/dialects/dialect_bigquery.py:2680-2695). ANSI contains only that latter sequence (src/sqlfluff/dialects/dialect_ansi.py:3154-3164). OneOf selects the longest matching alternative, with first-match tie behavior (src/sqlfluff/core/parser/grammar/anyof.py:250-255; src/sqlfluff/core/parser/match_algorithms.py:140-151). Thus INSERT ROW can be recognized as a complete alternative rather than just INSERT. This grammar distinguishes syntactic forms; optional parser elements alone do not establish what a database does when VALUES is omitted."
+    },
+    {
+      "task_id": "import-0fb897f83ec571cb8ff367e9",
+      "reference_sha256": "16601549b4d28371e96576680ea6fda746a8411ab338b677caa9f98768113f9e",
+      "question_sha256": "d0e5806db568258e4c9c8e8c9aaacdd77bee1340047acf403613324e48e81c8e",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Helper checks README existence and tests orchestrate setup/run/assertion",
+          "verdict": "supported",
+          "evidence": {
+            "path": "testing/test_cacheprovider.py",
+            "start_line": 1263,
+            "end_line": 1278
+          },
+          "reason": "Both test methods make a test file, invoke pytest, and assert the reusable helper result."
+        },
+        {
+          "claim": "Cache implementation creates README support file",
+          "verdict": "supported",
+          "evidence": {
+            "path": "src/_pytest/cacheprovider.py",
+            "start_line": 203,
+            "end_line": 226
+          },
+          "reason": "Creates directory support files when cache directory is absent; README is generated content."
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [
+        {
+          "original": "_pytest/cacheprovider.py:203-247",
+          "corrected": "src/_pytest/cacheprovider.py:203-247"
+        },
+        {
+          "original": "README.md treated as repository source citation",
+          "corrected": "Generated cache filename, not a repository source citation"
+        }
+      ],
+      "notes": "Question uses architectural layering language for a small helper pattern, but the described division is visible. parseconfigure runs configuration logic, so helper is not a pure filesystem predicate. No execution needed to understand the structure. Static source inspection only; no repository code executed."
+    }
+  ]
+}

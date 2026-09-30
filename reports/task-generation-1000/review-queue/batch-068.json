@@ -1,0 +1,421 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 172,
+            "file_sha256": "d4ec5d194e20fa7c83012fa1db10d347ae71f706405ee0ea3ad933a88b935899",
+            "path": "sphinx/ext/autodoc/importer.py",
+            "start_line": 95
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the MRO in the enum class inheriting from both a non-enum mixin and the standard enum base affect which data attributes from the non-enum mixin are accessible versus shadowed by the standard enum base's internal mechanisms?",
+      "question_sha256": "1458be3dafb4e6ce11a6e2a7ac27e8a995949ff533298465cce60ea600060f56",
+      "reference_answer": "The MRO affects attribute accessibility and shadowing in the `_filter_enum_dict` function in `sphinx/ext/autodoc/importer.py` (lines 95-172), specifically during the MRO iteration loop (lines 138-149) and the exclusion logic (line 153).\n\n**Location and mechanism:**\n\n1. **MRO iteration (lines 138-149)**: The function iterates through the enum class's MRO:\n   ```python\n   for parent in enum_class.__mro__:\n       if parent in {enum_class, Enum, object}:\n           continue\n       parent_dict = attrgetter(parent, '__dict__', {})\n       for name, value in parent_dict.items():\n           if should_ignore(name, value):\n               continue\n           candidate_in_mro.add(name)\n           if (item := query(name, parent)) is not None:\n               yield item\n   ```\n   Attributes from parents (including the non-enum mixin) are discovered in MRO order and added to `candidate_in_mro`.\n\n2. **Exclusion logic (line 153)**: Attributes from `Enum.__dict__` are excluded unless they were found in a mixin or data type:\n   ```python\n   excluded_members = Enum.__dict__.keys() - candidate_in_mro\n   ```\n   If a mixin attribute appears earlier in the MRO than `Enum`, it is added to `candidate_in_mro`, preventing `Enum`'s internal attributes from shadowing it.\n\n**For the specific case:**\n- `EnumSunderMissingInNonEnumMixin(_SunderMissingInNonEnumMixin, enum.Enum)` has MRO: `[EnumSunderMissingInNonEnumMixin, _SunderMissingInNonEnumMixin, enum.Enum, object]`\n- `_SunderMissingInNonEnumMixin` comes before `enum.Enum`, so its attributes (e.g., `_missing_`) are discovered first and added to `candidate_in_mro`\n- This prevents `Enum`'s internal `_missing_` from shadowing the mixin's version\n- The comment on lines 501-502 in `get_class_members` notes: \"the order of occurrence of *name* matches the subject's MRO, allowing inherited attributes to be shadowed correctly\"\n\n**Result:** Attributes from the non-enum mixin are accessible and not shadowed by `Enum`'s internal mechanisms because the MRO traversal discovers them first and marks them as candidates, preventing exclusion.",
+      "reference_sha256": "3e23ae91880ff6264d201074365e3241c84eed959c0db0d0a07f6bf594a41ca8",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-c2f8736c27259528da652f3b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 253,
+            "file_sha256": "43c2072aa70b2c45660abad91c9982e8d9100ca821d74f9865a86a4c2947e2ac",
+            "path": "sphinx/writers/manpage.py",
+            "start_line": 251
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does invoking the line termination method before the parent class footnote visitor affect the manual page translator output buffer state?",
+      "question_sha256": "3e63a4213abffaddcaf76836696966031e2fb6079539cfaaad1bb3434a2ba7f8",
+      "reference_answer": "The invocation occurs in the `visit_footnote` method override of the `ManualPageTranslator` class in `sphinx/writers/manpage.py` at lines 251-253:\n\n```python\n# overwritten -- added ensure_eol()\ndef visit_footnote(self, node: nodes.footnote) -> None:\n    self.ensure_eol()\n    super().visit_footnote(node)\n```\n\n`ManualPageTranslator` inherits from both `SphinxTranslator` and `manpage.Translator` (from docutils). The override calls `self.ensure_eol()` before `super().visit_footnote(node)`.\n\n`ensure_eol()` ensures the last line in `self.body` (the output buffer) ends with a newline. If the last element doesn't end with `\\n`, it appends one. This modifies `self.body` before the parent processes the footnote node.\n\nEffect on output buffer state:\n- Guarantees a newline before the parent's footnote output\n- Prevents formatting issues if the previous content didn't end with a newline\n- Ensures consistent line termination for manual page formatting\n\nThis ordering ensures proper formatting in the manual page output by normalizing the buffer state before the parent class processes the footnote node.",
+      "reference_sha256": "b24c2ffbaac5537fba0e883ec8c8aeebee8ba2fd5709ee3f6c3f14064ccbd3db",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-c8badd167b4069c2d42edd6f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 589,
+            "file_sha256": "d4ec5d194e20fa7c83012fa1db10d347ae71f706405ee0ea3ad933a88b935899",
+            "path": "sphinx/ext/autodoc/importer.py",
+            "start_line": 485
+          },
+          {
+            "end_line": 1683,
+            "file_sha256": "880cfc9e4078c886c879b24cd4c7119833713195bd314b180ce37a24035421d4",
+            "path": "sphinx/ext/autodoc/_documenters.py",
+            "start_line": 1660
+          },
+          {
+            "end_line": 86,
+            "file_sha256": "b4a1808c7729dc6dd3c1ae9321d7df15e3b1ad39ac211351947b5e34d84e6e0a",
+            "path": "tests/roots/test-ext-autodoc/target/enums.py",
+            "start_line": 80
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why would removing the inherited greeting method from the enum mixin class affect the method resolution order for classes depending on its documented behavior in the automated documentation test suite?",
+      "question_sha256": "399ef76ec0440c18ae6820b9f940cf7bfdd08747da6d67ebdf7396e3b3a8d6fc",
+      "reference_answer": "Removing the inherited greeting method from the enum mixin class affects the method resolution order (MRO) traversal used by the automated documentation system, which breaks the documented behavior for classes that depend on this method.\n\nHow autodoc processes inheritance:\n1. Member collection via MRO: `get_class_members()` in `sphinx/ext/autodoc/importer.py` (lines 485-589) traverses the MRO using `getmro(subject)` (line 536) to collect members from parent classes. When a member is found in a parent class's `__dict__`, it's stored as an `ObjectMember` with `class_` set to that parent (e.g., line 505 for enum members, line 529 for regular members).\n\n2. Filtering inherited members: In `ClassDocumenter.get_object_members()` (`sphinx/ext/autodoc/_documenters.py`, lines 1660-1683), when `inherited-members` is enabled (line 1680), all members are returned. Otherwise, only members where `m.class_ == self.props._obj` are returned (line 1683), meaning only members defined in the class itself.\n\n3. The enum mixin class: The `Greeter` class (`tests/roots/test-ext-autodoc/target/enums.py`, lines 80-86) defines `say_hello` with docstring \"inherited\". Multiple enum classes inherit from it:\n   - `EnumClassWithMixinTypeInherit` (line 102) \u2014 inherits `say_hello` from `Greeter`\n   - `EnumClassWithMixinEnumType` (line 114) \u2014 inherits `say_hello` from `Greeter`\n   - `EnumClassWithParentEnum` (line 149) \u2014 inherits via `_ParentEnum` (line 145), which inherits from `Greeter`\n\n4. Documented behavior in tests: When `inherited-members` is enabled, these classes show `say_hello` with the \"inherited\" docstring from `Greeter`:\n   - `test_enum_class_with_mixin_type_and_inheritence()` (line 1813) expects `say_hello` with \"inherited\" docstring\n   - `test_enum_class_with_mixin_enum_type()` (line 1838) expects `say_hello` with \"inherited\" docstring\n   - `test_enum_with_parent_enum()` (line 1910) expects `say_hello` with \"inherited\" docstring\n\nImpact of removal:\n- If `say_hello` is removed from `Greeter`, the MRO traversal in `get_class_members()` will not find this method in any parent class.\n- Classes that inherit from `Greeter` and don't override `say_hello` will no longer have this method available in their member dictionary.\n- The documented behavior will change: these classes will no longer show `say_hello` as an inherited method when `inherited-members` is enabled.\n- The tests will fail because they expect `say_hello` to appear in the documentation with the \"inherited\" docstring.\n\nThe inheritance chain is broken because the method resolution order traversal depends on finding `say_hello` in `Greeter.__dict__` during MRO traversal. When it's removed, descendant classes lose access to this method through inheritance, and the automated documentation system can no longer document it as an inherited member.",
+      "reference_sha256": "90ac97851bbab0ff6f7b6c76935d2f9346155c99aa3f24beebd30331ce0479fc",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-cf44ec3f13ea25c152faad43"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1813,
+            "file_sha256": "880cfc9e4078c886c879b24cd4c7119833713195bd314b180ce37a24035421d4",
+            "path": "sphinx/ext/autodoc/_documenters.py",
+            "start_line": 1810
+          },
+          {
+            "end_line": 111,
+            "file_sha256": "093a3f49bf069ecaeea87c34e195917c5889a8397711d19ceaaf492a051bf6e9",
+            "path": "sphinx/ext/autodoc/_property_types.py",
+            "start_line": 106
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the member documentation method in the specialized class documenter use the alias detection property to conditionally skip delegating to the base documenter's implementation?",
+      "question_sha256": "5e0ebb96774cf810aabb9df71bfef2e939e70463d59057f85f42077c6c0a1c00",
+      "reference_answer": "The member documentation method in `ClassDocumenter` uses the alias detection property (`doc_as_attr`) to conditionally skip delegating to the base `Documenter.document_members()` implementation because when a class is documented as an alias (under a different name than its actual `__name__`), it should be treated as a data/attribute rather than a full class, and therefore should not document its members.\n\nLooking at the implementation in `./sphinx/ext/autodoc/_documenters.py` (lines 1810-1813):\n\n```python\ndef document_members(self, all_members: bool = False) -> None:\n    if self.props.doc_as_attr:\n        return\n    super().document_members(all_members)\n```\n\nThe `doc_as_attr` property is defined in `_ClassDefProperties` (lines 106-111 of `_property_types.py`) and returns `True` when:\n1. The class object has no `__name__` attribute (`_obj___name__` is `None`), OR\n2. The documented name (last part of `self.parts`) doesn't match the actual class name (`self._obj___name__`)\n\nWhen `doc_as_attr` is `True`, the method returns early without calling `super().document_members(all_members)`, effectively skipping member documentation. This is appropriate because:\n- An aliased class should be documented as a simple attribute/data item, not as a full class with members\n- The alias behavior is handled elsewhere in the class (e.g., in `add_content()` at line 1801-1806, where it adds \"alias of...\" text)\n- Documenting members of an alias would be confusing and incorrect, as the alias is just a reference to another class\n\nWhen `doc_as_attr` is `False` (normal class documentation), the method delegates to the parent `Documenter.document_members()` method, which contains the full implementation for discovering, filtering, and documenting class members (lines 804-849).\n\nThis implements a Template Method pattern variant with a guard clause: the subclass (`ClassDocumenter`) conditionally uses or bypasses the parent's template method (`Documenter.document_members()`) based on a property check (`doc_as_attr`). The early return acts as a guard clause that prevents the template method from executing when the object should be treated differently (as an attribute rather than a class).",
+      "reference_sha256": "1fe1a8437d93787191a60b5d37ff1785973b41b57ab7ec5302575d799c2d7d62",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-d5934922ed879f794ac6f274"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 376,
+            "file_sha256": "06e0632cbeaf6fc68ecae8552e8e278e6e67287b91d21fec0a40dfc957640cf6",
+            "path": "sphinx/transforms/i18n.py",
+            "start_line": 338
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "06e0632cbeaf6fc68ecae8552e8e278e6e67287b91d21fec0a40dfc957640cf6",
+            "kind": "file_reference",
+            "line_count": 705,
+            "path": "sphinx/transforms/i18n.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the integration mechanism between the test function that validates glossary term reference consistency and the translation processing transform system?",
+      "question_sha256": "58eebbc2ee7662bb201b4cf00c63a10577ada18c58d825d19f552cbb5c94f3f3",
+      "reference_answer": "The integration mechanism connects the test function to the translation processing transform system through Sphinx's docutils transform pipeline.\n\n**Test Setup:**\nThe test function uses the `@sphinx_intl` decorator and `@pytest.mark.sphinx('text', testroot='intl')` to create a Sphinx application with internationalization configuration. This sets up:\n- Language configuration (`language: 'xx'`)\n- Locale directories (`locale_dirs: ['.']`)\n- Gettext compact mode disabled\n\n**Transform Registration:**\nThe translation processing transform system is registered in `sphinx/transforms/i18n.py` via the `setup()` function, which adds the `Locale` transform (priority 20) to the docutils transform pipeline. This transform processes all translatable nodes during document parsing.\n\n**Validation Mechanism:**\nWhen `app.build()` is called, the `Locale` transform processes translatable messages. For each translatable node:\n1. It extracts the original message and finds its translation from the gettext catalog\n2. It parses the translated message using `_publish_msgstr()` to create a docutils document\n3. It compares original and translated nodes using the `_NodeUpdater` class\n\n**Glossary Term Reference Validation:**\nThe `update_pending_xrefs()` method in `_NodeUpdater` (lines 338-376 of `sphinx/transforms/i18n.py`) specifically handles glossary term references:\n- It finds all `pending_xref` nodes with `refdomain='std'` and `reftype='term'` in both original and translated content\n- It calls `compare_references()` (lines 131-147) which compares the count of term references\n- If the counts differ, it generates a warning with type `'i18n'` and subtype `'inconsistent_references'`\n- The warning message format is: `\"inconsistent term references in translated message. original: {0}, translated: {1}\"`\n\n**Test Validation:**\nThe test function validates this mechanism by:\n1. Building a document with glossary term references that have inconsistent counts in translation\n2. Checking that the expected warning is generated (line 357-365)\n3. Verifying the warning contains the specific term references from both original and translated messages\n\nThis integration ensures that when translations change the number of glossary term references, the system detects and reports inconsistencies, maintaining referential integrity across translation layers.",
+      "reference_sha256": "4d830632acd13c59c5c97493bd17da69f8a599530c0ed9e41b7077c78bb3c4cd",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-d610f8d6b01ec25ced763be9"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 169,
+            "file_sha256": "023830bb69754b69ab552804fa58f8792dd77d5157adca8602014de36d40679c",
+            "path": "sphinx/util/_pathlib.py",
+            "start_line": 169
+          },
+          {
+            "end_line": 157,
+            "file_sha256": "976ba5733bfc83eb66fc5384d2565cfc6eee9132ba5ef166daa7cac27cd90e87",
+            "path": "sphinx/application.py",
+            "start_line": 154
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the path property descriptor class in the utility pathlib module resolve the instance attribute name dynamically?",
+      "question_sha256": "6dbeefdbe021e86dbf3f2f61def7f1644357d448a93155d8e2d069cbab6c2955",
+      "reference_answer": "The instance attribute name is resolved dynamically in the `__get__` method of the path property descriptor class, located in `sphinx/util/_pathlib.py` at line 169.\n\nThe resolution mechanism works as follows:\n\n1. **Initialization**: When a descriptor instance is created (line 150-151), it initializes `self.instance_attr` as an empty string.\n\n2. **Name binding**: When the descriptor is assigned to a class attribute (e.g., `srcdir = _StrPathProperty()`), Python automatically calls `__set_name__` (line 153-154), which stores the mangled attribute name in `self.instance_attr` by prefixing the class attribute name with an underscore (e.g., `'_srcdir'` for a class attribute named `srcdir`).\n\n3. **Dynamic resolution**: In the `__get__` method (lines 162-169), when accessed on an instance (not the class), the method:\n   - Checks if `obj is None` (class access) and returns `self` if so (line 165-166)\n   - Validates that `self.instance_attr` has been set (line 167-168)\n   - **Dynamically resolves the attribute** at line 169 using `getattr(obj, self.instance_attr)`, which retrieves the value from the instance using the mangled name stored in `self.instance_attr`\n\nThe dynamic resolution occurs specifically at line 169: `return getattr(obj, self.instance_attr)`. This uses the mangled attribute name (e.g., `'_srcdir'`) that was stored during class definition via `__set_name__`, allowing each descriptor instance to access the correct private attribute on the instance object.\n\nThe mechanism that ensures persistence across multiple descriptor instances is that each descriptor instance maintains its own `self.instance_attr` attribute, which is set independently when each descriptor is assigned to different class attributes. For example, in `sphinx/application.py` (lines 154-157), multiple instances (`srcdir`, `confdir`, `outdir`, `doctreedir`) each have their own `instance_attr` value set by their respective `__set_name__` calls.",
+      "reference_sha256": "35bf4de82aad4df85564a1651fc863b0b1e6e9c8d1b6696fcdb07f320820cd0a",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-d7d4bc9b12e09644708c604d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 134,
+            "file_sha256": "4ce59cd6b1552c597e54f4750dd0c1bcb2d74bf7e3b3a0fcc41499ac8a0cec17",
+            "path": "sphinx/ext/napoleon/docstring.py",
+            "start_line": 134
+          },
+          {
+            "end_line": 150,
+            "file_sha256": "22b9a3056e87209730b55755104d72e9982030812dcd0e283aa279c12da6d18b",
+            "path": "sphinx/domains/python/_object.py",
+            "start_line": 110
+          },
+          {
+            "end_line": 342,
+            "file_sha256": "5da92ffd4c6629ac3d7983c5b244b9e0a388721e60cfc6814c264c7bc4e837fe",
+            "path": "sphinx/util/docfields.py",
+            "start_line": 289
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the algorithmic approach used by the test function that validates parsing of type delimiters in Napoleon-style docstrings to correctly nest and structure document tree nodes for types representing multiple possible values?",
+      "question_sha256": "75780f5c77a46bb40ee7c9aa147e1ab01f587df69ad5c720e84beca37f57e65e",
+      "reference_answer": "The algorithmic approach used by the test functions `test_info_field_list_napoleon_deliminator_of` and `test_info_field_list_napoleon_deliminator_or` to correctly nest and structure document tree nodes for union types involves a multi-stage parsing and node construction process:\n\n**1. Tokenization Stage (Napoleon Extension)**\nThe process begins in the Napoleon extension's `_tokenize_type_spec` function (`sphinx/ext/napoleon/docstring.py:134`), which uses a regex pattern (`_token_regex` at line 45-50) to split type specifications into tokens. This regex recognizes delimiters including:\n- `\\sor\\s` (space-or-space) for union types\n- `\\sof\\s` (space-of-space) for container types\n- Other delimiters like commas, colons, and brackets\n\n**2. Type Classification Stage**\nEach token is classified by `_token_type` (line 155) into categories: 'literal', 'obj', 'control', 'delimiter', or 'reference'. Delimiters like \"of\" and \"or\" are identified as 'delimiter' type tokens (line 166).\n\n**3. Conversion to reStructuredText**\nThe `_convert_type_spec` function (line 214) converts tokens to reStructuredText format. Delimiters are preserved as-is (line 230: `'delimiter': lambda x: x`), while type names are converted to cross-references using `:py:class:` role.\n\n**4. Domain-Level Parsing (Python Domain)**\nWhen the Python domain processes type fields, the `PyTypedField` class (which extends both `PyXrefMixin` and `TypedField`) uses the `make_xrefs` method inherited from `PyXrefMixin` (`sphinx/domains/python/_object.py:110-150`). This method:\n\n- Uses `_delimiters_re` regex (line 106-108): `r'(\\s*[\\[\\]\\(\\),](?:\\s*o[rf]\\s)?\\s*|\\s+o[rf]\\s+|\\s*\\|\\s*|\\.\\.\\.)'` to split the type string, where `o[rf]` matches both \"or\" and \"of\" delimiters\n- Splits the target string into sub-targets using `_delimiters_re.split(target)` (line 121)\n- Iterates through each sub-target (line 127):\n  - If a sub-target matches the delimiter pattern, it creates a literal text node wrapped in `literal_emphasis` (line 132)\n  - Otherwise, it creates a `pending_xref` node wrapped in `literal_emphasis` for type references (lines 134-145)\n\n**5. Node Nesting Structure**\nThe `TypedField.make_field` method (`sphinx/util/docfields.py:289-342`) structures these nodes:\n- Creates a paragraph node for each parameter\n- Adds the parameter name as `literal_strong`\n- Wraps the type specification in parentheses: `' ('` + type nodes + `')'`\n- Each type reference becomes a `pending_xref` node with `literal_emphasis`\n- Each delimiter becomes a `literal_emphasis` text node\n- These are nested within paragraph nodes, which are nested within list items, which are nested within field body nodes\n\n**Example Structure for \"str or float or int\":**\n```\nparagraph\n  \u251c\u2500 literal_strong: \"str_float_int_var\"\n  \u251c\u2500 Text: \" (\"\n  \u251c\u2500 pending_xref \u2192 literal_emphasis: \"str\"\n  \u251c\u2500 literal_emphasis: \" or \"\n  \u251c\u2500 pending_xref \u2192 literal_emphasis: \"float\"\n  \u251c\u2500 literal_emphasis: \" or \"\n  \u251c\u2500 pending_xref \u2192 literal_emphasis: \"int\"\n  \u2514\u2500 Text: \")\"\n```\n\nThis approach ensures that:\n- Multiple delimiters are correctly recognized and preserved\n- Each type component becomes a separate cross-reference node\n- Delimiters are preserved as literal text between type references\n- The hierarchical structure maintains proper nesting for rendering\n- Union types (using \"or\") and container types (using \"of\") are handled consistently through the same delimiter-splitting mechanism\n</start_of_answer>",
+      "reference_sha256": "05869a2c012bc6055d8e179d6260be3a99cc6ce6f2b270012d7993b9ed921c25",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-e7628fedacb9831e50931b53"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 785,
+            "file_sha256": "5f93c327d5c10386c07718e83b7ed09908299a3b63f58a5cba32f86c946bf571",
+            "path": "sphinx/domains/cpp/_ast.py",
+            "start_line": 784
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the dependency of the hash implementation in the C++ postfix member-of-pointer operator AST node class on the nested name attribute's hashability?",
+      "question_sha256": "d7cdfc329db51d2c9f3f66a4e594cac74033c09b160c05e7b209e3e08ce72326",
+      "reference_answer": "The hash implementation in the C++ postfix member-of-pointer operator AST node class (`ASTPostfixMemberOfPointer`) has a direct dependency on the nested name attribute's hashability.\n\nIn `sphinx/domains/cpp/_ast.py` (lines 784-785), the `__hash__` method is implemented as:\n\n```python\ndef __hash__(self) -> int:\n    return hash(self.name)\n```\n\nThe `name` attribute is of type `ASTNestedName` (line 776). The hashability of `ASTPostfixMemberOfPointer` instances therefore depends entirely on `ASTNestedName` being hashable.\n\n`ASTNestedName` implements `__hash__` (lines 236-237) as:\n\n```python\ndef __hash__(self) -> int:\n    return hash((self.names, self.templates, self.rooted))\n```\n\nThis creates a dependency chain:\n1. `ASTPostfixMemberOfPointer.__hash__()` depends on `ASTNestedName.__hash__()`\n2. `ASTNestedName.__hash__()` depends on hashing a tuple containing `self.names` (a list of `ASTNestedNameElement` objects), `self.templates` (a list of booleans), and `self.rooted` (a boolean)\n3. Lists are hashable in Python only if all their elements are hashable\n4. `ASTNestedNameElement` implements `__hash__` (lines 185-186) as `hash((self.identOrOp, self.templateArgs))`, making it hashable\n\nThe same pattern appears in `ASTPostfixMember` (lines 759-760), which also uses `hash(self.name)` where `name` is an `ASTNestedName`. Both classes delegate their hashability to the `ASTNestedName` object.\n\nIf `ASTNestedName` were not hashable (e.g., if it contained unhashable elements in its `names` list), then `ASTPostfixMemberOfPointer` instances would also be unhashable, preventing their use as dictionary keys or set members. The hashability of the entire chain depends on all components (`ASTNestedNameElement`, `ASTIdentifier`, `ASTOperator`, `ASTTemplateArgs`, etc.) being hashable, which they are through their own `__hash__` implementations throughout the AST hierarchy.",
+      "reference_sha256": "35b4e4422c696e24d020a65717bf578340e8c67ee511cc4f86272d92d78ee7cb",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-e85fccc0f30798376009433e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 54,
+            "file_sha256": "d3807388b9ff869e2c0df9a53ba66215ff527353960015d172b22dbf259a8cb9",
+            "path": "sphinx/builders/texinfo.py",
+            "start_line": 52
+          },
+          {
+            "end_line": 423,
+            "file_sha256": "976ba5733bfc83eb66fc5384d2565cfc6eee9132ba5ef166daa7cac27cd90e87",
+            "path": "sphinx/application.py",
+            "start_line": 423
+          },
+          {
+            "end_line": 749,
+            "file_sha256": "7179291123d094bcb246398ceaa5fb7adbde6cb6bc26a6af7440344d04d72432",
+            "path": "sphinx/builders/__init__.py",
+            "start_line": 749
+          },
+          {
+            "end_line": 166,
+            "file_sha256": "7179291123d094bcb246398ceaa5fb7adbde6cb6bc26a6af7440344d04d72432",
+            "path": "sphinx/builders/__init__.py",
+            "start_line": 162
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "2eb8a2caac0d24e8d5f37543c2adf08d1e4bb53c95430d6ff132bde4be822467",
+            "kind": "file_reference",
+            "line_count": 15,
+            "path": "sphinx/util/build_phase.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What architectural separation does the initialization method in the builder class that generates Texinfo output establish between loading document configuration and early setup that prepares empty data structures within sequential processing phases?",
+      "question_sha256": "43c1c5fe9c1cae9bf70a9bf2726ed66ae9a9ab140c05063bdb713b2b545193e0",
+      "reference_answer": "The initialization method in the builder class that generates Texinfo output (`TexinfoBuilder.init()`, located in `sphinx/builders/texinfo.py` lines 52-54) establishes a clear architectural separation between two distinct responsibilities:\n\n1. **Early-stage setup that prepares empty data structures** (handled by `init()`):\n   - Called during the INITIALIZATION build phase via `_init_builder()` in `sphinx/application.py` (line 423)\n   - Only initializes empty containers: `self.docnames: Iterable[str] = []` and `self.document_data: list[tuple[...]] = []`\n   - Performs no document metadata loading or processing\n   - This occurs before any documents are read or processed\n\n2. **Loading document configuration information** (handled by `prepare_writing()`):\n   - Called during the WRITING build phase (in `sphinx/builders/__init__.py` line 749)\n   - Reads actual document metadata from `self.config.texinfo_documents` (line 69)\n   - Populates `self.document_data` with validated document metadata tuples containing docname, targetname, title, author, direntry, description, category, and toctree_only flags\n   - Validates that referenced documents exist in `self.env.all_docs` (line 82)\n   - This occurs after the environment has been built and documents are known\n\nThis separation ensures that:\n- Builder lifecycle initialization happens early when only empty state is needed\n- Document metadata processing is deferred until the WRITING phase when the build environment is fully populated and documents are validated\n- The builder can be initialized without requiring document information to be available\n- The architecture follows Sphinx's multi-stage build pipeline (INITIALIZATION \u2192 READING \u2192 CONSISTENCY_CHECK \u2192 RESOLVING \u2192 WRITING phases, as defined in `sphinx/util/build_phase.py`)\n\nThe base `Builder.init()` method in `sphinx/builders/__init__.py` (lines 162-166) provides a default no-op implementation, and `TexinfoBuilder` overrides it specifically to initialize these empty data structures, establishing this architectural pattern.",
+      "reference_sha256": "c0d5e1d427d87234c6614775d1bbb2c6ca7fad279ff352a717cc799057703573",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-ea2fa37eac6acfbeb930734b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 668,
+            "file_sha256": "7733662ca9b9b5b93cbb4b50ce49c50de7a9802eaeae4bdb543c30bdd658fadf",
+            "path": "sphinx/domains/cpp/_parser.py",
+            "start_line": 657
+          },
+          {
+            "end_line": 354,
+            "file_sha256": "ed37f51e7747531a9b7aaec62932f7ceaa21b47ede00bee59a0779478b7c8c43",
+            "path": "sphinx/domains/c/_parser.py",
+            "start_line": 343
+          },
+          {
+            "end_line": 316,
+            "file_sha256": "84e67b529f86d7c25c3ca1fd1c56dd2374306d0aa179f29ef6829e349a1c31a0",
+            "path": "sphinx/util/cfamily.py",
+            "start_line": 316
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where does the C/C++ declaration parser handle and recover from parsing failures when distinguishing cast expressions from unary expressions?",
+      "question_sha256": "e2c7241936528ef1c5798da1ba675bc6d7102dabf00bc60d8253f3b2ab092c92",
+      "reference_answer": "The C/C++ declaration parser handles and recovers from parsing failures when distinguishing cast expressions from unary expressions inside the `_parse_cast_expression` method, in the exception handler that catches `DefinitionError` during cast parsing attempts.\n\n**Location**: The error recovery code is at lines 657-668 in `sphinx/domains/cpp/_parser.py` (C++ parser) and lines 343-354 in `sphinx/domains/c/_parser.py` (C parser).\n\n**Recovery mechanism**:\n\n1. **Position saving**: Before attempting to parse a cast expression, the method saves the current parser position: `pos = self.pos` (line 648 in C++, line 334 in C).\n\n2. **Cast parsing attempt**: When an opening parenthesis `(` is detected, it tries to parse as a cast expression by calling `self._parse_type(False)` to parse the type, then expects a closing `)`, and recursively parses the cast expression.\n\n3. **Error recovery**: If cast parsing fails with a `DefinitionError` (caught as `ex_cast`), the parser:\n   - Resets the position: `self.pos = pos` (line 658 in C++, line 344 in C)\n   - Attempts alternative parsing: calls `self._parse_unary_expression()` to parse as a unary expression instead (line 660 in C++, line 346 in C)\n\n4. **Combined error reporting**: If both parsing attempts fail, the method creates a combined error message using `self._make_multi_error()` (defined in `sphinx/util/cfamily.py` at line 316), which aggregates both error messages with descriptive labels (\"If type cast expression\" and \"If unary expression\") to help users understand what went wrong.\n\nThis approach handles the ambiguity where `(something)` could be either a cast expression `(type)expr` or a parenthesized unary expression like `(*ptr)` or `(-x)`, by trying both interpretations and providing clear error messages if neither succeeds.",
+      "reference_sha256": "8c27bb0ebe1a84795a60cd5113c0188591a4f0166c8307d2574d77bd698b2b88",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-eb497b80d5bcc8de9a2b1a58"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sphinx-doc--sphinx-6c9e3209c4eb",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1,
+            "file_sha256": "44b3147af92c438c9985c9baca321a03ac3e87c3de305d56c247d058f27fed66",
+            "path": "sphinx/ext/autodoc/_sentinels.py",
+            "start_line": 1
+          },
+          {
+            "end_line": 59,
+            "file_sha256": "dbd906e30b265c9f7c8beeb738537d0c4d0ddf9ed4ace14011b08c4785489501",
+            "path": "sphinx/ext/autodoc/_directive_options.py",
+            "start_line": 59
+          },
+          {
+            "end_line": 122,
+            "file_sha256": "dbd906e30b265c9f7c8beeb738537d0c4d0ddf9ed4ace14011b08c4785489501",
+            "path": "sphinx/ext/autodoc/_directive_options.py",
+            "start_line": 122
+          },
+          {
+            "end_line": 721,
+            "file_sha256": "880cfc9e4078c886c879b24cd4c7119833713195bd314b180ce37a24035421d4",
+            "path": "sphinx/ext/autodoc/_documenters.py",
+            "start_line": 720
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the dependency relationship between the class that never matches any member for the exclude-members option and the base sentinel class that provides immutability and type union support?",
+      "question_sha256": "0f5618dc99ac152f4c8d2d7a8fec22e8f3b6c3800e793ead6c74cd16ef836a6b",
+      "reference_answer": "The dependency relationship is that `_Empty` inherits from `_Sentinel`, which establishes its sentinel behavior.\n\nLocated in `sphinx/ext/autodoc/_sentinels.py`:\n\n1. `_Sentinel` (lines 8-39) is the base class that provides:\n   - Immutability: `__setattr__` raises `AttributeError` to prevent modification\n   - String representation: `__repr__` returns the sentinel's name\n   - Type union support: `__or__` and `__ror__` return `typing.Union` types, enabling type annotations like `EMPTY_T | set[str]` in `_directive_options.py` (line 59)\n   - Pickle prevention: `__getstate__` raises `TypeError` to prevent serialization\n   - Unique sentinel creation: `__new__` creates instances with a name stored in `_name`\n\n2. `_Empty` (lines 52-56) inherits from `_Sentinel` and adds:\n   - `__contains__` that always returns `False`, ensuring no member is ever matched for exclusion\n\n3. Usage in the exclusion mechanism:\n   - `EMPTY = _Empty('EMPTY')` (line 101) is the default value for `exclude_members` when no exclusion is specified (see `exclude_members_option` in `_directive_options.py`, line 122)\n   - The exclusion check in `_documenters.py` (lines 720-721) uses `membername in self.options.exclude_members`\n   - When `exclude_members` is `EMPTY`, `__contains__` always returns `False`, so no members are excluded\n\nIf the inheritance relationship were removed:\n- `_Empty` would lose immutability, allowing accidental modification\n- Type annotations using `EMPTY_T | set[str]` would fail because `__or__`/`__ror__` wouldn't exist\n- `__repr__` wouldn't return the sentinel name, breaking debugging/logging\n- Pickle prevention would be lost, potentially causing serialization issues\n- The sentinel pattern wouldn't be properly enforced, breaking the design contract\n\nThe inheritance ensures `_Empty` behaves as a proper sentinel while providing the exclusion-specific `__contains__` behavior.",
+      "reference_sha256": "e023979e9e85d3878e86230a505603ff95b12d29e4e0caa8abd07ef89266275c",
+      "repository": {
+        "commit": "6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+        "family_id": "sphinx-doc/sphinx",
+        "url": "https://github.com/sphinx-doc/sphinx"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sphinx-doc--sphinx-6c9e3209c4ebc81c7c09f6a30eeaa4651f32f461",
+      "task_id": "import-f91a9955d806d1a664a5fd06"
+    }
+  ]
+}

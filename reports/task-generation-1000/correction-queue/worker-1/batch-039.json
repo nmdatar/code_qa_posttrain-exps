@@ -1,0 +1,109 @@
+{
+  "author_worker": 0,
+  "reviewer_worker": 1,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-039.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "b390b7b3c6affaa90a7d73bac18a6117ec89cc28a7297088547c0f4cf92cee39",
+      "question": "What is the dependency chain between HTTPError's inheritance from RequestException and the exception handling propagation through the requests library's dependency chain, and what role does this hierarchical relationship play in distinguishing HTTP-specific errors from connection-level failures in downstream error recovery mechanisms?",
+      "question_sha256": "dee7bcb34d06f638167f1aab7cced29781c0ebd1d74fe41a4f911a1ca55be999",
+      "reference_answer": "HTTPError and ConnectionError are sibling RequestException subclasses (src/requests/exceptions.py:55-60). Response.raise_for_status raises HTTPError with response=self for 4xx/5xx (models.py:1015-1026); it does not itself catch that exception. Adapter transport failures are mapped to ConnectionError or specialized subclasses (adapters.py:658-680). Callers can catch the common base or handle status failures separately from transport failures; transport failures are not restricted to initial connection establishment.",
+      "reference_sha256": "b151cd866563335406bad9b0796393121a0ded802fd0d7461cef4bf67b432179",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-dc55393bfd90497b05ffddc0"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "7dcdb75e15d0f53b36f18029fc2c32b32bbcfbde6d733739285a5d0fb3d27c71",
+      "question": "How does the register_hook method's dual handling of Callable and iterable hook parameters create a potential algorithmic inconsistency when deregister_hook attempts to remove hooks registered as part of an iterable collection?",
+      "question_sha256": "c093829b2c82b0f8a80037c4043a2b282c68a9d8ff81884012af1a0744c47919",
+      "reference_answer": "register_hook appends one callable or extends with callable elements from an iterable; it does not store the collection (src/requests/models.py:207-216). deregister_hook removes one matching element using list.remove and returns false if absent (218-227). Thus passing the original collection is not bulk deregistration, but its individual hooks can be removed. list.remove matches by equality, not exclusively identity; registration origin does not prevent removal.",
+      "reference_sha256": "25899b3a16ee5366c38f7dec08f2996b838d10c3f2352f9290312af1e4d9890d",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-de856d15114a7c0e30b8dd03"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "c525fb467a2392ef21858e5250f40273798cecad58c8f526792236272cb08449",
+      "question": "How does the should_strip_auth method's special case for http->https upgrades on standard ports maintain backward compatibility while implementing RFC 7235 security principles?",
+      "question_sha256": "92f8586862939316a58d4511f8e02ac51f06ccc60b08247b3ace66dc121fbac1",
+      "reference_answer": "should_strip_auth first strips on hostname change. For the same host, it preserves auth on standard-port HTTP-to-HTTPS upgrades; the comment identifies backward compatibility as the reason (src/requests/sessions.py:127-143). It also preserves equivalent implicit/explicit default ports under the same scheme (145-154). Other scheme/port changes strip auth. This describes the code policy without asserting blanket RFC compliance.",
+      "reference_sha256": "bc962392b3698c773d67852aba3390d92106f0d999a28d66de6a3abf0578e4a7",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-dfb0db0012798d808eecfe26"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "a0c79c819c2559665ccad1440f02601fe7bd227d4da0b4572f2f71f4cb525417",
+      "question": "How does the resolve_redirects method balance the requirements of consuming response bodies for socket release, managing redirect history, and conditionally rewinding request bodies to handle both streaming and non-streaming scenarios?",
+      "question_sha256": "cd39f1ca7f52a613ddaba9731ed4c4945ff588b800de8e6f4967638aca4eed99",
+      "reference_answer": "resolve_redirects first appends history, then consumes the current response (with raw-read fallback), checks redirect count, and closes it (src/requests/sessions.py:173-196). It rebuilds the next request and rewinds when _body_position is non-None and length/transfer headers are present (248-257); a failed-tell sentinel enters this path to raise UnrewindableBodyError. stream is passed to send, while intermediate redirect bodies are consumed regardless (265-272).",
+      "reference_sha256": "c1b2bf8072adc8538cd455abfc87f0288c641ec6bccad2e0a3bec77bcca1232a",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e041ffe44f26e8db1067ccc8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "0b09c21256448514b522a0763078122276e73cb4af6683533dc4c2f3ea2cd8e2",
+      "question": "Why does the guess_filename function's validation logic prevent security vulnerabilities when extracting filenames from file-like objects in multipart form data handling?",
+      "question_sha256": "1f233095fb0e342e98112f7ce55ef55c0dd29f57bbb180bc3d7c902644e6b3db",
+      "reference_answer": "guess_filename reads obj.name, accepts a nonempty string not starting with < and not ending with >, and returns os.path.basename(name) (src/requests/utils.py:251-255). This avoids pseudo-filenames and strips local directory components for multipart metadata. It does not open or block streams, prove prevention of data exfiltration, or guarantee how a remote server handles filenames.",
+      "reference_sha256": "2db7a9135e883f3a84efbd57d14a5e0a64277d8cf5a8ddd3efb5038f77043bab",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e270a6ca69ae7ed29865bc7c"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "original_reference_sha256": "fa06d3ef6938f13f3bbef4573454bf0cae65ddcba2946d34aaf0cf3c25d99934",
+      "question": "Why would the `host` method in `MockRequest` delegating to `get_host()` through a single-level indirection cause cumulative performance degradation when this method is invoked millions of times in a tight loop compared to direct attribute access, and how could this be optimized through caching or property memoization?",
+      "question_sha256": "8fd10f4a80b1ee8f38d66041e407640dc67f22a62cec6553015d2d68557bc9d3",
+      "reference_answer": "MockRequest.host delegates to get_host, which returns urlparse(self._r.url).netloc (src/requests/cookies.py:43-44,98-100). This adds Python calls versus a cached attribute, but the source does not quantify cost or prove full reparsing for identical URLs. If profiling justifies memoization, cache by URL or ensure wrapper snapshot semantics so externally changed request URLs do not leave a stale host.",
+      "reference_sha256": "507a04a944d37684b705d71c5f440370ad8b9e8cc7091c24584d0d03b9a2e18d",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-f399dd3ff4d2bd9180f44f59"
+    }
+  ]
+}

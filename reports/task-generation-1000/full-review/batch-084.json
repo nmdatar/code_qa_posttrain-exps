@@ -1,0 +1,339 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-1779e8c48e3859005bfe667c",
+      "reference_sha256": "e65510e82e723daf1d54d17cfdf997490431acb00abc9ffa19919e1d9f0a16b0",
+      "question_sha256": "e51f78a3635ecef70f639655abb822d119b25d2436e50deecb4d4f87f4edf55e",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Raw hierarchy",
+          "verdict": "supported",
+          "reason": "Code extends Raw; unlexable/keyword extend Code, comment/whitespace/newline extend Raw.",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/segments/raw.py",
+            "start_line": 219,
+            "end_line": 272
+          }
+        },
+        {
+          "claim": "ANSI specialized subclasses",
+          "verdict": "supported",
+          "reason": "Identifiers/literals/operators extend Code; literal keywords Keyword; composite Base.",
+          "evidence": {
+            "path": "src/sqlfluff/dialects/dialect_ansi.py",
+            "start_line": 61,
+            "end_line": 115
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-53601a04918107064022733c",
+      "reference_sha256": "5ba99a02326fc2314339658b5758b153982af8ffa149f6840cbba0e27bc312ff",
+      "question_sha256": "88dc9614c13e16fdc1e6dcce875f98a19dc75a8f89c02f56b2b967189d10335b",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "All properties invalidated consistently",
+          "verdict": "contradicted",
+          "reason": "Trailing-space keys miss actual descendant caches and is_templated omitted.",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/segments/base.py",
+            "start_line": 836,
+            "end_line": 852
+          }
+        },
+        {
+          "claim": "Mutation hook and recursion",
+          "verdict": "supported",
+          "reason": "segments assignment calls clear; not ancestor notification.",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/segments/base.py",
+            "start_line": 310,
+            "end_line": 318
+          }
+        }
+      ],
+      "material_errors": [
+        "False comprehensive invalidation guarantee in revision with known missing/misspelled keys."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "BaseSegment caches computed properties with cached_property (src/sqlfluff/core/parser/segments/base.py:385-513). Initialization and assigning segments call _recalculate_caches (308-318), while invalidate_caches recurses through children then clears self (889-898). Clearing pops a hardcoded key list, so subsequent access recomputes successfully removed entries (836-852). This revision has defects: descendant_type_set and direct_descendant_type_set keys have trailing spaces and is_templated is omitted. Thus it does not guarantee complete invalidation, nor does child mutation automatically notify ancestors."
+    },
+    {
+      "task_id": "import-52c3e212dce9fc4c4e9782f8",
+      "reference_sha256": "0d429a145e232f492c7118daffb91f734d96bee6ff94dcb02e137f495d1801a1",
+      "question_sha256": "deb06adae80203a23b86497c88b9ef3903350d84380aa54fd23032609d273140",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Discovery is upfront",
+          "verdict": "supported",
+          "reason": "Collects expanded paths before runner begins.",
+          "evidence": {
+            "path": "src/sqlfluff/core/linter/linter.py",
+            "start_line": 1160,
+            "end_line": 1199
+          }
+        },
+        {
+          "claim": "Proven dominant slowdown",
+          "verdict": "unsupported",
+          "reason": "Walk and ignore discovery are visible costs, not measured dominant bottlenecks.",
+          "evidence": {
+            "path": "src/sqlfluff/core/linter/linter.py",
+            "start_line": 1013,
+            "end_line": 1045
+          }
+        }
+      ],
+      "material_errors": [
+        "Unmeasured dramatic slowdown and per-file ignore traversal generalization."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "There is sequential startup work: paths_from_path materializes os.walk for a directory and finds ignore files (src/sqlfluff/core/linter/linter.py:1013-1045), and lint_paths collects expanded filenames before starting the runner/progress bar (1160-1199). These can add discovery latency and memory cost on large trees. The source alone does not establish that they dominate parsing, templating or linting, or quantify slowdown; representative profiling is required. ParallelRunner explicitly streams partial jobs so main-thread I/O can overlap workers (src/sqlfluff/core/linter/runner.py:128-145)."
+    },
+    {
+      "task_id": "import-67325acf7a6d39b706b5fca2",
+      "reference_sha256": "5ef1d959a1114990fad363be4f10fa7a131b9540bccec2a45a0247bf99880767",
+      "question_sha256": "63bc05fccdd4db8bdcbb467ce8248c773fe5a4737f1c8d6702b8315bc9838cf3",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Definitions and hardcoded invalidation mismatch",
+          "verdict": "supported",
+          "reason": "Trailing spaces and full_type_set present; is_templated absent.",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/segments/base.py",
+            "start_line": 836,
+            "end_line": 852
+          }
+        },
+        {
+          "claim": "Actual cached names",
+          "verdict": "supported",
+          "reason": "Descendant names lack spaces; is_templated cached.",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/segments/base.py",
+            "start_line": 418,
+            "end_line": 513
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-399de795fd21f4a142b65f26",
+      "reference_sha256": "9c60e7fc15d28c4eaf910a062cebc7de3c152dfa7452098d0c15febaeaa55ac0",
+      "question_sha256": "ac5ddedd95703a524df19ef275faabec97def854767ebc5b79cfcb861abff085",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Rule fail/pass helpers",
+          "verdict": "supported",
+          "reason": "Rule-specific assertions and fixed result retrieval.",
+          "evidence": {
+            "path": "src/sqlfluff/utils/testing/rules.py",
+            "start_line": 61,
+            "end_line": 136
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-981df91fa181d8c0ff6d88d4",
+      "reference_sha256": "066ddf6b3198a988431526c3d78389cc29fe4c0a81e362943a7ec788b4049886",
+      "question_sha256": "30f7ec1054f94d6f98cc98004b3cb51aa58d7c3cca1df21789722a3259e6c31d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Context composition",
+          "verdict": "supported",
+          "reason": "Base context then libraries, missing builtins, path macros, config macros.",
+          "evidence": {
+            "path": "src/sqlfluff/core/templaters/jinja.py",
+            "start_line": 300,
+            "end_line": 338
+          }
+        },
+        {
+          "claim": "Base inference",
+          "verdict": "supported",
+          "reason": "Default/config/override combination and inference.",
+          "evidence": {
+            "path": "src/sqlfluff/core/templaters/python.py",
+            "start_line": 180,
+            "end_line": 200
+          }
+        },
+        {
+          "claim": "Undefined behavior",
+          "verdict": "supported",
+          "reason": "Records accesses or uses dummy based on ignore setting.",
+          "evidence": {
+            "path": "src/sqlfluff/core/templaters/jinja.py",
+            "start_line": 429,
+            "end_line": 464
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-08b6011c02575f9a28426046",
+      "reference_sha256": "85e6704f83fa6a8ac1af204d9034beb84058682cd4d18fe192c4ee6a7dd17187",
+      "question_sha256": "e22b4fd0f6b38222ee89f727078488c69a5b4a111ac06a69c0cd8f23ba5fe59e",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Tracer rendered execution markers",
+          "verdict": "supported",
+          "reason": "Builds alternate trace, parses markers then separately renders original.",
+          "evidence": {
+            "path": "src/sqlfluff/core/templaters/slicers/tracer.py",
+            "start_line": 68,
+            "end_line": 125
+          }
+        },
+        {
+          "claim": "Execution path and coordinates",
+          "verdict": "supported",
+          "reason": "Selects jumps and records source/templated slices, advances rendered counter.",
+          "evidence": {
+            "path": "src/sqlfluff/core/templaters/slicers/tracer.py",
+            "start_line": 143,
+            "end_line": 190
+          }
+        },
+        {
+          "claim": "Literal breadcrumbs",
+          "verdict": "supported",
+          "reason": "Unique hex IDs and lengths; not every command emits a rendered value.",
+          "evidence": {
+            "path": "src/sqlfluff/core/templaters/slicers/tracer.py",
+            "start_line": 217,
+            "end_line": 240
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-0b90d8f0c3b707bbfb0211de",
+      "reference_sha256": "a405d19b87a2beb6894615d81d48cb06864ab38730683816700e6d863eb0df0f",
+      "question_sha256": "6bb4a53f2af227c937c00e686b1095d6f8133812abd9f45e7cca50c39f1f3f68",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Output routes coordinate tqdm",
+          "verdict": "supported",
+          "reason": "External write mode for stdout; file/devnull factory.",
+          "evidence": {
+            "path": "src/sqlfluff/cli/outputstream.py",
+            "start_line": 13,
+            "end_line": 76
+          }
+        },
+        {
+          "claim": "Global progress option",
+          "verdict": "supported",
+          "reason": "Singleton-esque config feeds disable behavior.",
+          "evidence": {
+            "path": "src/sqlfluff/core/config.py",
+            "start_line": 1126,
+            "end_line": 1154
+          }
+        },
+        {
+          "claim": "File progress lifecycle",
+          "verdict": "supported",
+          "reason": "Transient bar updated on runner results.",
+          "evidence": {
+            "path": "src/sqlfluff/core/linter/linter.py",
+            "start_line": 1190,
+            "end_line": 1213
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed."
+    },
+    {
+      "task_id": "import-e9014272c95c4beb2d940166",
+      "reference_sha256": "b86420f1a0085bb2c684d2f14a91c5a00ffc5fecf838170c9a51ff98a3e7ba29",
+      "question_sha256": "506aa924753244fb090345084fde66d381e4032d4fcd84770f325b05075c8fb2",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Key list guarantees descendant recalculation",
+          "verdict": "partially_supported",
+          "reason": "Literal list correct but space-suffixed keys do not remove actual cached descendant properties.",
+          "evidence": {
+            "path": "src/sqlfluff/core/parser/segments/base.py",
+            "start_line": 836,
+            "end_line": 852
+          }
+        }
+      ],
+      "material_errors": [
+        "Correct list but false blanket cache consistency implication."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "The hardcoded list is in src/sqlfluff/core/parser/segments/base.py:837-851; line852 pops each key from __dict__ with a None default. It includes is_code, is_comment, is_whitespace, raw, raw_upper, matched_length, raw_segments, raw_segments_with_ancestors, first_non_whitespace_segment_raw_upper, source_fixes, full_type_set, and the literal space-suffixed keys descendant_type_set and direct_descendant_type_set. Those trailing spaces are defects: actual cached properties at418-440 have no spaces, so they are not removed. is_templated (493-513) is also absent. Initialization/segments assignment invokes clearing (308-318), but complete invalidation is not guaranteed."
+    },
+    {
+      "task_id": "import-43485ea96059c7f844f04de6",
+      "reference_sha256": "3023b443fd417ce6ae0e8fa6d610bcd56f4825c7809100673bbdc2b1187a6576",
+      "question_sha256": "5d83c3b69fcd00d30a2b3588525114417bed8c4d24a1eedb2718004222fab9b5",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "No worker recycling configured",
+          "verdict": "supported",
+          "reason": "Pool creation passes process count/init args, no maxtasksperchild.",
+          "evidence": {
+            "path": "src/sqlfluff/core/linter/runner.py",
+            "start_line": 128,
+            "end_line": 180
+          }
+        },
+        {
+          "claim": "Intentional reliability tradeoff",
+          "verdict": "unsupported",
+          "reason": "Documents SIGINT handling, not rationale for absent recycling.",
+          "evidence": {
+            "path": "src/sqlfluff/core/linter/runner.py",
+            "start_line": 188,
+            "end_line": 203
+          }
+        }
+      ],
+      "material_errors": [
+        "Invented conscious design tradeoff and guaranteed reliability."
+      ],
+      "citation_corrections": [],
+      "notes": "Read the question/reference and relevant pinned-source code; static review only, no repository code executed.",
+      "corrected_reference_answer": "ParallelRunner creates its pool with process count, initializer and config arguments (src/sqlfluff/core/linter/runner.py:136-140); _create_pool delegates to POOL_TYPE (178-180), and MultiProcessRunner sets multiprocessing.Pool (188-203). No maxtasksperchild is supplied here, so worker recycling is not configured by this path. The source documents parent-controlled SIGINT handling and delayed exception propagation, but does not explain why recycling was omitted or prove memory/reliability tradeoffs. Adding it would require a separately evaluated design change."
+    }
+  ]
+}

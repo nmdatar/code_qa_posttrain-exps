@@ -1,0 +1,271 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-46b285409b97d8aaf72bc8f9",
+      "reference_sha256": "b015b4100b69197c9d31701dacc0df63cf3cec1131dee5a9a26d60a1024e31fa",
+      "question_sha256": "4b8ea4b00f109bcefdd3920395cf703fc57e6793bea04262ba75e5afd761c46d",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Direct state assignment bypasses reactive tracking",
+          "verdict": "unsupported",
+          "reason": "__setattr__ explicitly dirties base variables and calls _mark_dirty. Auto setters expose event handler entry points but do not replace attribute assignment tracking.",
+          "evidence": {
+            "path": "reflex/state.py",
+            "start_line": 1420,
+            "end_line": 1426
+          }
+        }
+      ],
+      "material_errors": [
+        "__setattr__ explicitly dirties base variables and calls _mark_dirty. Auto setters expose event handler entry points but do not replace attribute assignment tracking."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "_create_setter obtains a setter, wraps it as an EventHandler, and registers it on both the event-handler mapping and class (reflex/state.py:1164-1170). This supplies a named event entry point usable by components. Direct assignment on a state instance is still supported: __setattr__ performs assignment and marks base variables dirty (reflex/state.py:1420-1426). Therefore the reason is convenient event integration, not that ordinary state assignment inherently bypasses dependency tracking or breaks synchronization."
+    },
+    {
+      "task_id": "import-4bf5aa8929b36861bbfce409",
+      "reference_sha256": "667fa84157013f900df6c7575d78738538638e93b162e4a5a6aea5dc16c7bb80",
+      "question_sha256": "bb599d09c400312f1a2f27568317666ba624555a959e1b2c6587bbf5975d887f",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Callable protocol forces allocation and concurrency bottlenecks",
+          "verdict": "unsupported",
+          "reason": "Typing contract does not require each concrete callable to allocate a sequence or new Vars; no millions-of-calls concurrent runtime measurement shown.",
+          "evidence": {
+            "path": "reflex/event.py",
+            "start_line": 1665,
+            "end_line": 1683
+          }
+        }
+      ],
+      "material_errors": [
+        "Typing contract does not require each concrete callable to allocate a sequence or new Vars; no millions-of-calls concurrent runtime measurement shown."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "A callable protocol is a typing contract, not evidence of a runtime bottleneck. The concrete parse_args_spec path inspects annotations and signature, constructs argument Vars, invokes the spec, and converts its result to a list (reflex/event.py:1665-1683). Those operations can cost time, but their frequency and concurrency impact require profiling. The annotation itself does not force every implementation to allocate new Vars or prove GC contention, and this source does not establish millions of invocations per application workload."
+    },
+    {
+      "task_id": "import-5646e91dc2e7b3f401e55a3b",
+      "reference_sha256": "e5fca9a24e91bfdef5495078ee38a7fc8d7589427bcc77ac30ca31b23fab249f",
+      "question_sha256": "d6a436b1dec6290f9711f630ddf30484e354ecfd3e0c824b0f71c3165135462f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Stub generator creates missing create signature",
+          "verdict": "supported",
+          "reason": "Adds only absent create for recognized Component subclass; visit_FunctionDef983-992 regenerates existing create.",
+          "evidence": {
+            "path": "reflex/utils/pyi_generator.py",
+            "start_line": 944,
+            "end_line": 956
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-58452135aaf7061a9c0f3943",
+      "reference_sha256": "98a9ae4d8a859dddb1221ead806d47691c3331dcad9d5b711c73f24917ffe9a9",
+      "question_sha256": "407e64429f98aed767e195179f8aa4076050601ba35a36d1c22b6170a5aa83be",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "needs_update detects dependency changes",
+          "verdict": "partially_supported",
+          "reason": "needs_update checks elapsed interval, while dependency invalidation removes cached value via mark_dirty.",
+          "evidence": {
+            "path": "reflex/vars/base.py",
+            "start_line": 2272,
+            "end_line": 2286
+          }
+        }
+      ],
+      "material_errors": [
+        "needs_update checks elapsed interval, while dependency invalidation removes cached value via mark_dirty."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "fget exposes the underlying computation callable (reflex/vars/base.py:2525-2531). _deps analyzes that callable with DependencyTracker when auto dependencies are enabled (reflex/vars/base.py:2440-2453). __get__ calls fget for uncached values or missing/expired cached values (reflex/vars/base.py:2387-2398). Dependency invalidation uses mark_dirty to delete the cache (reflex/vars/base.py:2462-2469); needs_update separately tests an update interval and timestamp (reflex/vars/base.py:2272-2286), rather than directly detecting dependency changes."
+    },
+    {
+      "task_id": "import-6de8bb71306bba0126cedcf4",
+      "reference_sha256": "10b16017f54fb294e3f0cca8d3e52b1ebb88414c87121136083ed367c7944c7e",
+      "question_sha256": "15efe10dc29d86a0530ef34aefc0fc305dd258fc3e62a97d811ec65effeeba83",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Component repr is deterministic lifecycle-free communication snapshot",
+          "verdict": "partially_supported",
+          "reason": "JSON render representation is explicit but determinism/caching/lifecycle independence and use as communication boundary are unsupported architectural claims.",
+          "evidence": {
+            "path": "reflex/components/component.py",
+            "start_line": 902,
+            "end_line": 908
+          }
+        }
+      ],
+      "material_errors": [
+        "JSON render representation is explicit but determinism/caching/lifecycle independence and use as communication boundary are unsupported architectural claims."
+      ],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution.",
+      "corrected_reference_answer": "Component.__repr__ returns format.json_dumps(self.render()), providing a JSON text representation of the rendered component structure (reflex/components/component.py:902-908). It delegates structure production to render instead of exposing the object's internal dictionary directly. That is a useful representation boundary, but the method alone does not guarantee determinism, cache safety, statelessness, or use as a Python-JavaScript transport mechanism."
+    },
+    {
+      "task_id": "import-789879cccc3b20671fe7cee9",
+      "reference_sha256": "7a960c2180231b357295e24e51fd77e7c79433fdbb459e483aab4ea094241b26",
+      "question_sha256": "84ddd5b2e3a79fc2335f5835ea23e2711e2865809e97b73b008322ce3a132cec",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Computed dependency registration location",
+          "verdict": "supported",
+          "reason": "Initialization calls cvar._deps and records dependencies on defining state; vars/base.py2411-2453 discovers automatic/static dependencies.",
+          "evidence": {
+            "path": "reflex/state.py",
+            "start_line": 770,
+            "end_line": 800
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-7a5ec3af3b744877a8bf6075",
+      "reference_sha256": "a95fccf5d258a31677933897f933c536d2dd3f9975aaea9c8ed01142fbaa93dc",
+      "question_sha256": "34483ae895817f2a93195b800dbc59e9c520738954a446a8ca828f4192630c91",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Dual exception inheritance",
+          "verdict": "supported",
+          "reason": "Both shadow errors subclass ReflexError and NameError, allowing either category catch. NameError semantics are framework classification choice.",
+          "evidence": {
+            "path": "reflex/utils/exceptions.py",
+            "start_line": 197,
+            "end_line": 202
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-826043763a899130635fdcb4",
+      "reference_sha256": "0db8b7224c36f64e7704030f8b49ed2deef7171ca0b76b1a63d3632cb682e23a",
+      "question_sha256": "d8614c67c7f0c177c67734a9fd35770875fe124c4d089bee8ef48dce543cf95d",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Slot delegates native slot rendering",
+          "verdict": "supported",
+          "reason": "Thin BaseHTML tag slot wrapper with placeholder docstring. Correct projection requires proper browser shadow-tree composition, not guaranteed by wrapper alone.",
+          "evidence": {
+            "path": "reflex/components/el/elements/other.py",
+            "start_line": 35,
+            "end_line": 41
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-882cc6b0f9735091d2bd30e5",
+      "reference_sha256": "adfcf3655f18e6d0fdec7db3b4bfc47a9671c98f086cb6308ee00953aa9be012",
+      "question_sha256": "fa6372ba5275a38563c23ed32cbf995460e938001e6714de92c63f9ce6e2bb96",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Invalid children raise location",
+          "verdict": "supported",
+          "reason": "Recursively validates lists/tuples and raises ChildrenTypeError for dict or unsupported child type.",
+          "evidence": {
+            "path": "reflex/components/component.py",
+            "start_line": 1020,
+            "end_line": 1029
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-92d425e576a2fba2280026c1",
+      "reference_sha256": "af8f452ccc66085271306a38a9f48d2db71c15c6e1aa433d05039fdea9d5e186",
+      "question_sha256": "2efc6b8d242aa9f61c4309742b170398a5435331d81be1228d12f6baa20b5eb8",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "State-context detector validates static app",
+          "verdict": "supported",
+          "reason": "Call checks substring predicate and raises for no state; template355 exports contexts separately.",
+          "evidence": {
+            "path": "reflex/app.py",
+            "start_line": 1341,
+            "end_line": 1347
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-9626dedaeacdde487dc32607",
+      "reference_sha256": "d2fa8a6e55d25613e476fdbbeda4879f71d2015066c6474886af1131027361bb",
+      "question_sha256": "aacea6c2b40e796b89c15f966a8e46597f4cd55a75bab562b8a90e274efe43bf",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Numeric input event annotation location",
+          "verdict": "supported",
+          "reason": "All three events use EventHandler with float/int/input event specs.",
+          "evidence": {
+            "path": "reflex/components/el/elements/forms.py",
+            "start_line": 420,
+            "end_line": 430
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    },
+    {
+      "task_id": "import-9d6847f23a7ae3108a173ffa",
+      "reference_sha256": "b8f5f8c168f98eb5d4772832100e4d2cd2778006a8c91c1bce47d29bcaab5f07",
+      "question_sha256": "bc70baebd503dc7b7214868d08f2c5dd1344b828f3ac489063a19d9613f7a7ae",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Document template output compiler dependencies",
+          "verdict": "supported",
+          "reason": "Exports Layout; compiler45-59 invokes template, app template206 imports Layout as AppLayout. Named-export contract substantiated.",
+          "evidence": {
+            "path": "reflex/compiler/templates.py",
+            "start_line": 145,
+            "end_line": 162
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Static inspection of pinned source; no upstream code execution."
+    }
+  ]
+}

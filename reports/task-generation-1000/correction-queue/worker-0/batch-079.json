@@ -1,0 +1,58 @@
+{
+  "author_worker": 1,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-079.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "original_reference_sha256": "6718e8d652c0c153e7ffc46c8fefd499786d800165f4c6f98c0e9a73ce8dfc82",
+      "question": "Why does the abstract base class for N-dimensional arrays delegate object creation to the immutable dense storage implementation instead of providing its own initialization?",
+      "question_sha256": "870efd43a5420d66048b4d53ee1928bd30607d9ed9ed4c98d05f182b5dba502a",
+      "reference_answer": "NDimArray.__new__ is a convenience factory returning ImmutableDenseNDimArray(iterable, shape, **kwargs), while the base __getitem__ leaves storage access to subclasses (sympy/tensor/array/ndim_array.py:142-147). Thus calling NDimArray does create a concrete array. Delegation supplies a default representation; the source does not establish that another initializer is impossible or that dense storage is universally faster.",
+      "reference_sha256": "09c3f5641f77d9834bdcbe384658505548ab12b1159e85a3cc8a64382ce5eaa2",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-9f57a9f5e2784a78f4971602"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "original_reference_sha256": "1359c7e6c6d8b2e02489d2b7f3935a473ec6df0901429d49904299ed61cbfeb8",
+      "question": "What mechanism in the tensor product contraction process ensures that data array computation produces identical results regardless of the order in which tensor operands are arranged?",
+      "question_sha256": "cf3d4e70266d08ffb0bf764ca484603c31e4d40e9c2dade8b1465fbc39d982ce",
+      "reference_answer": "TensMul._extract_data collects operand arrays, computes dummy contractions and sorts free indices by their positions before contraction (sympy/tensor/tensor.py:4178-4186). _indices_to_free_dum tracks operand and overall index positions explicitly (3492-3536). Therefore arbitrary operand reorderings do not automatically produce identically ordered arrays. For mathematically equivalent expressions, compare arrays using an explicit common free-index order via replace_with_arrays(..., indices), whose contract controls output axes (2279-2292); commutation and symmetry assumptions must also hold.",
+      "reference_sha256": "e8e2e283178aef4dd800d319753f1070d039a20d50f361dd94ba58228f05f40e",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-aae1c9c95db1dde20fb6d88f"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sympy--sympy-3c817ed8ab55",
+      "original_reference_sha256": "7ecf75880089584ffcd1238880a4c52405c349c89d7e866693bf40b05fa0a2eb",
+      "question": "How should the expression simplification workflow decouple the bottom-up traversal applying normal methods from the function converting trigonometric and exponential forms to enable independent testing of simplifications involving imaginary unit operations without triggering unnecessary side effects in the rest of the symbolic computation framework?",
+      "question_sha256": "f04bba659bc33cabada8e42625afe11061a63efae2771e1b5c958a6db2356d9b",
+      "reference_answer": "No new simplify flag is needed for independent tests: exptrigsimp is already a standalone public function (sympy/simplify/trigsimp.py:571-596), and direct tests include cos(x) +/- I*sin(x) cases (sympy/simplify/tests/test_trigsimp.py:384-403). Test it directly to avoid simplify\u2019s earlier normalization stage. Its final guard rejects a rewritten result that introduces I when the input lacked it (sympy/simplify/trigsimp.py:659-662). Any optional-stage refactor would be a separate design proposal, not required by the current API.",
+      "reference_sha256": "6d59f422db11da543a5d6704bd8bc3885d5df7d441276ccced22e85a3c51b302",
+      "repository": {
+        "commit": "3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+        "family_id": "sympy/sympy",
+        "url": "https://github.com/sympy/sympy"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sympy--sympy-3c817ed8ab551d71e36907ce869afe5e4ca789ff",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-ba89bd3daaa09457e6d808d9"
+    }
+  ]
+}

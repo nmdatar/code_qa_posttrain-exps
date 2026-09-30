@@ -1,0 +1,256 @@
+{
+  "reviewer_kind": "independent_agent",
+  "human_reviewed": false,
+  "scope": "per-record central-claim source review; not human approval",
+  "tasks": [
+    {
+      "task_id": "import-bd5294761a162315d100e42b",
+      "reference_sha256": "20970130c0fef506443f7367a43e569b2ed2bd30f90cca02672788b5151dfede",
+      "question_sha256": "23893389399f961028bc34262b659a2356a66586ef0b98b52bf6742252205956",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Instances cannot have __name__",
+          "verdict": "partially_supported",
+          "reason": "These fixtures lack __name__, but user classes may explicitly define it on instances or classes.",
+          "evidence": {
+            "path": "tests/functional/a/access/access_to__name__.py",
+            "start_line": 7,
+            "end_line": 21
+          }
+        }
+      ],
+      "material_errors": [
+        "These fixtures lack __name__, but user classes may explicitly define it on instances or classes."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "In this fixture, self is an instance without a defined __name__, while self.__class__ is a class object with the standard class-name attribute. The expected no-member markers occur on self.__name__, not on self.__class__.__name__ (tests/functional/a/access/access_to__name__.py:7-21). This is not a universal ban on instance __name__: application classes can define such an attribute explicitly."
+    },
+    {
+      "task_id": "import-d1dc1726ea56efce92d14096",
+      "reference_sha256": "2364106fd0227dbacd4b6a4c769c95c4e8a3f4487a8e5887653052c72a899840",
+      "question_sha256": "41a19d5892d2635d42b98c1a1460d25938d03af70104fd263eb5b96c1ee8386f",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Assignment checks run in fixed order",
+          "verdict": "supported",
+          "reason": "Sequential calls directly establish order.",
+          "evidence": {
+            "path": "pylint/checkers/typecheck.py",
+            "start_line": 1221,
+            "end_line": 1224
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-d33c176e2df1bfb9bc625346",
+      "reference_sha256": "9a22e4fa131a80525606287d09f6f1e65247e5097c0abe490c6a741439aa96d3",
+      "question_sha256": "240614d2315746b0597d77c5903ac2dd7c04415de4234a3a0697ffa41398e7f8",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Augmented slots is a valid extension mechanism",
+          "verdict": "partially_supported",
+          "reason": "Fixture suppresses undefined-variable; ancestor slots checking is real but this fixture is not evidence of valid runtime extension or complete encapsulation.",
+          "evidence": {
+            "path": "tests/functional/s/slots_checks.py",
+            "start_line": 192,
+            "end_line": 203
+          }
+        }
+      ],
+      "material_errors": [
+        "Fixture suppresses undefined-variable; ancestor slots checking is real but this fixture is not evidence of valid runtime extension or complete encapsulation."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The fixture is a regression case for augmented __slots__ and explicitly suppresses undefined-variable on the augmentation (tests/functional/s/slots_checks.py:192-203). The checker infers locally defined slots with ilookup and validates their elements (pylint/checkers/classes/class_checker.py:1553-1588). _check_redefined_slots gathers names from ancestors and warns on intersection with the inferred child names (lines 1618-1642). This describes static validation and robustness, not a guarantee that bare __slots__ += in a subclass is a valid runtime way to access the parent binding."
+    },
+    {
+      "task_id": "import-d58d99ddc793e2afb8c014ef",
+      "reference_sha256": "2c976438ad36118a6704807abf14fbebc5fc5e21ea45f295abe1474f98cab019",
+      "question_sha256": "81224583e2f7a661b531f17c1824c7351a558f6d628c3144fac574de55dfe9e2",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Lambda overload presence suppresses unsupported-union warning",
+          "verdict": "supported",
+          "reason": "Overload lookup accepts non-builtins.type definitions rather than validating lambda arity.",
+          "evidence": {
+            "path": "pylint/checkers/typecheck.py",
+            "start_line": 2005,
+            "end_line": 2023
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-d688225fe2428e87aea9830a",
+      "reference_sha256": "607859c84e5b963324e8003fb8d56098f5024296dd1e03141df012442c57f7fa",
+      "question_sha256": "09a93e644bce5efb76166770bc1b1073543e62d460df6661361f4c586dd3a8fa",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "typing.final enforces implementation immutability",
+          "verdict": "partially_supported",
+          "reason": "Pylint emits a static warning; decorator does not prevent runtime overrides or prove LSP correctness.",
+          "evidence": {
+            "path": "pylint/checkers/classes/class_checker.py",
+            "start_line": 1503,
+            "end_line": 1511
+          }
+        }
+      ],
+      "material_errors": [
+        "Pylint emits a static warning; decorator does not prevent runtime overrides or prove LSP correctness."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The fixture uses typing.final to state that a method should not be overridden. For Python 3.8+ analysis, the checker detects the parent decorator and emits overridden-final-method on an override (pylint/checkers/classes/class_checker.py:1503-1511). This validates a static no-override contract; it does not make the method immutable, prevent runtime subclass modifications, or establish behavioral substitutability."
+    },
+    {
+      "task_id": "import-d98498238fb3bbbf9758fdf0",
+      "reference_sha256": "464c5a18df27121f793dc3cbeef3528137137cae539bf900dc5e80beee70c098",
+      "question_sha256": "ba0f2037295008a9b1d6e4a516d1218639d1ba0d2936e2f85b47101cf01ccf8e",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Abstract method alias tracked by assignment name",
+          "verdict": "supported",
+          "reason": "Original obj.name explicitly preserved in visited.",
+          "evidence": {
+            "path": "pylint/checkers/utils.py",
+            "start_line": 936,
+            "end_line": 986
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-e1b83a9a9039f4212e9b4187",
+      "reference_sha256": "697f1cb691f2ac96aec4c673edb08d684176f07efa0bf6888f4a046f6af61f85",
+      "question_sha256": "84f2fd33ed2b3f20463b32dc2231e8f72e214726a93d7f29f1d2823d9d36b6f5",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Passing node as caller violates contract and creates circular dependency",
+          "verdict": "contradicted",
+          "reason": "No stated contract requires distinct caller; helper annotation accepts FunctionDef, and no failing behavior established.",
+          "evidence": {
+            "path": "pylint/checkers/classes/special_methods_checker.py",
+            "start_line": 30,
+            "end_line": 53
+          }
+        }
+      ],
+      "material_errors": [
+        "No stated contract requires distinct caller; helper annotation accepts FunctionDef, and no failing behavior established."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The premise is not demonstrated. visit_functiondef calls _safe_infer_call_result(node, node), then dispatches an inferred result to the relevant protocol checker (pylint/checkers/classes/special_methods_checker.py:179-190). The helper passes its caller argument to infer_call_result and declines ambiguous or failed inference (lines 30-53). These lines establish the analysis strategy, not a circular dependency or requirement that caller be a distinct external function. A redesign requires a concrete inference failure and examination of the inference API contract."
+    },
+    {
+      "task_id": "import-e52e08202655091cb46d684b",
+      "reference_sha256": "834bb040e14554e5dcada6c3d859ab31066caa7e063522abad81c4948b2280b2",
+      "question_sha256": "e1aac01ed88e819141db25749c397fb4ac77ec7746ed575251efb71268c3ad9a",
+      "status": "reject",
+      "checked_claims": [
+        {
+          "claim": "Tainted else makes whole current chain ineligible",
+          "verdict": "contradicted",
+          "reason": "Flag stops subsequent primary candidates but previously collected breaks remain eligible; reference example is misexplained.",
+          "evidence": {
+            "path": "pylint/extensions/consider_refactoring_into_while_condition.py",
+            "start_line": 52,
+            "end_line": 88
+          }
+        }
+      ],
+      "material_errors": [
+        "Flag stops subsequent primary candidates but previously collected breaks remain eligible; reference example is misexplained."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "The checker collects leading if statements in a truthy-constant while loop. While following each else/elif chain, a non-If else statement sets tainted; the next primary candidate is then not processed. Already collected candidates are retained and filtered for a leading Break, and may still produce a suggestion (pylint/extensions/consider_refactoring_into_while_condition.py:52-88). The flag prevents pulling a later break condition ahead of intervening else-side effects; it does not reject the entire current chain."
+    },
+    {
+      "task_id": "import-ebd664ce300371b962e274fe",
+      "reference_sha256": "7b714a876b55806f81d7568332ca9c6c3129dc2cab1af0981bca140924583e9f",
+      "question_sha256": "77e5f6e0f94ed0043a69be0b966de7eacd9f085e816ec19a9a6093839d7a1509",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Doc node then inferred __doc__ fallback",
+          "verdict": "supported",
+          "reason": "Both access paths and missing case explicit.",
+          "evidence": {
+            "path": "pylint/checkers/base/docstring_checker.py",
+            "start_line": 152,
+            "end_line": 164
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    },
+    {
+      "task_id": "import-efcdc2f96c6ba2b9aced8685",
+      "reference_sha256": "d72fdbe8eabf7e0c16fc1ed58514cdb635e0714483da1fbcf413c355aecfc947",
+      "question_sha256": "8abaa382318782cc2f77a63504486ebe0aa85afcfc73798520fbd040738e72c5",
+      "status": "needs_review",
+      "checked_claims": [
+        {
+          "claim": "Annotation parser resolves all forward-reference names",
+          "verdict": "partially_supported",
+          "reason": "It records names from selected AST forms, not full type resolution; Annotated/Literal contexts excluded.",
+          "evidence": {
+            "path": "pylint/checkers/variables.py",
+            "start_line": 3461,
+            "end_line": 3489
+          }
+        }
+      ],
+      "material_errors": [
+        "It records names from selected AST forms, not full type resolution; Annotated/Literal contexts excluded."
+      ],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification.",
+      "corrected_reference_answer": "AST traversal invokes VariablesChecker.visit_const for constants. For a string in an annotation context, outside the excluded Literal/Annotated parameter cases, it parses node.value with extract_node and passes the result to _store_type_annotation_node (pylint/checkers/variables.py:3461-3489). The latter records names from Name, Attribute and Subscript forms (lines 2994-3017). This is name-use bookkeeping for string annotations, not a complete forward-reference type resolver; parse failures are ignored."
+    },
+    {
+      "task_id": "import-f76933eff2c71985930e4754",
+      "reference_sha256": "a6b251ab881366c73c843063967d6468484eb04837cc93c437f114691a8929ed",
+      "question_sha256": "d697c24b721de500d095716c8cda568df697c09db477036d769808c3e7baaca0",
+      "status": "supported",
+      "checked_claims": [
+        {
+          "claim": "Module __getattr__ suppresses no-member emission",
+          "verdict": "supported",
+          "reason": "Module branch returns False on successful getattr lookup.",
+          "evidence": {
+            "path": "pylint/checkers/typecheck.py",
+            "start_line": 484,
+            "end_line": 489
+          }
+        }
+      ],
+      "material_errors": [],
+      "citation_corrections": [],
+      "notes": "Independent static inspection of pinned source; repository code was not executed. Scope is central claims, not exhaustive runtime verification."
+    }
+  ]
+}

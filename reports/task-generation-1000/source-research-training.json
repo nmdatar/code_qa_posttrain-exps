@@ -1,0 +1,330 @@
+{
+  "research_date": "2026-09-28",
+  "github_revision": "93ac6a4f3af3fe3f86580f62142f47e97e2cc897",
+  "recommendation": "Use explicit upstream commit-pinned benchmark tasks for current roughly 1000-task release; retain source identity and evaluation contamination. RL training464 is a separate useful future training source but requires464 repository snapshots. Do not invent commits for SFT1000 trajectories.",
+  "sources": [
+    {
+      "dataset": "TIGER-Lab/SWE-QA-Pro-SFT-Trajectories",
+      "revision": "b8f5b8a8dcf90bca8b6d70adedac0d20dca02b86",
+      "split": "train",
+      "rows": 1000,
+      "unique_questions": 1000,
+      "fields": [
+        "tools",
+        "messages"
+      ],
+      "license_declaration": "MIT in dataset card; no separate LICENSE file in HuggingFace repository",
+      "teacher_attribution": "Claude Sonnet4.5 per official card",
+      "repository_information": "Repository basename embedded in temporary path in user prompt; owner and originalcommit absent as structured fields",
+      "exact_question_matches_to_rl_train_plus_test": 0,
+      "usable_as_pinned_live_tasks_without_additional_provenance": false,
+      "notes": [
+        "Preserve source messages as untrusted upstream content; do not adopt its instruction to reveal chain-of-thought.",
+        "Saved research dataset, not imported into production release."
+      ]
+    },
+    {
+      "dataset": "TIGER-AI-Lab/SWE-QA-Pro train/RL/verl-tool/dataset/train.parquet",
+      "split": "train",
+      "rows": 464,
+      "distinct_repositories": 464,
+      "valid_40_hex_commit_count": 464,
+      "fields": [
+        "session_id",
+        "data_source",
+        "prompt",
+        "use_tool",
+        "ability",
+        "reward_model",
+        "extra_info"
+      ],
+      "mapping": {
+        "question": "extra_info.question",
+        "repo": "extra_info.repo_name",
+        "commit": "extra_info.commit_id",
+        "reference": "extra_info.answer; reward_model.ground_truth",
+        "system_prompt": "prompt[role=system]"
+      },
+      "license_declaration": "MIT root repository LICENSE; saved complete text",
+      "repo_overlap_with_probench": [],
+      "sample_metadata": {
+        "repo_name": "osbuild/osbuild",
+        "commit_id": "144b0563d63034c086ed375a821b1831cd04b5e7",
+        "question": "Where does Azure cloud-init configuration data flow through the validation and processing pipeline from schema definition to final YAML output generation?",
+        "split": "train"
+      },
+      "readiness": "Metadata-ready source-reading candidates; no repository snapshot or citations independently verified in this research task."
+    },
+    {
+      "dataset": "TIGER-AI-Lab/SWE-QA-Pro train/RL/verl-tool/dataset/test.parquet",
+      "split": "test",
+      "rows": 48,
+      "distinct_repositories": 23,
+      "repo_overlap_with_rl_train": [],
+      "repo_overlap_with_probench": [
+        "PennyLaneAI/pennylane",
+        "bridgecrewio/checkov",
+        "cekit/cekit",
+        "docker/docker-py",
+        "dwavesystems/dwave-cloud-client",
+        "ethereum/web3.py",
+        "frictionlessdata/frictionless-py",
+        "geopandas/geopandas",
+        "getsentry/responses",
+        "hylang/hy",
+        "microsoft/pybryt",
+        "mkdocs/mkdocs",
+        "mwaskom/seaborn",
+        "numba/numba",
+        "pydata/xarray",
+        "python-pillow/Pillow",
+        "qiboteam/qibo",
+        "sanic-org/sanic",
+        "sphinx-doc/sphinx",
+        "sqlfluff/sqlfluff",
+        "stfc/PSyclone",
+        "tox-dev/tox",
+        "yt-dlp/yt-dlp"
+      ],
+      "use": "Evaluation contaminated; do not present as held-out after training use."
+    },
+    {
+      "dataset": "TIGER-Lab/SWE-QA-Pro-Bench",
+      "revision": "596892dac60b6f500f01a7dc2becb9f66593b7b7",
+      "split": "test",
+      "rows": 260,
+      "repositories": 26,
+      "tasks_per_repository": 10,
+      "unique_questions": 260,
+      "sha256_matches_existing_prepare_script": true,
+      "fields": [
+        "repo",
+        "commit_id",
+        "cluster",
+        "qa_type",
+        "question",
+        "answer"
+      ],
+      "license_declaration": "MIT in pinned card and API metadata; no standalone dataset LICENSE supplied",
+      "quality_attribution": "Official card reports human verification and difficulty calibration; this is upstream attribution, not newly performed semantic validation.",
+      "citation_format_examples": [
+        "src/qibo/models/variational.py: line583-590",
+        "src/qibo/models/circuit.py lines1287-1332",
+        "`src/qibo/models/circuit.py` (lines1275-1458)",
+        "src/tox/config/__init__.py ... around lines1390 to1404",
+        "pint/registry.py:2195"
+      ],
+      "strict_path_colon_line_pattern_matches": 180,
+      "strict_parser_limitation": "Other80answers include looser citations; count does not imply80uncited answers.",
+      "repo_manifest": [
+        {
+          "repo": "PennyLaneAI/pennylane",
+          "commit": "6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+          "task_count": 10
+        },
+        {
+          "repo": "bridgecrewio/checkov",
+          "commit": "c2091482f54d5aca11969e7e7c1ddf96a5f49159",
+          "task_count": 10
+        },
+        {
+          "repo": "cekit/cekit",
+          "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+          "task_count": 10
+        },
+        {
+          "repo": "docker/docker-py",
+          "commit": "b2a18d7209f827d83cc33acb80aa31bf404ffd4b",
+          "task_count": 10
+        },
+        {
+          "repo": "dwavesystems/dwave-cloud-client",
+          "commit": "88e14e9b745957569d86ca8d8fcd1461ff7101b9",
+          "task_count": 10
+        },
+        {
+          "repo": "ethereum/web3.py",
+          "commit": "305b3c30812f516dce33537ec054a9c6c64a3603",
+          "task_count": 10
+        },
+        {
+          "repo": "fitbenchmarking/fitbenchmarking",
+          "commit": "df465dc1b60d580dfb885ee9d03866c25988566f",
+          "task_count": 10
+        },
+        {
+          "repo": "frictionlessdata/frictionless-py",
+          "commit": "72e1391b41094678e97c1a3e386703f6e193c96d",
+          "task_count": 10
+        },
+        {
+          "repo": "geopandas/geopandas",
+          "commit": "7d460d9efff57720c970fd6a040914286846c589",
+          "task_count": 10
+        },
+        {
+          "repo": "getsentry/responses",
+          "commit": "3e029949c8f3c1b3b2b48f9e437fedd7cf27746d",
+          "task_count": 10
+        },
+        {
+          "repo": "hgrecco/pint",
+          "commit": "5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+          "task_count": 10
+        },
+        {
+          "repo": "hylang/hy",
+          "commit": "902233d854d765058927402d60f1ee8bef02daf8",
+          "task_count": 10
+        },
+        {
+          "repo": "microsoft/pybryt",
+          "commit": "4506ddccd82b3a3a4ca517ca586266b18f47a7a0",
+          "task_count": 10
+        },
+        {
+          "repo": "mkdocs/mkdocs",
+          "commit": "74d3191e419b7cb79fe66f700119ead3365f70d0",
+          "task_count": 10
+        },
+        {
+          "repo": "mwaskom/seaborn",
+          "commit": "3d3d715989d1a9cecc2b08fb23c695b6bb686754",
+          "task_count": 10
+        },
+        {
+          "repo": "numba/numba",
+          "commit": "6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+          "task_count": 10
+        },
+        {
+          "repo": "omni-us/jsonargparse",
+          "commit": "dd0f9e3767fcf2168c183bb346db9d7324bf7c28",
+          "task_count": 10
+        },
+        {
+          "repo": "pydata/xarray",
+          "commit": "82fd8320b1be7a434effd247baf07004b66b802f",
+          "task_count": 10
+        },
+        {
+          "repo": "python-pillow/Pillow",
+          "commit": "c4325c805e5909f0bf7201ce1f259bc34a1a49e0",
+          "task_count": 10
+        },
+        {
+          "repo": "qiboteam/qibo",
+          "commit": "2f98679c4a738d5a59de17eccd4712659d52a461",
+          "task_count": 10
+        },
+        {
+          "repo": "sanic-org/sanic",
+          "commit": "57d44f263fa84bd5cd6f77b5565825640d85b1e2",
+          "task_count": 10
+        },
+        {
+          "repo": "sphinx-doc/sphinx",
+          "commit": "47757c4062a6421feeaf0ae2ded89896d6cb3526",
+          "task_count": 10
+        },
+        {
+          "repo": "sqlfluff/sqlfluff",
+          "commit": "0243d4a1ba29e6cc3dc96bd9ea178d0f8a576a8f",
+          "task_count": 10
+        },
+        {
+          "repo": "stfc/PSyclone",
+          "commit": "0a0cfa6f0577acc4b4d9c2ad21a27794af97449b",
+          "task_count": 10
+        },
+        {
+          "repo": "tox-dev/tox",
+          "commit": "984ce025ad8e75e323877fb5f34128abcfba950d",
+          "task_count": 10
+        },
+        {
+          "repo": "yt-dlp/yt-dlp",
+          "commit": "f2a4983df7a64c4e93b56f79dbd16a781bd90206",
+          "task_count": 10
+        }
+      ]
+    }
+  ],
+  "download_provenance": [
+    {
+      "path": "artifacts/task-generation-1000/training-research/rl-train.parquet",
+      "url": "https://raw.githubusercontent.com/TIGER-AI-Lab/SWE-QA-Pro/93ac6a4f3af3fe3f86580f62142f47e97e2cc897/train/RL/verl-tool/dataset/train.parquet",
+      "bytes": 1035096,
+      "sha256": "d9403fbdd343d5cf383a2ed75ad00cae64bc61e605b1c30302f3ffbe200431bf"
+    },
+    {
+      "path": "artifacts/task-generation-1000/training-research/rl-test.parquet",
+      "url": "https://raw.githubusercontent.com/TIGER-AI-Lab/SWE-QA-Pro/93ac6a4f3af3fe3f86580f62142f47e97e2cc897/train/RL/verl-tool/dataset/test.parquet",
+      "bytes": 157605,
+      "sha256": "e0233a230455190a2e9f9a062f5bc6a1ca473641c7a66bf5cbd58143b94a22c4"
+    },
+    {
+      "path": "artifacts/task-generation-1000/training-research/rl-readme.md",
+      "url": "https://raw.githubusercontent.com/TIGER-AI-Lab/SWE-QA-Pro/93ac6a4f3af3fe3f86580f62142f47e97e2cc897/train/RL/README.md",
+      "bytes": 1501,
+      "sha256": "1a2b62b33e45b7cf0fee09f554d2361a665f673894fc96d91cce72e5daa305a7"
+    },
+    {
+      "path": "artifacts/task-generation-1000/training-research/repository-license.txt",
+      "url": "https://raw.githubusercontent.com/TIGER-AI-Lab/SWE-QA-Pro/93ac6a4f3af3fe3f86580f62142f47e97e2cc897/LICENSE",
+      "bytes": 1065,
+      "sha256": "9c0ca3641895c6cbef8a4224250b908b5184a058f17f0177ce74fcd4a5e75e3d"
+    },
+    {
+      "path": "artifacts/task-generation-1000/training-research/sft-card.md",
+      "url": "https://huggingface.co/datasets/TIGER-Lab/SWE-QA-Pro-SFT-Trajectories/resolve/b8f5b8a8dcf90bca8b6d70adedac0d20dca02b86/README.md",
+      "bytes": 3138,
+      "sha256": "ef2a8c1dde5f0cfc7db199ecb1d1a16b98941886f867e9c11dfd5c31a8bbcc4a"
+    },
+    {
+      "path": "artifacts/task-generation-1000/training-research/sft-train.jsonl",
+      "url": "https://huggingface.co/datasets/TIGER-Lab/SWE-QA-Pro-SFT-Trajectories/resolve/b8f5b8a8dcf90bca8b6d70adedac0d20dca02b86/train.jsonl",
+      "bytes": 65239567,
+      "sha256": "c0a68ca899762c2e62fab59df2be13815c9bd4235173312a69197db2b44ad51a"
+    },
+    {
+      "path": "artifacts/task-generation-1000/training-research/eval-repos.txt",
+      "url": "https://raw.githubusercontent.com/TIGER-AI-Lab/SWE-QA-Pro/93ac6a4f3af3fe3f86580f62142f47e97e2cc897/eval/repos.txt",
+      "bytes": 2030,
+      "sha256": "41994f59b95b436920a595fbb71ad64cb5fbc89128199b4ce18a7ce16428c7f8"
+    },
+    {
+      "path": "artifacts/task-generation-1000/training-research/probench-test.jsonl",
+      "url": "https://huggingface.co/datasets/TIGER-Lab/SWE-QA-Pro-Bench/resolve/596892dac60b6f500f01a7dc2becb9f66593b7b7/data/test.jsonl",
+      "bytes": 568325,
+      "sha256": "bba4aade95e707d012e11e622a40687bc0efd8cc509ed4a7dd3ba24c6e365737"
+    },
+    {
+      "path": "artifacts/task-generation-1000/training-research/probench-card.md",
+      "url": "https://huggingface.co/datasets/TIGER-Lab/SWE-QA-Pro-Bench/resolve/596892dac60b6f500f01a7dc2becb9f66593b7b7/README.md",
+      "bytes": 3356,
+      "sha256": "4ea183ebd1d40abaa14c435df7a60614c6ec528491a1df3f1602ab1186dae832"
+    },
+    {
+      "path": "artifacts/task-generation-1000/training-research/probench-api.json",
+      "url": "https://huggingface.co/api/datasets/TIGER-Lab/SWE-QA-Pro-Bench/revision/596892dac60b6f500f01a7dc2becb9f66593b7b7",
+      "bytes": 1504,
+      "sha256": "59aeb19b2645fa2b24e5e2634a6a52a4a5b6f63d16af1b8843ab22fc8400849e"
+    }
+  ],
+  "derived_files": [
+    {
+      "path": "artifacts/task-generation-1000/training-research/rl-train.jsonl",
+      "sha256": "54a0c29137ec940a2f8c0d7d595d6e448e763349a2a3a7691e27440ec70333ec"
+    },
+    {
+      "path": "artifacts/task-generation-1000/training-research/rl-test.jsonl",
+      "sha256": "e59f68f84f0e416cfab2397715ef00c4061457ebbfb5f8eb64bcd869d87249cf"
+    }
+  ],
+  "limits": [
+    "No upstream code executed.",
+    "No new human review, semantic certification, benchmarkdifficulty replication, training eligibility, or runnable image is asserted by this research report.",
+    "Original taskrepo licenses separate from datasetcard licensing; obtain per-repo licenses when snapshots are staged."
+  ]
+}

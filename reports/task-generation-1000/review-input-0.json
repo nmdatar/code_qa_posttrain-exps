@@ -1,0 +1,737 @@
+{
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/PennyLaneAI--pennylane-6fae4e77ab73",
+      "category": "{'id': '8.0', 'name': 'tensors / training / GPU / ML experiment logging / tuning'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 286,
+            "file_sha256": "07563a8ad8f11336cdab8d55c281aaf794259f80e52934c47409cc8317e607b4",
+            "path": "pennylane/gradients/parameter_shift.py",
+            "start_line": 234
+          },
+          {
+            "end_line": 1743,
+            "file_sha256": "f903f96971c62cf6b9e4eccfafeb4ae97f5608a37ff0e98fd5bd65ad0756d5fb",
+            "path": "pennylane/operation.py",
+            "start_line": 1743
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the inheritance hierarchy and method precedence order that PennyLane operations follow for gradient computation in the parameter-shift differentiation system?",
+      "question_sha256": "993d98f8855178c11c49a54f792f67689e4efac56f489148857b516c94c825ec",
+      "reference_answer": "In PennyLane\u2019s parameter shift differentiation system, the inheritance and method precedence for computing gradients is enforced by a single, explicit control flow centered on the _get_operation_recipe function in pennylane/gradients/parameter_shift.py (lines 234 to 286), which deterministically selects the most specific valid rule available for a given operation parameter. The highest precedence is given to an operation defined grad_recipe, which is an optional class attribute on Operation subclasses; during initialization, a missing recipe is normalized into a list of None values of length num_params, allowing _process_op_recipe to safely inspect each parameter index and immediately return an explicit shift rule when present, bypassing all other mechanisms. If no valid grad_recipe entry exists for that parameter, _get_operation_recipe next attempts to construct a generic parameter shift rule from op.parameter_frequencies[p_idx], which represents the spectral frequencies governing the derivative; this property may be explicitly overridden by subclasses, but if it is not, the default implementation in pennylane/operation.py (line 1743) attempts to infer the frequencies automatically by calling qml.generator(self, format=\"observable\"), extracting the generator\u2019s eigenvalues, and converting them to frequencies via eigvals_to_frequencies. This implicit path establishes the generator as the lowest precedence fallback rather than an independent alternative: it is only consulted indirectly when parameter_frequencies has not been explicitly provided. If the operation does not define a generator, or if frequency inference is otherwise impossible, the default parameter_frequencies implementation raises ParameterFrequenciesUndefinedError, which _get_operation_recipe catches and re raises as OperatorPropertyUndefined with an explicit message stating that no grad_recipe, parameter_frequencies, or generator is available, and therefore no parameter shift rule can be applied. This three tier structure ensures that hand crafted analytic shift rules always override spectral rules, that spectral rules derived from known generators provide a robust general fallback, and that unsupported operations fail early and transparently, with each step\u2019s behavior fully determined by concrete class attributes and method overrides rather than implicit inheritance side effects.",
+      "reference_sha256": "ad3292bbb5d2c54c5f4e73a4a8624bfb118a0906d0646484e62bc4cb66ffc91f",
+      "repository": {
+        "commit": "6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+        "family_id": "pennylaneai/pennylane",
+        "url": "https://github.com/PennyLaneAI/pennylane"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/PennyLaneAI--pennylane-6fae4e77ab73a330cd28eb237cd3b7ed712f4dac",
+      "task_id": "import-49ba4958e42790048ef24166"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/cekit--cekit-6b82c4adc0e2",
+      "category": "{'id': '0.3', 'name': 'file import/export / metadata / sorting / recurrence'}",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "10247aaaf00714c0c96fc5efa8bbc4d1d9518dfdbe62fb47a17331fe1970fb31",
+            "kind": "file_reference",
+            "line_count": 425,
+            "path": "cekit/generator/base.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does CEKit's descriptor override system coordinate between configuration loading, descriptor merging, and path resolution when processing override files?",
+      "question_sha256": "249f0c190e500183f4daef5897051632796cdc3c0910b96adb54f46f739070da",
+      "reference_answer": "CEKit's descriptor override system coordinates through a multi-phase orchestrated process managed by the Generator class (cekit/generator/base.py). Configuration loading occurs via Config.configure() which processes configuration files using configparser and handles command-line argument overrides separately from descriptor overrides. The override system centers around the Overrides class, which inherits from the Image descriptor and uses the same schema validation framework but allows selective field modifications. Path resolution is handled through the artifact_dir context parameter, where override files are loaded with os.path.dirname(os.path.abspath(override)) ensuring that relative paths within override files are resolved correctly relative to their location rather than the current working directory. The descriptor merging coordination occurs in the Generator.init() method, which first loads override files with their proper path context, then loads the main image descriptor, and finally applies overrides through Image.apply_image_overrides(). The core merging logic is implemented by the _merge_descriptors() function, which recursively merges descriptors while respecting each descriptor class's skip_merging list that prevents certain critical fields like name, version, and description from being merged. This design preserves the descriptor hierarchy while enabling selective field replacement, with the skip_merging mechanism ensuring that identity and metadata fields maintain their integrity throughout the override process. The system supports multiple override files processed in sequence, with later overrides taking precedence, and handles both inline JSON overrides and YAML override files through the same unified pathway.",
+      "reference_sha256": "7fbb5ee211c42eb0aa8bdd8298a6380f447c2e77459a954951048eef487c9404",
+      "repository": {
+        "commit": "6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+        "family_id": "cekit/cekit",
+        "url": "https://github.com/cekit/cekit"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/cekit--cekit-6b82c4adc0e2e1d2ddda66305c1c9abe7b91f407",
+      "task_id": "import-3d933c0b7aa19317881b8fc2"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/docker--docker-py-b2a18d7209f8",
+      "category": "{'id': '7.2', 'name': 'auth systems / deployment / extension plugins / cloud services'}",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "Why does docker-py implement a multi-protocol transport adapter architecture instead of using direct HTTP requests to the Docker daemon?",
+      "question_sha256": "f9f826d9ae523f1399b9e2a3ed48e44ce3c3589fb9f00bf7e4f29a0519890343",
+      "reference_answer": "Docker-py implements a multi-protocol transport adapter architecture instead of direct HTTP requests because Docker daemons communicate through multiple fundamentally different protocols that cannot be handled by standard HTTP libraries. The architecture leverages the adapter pattern where APIClient inherits from requests.Session to provide a unified interface, while different transport adapters handle protocol-specific implementations. UnixHTTPAdapter creates Unix domain sockets using socket.AF_UNIX for local communication on Unix systems, which bypasses TCP entirely. SSHHTTPAdapter establishes SSH connections using paramiko or external SSH clients and communicates via the 'docker system dial-stdio' protocol for secure remote access. NpipeHTTPAdapter handles Windows named pipes for local communication on Windows platforms. SSLHTTPAdapter manages SSL/TLS connections with configurable certificate verification and SSL version control. The parse_host function in utils automatically determines the appropriate protocol based on URL schemes (http+unix://, ssh://, npipe://, tcp://) and the APIClient conditionally mounts the corresponding adapter. Each adapter implements custom connection pooling, socket management, and protocol-specific communication patterns that would be impossible with direct HTTP requests. This architecture ensures docker-py can transparently work across diverse deployment environments while maintaining a consistent API interface for developers.",
+      "reference_sha256": "944dbac5e7ce7c0d9207095f2dca1562669b3185bd04143160055313a2419caa",
+      "repository": {
+        "commit": "b2a18d7209f827d83cc33acb80aa31bf404ffd4b",
+        "family_id": "docker/docker-py",
+        "url": "https://github.com/docker/docker-py"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/docker--docker-py-b2a18d7209f827d83cc33acb80aa31bf404ffd4b",
+      "task_id": "import-25976163f78e3175f9ece212"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/frictionlessdata--frictionless-py-72e1391b4109",
+      "category": "{'id': '7.4', 'name': 'reverse proxy / URL routing / websocket / CDN / streaming'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 20,
+            "file_sha256": "dc3d429f85c9824edead32b8a76e8d81690dc47a2d18cff1b8d146ad0c6ab9e3",
+            "path": "frictionless/system.py",
+            "start_line": 20
+          },
+          {
+            "end_line": 293,
+            "file_sha256": "dc3d429f85c9824edead32b8a76e8d81690dc47a2d18cff1b8d146ad0c6ab9e3",
+            "path": "frictionless/system.py",
+            "start_line": 293
+          },
+          {
+            "end_line": 307,
+            "file_sha256": "dc3d429f85c9824edead32b8a76e8d81690dc47a2d18cff1b8d146ad0c6ab9e3",
+            "path": "frictionless/system.py",
+            "start_line": 307
+          },
+          {
+            "end_line": 33,
+            "file_sha256": "a05563d835b61cfb4740d0a50641673152b0bfa1d5810ef7699538df44f6f443",
+            "path": "frictionless/plugins/remote/plugin.py",
+            "start_line": 30
+          },
+          {
+            "end_line": 47,
+            "file_sha256": "1d87ee1f51adbdf52bed6b5a2df030410dfe9df18e26205f7ac40f70f9ab0b17",
+            "path": "frictionless/plugins/remote/control.py",
+            "start_line": 39
+          },
+          {
+            "end_line": 99,
+            "file_sha256": "a113828e3334259430f1450f86a423baee226fd9b99e1d1155cf79bab73c48a3",
+            "path": "frictionless/plugins/remote/loader.py",
+            "start_line": 44
+          },
+          {
+            "end_line": 20,
+            "file_sha256": "a113828e3334259430f1450f86a423baee226fd9b99e1d1155cf79bab73c48a3",
+            "path": "frictionless/plugins/remote/loader.py",
+            "start_line": 20
+          },
+          {
+            "end_line": 156,
+            "file_sha256": "5e8092c6a38e47994c3d56fc25c43ff0a844251b2d326640ad6dfecd54721d7d",
+            "path": "frictionless/helpers.py",
+            "start_line": 140
+          },
+          {
+            "end_line": 109,
+            "file_sha256": "fddfecd3eb976fff569853880db82315f5b870624c76ad9de3e6fe48b3ba16fd",
+            "path": "frictionless/file.py",
+            "start_line": 109
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does the system implement HTTP session management and coordinate it across the plugin architecture for remote resource loading?",
+      "question_sha256": "2e4842cb1d5c18f769753aa3e80f4c070f372106303dcfb08679018e1025caa2",
+      "reference_answer": "The HTTP session management system operates through a coordinated three-layer architecture that integrates seamlessly with the plugin framework. At the top level, the \"System\" class (frictionless/system.py: line 20) maintains centralized session management through a private \"__http_session\" instance variable, providing two key interfaces: \"get_http_session()\" (frictionless/system.py: line 293) which returns either the stored session or creates a default one via the remote plugin, and \"use_http_session()\" (frictionless/system.py: line 307) which implements a context manager for custom session management.\n\nThe middle layer consists of the \"RemotePlugin\", which implements \"create_http_session()\" to generate default sessions configured with standard headers (frictionless/plugins/remote/plugin.py: line 30-33). The \"RemoteControl\" acts as the coordination layer, with its \"http_session\" property checking for custom user-provided sessions before falling back to \"system.get_http_session()\" (frictionless/plugins/remote/control.py: line 39-47).\n\nAt the execution layer, the \"RemoteLoader\" retrieves sessions from the resource control and creates \"RemoteByteStream\" instances (frictionless/plugins/remote/loader.py: line 44-99). These streams implement seekable byte stream interfaces over HTTP responses using streaming GET requests (frictionless/plugins/remote/loader.py: line 20). URL processing is handled by helper functions \"parse_scheme_and_format()\" and \"is_remote_path()\" (frictionless/helpers.py: line 140-156, 194-201) which analyze URL schemes to determine when remote loading is required, with this detection integrated into the file processing pipeline (frictionless/file.py: line 109).",
+      "reference_sha256": "27da3b2b019a4c92a5236fd0c7c440ac3e4e552afe5af5b3198ba86bffc56dfd",
+      "repository": {
+        "commit": "72e1391b41094678e97c1a3e386703f6e193c96d",
+        "family_id": "frictionlessdata/frictionless-py",
+        "url": "https://github.com/frictionlessdata/frictionless-py"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/frictionlessdata--frictionless-py-72e1391b41094678e97c1a3e386703f6e193c96d",
+      "task_id": "import-36bb2877fb98daa82b44ec54"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/hgrecco--pint-5bdf0109576b",
+      "category": "{'id': '2.1', 'name': 'dependency injection / config / attrs / API design'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 2195,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 2195
+          },
+          {
+            "end_line": 1344,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 177
+          },
+          {
+            "end_line": 2192,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 1934
+          },
+          {
+            "end_line": 1931,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 1553
+          },
+          {
+            "end_line": 1550,
+            "file_sha256": "a4865f70454e27d412b9193d9b2143d272ef83c46791fbff0078f307d7bbebb8",
+            "path": "pint/registry.py",
+            "start_line": 1347
+          },
+          {
+            "end_line": 466,
+            "file_sha256": "aa8fb4f2ada08d1a8b9716a9183983e6790070a07d6f96d7c3bcc54e5621fa69",
+            "path": "pint/systems.py",
+            "start_line": 455
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does pint's registry architecture implement the multiple inheritance pattern to coordinate unit definitions, system management, context-dependent conversions, and offset unit handling?",
+      "question_sha256": "b6e6f56625a2d0e25915e61d2b396af2b52d8a1cb9410f95d3355b2d02dd3bca",
+      "reference_answer": "Pint\u2019s UnitRegistry serves as the central entry point for unit conversion by composing multiple orthogonal capabilities through Python\u2019s multiple inheritance (Mixin) pattern (pint/registry.py: 2195). Each registry class encapsulates a distinct dimension of functionality. BaseRegistry (pint/registry.py: 177\u20131344) provides core unit definition and querying, multiplicative unit conversion, unit parsing with prefixes and suffixes, and definition file loading. SystemRegistry (pint/registry.py: 1934\u20132192) manages unit systems and groups, defining base units for systems such as SI or CGS. ContextRegistry (pint/registry.py: 1553\u20131931) enables context-dependent, dimension-crossing conversions (for example, frequency to energy) via context activation, context-specific caches, and graph-based multi-step conversion paths. NonMultiplicativeRegistry (pint/registry.py: 1347\u20131550) handles offset units such as temperatures, enforcing correct offset usage and implementing specialized conversion logic beyond simple scaling. SystemRegistry, ContextRegistry, and NonMultiplicativeRegistry all inherit from BaseRegistry. The final UnitRegistry combines them via multiple inheritance in the order UnitRegistry \u2192 SystemRegistry \u2192 ContextRegistry \u2192 NonMultiplicativeRegistry \u2192 BaseRegistry. At runtime, coordination is achieved through Python\u2019s C3 method resolution order and consistent use of super(). When a method such as _convert is invoked on a UnitRegistry instance, each registry layer can process its own concern and then delegate to the next class in the MRO via super()._convert. This composes system rules, context-based transformations, and offset handling into a single conversion pipeline under a unified interface. The design is further supported by dynamically created Group and System classes (pint/systems.py: 455\u2013466) that retain references to their parent registry, enabling modular and extensible composition of registry capabilities.",
+      "reference_sha256": "2d010b749e4565fb5be36122ec6ad8104e4a738fa9be2a5773c411792819e0ff",
+      "repository": {
+        "commit": "5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+        "family_id": "hgrecco/pint",
+        "url": "https://github.com/hgrecco/pint"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/hgrecco--pint-5bdf0109576b423823fd67fd5eaabe0ce4d02fc6",
+      "task_id": "import-1469913538e10f11cffe5452"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/microsoft--pybryt-4506ddccd82b",
+      "category": "{'id': '6.0', 'name': 'file paths / filesystem permissions / symlinks / env config / cache system'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 12,
+            "file_sha256": "c20a10e2ebd72278ea4a3b4d03d2352209993feded66441f8227f98dc2ad71c1",
+            "path": "pybryt/annotations/annotation.py",
+            "start_line": 10
+          },
+          {
+            "end_line": 54,
+            "file_sha256": "c20a10e2ebd72278ea4a3b4d03d2352209993feded66441f8227f98dc2ad71c1",
+            "path": "pybryt/annotations/annotation.py",
+            "start_line": 53
+          },
+          {
+            "end_line": 96,
+            "file_sha256": "c20a10e2ebd72278ea4a3b4d03d2352209993feded66441f8227f98dc2ad71c1",
+            "path": "pybryt/annotations/annotation.py",
+            "start_line": 80
+          },
+          {
+            "end_line": 117,
+            "file_sha256": "c20a10e2ebd72278ea4a3b4d03d2352209993feded66441f8227f98dc2ad71c1",
+            "path": "pybryt/annotations/annotation.py",
+            "start_line": 108
+          },
+          {
+            "end_line": 8,
+            "file_sha256": "fac803b02911bbaeffd77893effbfb538209b216a0e50aef77c3267d89676feb",
+            "path": "pybryt/execution/complexity.py",
+            "start_line": 8
+          },
+          {
+            "end_line": 81,
+            "file_sha256": "fac803b02911bbaeffd77893effbfb538209b216a0e50aef77c3267d89676feb",
+            "path": "pybryt/execution/complexity.py",
+            "start_line": 81
+          },
+          {
+            "end_line": 78,
+            "file_sha256": "c20a10e2ebd72278ea4a3b4d03d2352209993feded66441f8227f98dc2ad71c1",
+            "path": "pybryt/annotations/annotation.py",
+            "start_line": 76
+          },
+          {
+            "end_line": 100,
+            "file_sha256": "aa267d98314f618e55c9131ddf842801f5c7bd1cc7cf0008cee345bfa1aa0496",
+            "path": "pybryt/execution/tracing.py",
+            "start_line": 98
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Where are the global annotation tracking identifiers `_TRACKED_ANNOTATIONS`, `_GROUP_INDICES`, and `_ANNOTATION_COUNTER` defined and modified throughout PyBryt's annotation system?",
+      "question_sha256": "bfc65789246893a4bd1b99d5902ae23159050d4acf06bfa965cba3197388e3a3",
+      "reference_answer": "The global annotation tracking identifiers are defined at the module level in pybryt/annotations/annotation.py: line 10-12. The _TRACKED_ANNOTATIONS list maintains all annotation instances created throughout the system, _GROUP_INDICES maps annotation names to their corresponding indices in the tracked list, and _ANNOTATION_COUNTER provides unique sequential numbering for annotations. These identifiers are modified in three key locations within the same file: the __init__ method (pybryt/annotations/annotation.py: line 53-54) increments the counter for each new annotation instance, the _track method (pybryt/annotations/annotation.py: line 80-96) handles the core tracking logic by updating both the annotations list and group indices mapping while managing annotation limits and removing child annotations, and the reset_tracked_annotations static method (pybryt/annotations/annotation.py: line 108-117) provides a cleanup mechanism that clears all three tracking structures. The system integrates with PyBryt's complexity analysis module through the _TRACKING_DISABLED flag (pybryt/execution/complexity.py: line 8), which is toggled during time complexity checks (pybryt/execution/complexity.py: line 81, 86) and checked in both the annotation tracking (pybryt/annotations/annotation.py: line 76-78) and value collection systems (pybryt/execution/tracing.py: line 98-100) to temporarily suspend tracking operations during performance measurement blocks.",
+      "reference_sha256": "c5a0a6d3025646f64b85cbac2eb658d1de58b57fb1990488d8c6045e58fc5397",
+      "repository": {
+        "commit": "4506ddccd82b3a3a4ca517ca586266b18f47a7a0",
+        "family_id": "microsoft/pybryt",
+        "url": "https://github.com/microsoft/pybryt"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/microsoft--pybryt-4506ddccd82b3a3a4ca517ca586266b18f47a7a0",
+      "task_id": "import-2c86794d0260171bd2aeee8e"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/numba--numba-6bb29300254a",
+      "category": "{'id': '2.4', 'name': 'type hints / mypy / typing system / code generation'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 312,
+            "file_sha256": "2d73d6b29e7e1fc8534bbf1fcd6aaf3b9243b80527bf076bc44cd1fa370c0fce",
+            "path": "numba/core/ir.py",
+            "start_line": 302
+          },
+          {
+            "end_line": 339,
+            "file_sha256": "2d73d6b29e7e1fc8534bbf1fcd6aaf3b9243b80527bf076bc44cd1fa370c0fce",
+            "path": "numba/core/ir.py",
+            "start_line": 335
+          },
+          {
+            "end_line": 843,
+            "file_sha256": "2d73d6b29e7e1fc8534bbf1fcd6aaf3b9243b80527bf076bc44cd1fa370c0fce",
+            "path": "numba/core/ir.py",
+            "start_line": 833
+          },
+          {
+            "end_line": 600,
+            "file_sha256": "2d73d6b29e7e1fc8534bbf1fcd6aaf3b9243b80527bf076bc44cd1fa370c0fce",
+            "path": "numba/core/ir.py",
+            "start_line": 584
+          },
+          {
+            "end_line": 370,
+            "file_sha256": "2d73d6b29e7e1fc8534bbf1fcd6aaf3b9243b80527bf076bc44cd1fa370c0fce",
+            "path": "numba/core/ir.py",
+            "start_line": 366
+          },
+          {
+            "end_line": 399,
+            "file_sha256": "2d73d6b29e7e1fc8534bbf1fcd6aaf3b9243b80527bf076bc44cd1fa370c0fce",
+            "path": "numba/core/ir.py",
+            "start_line": 391
+          },
+          {
+            "end_line": 359,
+            "file_sha256": "2d73d6b29e7e1fc8534bbf1fcd6aaf3b9243b80527bf076bc44cd1fa370c0fce",
+            "path": "numba/core/ir.py",
+            "start_line": 350
+          },
+          {
+            "end_line": 709,
+            "file_sha256": "2d73d6b29e7e1fc8534bbf1fcd6aaf3b9243b80527bf076bc44cd1fa370c0fce",
+            "path": "numba/core/ir.py",
+            "start_line": 695
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What are the main categories of instruction types defined in Numba's intermediate representation (IR) system and their specific operational roles?",
+      "question_sha256": "e31b5613aa5cf424326d5e6039df02eb5ec6f25921fa4e69f8d6cac3f6a91f2b",
+      "reference_answer": "Numba's IR defines a small hierarchy of instruction categories with distinct roles. At the root, Inst is the base for all IR instructions and provides the common API surface (e.g., list_vars()) (numba/core/ir.py: line 302-312). Above that, Stmt (statement) represents instructions that can appear standalone inside a basic block (Block) (numba/core/ir.py: line 335-339); typical operational roles include binding values to variables via Assign (numba/core/ir.py: line 833-843) and performing state-changing actions like SetItem, SetAttr, and Del (numba/core/ir.py: line 584-600, line 641-650, line 684-692). Expr (expression) represents an instruction that \"can only be part of a larger statement\" (i.e., it is not itself a standalone block statement) (numba/core/ir.py: line 366-370), and it models value-producing operations such as binop, unary, call, build_map, iterator operations like getiter/iternext, and special nodes like cast (numba/core/ir.py: line 391-399, line 413-418, line 421-426, line 447-451, line 467-478, line 522-529). Finally, Terminator is a specialized kind of Stmt that must be the last statement in a block and must either exit the function or jump to another block (with targets reported by get_targets()) (numba/core/ir.py: line 350-359); its operational role is control-flow transfer via Return/Raise (function exit) and Jump/Branch (unconditional/conditional branching) (numba/core/ir.py: line 695-709, line 777-794, line 796-810, line 813-830).",
+      "reference_sha256": "c2c21ea014c7219867514e0a7deb7d8eb9412f37de3a66c7aa8f06c51783e71d",
+      "repository": {
+        "commit": "6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+        "family_id": "numba/numba",
+        "url": "https://github.com/numba/numba"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/numba--numba-6bb29300254a40d2be35a6c88906bd4ddaad2c4d",
+      "task_id": "import-0fbd91ed5764b08d8d0458c1"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/psf--requests-46e939b5525d",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 997,
+            "file_sha256": "32365d67893bb67c3ed67cf93ca4a18e63e6ab29342fa0dc8b09c59e06ff564e",
+            "path": "src/requests/models.py",
+            "start_line": 983
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [
+              "src/requests/utils.py",
+              "tests/utils.py"
+            ],
+            "end_line": 991,
+            "path": "utils.py",
+            "reason": "ambiguous_basename",
+            "reference": "utils.py",
+            "start_line": 991
+          }
+        ]
+      },
+      "question": "How does the links method handle the case where the 'link' header contains multiple entries with identical 'rel' values, and what is the algorithmic consequence of using 'rel' as the dictionary key?",
+      "question_sha256": "d3e2accc0f1c45257b59bbdcec643a3ff486be8c81575a60359deccc23dcf409",
+      "reference_answer": "The `links` property in the `Response` class (defined in `src/requests/models.py` at lines 983-997) handles multiple Link header entries with identical `rel` values by overwriting earlier entries with later ones.\n\nImplementation:\n1. It retrieves the \"link\" header from response headers (line 986).\n2. It parses the header using `parse_header_links()` from `utils.py` (line 991), which returns a list of dictionaries, each representing a parsed link.\n3. For each link, it creates a dictionary key using `link.get(\"rel\") or link.get(\"url\")` (line 994).\n4. It stores each link in `resolved_links` using that key (line 995).\n\nConsequence: Because dictionary keys must be unique, if multiple links share the same `rel` value, only the last one processed remains in the dictionary. Earlier entries with the same `rel` are overwritten and lost.\n\nExample: If the Link header contains:\n```\n<url1>; rel=\"next\", <url2>; rel=\"next\"\n```\nThe returned dictionary will only contain the second link under the key \"next\"; the first is overwritten.\n\nThis behavior is a consequence of using `rel` (or `url` as fallback) as the dictionary key, which assumes unique relation types per response.",
+      "reference_sha256": "9abe9d8c5089ebc47eade0d3d50a3fb5125751506fa7b830a01393cb5fb69d39",
+      "repository": {
+        "commit": "46e939b5525d9c72b677340985582b04b128478a",
+        "family_id": "psf/requests",
+        "url": "https://github.com/psf/requests"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/psf--requests-46e939b5525d9c72b677340985582b04b128478a",
+      "task_id": "import-0bba7197e5bb25f773d1da82"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pylint-dev--pylint-44740e5e5cdd",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1296,
+            "file_sha256": "b1d5dd6400d18daa9b3166ebe480b4eabf06aaafdf95335b175a1ad5b3ccba8c",
+            "path": "pylint/checkers/utils.py",
+            "start_line": 1266
+          },
+          {
+            "end_line": 1118,
+            "file_sha256": "3f186aa53840acd0fea31537e1b8e0763109fc9f8e13461d356ff6f6ca493842",
+            "path": "pylint/checkers/typecheck.py",
+            "start_line": 1118
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "767c69cb6559682cc586df07c5c33dee058a3901b9390896a880c2edc2d81f49",
+            "kind": "file_reference",
+            "line_count": 44,
+            "path": "tests/functional/r/regression/regression_properties_in_class_context.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "How does a custom metaclass implementing a property affect class attribute resolution compared to standard Python class creation?",
+      "question_sha256": "55e94404a8ae75ca404f3e57d869a754be8a66dbd11c38daf1c3efa2cc8fc386",
+      "reference_answer": "In pylint, a custom metaclass implementing a property affects class attribute resolution differently than standard Python class creation. The key mechanism is implemented in the `_supports_protocol` function in `pylint/checkers/utils.py` (lines 1266-1296).\n\nWhen pylint checks if a class supports protocols like iteration or membership testing, it first checks if the class has a metaclass. If the metaclass itself supports the protocol (e.g., has `__iter__` or `__contains__` methods, or in this case, a property that returns an iterable), then the class is considered to support that protocol as well (lines 1272-1276):\n\n```python\nmeta = value.metaclass()\nif meta is not None:\n    if protocol_callback(meta):\n        return True\n```\n\nThis means that when a metaclass defines a `@property` (like the `values` property in the test case at `tests/functional/r/regression/regression_properties_in_class_context.py`), that property becomes accessible on the class itself, not just on instances. The property is resolved through the metaclass's attribute lookup mechanism, which differs from standard class creation where attributes are typically defined directly on the class or inherited from base classes.\n\nHowever, there's a limitation in pylint's current implementation: when a child class inherits from a parent class that uses such a metaclass, pylint may not properly infer that the metaclass property is accessible on the child class, leading to false positives like \"unsupported-membership-test\" and \"not-an-iterable\" errors (as shown in the regression test where `Child.values` triggers false warnings even though `Parent.values` works correctly).\n\nThe attribute resolution works through astroid's inference system, where `owner.getattr(node.attrname)` is called in `visit_attribute` (line 1118 of `typecheck.py`). For classes with metaclasses, the attribute lookup includes checking the metaclass's attributes, which allows metaclass properties to be found during static analysis, but the protocol checking logic doesn't always properly propagate this information to subclasses.",
+      "reference_sha256": "bc4417f6e3f818f50eda6f26c99c53adf72b674653ff1b9e7dbb9ddd6ff79184",
+      "repository": {
+        "commit": "44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+        "family_id": "pylint-dev/pylint",
+        "url": "https://github.com/pylint-dev/pylint"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pylint-dev--pylint-44740e5e5cdd2b80321a4f0ed4254213d058b9f6",
+      "task_id": "import-0393a4ef848d1cf8eaf51897"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/qiboteam--qibo-2f98679c4a73",
+      "category": "{'id': '8.4', 'name': 'bayesian models / MCMC / statistics / reproducibility'}",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 391,
+            "file_sha256": "38a175e4dc12f4c3d1a5e85793a94c767131af3a9395ea45e11fe43304b362e6",
+            "path": "src/qibo/backends/abstract.py",
+            "start_line": 6
+          },
+          {
+            "end_line": 28,
+            "file_sha256": "3ccb4890c824f9b44fab0ce4d738a189569195cf343d0c96f7d23f365830ed46",
+            "path": "src/qibo/config.py",
+            "start_line": 28
+          },
+          {
+            "end_line": 85,
+            "file_sha256": "f062143ef5dbaaad82ee110919c09e5d0db05bd8f1e7138c2b015a7a7cb9f1e1",
+            "path": "src/qibo/backends/__init__.py",
+            "start_line": 41
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "eb19d4baadd84d633ae524647916ab345634e9672ea9850941268e6e457fecb9",
+            "kind": "file_reference",
+            "line_count": 700,
+            "path": "src/qibo/backends/numpy.py"
+          },
+          {
+            "file_sha256": "bc9ea779ef7359268280b9a1c60ad207c6e5e2df8ea748f3f01f9a4d4a5a61ec",
+            "kind": "file_reference",
+            "line_count": 362,
+            "path": "src/qibo/backends/tensorflow.py"
+          },
+          {
+            "file_sha256": "34e37c93fb7c71fcac15e960c74c0f69da46b5cf918160af94676ad79c26c41f",
+            "kind": "file_reference",
+            "line_count": 246,
+            "path": "src/qibo/states.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "What is the statistical sampling architecture that ensures reproducible probabilistic measurements across different computational backends in Qibo?",
+      "question_sha256": "256ec98ab6421c22c8f9cb08a8f6b5c640a45b85651c9fff323dcd4b8ca7611f",
+      "reference_answer": "Qibo's statistical sampling architecture ensures reproducible probabilistic measurements through a three-layer design that maintains consistency across different computational backends. The first layer is the abstract backend interface, defined by the Backend abstract base class (src/qibo/backends/abstract.py: lines 6-391), which specifies core sampling contracts including set_seed for deterministic random number generation (line 254-256), sample_shots for sampling individual measurement outcomes according to probability distributions (lines 259-261), and sample_frequencies for efficient batch frequency sampling (lines 290-292). The second layer consists of concrete backend implementations that provide platform-specific statistical algorithms while maintaining interface compatibility. The NumpyBackend (src/qibo/backends/numpy.py) implements set_seed using numpy.random.seed (line 515-516), sample_shots using numpy.random.choice (lines 518-521), and sample_frequencies with batched processing via the configurable SHOT_BATCH_SIZE parameter (lines 546-556). The TensorFlow backend (src/qibo/backends/tensorflow.py) redefines sample_shots using tf.random.categorical with logits-based probability handling (lines 267-271) since tnp.random.choice is not available. Both backends inherit the sample_frequencies method from NumpyBackend. The SHOT_BATCH_SIZE is configured as 2^18 (262,144 samples) in src/qibo/config.py (line 28), enabling efficient computation for large shot counts by processing measurements in batches. The third layer is the GlobalBackend singleton pattern (src/qibo/backends/__init__.py: lines 41-85), which ensures consistent probabilistic behavior across the entire framework by maintaining a single backend instance throughout execution. The GlobalBackend uses automatic backend selection based on availability, checking for qibojit (with cupy or numba platforms), tensorflow, and numpy backends in order (lines 46-51). The CircuitResult class (src/qibo/states.py) utilizes these backend methods to perform measurements: sample_shots is called at line 116 when retrieving individual samples, and sample_frequencies is called at line 192 when computing measurement frequencies efficiently without storing individual shots.",
+      "reference_sha256": "7a9e2887d685e4c77cfb9616fdd34676d3d55c80ca4cf22197fbf1a78e0044c6",
+      "repository": {
+        "commit": "2f98679c4a738d5a59de17eccd4712659d52a461",
+        "family_id": "qiboteam/qibo",
+        "url": "https://github.com/qiboteam/qibo"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/qiboteam--qibo-2f98679c4a738d5a59de17eccd4712659d52a461",
+      "task_id": "import-02c731a42afa11b8e9213924"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/scikit-learn--scikit-learn-adb1ae76d798",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "1ea3967ccd5164c731e5e7a9e50920d576c656894c8204b6072a39e5a6d8d1d8",
+            "kind": "file_reference",
+            "line_count": 1492,
+            "path": "sklearn/ensemble/_bagging.py"
+          },
+          {
+            "file_sha256": "c2166d803ee48660996a34b9d96c8ef08d5f092beba5b561c60a36a219c240fc",
+            "kind": "file_reference",
+            "line_count": 1370,
+            "path": "sklearn/base.py"
+          },
+          {
+            "file_sha256": "92c1d4311bca1a31bb1289e9ce9f6d567412acc52939fa262799c2e257e157ba",
+            "kind": "file_reference",
+            "line_count": 22,
+            "path": "sklearn/utils/metadata_routing.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "What is the dependency resolution mechanism in _parallel_predict_regression that handles the estimator.predict method across heterogeneous base estimators with different feature selection requirements, and what internal module dependencies enable this polymorphic behavior?",
+      "question_sha256": "c6e9e36a595d2ccf3100590ad4e1818489155846ceb5d2ff91bfa7e51e17e3a3",
+      "reference_answer": "The dependency resolution mechanism in the private parallel prediction function (`_parallel_predict_regression` in `sklearn/ensemble/_bagging.py`) uses Python's duck typing and feature indexing to handle prediction across heterogeneous base estimators with different feature selection requirements.\n\n**Core Mechanism:**\n\nThe function (lines 257-262) resolves dependencies through:\n\n1. **Duck Typing Interface**: All estimators inherit from `BaseEstimator` (defined in `sklearn/base.py`), which provides a common interface. The function calls `estimator.predict(X[:, features], **params)` on each estimator, relying on Python's duck typing that all estimators implement the same `predict` method signature.\n\n2. **Feature Selection via Indexing**: Each estimator can have different feature requirements stored in the `estimators_features` list (created during `_parallel_build_estimators` at lines 105-183). The function handles this by indexing the input data: `X[:, features]`, where `features` is a numpy array of feature indices specific to each estimator. This allows each estimator to receive only the features it was trained on, even when they differ across estimators.\n\n3. **Parameter Routing via Metadata Routing**: The `**params` argument enables polymorphic parameter passing through the metadata routing system. When metadata routing is enabled (via `_routing_enabled()`), the `process_routing` function (from `sklearn/utils/metadata_routing.py`) routes parameters from the meta-estimator's `predict` method to the appropriate sub-estimator methods.\n\n**Internal Module Dependencies:**\n\nThe polymorphic behavior is enabled by several internal modules:\n\n1. **`sklearn.base.BaseEstimator`**: Provides the base interface that all estimators inherit from, ensuring they implement methods like `predict()`.\n\n2. **`sklearn.base.MetaEstimatorMixin`**: Enables metadata routing capabilities in meta-estimators like `BaggingRegressor`.\n\n3. **`sklearn.ensemble._base.BaseEnsemble`**: The base class for ensemble estimators (inherited by `BaseBagging`), which provides the `_make_estimator` method that clones base estimators.\n\n4. **`sklearn.utils.metadata_routing`**: Contains `process_routing` and `get_routing_for_object`, which handle parameter routing from meta-estimators to sub-estimators.\n\n5. **`sklearn.utils.parallel`**: Provides `Parallel` and `delayed` for parallel execution, allowing the function to be called across multiple jobs.\n\nThe mechanism works because all scikit-learn estimators follow the same interface contract (via `BaseEstimator`), allowing the function to treat them polymorphically while still respecting their individual feature selection requirements through the feature indexing mechanism.",
+      "reference_sha256": "fd310ca8c0eb4f7f4d0c4db73d09ac808de83050e62456f636923c10ea95b9c8",
+      "repository": {
+        "commit": "adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+        "family_id": "scikit-learn/scikit-learn",
+        "url": "https://github.com/scikit-learn/scikit-learn"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/scikit-learn--scikit-learn-adb1ae76d798e822984d4e312c90c6ca8f01a3df",
+      "task_id": "import-00c7d5eb9ea4bac8201cd1da"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1043,
+            "file_sha256": "475b2ea54dc7e4606887a2075fc8770cbe11ba506e4ec0f08605a0e9e7fc319a",
+            "path": "src/sqlfluff/dialects/dialect_postgres.py",
+            "start_line": 1043
+          }
+        ],
+        "file_references": [
+          {
+            "file_sha256": "cf7142fd7a7cdda1b6dc61610ecd6a6d3cc244988e11c3ee814a7ee6aabd0b3b",
+            "kind": "file_reference",
+            "line_count": 4493,
+            "path": "src/sqlfluff/dialects/dialect_ansi.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "source_spans_verified",
+        "unresolved": []
+      },
+      "question": "Why does the segment class that represents operator class references integrate with the dialect's type system to enable proper parsing and validation in index creation and constraint definitions?",
+      "question_sha256": "eff83026926ee6b8ff0883b0a63e1075adc3dead3e2a1f9b9a35c084c4f3c2eb",
+      "reference_answer": "The segment class that represents operator class references integrates with the dialect's type system to enable proper parsing and validation in index creation and constraint definitions for the following reasons:\n\n1. **Inheritance from ObjectReferenceSegment**: The class inherits from `ansi.ObjectReferenceSegment` (defined in `./src/sqlfluff/dialects/dialect_ansi.py`), which provides:\n   - A parsing grammar that handles qualified identifiers (e.g., `schema.operator_class`) using delimited identifiers with dot separators\n   - Methods like `iter_raw_references()`, `is_qualified()`, and `extract_possible_references()` for extracting and validating reference parts\n   - Support for schema-qualified names, which PostgreSQL operator classes can use\n\n2. **Type identification**: The class sets `type = \"operator_class_reference\"` (line 1043 in `dialect_postgres.py`), which:\n   - Allows the parse tree to identify operator class references specifically\n   - Enables rules and validators to target this segment type\n   - Distinguishes operator class references from other object references in the grammar\n\n3. **Context-specific parsing**: The segment is used in `IndexElementOptionsSegment` (lines 4057-4069), which is part of:\n   - `IndexElementSegment` used in `CreateIndexStatementSegment` for index creation\n   - `ExclusionConstraintElementSegment` for exclusion constraints in table definitions\n   \n   The integration ensures that operator class references are parsed correctly in these contexts, with proper handling of optional relation options and exclusion of conflicting keywords (like \"NULLS FIRST/LAST\").\n\n4. **Validation capabilities**: By inheriting from `ObjectReferenceSegment`, the segment gains validation methods that can:\n   - Check if references are qualified or unqualified\n   - Extract reference parts for validation\n   - Support dialect-specific validation rules that can target the `operator_class_reference` type\n\nThis integration ensures that operator class references in PostgreSQL index definitions and constraint specifications are correctly parsed, identified in the parse tree, and can be validated by SQLFluff rules that need to work with operator class references specifically.",
+      "reference_sha256": "b51f932be08a2701a89367228634e5c27af7f538dfbd15bd1bab8a9e96a9207d",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-013007e2033b14b73a3e6f27"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/tox-dev--tox-984ce025ad8e",
+      "category": "{'id': '0.2', 'name': 'CLI args / syntax / regex / command completion'}",
+      "citation_diagnostics": {
+        "evidence": [],
+        "file_references": [
+          {
+            "file_sha256": "9db7d6be6fc070aa182bd825b826d295c52dca6ef2f133217e316a7a77aa95f0",
+            "kind": "file_reference",
+            "line_count": 1683,
+            "path": "src/tox/config/__init__.py"
+          }
+        ],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "no_resolvable_citations",
+        "unresolved": []
+      },
+      "question": "How does tox's factor expression parsing algorithm implement boolean logic evaluation for conditional configuration lines?",
+      "question_sha256": "768125a8526340debc8033b2724740812d1f4fae96da73a9223c9d635666ba36",
+      "reference_answer": "In tox, factor expression parsing for conditional configuration lines is implemented as a deliberate parse then evaluate pipeline that turns the textual prefix before a colon into a small boolean language over the current environment\u2019s factor set, and then uses that boolean result to decide whether a line contributes a value. Concretely, the entry point is the conditional line handler in src/tox/config/__init__.py inside SectionReader._apply_factors (around lines 1390 to 1404), which matches lines shaped like <factor_expr>:\\s+<payload> using the regex r\"^([\\w{}\\..!,-]+)\\:\\s+(.+)\", extracting the left side as the factor expression and the right side as the payload, and then delegates parsing of the left side to _split_factor_expr. The boolean semantics are defined by how _split_factor_expr (around lines 1219 to 1227) decomposes syntax: it first expands brace groupings through _expand_envstr (around lines 1235 to 1245), which splits on commas outside braces and uses Cartesian product expansion to generate all concrete factor combinations, so an expression like {py27,py38}-django becomes multiple independent alternatives. After expansion, commas at the top level represent OR logic, producing multiple alternative factor clauses, while hyphens inside each clause represent AND logic, meaning all hyphen separated conditions must hold simultaneously. Each hyphen separated token is analyzed for negation using the helpers _is_negated_factor and _base_factor_name (around lines 1211 to 1216), which detect a leading ! and normalize the factor name, allowing the parser to split every clause into an included set and an excluded set. The final boolean evaluation occurs back in _apply_factors (around lines 1397 to 1400), where each clause is tested with the predicate included <= self.factors and not any(x in self.factors for x in excluded). This directly encodes conjunction and negation over the environment\u2019s active factors, and because the overall expression succeeds if any clause evaluates to true, it implements OR across comma separated clauses. Through this structured combination of regex extraction, explicit syntactic decomposition, brace expansion, and set based evaluation, tox provides a precise and verifiable implementation of boolean logic for conditional configuration lines, supporting negation, conjunction, disjunction, and grouped combinations in a way that follows directly and transparently from the underlying code.",
+      "reference_sha256": "82674fdc4f6e5d62783608b1948ec3f73d1bac1a0d603458f5fd40be62b7f6ab",
+      "repository": {
+        "commit": "984ce025ad8e75e323877fb5f34128abcfba950d",
+        "family_id": "tox-dev/tox",
+        "url": "https://github.com/tox-dev/tox"
+      },
+      "selection": "minimum stable task ID per environment",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/tox-dev--tox-984ce025ad8e75e323877fb5f34128abcfba950d",
+      "task_id": "import-102926564e08a0459d95a35d"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/sqlfluff--sqlfluff-db9801b7eb7f",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 3164,
+            "file_sha256": "cf7142fd7a7cdda1b6dc61610ecd6a6d3cc244988e11c3ee814a7ee6aabd0b3b",
+            "path": "src/sqlfluff/dialects/dialect_ansi.py",
+            "start_line": 3154
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "end_line": 2695,
+            "path": "/src/sqlfluff/dialects/dialect_bigquery.py",
+            "reason": "unsafe_path",
+            "reference": "/src/sqlfluff/dialects/dialect_bigquery.py",
+            "start_line": 2680
+          },
+          {
+            "end_line": null,
+            "path": "/src/sqlfluff/core/parser/match_algorithms.py",
+            "reason": "unsafe_path",
+            "reference": "/src/sqlfluff/core/parser/match_algorithms.py",
+            "start_line": null
+          }
+        ]
+      },
+      "question": " What is the semantic distinction in the BigQuery dialect's MERGE INSERT clause segment grammar between wildcard insertion and explicit column-value insertion?",
+      "question_sha256": "a5a90fc04b24077b1f237822c7bbc385443f6b68117ed2d2960070ede2753adf",
+      "reference_answer": "The semantic distinction in the BigQuery dialect's `MergeInsertClauseSegment` grammar between wildcard insertion and explicit column-value insertion is handled by a `OneOf` construct in the `match_grammar` definition that provides two alternative parsing paths:\n\n1. **Wildcard insertion (`INSERT ROW`)**: The second alternative in the `OneOf` is `Sequence(\"INSERT\", \"ROW\")`. This form inserts all columns from the source table without explicitly specifying column names or values. It's a shorthand that automatically maps all columns from the USING clause's source to the target table.\n\n2. **Explicit column-value insertion**: The first alternative is a `Sequence` containing `\"INSERT\"`, optional `BracketedColumnReferenceListGrammar` (for column names), and optional `ValuesClauseSegment` (for explicit values). This form allows developers to:\n   - Specify which columns to insert via the bracketed column list\n   - Optionally provide explicit values via a VALUES clause\n   - Omit the column list entirely (inserting all columns in table order)\n   - Omit the VALUES clause (using column references from the source)\n\nThe implementation is found in `/src/sqlfluff/dialects/dialect_bigquery.py` at lines 2680-2695, where `MergeInsertClauseSegment` overrides the ANSI base class to add support for `INSERT ROW` statements. The base ANSI implementation (lines 3154-3164 in `dialect_ansi.py`) only supports the explicit form with optional column lists and VALUES clauses.\n\nThe `OneOf` construct uses the `longest_match` algorithm (implemented in `/src/sqlfluff/core/parser/match_algorithms.py`), which prioritizes the longest matching alternative. This means `INSERT ROW` will correctly match the second alternative rather than partially matching the first alternative's `INSERT` keyword followed by optional elements. However, potential parsing ambiguities could arise if the first Sequence's optional elements allow it to match just `INSERT` before the parser evaluates the second alternative, though the longest_match algorithm should resolve this by preferring the complete `INSERT ROW` match.",
+      "reference_sha256": "b079a06fef81fa645a5adeb7bc93b9a976e64f8b73bdfc1290833e911a1710c2",
+      "repository": {
+        "commit": "db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+        "family_id": "sqlfluff/sqlfluff",
+        "url": "https://github.com/sqlfluff/sqlfluff"
+      },
+      "selection": "additional diagnostic risk sample",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlfluff--sqlfluff-db9801b7eb7fd014e765117f63ee1b0675fa9f87",
+      "task_id": "import-086304108660dbab46edcf9b"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/pytest-dev--pytest-5989efe3efec",
+      "category": "repository_qa",
+      "citation_diagnostics": {
+        "evidence": [
+          {
+            "end_line": 1268,
+            "file_sha256": "85bafc243bf3653c953d3ff9fc4551e24caf4be7b93d40d42566bdc7792c8328",
+            "path": "testing/test_cacheprovider.py",
+            "start_line": 1264
+          }
+        ],
+        "file_references": [],
+        "parser_scope": "Explicit source filenames with recognized extensions; adjacent path:line-range, path (lines N-M), lines N-M in path, code-fence N:M:path headings, and GitHub blob #LN-LM anchors. File-only references are separate. Unattached prose line numbers and semantic support are not assessed; this parser does not guarantee complete citation extraction.",
+        "semantic_validation": "not_performed",
+        "status": "partial",
+        "unresolved": [
+          {
+            "candidates": [],
+            "end_line": null,
+            "path": "README.md",
+            "reason": "not_tracked",
+            "reference": "README.md",
+            "start_line": null
+          },
+          {
+            "candidates": [],
+            "end_line": 247,
+            "path": "_pytest/cacheprovider.py",
+            "reason": "not_tracked",
+            "reference": "_pytest/cacheprovider.py",
+            "start_line": 203
+          }
+        ]
+      },
+      "question": "How does the TestReadme class separate the concerns of cache directory verification from test execution orchestration to maintain architectural layering between test setup, execution, and assertion phases?",
+      "question_sha256": "d0e5806db568258e4c9c8e8c9aaacdd77bee1340047acf403613324e48e81c8e",
+      "reference_answer": "The test class that verifies README file creation in the cache directory separates cache directory verification from test execution orchestration through a helper method pattern that isolates verification logic from test orchestration.\n\n**Separation of Concerns:**\n\n1. **Cache Directory Verification (`check_readme` method)**: Located at lines 1264-1268 in `testing/test_cacheprovider.py`, this method encapsulates the verification concern:\n   ```python\n   def check_readme(self, pytester: Pytester) -> bool:\n       config = pytester.parseconfigure()\n       assert config.cache is not None\n       readme = config.cache._cachedir.joinpath(\"README.md\")\n       return readme.is_file()\n   ```\n   This method focuses solely on verifying the README.md file's existence in the cache directory. It accesses the cache configuration, constructs the README path, and returns a boolean indicating file existence. It has no knowledge of test execution, test file creation, or pytest runs.\n\n2. **Test Execution Orchestration (`test_readme_passed` and `test_readme_failed` methods)**: Located at lines 1270-1278, these methods handle the orchestration:\n   ```python\n   def test_readme_passed(self, pytester: Pytester) -> None:\n       pytester.makepyfile(\"def test_always_passes(): pass\")\n       pytester.runpytest()\n       assert self.check_readme(pytester) is True\n   \n   def test_readme_failed(self, pytester: Pytester) -> None:\n       pytester.makepyfile(\"def test_always_fails(): assert 0\")\n       pytester.runpytest()\n       assert self.check_readme(pytester) is True\n   ```\n   These methods orchestrate the test lifecycle: creating test files, running pytest, and delegating verification to `check_readme`.\n\n**Architectural Layering:**\n\nThe separation maintains clear boundaries between three phases:\n\n1. **Setup Phase**: Handled in the test methods via `pytester.makepyfile()` - creates test files with different outcomes (passing vs failing tests).\n\n2. **Execution Phase**: Handled in the test methods via `pytester.runpytest()` - executes the test suite, which triggers cache directory creation (as implemented in `_pytest/cacheprovider.py` at lines 203-247, where `_ensure_cache_dir_and_supporting_files()` creates the README.md file).\n\n3. **Assertion Phase**: Delegated to `check_readme()` - isolated verification logic that checks whether the README.md file was created in the cache directory.\n\n**Benefits of This Separation:**\n\n- **Reusability**: The `check_readme` method can be reused across multiple test scenarios without duplicating verification logic.\n- **Maintainability**: Changes to verification logic only require updates to `check_readme`, not to each test method.\n- **Clarity**: Test methods focus on orchestration (what to test), while verification logic is isolated (how to verify).\n- **Testability**: The verification logic can be tested independently of test execution scenarios.\n\nThis design pattern ensures that cache directory verification remains a distinct, reusable concern separate from the orchestration of test execution, maintaining clean architectural boundaries between setup, execution, and assertion phases.",
+      "reference_sha256": "16601549b4d28371e96576680ea6fda746a8411ab338b677caa9f98768113f9e",
+      "repository": {
+        "commit": "5989efe3efec31a9d14f550d89903b6311dfc828",
+        "family_id": "pytest-dev/pytest",
+        "url": "https://github.com/pytest-dev/pytest"
+      },
+      "selection": "additional diagnostic risk sample",
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pytest-dev--pytest-5989efe3efec31a9d14f550d89903b6311dfc828",
+      "task_id": "import-0fb897f83ec571cb8ff367e9"
+    }
+  ]
+}

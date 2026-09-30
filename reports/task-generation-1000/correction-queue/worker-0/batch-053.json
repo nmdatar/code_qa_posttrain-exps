@@ -1,0 +1,75 @@
+{
+  "author_worker": 2,
+  "reviewer_worker": 0,
+  "source_review_report": "reports/task-generation-1000/full-review/batch-053.json",
+  "tasks": [
+    {
+      "bundle": "data/generated/collection-1000-v1/python-pillow--Pillow-c4325c805e59",
+      "original_reference_sha256": "cfe821d0f255157f4a36d9170739d3986989caf4af3833ab944316aa344aef9f",
+      "question": "Why do repeated calls to ImageFont operations cause progressive memory leaks that eventually lead to resource exhaustion in Pillow's FreeType integration?",
+      "question_sha256": "0aee1e4afd9f14be4c825783ffb22512cadd53e98dc872af8a310c8ee0a32a60",
+      "reference_answer": "The premise is not established. FreeTypeFont holds its C font and optionally bytes (src/PIL/ImageFont.py:198-216), while font_dealloc releases FT_Face and allocated font bytes (src/_imagingft.c:1214-1221). These references alone do not form a cycle. The leak regression test repeatedly draws using one font and a memory limit (Tests/test_font_leaks.py:6-23); it is not evidence that current repeated ImageFont operations necessarily leak. Distinguish retained live font objects, allocator behavior, and an actual unreleased allocation using a measured reproduction before assigning a cause.",
+      "reference_sha256": "a1b82b4ca12452bbedf39e053fdc64c666a18db623cdd5da4df55f6bbae8b899",
+      "repository": {
+        "commit": "c4325c805e5909f0bf7201ce1f259bc34a1a49e0",
+        "family_id": "python-pillow/pillow",
+        "url": "https://github.com/python-pillow/Pillow"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/python-pillow--Pillow-c4325c805e5909f0bf7201ce1f259bc34a1a49e0",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-46d164d1fddcedd7c8a72721"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/python-pillow--Pillow-c4325c805e59",
+      "original_reference_sha256": "4ed6a7d95e949f1644bab7904447bce7cfedb295c8268616d96e67b9d3249cb2",
+      "question": "Why does Pillow implement a dual-plugin architecture for FITS file format support using both FitsImagePlugin and FitsStubImagePlugin instead of a single unified plugin?",
+      "question_sha256": "e0cb27c190f82ae5c2d1c0a036fc44b2dae1c31490257ba5216455f321e463bb",
+      "reference_answer": "At this pin, FitsImagePlugin provides a built-in reader using FITS headers and a raw tile (src/PIL/FitsImagePlugin.py:26-63). FitsStubImagePlugin retains register_handler for existing external handlers: it emits a deprecation warning and overrides the FITS open registration for backward compatibility (src/PIL/FitsStubImagePlugin.py:18-43). The stub obtains size/mode through the native reader, then invokes the handler (src/PIL/FitsStubImagePlugin.py:51-66). This is a transition path, not two automatically alternating loaders or a claim of complete FITS coverage.",
+      "reference_sha256": "47eb28680caacf0090b0d9939dc24ccb0bc0f130281af515c968d1fd41fa0a4f",
+      "repository": {
+        "commit": "c4325c805e5909f0bf7201ce1f259bc34a1a49e0",
+        "family_id": "python-pillow/pillow",
+        "url": "https://github.com/python-pillow/Pillow"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/python-pillow--Pillow-c4325c805e5909f0bf7201ce1f259bc34a1a49e0",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-58bfff5b84fffcb8ce8357a8"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/python-pillow--Pillow-c4325c805e59",
+      "original_reference_sha256": "d61e9ee287e584e36444c8fbba963603eed2bfb0bbdacc9c67302562da3eb518",
+      "question": "Why does PIL implement both full plugin implementations and stub plugin implementations for different image formats in its plugin architecture?",
+      "question_sha256": "e6070659a800c96c056384eefa93a32e53482a3f1dbd6f616460c5b2a425b4c1",
+      "reference_answer": "ImageFile subclasses implement format identification/parsing and configure image loading, while StubImageFile explicitly identifies a format and relies on external code to load it (src/PIL/ImageFile.py:315-335). BUFR demonstrates application-specific handler registration and delegation (src/PIL/BufrStubImagePlugin.py:17-24,40-55). This lets specialized handlers integrate with Pillow's image interface without implementing all format processing in that stub. Full plugin implementations do not universally guarantee zero dependencies or optimal performance; those claims do not follow from this architecture.",
+      "reference_sha256": "40dba9af119fde5027ec4909e7f8262a6efaeb6d437b3a7febd110337085b5d2",
+      "repository": {
+        "commit": "c4325c805e5909f0bf7201ce1f259bc34a1a49e0",
+        "family_id": "python-pillow/pillow",
+        "url": "https://github.com/python-pillow/Pillow"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/python-pillow--Pillow-c4325c805e5909f0bf7201ce1f259bc34a1a49e0",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-cf2f71e7e7b258f739a7dd54"
+    },
+    {
+      "bundle": "data/generated/collection-1000-v1/python-pillow--Pillow-c4325c805e59",
+      "original_reference_sha256": "dc91bf5b087cf7d903186735cd83b8ea5e3d9279deb58e9fda4b0c0ec8dc2cb2",
+      "question": "Why does Pillow's numpy array interface architecture use a dual conversion system with separate `__array__()` and `fromarray()` pathways instead of implementing a unified bidirectional array protocol?",
+      "question_sha256": "1c0ef8f56ef54b8c02b3cf2118ad2db07680197fbb673109830988001e5ee37d",
+      "reference_answer": "The two directions have different entry points. Image.__array__ builds shape/type metadata, materializes image bytes (expanding mode 1), and returns np.array over an array-interface wrapper (src/PIL/Image.py:665-685). This is not zero-copy exposure of Pillow's internal storage. fromarray inspects a foreign __array_interface__, selects mode/rawmode, validates dimensionality, converts strided inputs to bytes, and calls frombuffer (src/PIL/Image.py:2890-2921). Their asymmetry reflects exporting Pillow data versus interpreting foreign array metadata, without proving that a unified API is impossible or less efficient.",
+      "reference_sha256": "3b1e31c1ceb23a904fb7c5b70a19ca6833b2b8aeb643cc8780e191382a05a370",
+      "repository": {
+        "commit": "c4325c805e5909f0bf7201ce1f259bc34a1a49e0",
+        "family_id": "python-pillow/pillow",
+        "url": "https://github.com/python-pillow/Pillow"
+      },
+      "snapshot_path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/python-pillow--Pillow-c4325c805e5909f0bf7201ce1f259bc34a1a49e0",
+      "source_inventory_mode": "checkout",
+      "source_scope": "Primary pinned repository snapshot",
+      "task_id": "import-e10ace2cbd40679911ed7eb5"
+    }
+  ]
+}
