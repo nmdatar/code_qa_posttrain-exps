@@ -1,5 +1,7 @@
 # Experiment classification
 
+For the reader-facing sequence and observed outcomes, start with the [research progression](../experiments/README.md). This page is an inventory of interventions and proposals; historical reward/readiness bundles are in the [pinned historical index](EXPERIMENT_HISTORY.md).
+
 This inventory groups the designed experiment families in the repository and supplied screenshot. Numbered execution procedures, roadmap numbers and screenshot numbers are different namespaces. Config revisions/repeats belong to the same family; a config is not evidence that an experiment ran or worked.
 
 **Model** means solver weights/checkpoint or model size changes. **Harness** means inference prompts, orchestration, tools or visible context changes with weights frozen. **Training objective** means rewards/optimizer/loss change and subsequently change weights. **Data/evaluator** means examples, rubrics, grader or measurement changes. **Infrastructure** means scheduling, serving or sandbox setup changes. An experiment can have several labels; use the first column as its primary intervention, not an exclusive taxonomy.

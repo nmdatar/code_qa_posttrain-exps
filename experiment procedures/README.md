@@ -1,8 +1,10 @@
-# Current experiment procedures — campaign v8
+# Experiment designs — campaign v8
 
 See [experiment classification](../docs/EXPERIMENT_CLASSIFICATION.md) for all designed model, harness, reward, data/evaluator and infrastructure studies, including deferred proposals. New [procedure 07: question decomposition](07-question-decomposition.md) and [procedure 08: matched investigation distillation](08-investigation-distillation.md) have separate [research extension configs](../configs/experiments/research-extensions-v1/README.md). They do not replace campaign v8; distillation remains one-example smoke-only.
 
-Use [the current runnable suite](../configs/experiments/current-v8/README.md) and its [study plan](../configs/experiments/current-v8/study-plan.json) for new work. Campaign v8 pins training-claims-v6, all-claims-v7, definition-context-v1, action-alias-v1 and paginate-v1. Earlier atomic-claims-v4/current-v7 settings remain frozen historical inputs.
+Start with the [research progression](../experiments/README.md) for completed studies and results. These procedures describe versioned designs, not a universal latest campaign.
+
+Use [the campaign-v8 suite](../configs/experiments/current-v8/README.md) and its [study plan](../configs/experiments/current-v8/study-plan.json) for new work. Campaign v8 pins training-claims-v6, all-claims-v7, definition-context-v1, action-alias-v1 and paginate-v1. Earlier atomic-claims-v4/current-v7 settings remain frozen historical inputs.
 
 | Procedure | Current configuration and scope |
 |---|---|
