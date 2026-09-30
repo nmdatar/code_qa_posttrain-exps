@@ -14,7 +14,7 @@ from .remote import PACKAGES, verify_bundle, require_remote_worker, controller_r
 
 def prepare(output):
     from .config import inputs
-    c=read('configs/experiments/02-direct-grpo-screen.json')
+    c=read('examples/remote-validation-base.json')
     row=next(r for r in inputs(c)['tasks'] if r['id']=='import-9bf889d14b884ea533ee5165')
     root=Path(output).resolve();root.mkdir(parents=True,exist_ok=False)
     source=Path(__file__).resolve().parents[1]

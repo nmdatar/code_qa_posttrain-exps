@@ -18,7 +18,7 @@ class IndependentCoverageTests(unittest.TestCase):
         from types import SimpleNamespace
         from unittest.mock import patch
         from training_pipeline.collection import CollectionFactory
-        config=json.loads(Path('configs/experiments/reward-v4/diagnostic.json').read_text())
+        config=json.loads(Path('tests/fixtures/experiment_contracts/reward-diagnostic.json').read_text())
         config['environment']['grading_version']='all-claims-v7'
         request={'episode_id':'case','source_row':{'split':'train'},'rubric':{'claims':[{'id':'r1'}],'rubric_hash':'hash'}}
         coverage={'status':'resolved','score':.5,'reason':'one fact'}

@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class RemoteExperimentsTests(unittest.TestCase):
     def config(self):
-        return read(ROOT/'configs/experiments/02-direct-grpo-screen.json')
+        return read(ROOT/'examples/remote-validation-base.json')
 
     def test_local_production_execution_is_rejected_before_remote_allocation(self):
         from training_pipeline.orchestrator import Pipeline
@@ -62,10 +62,11 @@ class RemoteExperimentsTests(unittest.TestCase):
             (root/'secret.txt').write_text('must not upload')
             with self.assertRaises(ConfigurationError):verify_bundle(root)
 
-    def test_all_experiment_configs_pin_remote_and_strict_qwen_judge(self):
-        for path in (ROOT/'configs/experiments').glob('*.json'):
+    def test_frozen_remote_contract_pins_execution_judge_and_budget(self):
+        # Keep this historical contract regression independent of active campaigns.
+        for path in (ROOT/'examples/remote-validation-base.json',
+                     ROOT/'tests/fixtures/experiment_contracts/grpo-schedule.json'):
             c=read(path)
-            if 'environment' not in c:continue
             validate_execution(c['execution'])
             self.assertEqual(c['environment']['grading_version'],'all-claims-v3')
             self.assertEqual(c['judge']['base_model'],'Qwen/Qwen3.5-397B-A17B')

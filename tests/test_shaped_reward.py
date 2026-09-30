@@ -151,7 +151,7 @@ class RewardRoutingTests(unittest.TestCase):
         from training_pipeline.config import validate_config
         from training_pipeline.storage import semantic_hash
         from training_pipeline.contracts import ConfigurationError
-        c=json.loads(Path('configs/experiments/reward-v4/diagnostic.json').read_text())
+        c=json.loads(Path('tests/fixtures/experiment_contracts/reward-diagnostic.json').read_text())
         validate_config(c)
         one=copy.deepcopy(c);one['judge']['repair_attempts']=0
         self.assertEqual(estimate(c,c['spend']['prices'],True)['components_usd']['reference_grading'],
@@ -273,7 +273,7 @@ class PositiveGraderTests(unittest.TestCase):
     def test_new_config_rejects_old_grader(self):
         from training_pipeline.config import validate_config
         from training_pipeline.contracts import ConfigurationError
-        c = json.loads(Path('configs/experiments/reward-v4/diagnostic.json').read_text())
+        c = json.loads(Path('tests/fixtures/experiment_contracts/reward-diagnostic.json').read_text())
         validate_config(c)
         c['environment']['grading_version'] = 'all-claims-v5'
         with self.assertRaises(ConfigurationError):

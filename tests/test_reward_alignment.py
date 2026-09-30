@@ -196,7 +196,7 @@ class AlignedCollectionTests(unittest.TestCase):
         from types import SimpleNamespace
         from unittest.mock import patch
         from training_pipeline.collection import CollectionFactory
-        config = json.loads(Path('configs/experiments/reward-v4/diagnostic.json').read_text())
+        config = json.loads(Path('tests/fixtures/experiment_contracts/reward-diagnostic.json').read_text())
         config['environment']['grading_version'] = 'all-claims-v7'
         config['training_reward'] = {'version': VERSION}
         factory = CollectionFactory(config, self.root, None, judge=SimpleNamespace())
@@ -220,7 +220,7 @@ class AlignedCollectionTests(unittest.TestCase):
         from training_pipeline.config import validate_config
         from training_pipeline.collection import CollectionFactory
         from training_pipeline.contracts import ConfigurationError
-        config = json.loads(Path('configs/experiments/reward-v4/diagnostic.json').read_text())
+        config = json.loads(Path('tests/fixtures/experiment_contracts/reward-diagnostic.json').read_text())
         config['training_reward'] = {'version': VERSION}
         config['environment']['grading_version'] = 'all-claims-v7'
         validate_config(config)

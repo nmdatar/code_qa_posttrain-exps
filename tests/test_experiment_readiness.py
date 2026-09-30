@@ -28,7 +28,7 @@ class ReadinessTests(unittest.TestCase):
     def test_estimate_bounds_schedule_without_pricing_confirmation_for_training(self):
         from training_pipeline.launch import estimate
         from training_pipeline.storage import read
-        c = read('configs/experiments/02-direct-grpo.json')
+        c = read('tests/fixtures/experiment_contracts/grpo-schedule.json')
         # Exercise a fixed schedule independently of the live campaign budget.
         c['stages'][0].update(max_updates=30, max_batches=30)
         prices = c['spend']['prices']
