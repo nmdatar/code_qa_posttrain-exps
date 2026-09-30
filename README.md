@@ -72,6 +72,14 @@ interpret correctness, completeness, failures, and efficiency.
 
 ## Product
 
+**action-trace** is the local repository-research UI: choose a pinned repository and
+Tinker checkpoint, ask a question, and inspect live tool activity, source evidence,
+and isolated execution output. A clearly labeled scripted preview works without
+provider credentials.
+
+See [setup and usage](docs/PRODUCT.md), the [product plan](requirements/PRODUCT_PLAN.md),
+and its [editable Excalidraw flow](requirements/diagrams/product-flow.excalidraw).
+
 ## Correctness-first evaluator
 
 The stricter `qa_eval` package implements evidence checks, claim-level judging,

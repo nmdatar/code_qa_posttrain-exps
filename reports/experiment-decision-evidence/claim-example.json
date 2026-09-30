@@ -1,0 +1,549 @@
+{
+  "task_id": "import-c6fc34340a25ce91bf221303",
+  "answer": "The IndexVariable API guarantees immutability of the name attribute by defining a read-only property (line 2911-2912) and a setter that raises an AttributeError (line 2915-2916), preventing in-place modification. The get_level_variable() method (line 2903-2908) supports MultiIndex introspection by returning a new IndexVariable instance constructed from level values, ensuring the original object remains unchanged. When operations are applied to non-MultiIndex data, get_level_variable() raises a ValueError (line 2906) if level_names is None, indicating the absence of a MultiIndex.",
+  "citations": [
+    {
+      "end_line": 2916,
+      "file_sha256": "597654505291e5df53df404bb28b01b45d2e93a03d01d7fbde39257884355fdc",
+      "id": "c1",
+      "path": "xarray/core/variable.py",
+      "start_line": 2903
+    }
+  ],
+  "original_rubric": {
+    "answerability": "answerable",
+    "claims": [
+      {
+        "id": "c1",
+        "separable_subparts": [],
+        "text": "Name setter blocks assignment and level extraction returns new variable",
+        "weight": 1.0
+      }
+    ],
+    "critical_errors": [
+      "Material falsehood or false claim of code execution"
+    ],
+    "diagram": {
+      "allowed_abstractions": [],
+      "criteria": [],
+      "required": false
+    }
+  },
+  "source_lines": [
+    "2892:     @property",
+    "2893:     def level_names(self) -> list[str] | None:",
+    "2894:         \"\"\"Return MultiIndex level names or None if this IndexVariable has no",
+    "2895:         MultiIndex.",
+    "2896:         \"\"\"",
+    "2897:         index = self.to_index()",
+    "2898:         if isinstance(index, pd.MultiIndex):",
+    "2899:             return index.names",
+    "2900:         else:",
+    "2901:             return None",
+    "2902: ",
+    "2903:     def get_level_variable(self, level):",
+    "2904:         \"\"\"Return a new IndexVariable from a given MultiIndex level.\"\"\"",
+    "2905:         if self.level_names is None:",
+    "2906:             raise ValueError(f\"IndexVariable {self.name!r} has no MultiIndex\")",
+    "2907:         index = self.to_index()",
+    "2908:         return type(self)(self.dims, index.get_level_values(level))",
+    "2909: ",
+    "2910:     @property",
+    "2911:     def name(self) -> Hashable:",
+    "2912:         return self.dims[0]",
+    "2913: ",
+    "2914:     @name.setter",
+    "2915:     def name(self, value) -> NoReturn:",
+    "2916:         raise AttributeError(\"cannot modify name of IndexVariable in-place\")"
+  ],
+  "original_grade": {
+    "aggregation_version": "all-claims-v6",
+    "claim_count": 1,
+    "claims": [
+      {
+        "coverage": "partial",
+        "evidence_keys": [
+          "97935e294928204cda1c9a91ab675c89797494d0cb73fb771d247b4c6bb9e8d5",
+          "fa6dcd4336c8c18008e54bc3619b16d95ccbca5701cff9f9f5c391704d7fbb37",
+          "6994250cc6f7244b0f81409dd989f66b7afd26cba826306b24030073eea0426d",
+          "fc6a8921e681236ee27846378a2b8b2f6625bcaea7b38b05d157fdc1f91bd5db"
+        ],
+        "id": "c1",
+        "material_error": true,
+        "reason": "The answer correctly identifies the read-only property mechanism (lines 2911-2916) preventing name modification. However, it falsely claims that get_level_variable() raises a ValueError if 'level_names is None'. The source code (line 2905) shows the check is 'if self.level_names is None', where 'self.level_names' is a property call, not a local variable or argument named 'level_names'. This misrepresentation of the code logic constitutes a material error in the explanation of error handling.",
+        "verdict": "supported"
+      }
+    ],
+    "human_reviewed": false,
+    "independent_evaluation": false,
+    "material_error": true,
+    "reason": "Material falsehood, contradiction, or false execution claim",
+    "rubric_hash": "c0728bbb2c735c5aa67144e5daa3f7a98571abee4918e4684ca9f09fe95793c1",
+    "score": 0.0,
+    "semantic": {
+      "additional_claims": [
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "97935e294928204cda1c9a91ab675c89797494d0cb73fb771d247b4c6bb9e8d5"
+          ],
+          "id": "claim_1",
+          "material_error": false,
+          "reason": "Supported by lines 2911-2912 which define the property without a standard setter logic, effectively making it read-only via the custom setter.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "fa6dcd4336c8c18008e54bc3619b16d95ccbca5701cff9f9f5c391704d7fbb37"
+          ],
+          "id": "claim_2",
+          "material_error": false,
+          "reason": "Supported by lines 2914-2916 which define the setter raising AttributeError.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "6994250cc6f7244b0f81409dd989f66b7afd26cba826306b24030073eea0426d"
+          ],
+          "id": "claim_3",
+          "material_error": false,
+          "reason": "Supported by lines 2903-2908 showing the method returns a new instance using level values.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "6994250cc6f7244b0f81409dd989f66b7afd26cba826306b24030073eea0426d"
+          ],
+          "id": "claim_4",
+          "material_error": false,
+          "reason": "Implicitly supported by the construction of a new object (line 2908) rather than modifying self, consistent with immutability patterns.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "partial",
+          "evidence_keys": [
+            "fc6a8921e681236ee27846378a2b8b2f6625bcaea7b38b05d157fdc1f91bd5db"
+          ],
+          "id": "claim_5",
+          "material_error": true,
+          "reason": "The claim states the error occurs if 'level_names is None'. The source (line 2905) checks 'self.level_names is None'. 'level_names' is a property of the instance, not a standalone variable or parameter passed to the function. The phrasing implies a local variable check which is factually incorrect regarding the code structure.",
+          "verdict": "contradicted"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "fc6a8921e681236ee27846378a2b8b2f6625bcaea7b38b05d157fdc1f91bd5db",
+            "6994250cc6f7244b0f81409dd989f66b7afd26cba826306b24030073eea0426d"
+          ],
+          "id": "claim_6",
+          "material_error": false,
+          "reason": "The property 'level_names' returns None if the index is not a MultiIndex (lines 2893-2901), so the check correctly indicates the absence of a MultiIndex.",
+          "verdict": "supported"
+        }
+      ],
+      "answer_mode": "answer",
+      "answerability_satisfied": true,
+      "assessment_complete": true,
+      "citation_links": [
+        {
+          "citation_id": "c1",
+          "claim_id": "c1",
+          "reason": "The citation covers the relevant lines for the name property and get_level_variable method, although the answer's interpretation of the error condition contains a factual error regarding variable scope.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_1",
+          "reason": "Lines 2911-2912 are within the cited range.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_2",
+          "reason": "Lines 2915-2916 are within the cited range.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_3",
+          "reason": "Lines 2903-2908 are within the cited range.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_4",
+          "reason": "Lines 2903-2908 are within the cited range.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_5",
+          "reason": "Line 2906 is within the cited range, though the claim text misidentifies the variable being checked.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_6",
+          "reason": "Lines 2905-2906 are within the cited range.",
+          "supported": true
+        }
+      ],
+      "critical_error": false,
+      "diagram": {
+        "assessed": false,
+        "complete": false,
+        "consistent": false,
+        "findings": [],
+        "material_error": false,
+        "readable": false,
+        "supported": false
+      },
+      "disagreements": [],
+      "evidence_keys": [
+        "662ffffd38367e5ee3274d663c220307c6bd6098eee19dd819cb62a98a9314fc",
+        "6994250cc6f7244b0f81409dd989f66b7afd26cba826306b24030073eea0426d",
+        "7f9a213e9a2257aa100984ece6ec772720b5a4bab6ad61a69145cee30e8a255e",
+        "97935e294928204cda1c9a91ab675c89797494d0cb73fb771d247b4c6bb9e8d5",
+        "e464f69f754519f668e2d1d29da304a9ea9c60cffa98e0167b8a3a2a2963035f",
+        "fa6dcd4336c8c18008e54bc3619b16d95ccbca5701cff9f9f5c391704d7fbb37",
+        "fc6a8921e681236ee27846378a2b8b2f6625bcaea7b38b05d157fdc1f91bd5db",
+        "repository_snapshot",
+        "source_0677bb7c760d7e6429fbba8f"
+      ],
+      "experiment_hash": "082ea152bbbd549c9324f4abb984a5163442b6e04c7e3e37c4aa825dc05c7cf2",
+      "extracted_claims": [
+        {
+          "id": "claim_1",
+          "source": "text",
+          "text": "The IndexVariable API guarantees immutability of the name attribute by defining a read-only property."
+        },
+        {
+          "id": "claim_2",
+          "source": "text",
+          "text": "The IndexVariable API includes a setter for the name attribute that raises an AttributeError to prevent in-place modification."
+        },
+        {
+          "id": "claim_3",
+          "source": "text",
+          "text": "The get_level_variable() method supports MultiIndex introspection by returning a new IndexVariable instance constructed from level values."
+        },
+        {
+          "id": "claim_4",
+          "source": "text",
+          "text": "Returning a new IndexVariable instance in get_level_variable() ensures the original object remains unchanged."
+        },
+        {
+          "id": "claim_5",
+          "source": "text",
+          "text": "When operations are applied to non-MultiIndex data, get_level_variable() raises a ValueError if level_names is None."
+        },
+        {
+          "id": "claim_6",
+          "source": "text",
+          "text": "A ValueError raised by get_level_variable() when level_names is None indicates the absence of a MultiIndex."
+        }
+      ],
+      "false_execution_claim": false,
+      "judge_family": "qwen",
+      "judge_version": "all-claims-v6",
+      "needs_review": false,
+      "prompt_version": "1.0",
+      "required_claims": [
+        {
+          "coverage": "partial",
+          "evidence_keys": [
+            "97935e294928204cda1c9a91ab675c89797494d0cb73fb771d247b4c6bb9e8d5",
+            "fa6dcd4336c8c18008e54bc3619b16d95ccbca5701cff9f9f5c391704d7fbb37",
+            "6994250cc6f7244b0f81409dd989f66b7afd26cba826306b24030073eea0426d",
+            "fc6a8921e681236ee27846378a2b8b2f6625bcaea7b38b05d157fdc1f91bd5db"
+          ],
+          "id": "c1",
+          "material_error": true,
+          "reason": "The answer correctly identifies the read-only property mechanism (lines 2911-2916) preventing name modification. However, it falsely claims that get_level_variable() raises a ValueError if 'level_names is None'. The source code (line 2905) shows the check is 'if self.level_names is None', where 'self.level_names' is a property call, not a local variable or argument named 'level_names'. This misrepresentation of the code logic constitutes a material error in the explanation of error handling.",
+          "verdict": "supported"
+        }
+      ],
+      "schema_version": "1.0",
+      "snapshot_fingerprint": "8373c90881db3e140e79d00275a41431902b5ebe41bce3b6d6291278c0b6aa0d",
+      "submission_hash": "79fe62f07214acfae62bcad0c2fe20de1d76396a175b729bc94df336fae89f15",
+      "task_hash": "9213d44e64de363f087822421834fde52eacf0525cb952a9243de064496a8ef5",
+      "uncited_claim_ids": []
+    },
+    "status": "resolved",
+    "strict_score": 0.0,
+    "tier": "failed",
+    "training_feedback": {
+      "components": {
+        "bad_citation": 0,
+        "contradicted": 1,
+        "required_coverage": 0.5,
+        "uncited": 0,
+        "unsupported": 0
+      },
+      "eligible": true,
+      "reward": 0.5,
+      "version": "positive-coverage-v4"
+    }
+  },
+  "atomic_grade": {
+    "aggregation_version": "all-claims-v6",
+    "claim_count": 2,
+    "claims": [
+      {
+        "coverage": "complete",
+        "evidence_keys": [
+          "97935e294928204cda1c9a91ab675c89797494d0cb73fb771d247b4c6bb9e8d5",
+          "fa6dcd4336c8c18008e54bc3619b16d95ccbca5701cff9f9f5c391704d7fbb37"
+        ],
+        "id": "c1",
+        "material_error": false,
+        "reason": "The answer correctly identifies that the name attribute is a read-only property (lines 2911-2912) and that the setter raises an AttributeError (lines 2915-2916), preventing assignment. This matches the source code in e5 and e6.",
+        "verdict": "supported"
+      },
+      {
+        "coverage": "complete",
+        "evidence_keys": [
+          "6994250cc6f7244b0f81409dd989f66b7afd26cba826306b24030073eea0426d"
+        ],
+        "id": "c2",
+        "material_error": false,
+        "reason": "The answer correctly states that get_level_variable() returns a new IndexVariable instance (line 2908) constructed from level values, ensuring the original object is unchanged. The source code in e7 confirms the return statement creates a new instance via type(self)(...).",
+        "verdict": "supported"
+      }
+    ],
+    "human_reviewed": false,
+    "independent_evaluation": false,
+    "material_error": false,
+    "reason": "All submitted assertions and required claims assessed",
+    "rubric_hash": "8e4ec1ef183ca898d6db55fbf025300ec05f99d7b6f7d8c9f007f3ef6705bf52",
+    "score": 1.0,
+    "semantic": {
+      "additional_claims": [
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "97935e294928204cda1c9a91ab675c89797494d0cb73fb771d247b4c6bb9e8d5"
+          ],
+          "id": "claim_1",
+          "material_error": false,
+          "reason": "Supported by lines 2911-2912 in e5 which define the property without a standard setter logic, just an error raiser.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "fa6dcd4336c8c18008e54bc3619b16d95ccbca5701cff9f9f5c391704d7fbb37"
+          ],
+          "id": "claim_2",
+          "material_error": false,
+          "reason": "Supported by lines 2914-2916 in e6 which explicitly raise AttributeError.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "6994250cc6f7244b0f81409dd989f66b7afd26cba826306b24030073eea0426d"
+          ],
+          "id": "claim_3",
+          "material_error": false,
+          "reason": "Supported by line 2908 in e7 which returns a new instance using index.get_level_values(level).",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "6994250cc6f7244b0f81409dd989f66b7afd26cba826306b24030073eea0426d"
+          ],
+          "id": "claim_4",
+          "material_error": false,
+          "reason": "Implicitly supported by the fact that a new instance is returned (claim_3) and the method does not modify self. The source in e7 shows no mutation of self.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "fc6a8921e681236ee27846378a2b8b2f6625bcaea7b38b05d157fdc1f91bd5db"
+          ],
+          "id": "claim_5",
+          "material_error": false,
+          "reason": "Supported by lines 2905-2906 in e8. The code checks if self.level_names is None (which implies no MultiIndex) and raises ValueError.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "fc6a8921e681236ee27846378a2b8b2f6625bcaea7b38b05d157fdc1f91bd5db",
+            "7f9a213e9a2257aa100984ece6ec772720b5a4bab6ad61a69145cee30e8a255e"
+          ],
+          "id": "claim_6",
+          "material_error": false,
+          "reason": "Supported by the logic in e8 and the definition of level_names in e2 (lines 2893-2901), which returns None if the index is not a MultiIndex. Thus, level_names being None indicates the absence of a MultiIndex.",
+          "verdict": "supported"
+        }
+      ],
+      "answer_mode": "answer",
+      "answerability_satisfied": true,
+      "assessment_complete": true,
+      "citation_links": [
+        {
+          "citation_id": "c1",
+          "claim_id": "c1",
+          "reason": "Citation c1 covers lines 2903-2916. This range includes the name property and setter (2911-2916) relevant to claim c1.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "c2",
+          "reason": "Citation c1 covers lines 2903-2916. This range includes the get_level_variable method (2903-2908) relevant to claim c2.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_1",
+          "reason": "Citation c1 includes the relevant lines for the name property.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_2",
+          "reason": "Citation c1 includes the relevant lines for the name setter.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_3",
+          "reason": "Citation c1 includes the get_level_variable method implementation.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_4",
+          "reason": "Citation c1 includes the get_level_variable method implementation.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_5",
+          "reason": "Citation c1 includes the ValueError raise in get_level_variable.",
+          "supported": true
+        },
+        {
+          "citation_id": "c1",
+          "claim_id": "claim_6",
+          "reason": "Citation c1 includes the context (level_names check) required to verify this claim.",
+          "supported": true
+        }
+      ],
+      "critical_error": false,
+      "diagram": {
+        "assessed": false,
+        "complete": false,
+        "consistent": false,
+        "findings": [],
+        "material_error": false,
+        "readable": false,
+        "supported": false
+      },
+      "disagreements": [],
+      "evidence_keys": [
+        "662ffffd38367e5ee3274d663c220307c6bd6098eee19dd819cb62a98a9314fc",
+        "6994250cc6f7244b0f81409dd989f66b7afd26cba826306b24030073eea0426d",
+        "7f9a213e9a2257aa100984ece6ec772720b5a4bab6ad61a69145cee30e8a255e",
+        "97935e294928204cda1c9a91ab675c89797494d0cb73fb771d247b4c6bb9e8d5",
+        "e464f69f754519f668e2d1d29da304a9ea9c60cffa98e0167b8a3a2a2963035f",
+        "fa6dcd4336c8c18008e54bc3619b16d95ccbca5701cff9f9f5c391704d7fbb37",
+        "fc6a8921e681236ee27846378a2b8b2f6625bcaea7b38b05d157fdc1f91bd5db",
+        "repository_snapshot",
+        "source_0677bb7c760d7e6429fbba8f"
+      ],
+      "experiment_hash": "082ea152bbbd549c9324f4abb984a5163442b6e04c7e3e37c4aa825dc05c7cf2",
+      "extracted_claims": [
+        {
+          "id": "claim_1",
+          "source": "text",
+          "text": "The IndexVariable API guarantees immutability of the name attribute by defining a read-only property."
+        },
+        {
+          "id": "claim_2",
+          "source": "text",
+          "text": "The IndexVariable API includes a setter for the name attribute that raises an AttributeError to prevent in-place modification."
+        },
+        {
+          "id": "claim_3",
+          "source": "text",
+          "text": "The get_level_variable() method supports MultiIndex introspection by returning a new IndexVariable instance constructed from level values."
+        },
+        {
+          "id": "claim_4",
+          "source": "text",
+          "text": "The get_level_variable() method ensures the original object remains unchanged."
+        },
+        {
+          "id": "claim_5",
+          "source": "text",
+          "text": "When operations are applied to non-MultiIndex data, get_level_variable() raises a ValueError if level_names is None."
+        },
+        {
+          "id": "claim_6",
+          "source": "text",
+          "text": "A ValueError raised by get_level_variable() when level_names is None indicates the absence of a MultiIndex."
+        }
+      ],
+      "false_execution_claim": false,
+      "judge_family": "qwen",
+      "judge_version": "all-claims-v6",
+      "needs_review": false,
+      "prompt_version": "1.0",
+      "required_claims": [
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "97935e294928204cda1c9a91ab675c89797494d0cb73fb771d247b4c6bb9e8d5",
+            "fa6dcd4336c8c18008e54bc3619b16d95ccbca5701cff9f9f5c391704d7fbb37"
+          ],
+          "id": "c1",
+          "material_error": false,
+          "reason": "The answer correctly identifies that the name attribute is a read-only property (lines 2911-2912) and that the setter raises an AttributeError (lines 2915-2916), preventing assignment. This matches the source code in e5 and e6.",
+          "verdict": "supported"
+        },
+        {
+          "coverage": "complete",
+          "evidence_keys": [
+            "6994250cc6f7244b0f81409dd989f66b7afd26cba826306b24030073eea0426d"
+          ],
+          "id": "c2",
+          "material_error": false,
+          "reason": "The answer correctly states that get_level_variable() returns a new IndexVariable instance (line 2908) constructed from level values, ensuring the original object is unchanged. The source code in e7 confirms the return statement creates a new instance via type(self)(...).",
+          "verdict": "supported"
+        }
+      ],
+      "schema_version": "1.0",
+      "snapshot_fingerprint": "8373c90881db3e140e79d00275a41431902b5ebe41bce3b6d6291278c0b6aa0d",
+      "submission_hash": "79fe62f07214acfae62bcad0c2fe20de1d76396a175b729bc94df336fae89f15",
+      "task_hash": "71e3f5d0438e9fda082a1e161fc5a155125b3fe9221a2743fc9cb65096378c12",
+      "uncited_claim_ids": []
+    },
+    "status": "resolved",
+    "strict_score": 1.0,
+    "tier": "accepted",
+    "training_feedback": {
+      "components": {
+        "bad_citation": 0,
+        "contradicted": 0,
+        "required_coverage": 1.0,
+        "uncited": 0,
+        "unsupported": 0
+      },
+      "eligible": true,
+      "reward": 1.0,
+      "version": "positive-coverage-v4"
+    }
+  },
+  "sources": {
+    "original": "artifacts/atomic-claims-comparison-results/artifacts/experiments/atomic-claims-judge-comparison-reviewed-v1/comparison/Qwen3.5-397B-A17B/original/private/saved-correct.assess.judge-raw.json",
+    "atomic": "artifacts/atomic-claims-comparison-results/artifacts/experiments/atomic-claims-judge-comparison-reviewed-v1/comparison/Qwen3.5-397B-A17B/atomic/private/saved-correct.assess.judge-raw.json"
+  }
+}

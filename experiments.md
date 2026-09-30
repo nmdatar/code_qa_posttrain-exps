@@ -1,4 +1,8 @@
+> **Current execution plan:** use [procedures 1–6](experiment%20procedures/README.md) and [current-v8 configurations](configs/experiments/current-v8/README.md). This file is the broader research roadmap; its numbering differs from the execution procedures. REINFORCE, PPO/learned rewards, annotations and 9B scaling remain deferred. All future studies inherit the current dataset/cohort/judge version lock unless a separately registered ablation explicitly changes it.
+
 # Experiments, in recommended order
+
+For a classification of every designed experiment family by what it changes, see [experiment classification](docs/EXPERIMENT_CLASSIFICATION.md). The screenshot's decomposition and distillation ideas are covered by [procedure 07](experiment%20procedures/07-question-decomposition.md) and [procedure 08](experiment%20procedures/08-investigation-distillation.md), with separate offline-validated configs. Historical running-baseline REINFORCE has since been implemented/submitted; the deferred status below refers to the broader roadmap/current-v8 suite, not that historical run.
 
 Research checked September 28, 2026. Start with **Qwen3.5-4B**, then repeat the strongest results on **Qwen3.5-9B**, as specified in the [project description](PROJECT_DESCRIPTION.md). Both appear in the [Tinker catalog](https://tinker-docs.thinkingmachines.ai/tinker/models/). Record exact checkpoint IDs: these are starting models; a pretrained `-Base` checkpoint is a separate initialization experiment.
 

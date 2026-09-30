@@ -1,5 +1,7 @@
 # Generated tasks and isolated environments
 
+The current three-repository development batch is documented in [Dataset execution status](requirements/DATASET_EXECUTION_STATUS.md). It extends the Click example below with runnable Pydantic, TanStack Query, and SQLAlchemy tasks, independent investigations, and replay.
+
 Implementation of the repository/environment portion of [the dataset roadmap](requirements/DATASET_ROADMAP.md). This is a working-example pipeline, not a claim that all roadmap components or a training-ready release are complete.
 
 ## Included source tasks
@@ -33,6 +35,8 @@ uv pip install --python .venv-dataset/bin/python 'modal==1.5.5'
 .venv-dataset/bin/modal token new
 .venv-dataset/bin/python -m dataset_builder build-environment \
   --bundle data/generated/click-v1 --backend modal
+.venv-dataset/bin/python -m dataset_builder check-isolation \
+  --bundle data/generated/click-v1
 .venv-dataset/bin/python -m dataset_builder verify \
   --bundle data/generated/click-v1
 ```
@@ -69,3 +73,11 @@ python3 -m unittest discover -s tests -v
 Tests cover schema/private-data separation, dirty and wrong-commit rejection, evidence path/symlink confinement, split leakage, deterministic preparation, immutable output preservation, sandbox command policies, timeout/output handling, and private assertion results.
 
 Behavior probes verify reference facts, not the semantic quality of a generated answer. The source explanations still require review. This implementation does not fabricate a teacher trajectory, an SFT release, a human review, or an RL training run. Automated repository discovery, general question generation, a provider-backed agent controller, large-scale collection, and final release admission remain subsequent components. This example gives those components a concrete task/environment contract and reproducible checks.
+
+## Observed working example
+
+The pinned Click image built on Modal as `im-Xbi4p0L9GTllFaxjFjyLi8`. Readiness imported `/workspace/src/click/__init__.py`. Both private behavior probes passed in separate sandboxes: optional values produced Default / Flag / Alice; negative boolean and nonboolean cases produced True / False / upper / upper. See [execution summary](reports/dataset-generation-example.json) and the generated private verification report for exact outputs and sandbox IDs. No repository code ran on the host.
+
+Live isolation checks passed in two fresh sandboxes: nonroot, read-only source, blocked outbound connection, no bundled gold, and clean temporary state. Modal did not honor Dockerfile USER by itself; runtime v2 explicitly drops supplementary groups/GID/UID and enables `no_new_privs` before executing commands. The initial failed isolation report is preserved separately from the corrected passing report.
+
+An independent subagent solved the first public task without access to private grading records. Its [answer](artifacts/dataset-example/independent-answer.json) and [investigation log](artifacts/dataset-example/investigation.jsonl) include actual source citations and a successful Modal probe, plus the initial failed import and retry. This is an agent-produced example, not human-reviewed gold or a trainer-ready token/log-probability trajectory. All 113 local tests passed.

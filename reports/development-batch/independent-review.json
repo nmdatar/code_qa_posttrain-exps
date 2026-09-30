@@ -1,0 +1,299 @@
+{
+  "reviewer_kind": "independent_codex_agent",
+  "human_reviewed": false,
+  "official_model_evaluation": false,
+  "reviewer_model_family": null,
+  "reviewer_model_version": null,
+  "review_scope": "Independent semantic review of all 18 required claims, answer additions, cited exact-commit source and actual recorded probe code/output. Not human approval or an official model evaluation. No repository code executed on host and no new runtime execution performed; only read-only text parsing and Git inspection. Reviewer model family/version unavailable.",
+  "tasks": [
+    {
+      "task_id": "pydantic-frozen-copy-8960",
+      "status": "supported",
+      "repository_commit": "bb6da4cfbb1f559885ea2fa207ec93853bfeac64",
+      "source_snapshot": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/pydantic--pydantic-bb6da4cfbb1f559885ea2fa207ec93853bfeac64",
+      "required_claims": [
+        {
+          "id": "copy-bypasses-validation",
+          "verdict": "supported",
+          "reason": "Direct __dict__.update bypasses validation after __new__-based copying; probe confirms invalid distinct copy and unchanged original.",
+          "evidence": [
+            "pydantic/main.py:410-469",
+            "artifacts/investigations/pydantic-v1/trajectory.jsonl#sequence=4"
+          ]
+        },
+        {
+          "id": "deep-is-not-validation",
+          "verdict": "supported",
+          "reason": "At this exact revision deep+update shallow-copies then deep-copies only existing values not being replaced before the same unvalidated update; both depth results agree.",
+          "evidence": [
+            "pydantic/main.py:432-469",
+            "artifacts/investigations/pydantic-v1/trajectory.jsonl#sequence=4"
+          ]
+        },
+        {
+          "id": "frozen-and-strict",
+          "verdict": "supported",
+          "reason": "Assignment reaches _check_frozen before validate_assignment, strict is a core validation setting, and neither intercepts copy updates. Probe observes frozen_instance on both assignment types and int_type on construction.",
+          "evidence": [
+            "pydantic/main.py:96-106",
+            "pydantic/main.py:1136-1157",
+            "pydantic/config.py:461-486",
+            "artifacts/investigations/pydantic-v1/trajectory.jsonl#sequence=4"
+          ]
+        },
+        {
+          "id": "instance-revalidation-default",
+          "verdict": "supported",
+          "reason": "model_validate forwards strict to validate_python while revalidate_instances defaults to never. Probe confirms identity-preserving acceptance of invalid existing instance.",
+          "evidence": [
+            "pydantic/main.py:747-798",
+            "pydantic/_internal/_config.py:279-284",
+            "pydantic/config.py:491-526",
+            "artifacts/investigations/pydantic-v1/trajectory.jsonl#sequence=4"
+          ]
+        },
+        {
+          "id": "instance-revalidation-always",
+          "verdict": "supported",
+          "reason": "Configuration merges inherited model settings and maps revalidate_instances into CoreConfig attached to schema and validator; always-model copy succeeds then model_validate rejects with int_type.",
+          "evidence": [
+            "pydantic/config.py:491-504",
+            "pydantic/_internal/_config.py:32-46",
+            "pydantic/_internal/_config.py:220-228",
+            "artifacts/investigations/pydantic-v1/trajectory.jsonl#sequence=4"
+          ]
+        },
+        {
+          "id": "validate-input-mapping",
+          "verdict": "supported",
+          "reason": "Ordinary mapping passes through validate_python; invalid quantity is rejected and integer 2 accepted. Extra-forbid is separately verified by direct keyword construction. model_dump is correctly described as serialization, not validation.",
+          "evidence": [
+            "pydantic/main.py:747-798",
+            "pydantic/config.py:84-104",
+            "pydantic/config.py:461-486",
+            "artifacts/investigations/pydantic-v1/trajectory.jsonl#sequence=4"
+          ]
+        }
+      ],
+      "citation_findings": [
+        {
+          "status": "supported",
+          "finding": "Every distinct answer citation was read at its stated range in the pinned checkout. Ranges exist and support the mechanism; no materially invalid citation found. Snapshot HEAD matches the task commit, Git status is clean, reference file hashes match. Answer Markdown and JSON prose match.",
+          "additional_mechanism_evidence": [
+            "pydantic/main.py:1034-1072",
+            "pydantic/main.py:270-280",
+            "pydantic/main.py:1139-1154",
+            "pydantic/_internal/_config.py:147-187",
+            "pydantic/_internal/_generate_schema.py:932-941",
+            "pydantic/_internal/_model_construction.py:635-660"
+          ]
+        }
+      ],
+      "execution_claims_supported": true,
+      "execution_evidence": {
+        "trajectory": "artifacts/investigations/pydantic-v1/trajectory.jsonl#sequence=4",
+        "exit_code": 0,
+        "stderr": "",
+        "timed_out": false,
+        "truncated": false,
+        "private_verification_report": "data/generated/pydantic-v1/private/verification-report.json",
+        "finding": "Actual probe inputs and stdout agree with answer tables and execution statements. Separate private fixture also passes, but its output was not substituted for answer-trajectory evidence."
+      },
+      "material_errors": [],
+      "ambiguity_notes": [],
+      "quality_notes": [
+        "Revision-specific selective deep-copy behavior is correctly explained. Always-revalidation is configured on the same model whose instance is later validated. Rust internals remain outside scope."
+      ]
+    },
+    {
+      "task_id": "tanstack-hydration-fetch-freshness-8936",
+      "status": "supported",
+      "repository_commit": "fd96529f3e0b748874be4655516caecc5d6a0521",
+      "source_snapshot": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/TanStack--query-fd96529f3e0b748874be4655516caecc5d6a0521",
+      "required_claims": [
+        {
+          "id": "hydration-state-not-options",
+          "verdict": "supported",
+          "reason": "dehydrateQuery spreads query state and emits identity, timestamp and optional metadata/type/promise; staleTime and queryFn are absent, as the source comment explicitly says.",
+          "evidence": [
+            "packages/query-core/src/hydration.ts:139-171",
+            "artifacts/investigations/tanstack-query-v1/trajectory.jsonl#sequence=11"
+          ]
+        },
+        {
+          "id": "client-options-after-hydration",
+          "verdict": "supported",
+          "reason": "New-entry hydrate spreads hydration defaults and sets idle while preserving successful dataUpdatedAt; QueryCache.build applies client defaults. Probe confirms stored 5000 and timestamp 1000000.",
+          "evidence": [
+            "packages/query-core/src/hydration.ts:340-369",
+            "packages/query-core/src/queryCache.ts:159-176",
+            "packages/query-core/src/queryClient.ts:1024-1029",
+            "artifacts/investigations/tanstack-query-v1/trajectory.jsonl#sequence=11"
+          ]
+        },
+        {
+          "id": "explicit-call-wins",
+          "verdict": "supported",
+          "reason": "defaultQueryOptions merges global defaults, key defaults and explicit options in that order; fetchQuery uses the resulting call staleTime.",
+          "evidence": [
+            "packages/query-core/src/queryClient.ts:1024-1029",
+            "packages/query-core/src/queryClient.ts:623-635",
+            "artifacts/investigations/tanstack-query-v1/trajectory.jsonl#sequence=11"
+          ]
+        },
+        {
+          "id": "ten-second-cache-hit",
+          "verdict": "supported",
+          "reason": "Numeric time check leaves 290000 ms at age 10000 and fresh branch resolves query.state.data without query.fetch; observed calls=0 and server-report agree.",
+          "evidence": [
+            "packages/query-core/src/queryClient.ts:623-637",
+            "packages/query-core/src/query.ts:473-488",
+            "packages/query-core/src/utils.ts:136-138",
+            "artifacts/investigations/tanstack-query-v1/trajectory.jsonl#sequence=11"
+          ]
+        },
+        {
+          "id": "expiration-boundary",
+          "verdict": "supported",
+          "reason": "Math.max reaches zero at equality and isStaleByTime negates it. Fresh independent clients observe calls 0 at 299999, calls 1 at 300000 and 300001, and loader-report after fetch.",
+          "evidence": [
+            "packages/query-core/src/query.ts:473-488",
+            "packages/query-core/src/utils.ts:136-138",
+            "packages/query-core/src/queryClient.ts:633-637",
+            "artifacts/investigations/tanstack-query-v1/trajectory.jsonl#sequence=11"
+          ]
+        },
+        {
+          "id": "display-not-fetch-policy",
+          "verdict": "supported",
+          "reason": "Observer-free isStale checks missing data/invalidation only; imperative fetch uses resolved call staleTime. Probe records flags before fetch and distinguishes stored option from effective policy. No DevTools implementation or execution claimed.",
+          "evidence": [
+            "packages/query-core/src/query.ts:447-457",
+            "packages/query-core/src/queryClient.ts:623-637",
+            "artifacts/investigations/tanstack-query-v1/trajectory.jsonl#sequence=11"
+          ]
+        }
+      ],
+      "citation_findings": [
+        {
+          "status": "supported",
+          "finding": "Every distinct answer citation was read at its stated range in the pinned checkout. Ranges exist and support the mechanism; no materially invalid citation found. Snapshot HEAD matches the task commit, Git status is clean, reference file hashes match. Answer Markdown and JSON prose match.",
+          "additional_mechanism_evidence": []
+        }
+      ],
+      "execution_claims_supported": true,
+      "execution_evidence": {
+        "trajectory": "artifacts/investigations/tanstack-query-v1/trajectory.jsonl#sequence=11",
+        "exit_code": 0,
+        "stderr": "",
+        "timed_out": false,
+        "truncated": false,
+        "private_verification_report": "data/generated/tanstack-query-v1/private/verification-report.json",
+        "finding": "Actual probe inputs and stdout agree with answer tables and execution statements. Separate private fixture also passes, but its output was not substituted for answer-trajectory evidence."
+      },
+      "material_errors": [],
+      "ambiguity_notes": [],
+      "quality_notes": [
+        "Separate clients, controlled clock, gcTime Infinity and zero observer assertion match assumptions. Before-fetch stale flags are distinguished from refreshed state; option persistence is correctly limited to cache-hit cases."
+      ]
+    },
+    {
+      "task_id": "sqlalchemy-filtered-collection-7654",
+      "status": "supported",
+      "repository_commit": "749086adb0cc5b966aa3854712f16e213b979310",
+      "source_snapshot": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/artifacts/repos/sqlalchemy--sqlalchemy-749086adb0cc5b966aa3854712f16e213b979310",
+      "required_claims": [
+        {
+          "id": "sql-versus-loaded-state",
+          "verdict": "supported",
+          "reason": "Raw SQL output has only Book 1 while ordinary ORM result retains [1,2]. Documentation and partial-path attribute gates explain preserved loaded state.",
+          "evidence": [
+            "doc/build/orm/queryguide/relationships.rst:1125-1132",
+            "doc/build/orm/queryguide/relationships.rst:1165-1176",
+            "artifacts/investigations/sqlalchemy-v1/trajectory.jsonl#sequence=8"
+          ]
+        },
+        {
+          "id": "identity-map-reuse",
+          "verdict": "supported",
+          "reason": "Identity key lookup retrieves existing instance and its state/dict; allocation is only in absent-identity branch. Both filtered result is-client checks are True.",
+          "evidence": [
+            "lib/sqlalchemy/orm/loading.py:1085-1103",
+            "artifacts/investigations/sqlalchemy-v1/trajectory.jsonl#sequence=8"
+          ]
+        },
+        {
+          "id": "population-branch",
+          "verdict": "supported",
+          "reason": "currentload or effective_populate_existing selects _populate_full; otherwise _populate_partial gates attributes on unloaded/to_load. The answer correctly explains that isnew can mean first row in this load, not a new object.",
+          "evidence": [
+            "lib/sqlalchemy/orm/loading.py:1133-1163",
+            "lib/sqlalchemy/orm/loading.py:1198-1223",
+            "artifacts/investigations/sqlalchemy-v1/trajectory.jsonl#sequence=8"
+          ]
+        },
+        {
+          "id": "replace-filtered-collection",
+          "verdict": "supported",
+          "reason": "populate_existing flows through context to loader; full population invokes new collection populator which clears collection and appends joined Book 1. Same parent identity and [1] observed.",
+          "evidence": [
+            "doc/build/orm/queryguide/relationships.rst:1145-1176",
+            "lib/sqlalchemy/orm/loading.py:1133-1163",
+            "artifacts/investigations/sqlalchemy-v1/trajectory.jsonl#sequence=8"
+          ]
+        },
+        {
+          "id": "expiration-not-sticky",
+          "verdict": "supported",
+          "reason": "Documentation explicitly makes custom contains_eager contents non-sticky. Probe expiration performs no SELECT; next access emits ordinary FK-only lazy-load SQL and restores [1,2]. Stored foreign keys remain unchanged.",
+          "evidence": [
+            "doc/build/orm/queryguide/relationships.rst:1178-1184",
+            "artifacts/investigations/sqlalchemy-v1/trajectory.jsonl#sequence=8"
+          ]
+        },
+        {
+          "id": "pending-change-caution",
+          "verdict": "supported",
+          "reason": "Documentation warns of resetting loaded attributes/pending changes and recommends flush; ORM context invokes autoflush and loader commits refreshed state. Answer correctly scopes the fixture to flushed data.",
+          "evidence": [
+            "doc/build/orm/queryguide/relationships.rst:1173-1176",
+            "artifacts/investigations/sqlalchemy-v1/trajectory.jsonl#sequence=8"
+          ]
+        }
+      ],
+      "citation_findings": [
+        {
+          "status": "supported",
+          "finding": "Every distinct answer citation was read at its stated range in the pinned checkout. Ranges exist and support the mechanism; no materially invalid citation found. Snapshot HEAD matches the task commit, Git status is clean, reference file hashes match. Answer Markdown and JSON prose match.",
+          "additional_mechanism_evidence": [
+            "lib/sqlalchemy/orm/loading.py:1336-1364",
+            "lib/sqlalchemy/orm/loading.py:1412-1444",
+            "lib/sqlalchemy/orm/strategies.py:2890-2935",
+            "lib/sqlalchemy/orm/context.py:515-531",
+            "lib/sqlalchemy/orm/context.py:590-591"
+          ]
+        }
+      ],
+      "execution_claims_supported": true,
+      "execution_evidence": {
+        "trajectory": "artifacts/investigations/sqlalchemy-v1/trajectory.jsonl#sequence=8",
+        "exit_code": 0,
+        "stderr": "",
+        "timed_out": false,
+        "truncated": false,
+        "private_verification_report": "data/generated/sqlalchemy-v1/private/verification-report.json",
+        "finding": "Actual probe inputs and stdout agree with answer tables and execution statements. Separate private fixture also passes, but its output was not substituted for answer-trajectory evidence."
+      },
+      "material_errors": [],
+      "ambiguity_notes": [],
+      "quality_notes": [
+        "Run-id interpretation, unloaded-state gating and collection reset are explained. Strong references make book identity comparisons meaningful; all requested read/refresh/expire stages use one Session."
+      ]
+    }
+  ],
+  "difficulty_advisory": {
+    "evidence": "reports/development-batch/question-only-control.json",
+    "finding": "The fresh zero-tool control recovers the main behavioral answers for all three scenarios. These are useful development/runtime correctness tasks, but this evidence does not justify calling them hard repository reasoning. Exact pinned paths, citations and observed execution still require verification. Pydantic is particularly discriminating at mechanism level: the control gives generic __copy__/__deepcopy__ routing, while this commit uses selective deep-copy for a nonempty update.",
+    "limitations": "Control prompts were abbreviated, not byte-identical; one answer per task and model version unknown. Advisory difficulty screening only, not a formal score, pass-rate estimate or official model evaluation."
+  }
+}
