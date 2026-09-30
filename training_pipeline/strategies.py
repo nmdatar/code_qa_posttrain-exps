@@ -57,6 +57,49 @@ def grpo_batch(groups):
         scale = advantage / (tokens * len(contributing))
         for g in trajectory.generations:
             rows.append(shifted(g.prompt, g.tokens, [scale] * len(g.tokens), g.logprobs))
+    # Report all resolved attempts, including those in otherwise excluded groups.
+    attempts = [t for group in groups for t in group]
+    resolved = [t.verification.reward for t in attempts
+                if t.verification is not None and t.verification.status == 'resolved']
+    stats.update(mean_reward=statistics.fmean(resolved) if resolved else None,
+                 eligible_mean_reward=statistics.fmean(stats['rewards']) if stats['rewards'] else None,
+                 scoring_coverage=len(resolved)/len(attempts) if attempts else 0.0,
+                 attempted_trajectories=len(attempts), resolved_trajectories=len(resolved),
+                 excluded_group_fraction=stats['excluded_groups']/len(groups) if groups else 0.0)
     stats['contributing_trajectories'] = len(contributing)
     stats['reward_variance'] = statistics.pvariance(stats['rewards']) if stats['rewards'] else None
     return rows, stats
+
+
+def reinforce_batch(groups, baseline_state=None):
+    """Prior-batch running mean baseline; never center within the current group.
+
+    Preserve GRPO's complete-group admission and per-trajectory token averaging.
+    The baseline starts at zero and is updated only after advantages are fixed.
+    Its sum/count are checkpointed by the orchestrator for exact resume.
+    """
+    import math
+    state = dict(baseline_state or {'reward_sum': 0.0, 'count': 0})
+    if (set(state) != {'reward_sum', 'count'} or type(state['count']) is not int
+            or state['count'] < 0 or not math.isfinite(state['reward_sum'])
+            or (state['count'] == 0 and state['reward_sum'] != 0)):
+        raise ValueError('Invalid running baseline state')
+    baseline = state['reward_sum'] / state['count'] if state['count'] else 0.0
+    _, stats = grpo_batch(groups)  # Identical validation and admission contract.
+    eligible = [t for group in groups if group_advantages(group) is not None for t in group]
+    advantages = [t.verification.reward - baseline for t in eligible]
+    contributing = [(t, a) for t, a in zip(eligible, advantages) if a != 0]
+    rows = []
+    for t, advantage in contributing:
+        if not t.generations:
+            raise ValueError('Resolved trajectory has no actions')
+        tokens = sum(len(g.tokens) for g in t.generations)
+        scale = advantage / (tokens * len(contributing))
+        for g in t.generations:
+            rows.append(shifted(g.prompt, g.tokens, [scale] * len(g.tokens), g.logprobs))
+    state['reward_sum'] += sum(t.verification.reward for t in eligible)
+    state['count'] += len(eligible)
+    stats.update(advantages=advantages, contributing_trajectories=len(contributing),
+                 advantage_baseline=baseline, baseline_count_before=state['count']-len(eligible),
+                 baseline_count_after=state['count'], algorithm='reinforce-prior-mean-v1')
+    return rows, stats, state

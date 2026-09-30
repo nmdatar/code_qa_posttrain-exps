@@ -116,7 +116,8 @@ class ModelActionError(ModelError):
     """A policy-authored invalid action with preserved provider usage."""
 
     def __init__(self, message: str, usage: Usage, termination_reason: str = "agent_error", *,
-                 conditioning_token_ids=None, token_ids=None, logprobs=None):
+                 conditioning_token_ids=None, token_ids=None, logprobs=None,
+                 raw_response: str | None = None, repair_feedback: str | None = None):
         if termination_reason not in {"agent_error", "budget_exhausted"}:
             raise ValueError("invalid model action termination reason")
         super().__init__(message)
@@ -125,3 +126,5 @@ class ModelActionError(ModelError):
         self.conditioning_token_ids = conditioning_token_ids
         self.token_ids = token_ids
         self.logprobs = logprobs
+        self.raw_response = raw_response
+        self.repair_feedback = repair_feedback

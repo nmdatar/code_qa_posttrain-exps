@@ -38,6 +38,7 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
                 break
             max_tokens = min(effective['max_tokens_per_call'], effective['max_output_tokens'] - output_tokens)
             if hasattr(episode, 'prepare_generation'):
+                episode.remaining_tool_calls = effective['max_tool_calls'] - tool_calls
                 episode.prepare_generation(effective['max_generations'] - _)
             generation = measured('generation_seconds', lambda: backend.sample(episode.messages, max_tokens, temperature))
             generation.validate()
@@ -66,7 +67,8 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
                     tool_calls += 1
                 done, observation = measured('action_seconds', lambda: episode.step(action))
             except (ValueError, KeyError, TypeError) as exc:
-                done, observation = False, {'error': 'Invalid action: ' + type(exc).__name__}
+                done, observation = False, {'error': 'Invalid action: ' + type(exc).__name__,
+                    'detail': str(exc)[:500], 'instruction': 'Correct the action. Return exactly one JSON object.'}
             trajectory.events.append({'kind': 'observation', 'value': observation})
             if done:
                 trajectory.submission = observation
@@ -76,6 +78,8 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
             if len(text.encode()) > effective['max_tool_output_bytes']:
                 text = text[:effective['max_tool_output_bytes']] + '\n[output truncated]'
             episode.messages.append({'role': 'user', 'content': 'Tool observation: ' + text})
+            if hasattr(episode, 'remember_observation'):
+                episode.remember_observation(observation)
         else:
             trajectory.termination = 'budget_exhausted'
         trajectory.verification = measured('verification_seconds', lambda: episode.verify(trajectory))
@@ -106,5 +110,8 @@ def run_episode(backend, factory, task, limits, *, run_id, stage, group_id, epis
         trajectory.usage = {'input_tokens': sum(len(g.prompt) for g in trajectory.generations),
                             'output_tokens': output_tokens, 'tool_calls': tool_calls,
                             'latency_seconds': time.monotonic() - start, 'cost_usd': None, **timings}
+        recorder = getattr(episode, 'recorder', None)
+        if recorder is not None and 'tool_seconds' in recorder.record:
+            trajectory.usage['tool_seconds'] = recorder.record['tool_seconds']
         tracker.trajectory(trajectory)
     return trajectory

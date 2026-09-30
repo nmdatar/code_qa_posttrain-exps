@@ -20,9 +20,14 @@ _SYSTEM = ("Investigate the question using the available tools and submit a fina
 
 class AgentRunner:
     def __init__(self, model: ModelAdapter, registry: ToolRegistry, artifacts: ArtifactStore,
-                 output_validator: Callable[[Any], Any] | None = None):
+                 output_validator: Callable[[Any], Any] | None = None,
+                 submission_feedback: Callable[[Any], str | None] | None = None,
+                 max_submission_repairs: int = 2, max_action_repairs: int = 0):
         self.model, self.registry, self.artifacts = model, registry, artifacts
         self.output_validator = output_validator
+        self.submission_feedback = submission_feedback
+        self.max_submission_repairs = max_submission_repairs
+        self.max_action_repairs = max_action_repairs
 
     def run(self, request: ResearchRequest, episode_id: str | None = None) -> EpisodeResult:
         self._validate_request(request)
@@ -35,6 +40,8 @@ class AgentRunner:
                                    "integrity_violations": [], "steps": 0}
         reason, submission = "infrastructure_error", None
         sequence = 0
+        submission_repairs = 0
+        action_repairs = 0
         def event(kind: str, **payload: Any) -> None:
             nonlocal sequence
             self.artifacts.append_event(episode_id, {"sequence": sequence, "kind": kind,
@@ -82,10 +89,23 @@ class AgentRunner:
                                                        timeout_seconds=remaining())
                 except ModelActionError as exc:
                     self._account(ModelResponse(FinalAnswer(None), usage=exc.usage), metrics)
+                    output_reserved += exc.usage.output_tokens if exc.usage.output_tokens is not None else token_allowance
                     reason = exc.termination_reason
                     event("invalid_action", error=str(exc), usage=asdict(exc.usage),
                           conditioning_token_ids=exc.conditioning_token_ids,
-                          token_ids=exc.token_ids, logprobs=exc.logprobs)
+                          token_ids=exc.token_ids, logprobs=exc.logprobs,
+                          raw_response=exc.raw_response)
+                    if remaining() <= 0 or output_reserved >= request.limits.max_output_tokens:
+                        reason = "budget_exhausted"
+                        break
+                    if (reason == "agent_error" and exc.repair_feedback
+                            and action_repairs < self.max_action_repairs):
+                        action_repairs += 1
+                        if exc.raw_response is not None:
+                            messages.append({"role": "assistant", "content": exc.raw_response})
+                        messages.append({"role": "user", "content": exc.repair_feedback})
+                        event("action_rejected", feedback=exc.repair_feedback, attempt=action_repairs)
+                        continue
                     break
                 except BaseException:
                     # A failed call can still have consumed paid/provider tokens.
@@ -112,6 +132,9 @@ class AgentRunner:
                     reason = "agent_error"
                     event("invalid_action", error="policy action has invalid fields or is not JSON serializable")
                     break
+                # Reset consecutive format failures after a valid action; global
+                # token, step, and time budgets still bound all repair attempts.
+                action_repairs = 0
                 event("model_response", response=asdict(response),
                       action_type="tool_call" if isinstance(response.action, ToolCall) else "final_answer")
                 if remaining() <= 0 or (response.usage.output_tokens is not None and response.usage.output_tokens > token_allowance):
@@ -121,6 +144,18 @@ class AgentRunner:
                 if isinstance(action, FinalAnswer):
                     try:
                         json_text(action.value)
+                        if self.submission_feedback is not None:
+                            with call_deadline(remaining()):
+                                feedback = self.submission_feedback(action.value)
+                            if feedback:
+                                event("submission_rejected", feedback=feedback)
+                                if submission_repairs >= self.max_submission_repairs:
+                                    reason = "agent_error"
+                                    break
+                                submission_repairs += 1
+                                messages.append({"role": "user", "content":
+                                    "Your attempted final answer was not accepted. " + feedback})
+                                continue
                         if self.output_validator is not None:
                             with call_deadline(remaining()):
                                 self.output_validator(action.value)

@@ -52,6 +52,12 @@ def verified_source(root):
 def blob(snapshot, commit, path):
     if PurePosixPath(path).is_absolute() or '..' in PurePosixPath(path).parts:
         raise ValueError('Unsafe evidence path')
+    import os
+    if os.environ.get('QA_MODAL_WORKER') == '1':
+        mapping = read(os.environ['QA_SNAPSHOT_MAP'])
+        if snapshot not in mapping:
+            raise ValueError('Snapshot was not staged for remote execution')
+        snapshot = mapping[snapshot]
     return subprocess.run(['git', '--no-replace-objects', '-C', snapshot, 'show', commit + ':' + path],
                           capture_output=True, check=True, timeout=30).stdout
 

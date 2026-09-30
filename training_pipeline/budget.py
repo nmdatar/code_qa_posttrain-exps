@@ -14,6 +14,26 @@ class BudgetLimit(RuntimeError):
     pass
 
 
+def persist_remote_reservation(path):
+    """On the Modal v2 volume, commit reservations before any paid dispatch."""
+    import os
+    if os.environ.get('QA_MODAL_WORKER') == '1':
+        import subprocess
+        subprocess.run(['sync', str(Path(path).parent)], check=True, timeout=60)
+
+
+def process_lock_path(path):
+    """Use the controller's local filesystem for locks, not a distributed volume."""
+    import os
+    path = Path(path)
+    if os.environ.get('QA_MODAL_WORKER') == '1':
+        import hashlib
+        import tempfile
+        path = Path(tempfile.gettempdir())/'qa-training-locks'/hashlib.sha256(str(path.resolve()).encode()).hexdigest()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path
+
+
 def current_prices(model, sampling_only=False):
     try:
         import certifi
@@ -44,7 +64,7 @@ def current_prices(model, sampling_only=False):
 def ledger_lock(path):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.with_suffix(path.suffix + '.lock').open('a') as lock:
+    with process_lock_path(path.with_suffix(path.suffix + '.lock')).open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         try:
             yield
@@ -106,6 +126,7 @@ class SpendLedger:
         self.state['reserved_usd'] += amount
         self.state['reservations'].append({'kind': kind, 'upper_estimate_usd': amount, **usage})
         atomic_json(self.path, self.state)
+        persist_remote_reservation(self.path)
         return amount
 
     def reserve_external(self, kind, amount, **metadata):
@@ -118,3 +139,4 @@ class SpendLedger:
             self.state['reserved_usd'] += amount
             self.state['reservations'].append({'kind': kind, 'upper_estimate_usd': amount, **metadata})
             atomic_json(self.path, self.state)
+            persist_remote_reservation(self.path)

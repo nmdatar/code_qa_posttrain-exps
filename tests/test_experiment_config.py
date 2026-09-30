@@ -1,3 +1,4 @@
+from tests.test_claim_grading import request_fixture, judgments
 """Config-to-runtime integration: independent judging, training knobs and run identity."""
 import copy
 import importlib.util
@@ -68,11 +69,11 @@ class ExperimentConfigTests(unittest.TestCase):
             judge = Mock()
             judge.identity = {'base_model': c['judge']['base_model']}
             judge.sample.return_value = Generation([1], [2], [-.1],
-                json.dumps({'status':'resolved','score':.75,'reason':'supported'}), 'stop', 'judge')
+                json.dumps(judgments()), 'stop', 'judge')
             ledger = Mock()
             with patch('training_pipeline.judge.TinkerJudge', return_value=judge) as constructor:
                 factory = CollectionFactory(c, directory, ledger)
-                factory.grade({'episode_id':'test'})
+                factory.grade(request_fixture())
                 constructor.assert_called_once_with(c['judge'], ledger)
                 self.assertEqual(judge.sample.call_args.args[1:], (1024, .25))
                 self.assertEqual(factory.judge_model, c['judge']['base_model'])

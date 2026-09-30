@@ -1,0 +1,155 @@
+{
+  "schema_version": "1.0",
+  "experiment_id": "baseline-qwen35-4b-generated-dev-v1",
+  "description": "First real tool-using baseline on the 12 generated development tasks; verify rollout, grading and W&B plumbing before training.",
+  "kind": "standalone_evaluation",
+  "implementation_status": "implemented in eval_pipeline.baseline; live one-task pipeline verified",
+  "training": {
+    "enabled": false
+  },
+  "model": {
+    "provider": "tinker",
+    "api": "native_sampling",
+    "base_model": "Qwen/Qwen3.5-4B",
+    "checkpoint": null,
+    "authentication": "tinker auth login or TINKER_API_KEY",
+    "temperature": 0.0,
+    "max_tokens_per_call": 2048,
+    "renderer": "huggingface.apply_chat_template(enable_thinking=False)"
+  },
+  "judge": {
+    "provider": "tinker",
+    "api": "native_sampling",
+    "base_model": "Qwen/Qwen3.5-397B-A17B",
+    "authentication": "same Tinker credentials as solver",
+    "temperature": 0.0,
+    "max_tokens_per_call": 4096,
+    "rubric_version": "generated-reference-claims-v1",
+    "method": "Claim-level comparison against private reference claims and observed tool evidence",
+    "calibrated": false,
+    "strict_rl_reward_certified": false,
+    "renderer": "huggingface.apply_chat_template(enable_thinking=False)",
+    "scoring": "weighted claim coverage: supported=1, partial=0.5, missing/contradicted=0; not a strict RL reward"
+  },
+  "dataset": {
+    "split": "development",
+    "expected_tasks": 12,
+    "releases": [
+      {
+        "id": "repo-qa-development-v1",
+        "path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/data/releases/repo-qa-development-v1",
+        "manifest_sha256": "b61b0dac6785ab66dbf2a1cade6306b622233b04ba36fc88a7b455284371618d",
+        "tasks_sha256": "42099356222e4bd53033d9733b76182fe117a9f6e2cea88b0b9d7461c6b28a89",
+        "environments_sha256": "864fbc75288b848dad24e418bff68631d90577a38d01db22ad80b020d0ce42c7",
+        "task_ids": [
+          "pydantic-frozen-copy-8960",
+          "tanstack-hydration-fetch-freshness-8936",
+          "sqlalchemy-filtered-collection-7654"
+        ]
+      },
+      {
+        "id": "repo-qa-generation-v2",
+        "path": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/data/releases/repo-qa-generation-v2",
+        "manifest_sha256": "2178773b159f970d3d484107d3218f07c93ddd92772e8b2a122ab5160aeb7a0e",
+        "tasks_sha256": "7166f1ffbbc544ffdb7693e7a98252580d6dfd6792fd4771934a51cd427c33ad",
+        "environments_sha256": "864fbc75288b848dad24e418bff68631d90577a38d01db22ad80b020d0ce42c7",
+        "task_ids": [
+          "pydantic-typed-extras-runtime-policy",
+          "pydantic-factory-data-signature-order",
+          "pydantic-alias-choice-unused-inputs",
+          "tanstack-signal-consumption-unsubscribe",
+          "tanstack-manual-cache-edit-cancel-revert",
+          "tanstack-inflight-options-retry-capture",
+          "sqlalchemy-savepoint-preflush-state",
+          "sqlalchemy-json-joinedload-uniquing",
+          "sqlalchemy-none-default-json-matrix"
+        ]
+      }
+    ],
+    "human_reviewed": false,
+    "training_eligible": false,
+    "purpose": "pipeline smoke test and regression baseline; not final benchmark"
+  },
+  "rollout": {
+    "attempts_per_task": 1,
+    "concurrency": 1,
+    "sandbox_backend": "modal",
+    "environment_policy": "reuse verified immutable images; fresh stateless sandbox per tool operation",
+    "tools": [
+      "list_files",
+      "search_code",
+      "read_file",
+      "python_probe"
+    ],
+    "max_tool_calls": 40,
+    "max_output_tokens_total": 6000,
+    "max_submission_bytes": 64000,
+    "latency_seconds": 1200,
+    "provider_timeout_seconds": 120,
+    "automatic_retry": false,
+    "private_references_visible_to_solver": false,
+    "protocol": "json-action-v1; flat tool args accepted; missing terminal object braces repaired only after natural stop, counted and raw output retained",
+    "tool_output_bytes": 32000,
+    "max_protocol_errors": 3
+  },
+  "tracking": {
+    "backend": "wandb",
+    "mode": "online",
+    "project": "repository-qa-eval",
+    "entity": null,
+    "group": "generated-dev-baselines",
+    "name": "baseline-qwen35-4b-generated-dev-v1",
+    "tags": [
+      "baseline",
+      "untrained",
+      "generated-tasks",
+      "development",
+      "pipeline-smoke"
+    ],
+    "log": [
+      "config_and_hash",
+      "task_ids_and_versions",
+      "public_trajectories",
+      "answers",
+      "per_claim_judgments",
+      "coverage_and_failures",
+      "tokens",
+      "tool_calls",
+      "latency"
+    ],
+    "local_output_root": "artifacts/runs",
+    "unique_run_directory": true,
+    "upload_failure_policy": "preserve local results; mark tracking failure"
+  },
+  "success_criteria": {
+    "expected_attempted": 12,
+    "expected_answers": 12,
+    "expected_graded": 12,
+    "required": "Live model generation, real Modal tool execution, valid grader output, W&B run URL and durable per-task records",
+    "quality_threshold": null,
+    "missing_results": "report as unresolved; never silently drop from coverage"
+  },
+  "provenance": {
+    "model_catalog": "https://tinker-docs.thinkingmachines.ai/tinker/models/",
+    "task_runtime_source": "/Users/ndatar/.codex/worktrees/dataset-generation/action-interview/dataset_builder/investigate.py",
+    "freeze_at_launch": [
+      "resolved model IDs",
+      "renderer versions",
+      "SDK versions",
+      "runner hash",
+      "judge prompt hash",
+      "config hash",
+      "image IDs"
+    ],
+    "notes": [
+      "No secret values belong in this file.",
+      "Snapshot this config into each run; use a new experiment ID for changed settings.",
+      "Do not silently substitute SWE-QA-Pro retrieval/demo runs for these generated tool tasks."
+    ]
+  },
+  "environment_notes": {
+    "env-46d7f4e35bd41dd2d7e6": "Python probes should import pinned Pydantic from /workspace (add /workspace to sys.path if needed). Pinned dependencies are preinstalled.",
+    "env-62db948e733a1ddc023f": "Node is installed. Use python_probe with subprocess.run([\"node\", \"-e\", code], check=True). The pinned query-core source is compiled at /opt/query-core.cjs; require that path for runtime probes. Inspect TypeScript source under /workspace for citations.",
+    "env-5a730309e4a3cdfdb251": "Python probes should add /workspace/lib to sys.path before importing sqlalchemy to use the pinned source. SQLite is available for in-memory fixtures."
+  }
+}

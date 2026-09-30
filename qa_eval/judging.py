@@ -45,24 +45,30 @@ def adapter_call(command, payload, timeout):
                       parse_constant=lambda x: (_ for _ in ()).throw(ValueError(x)))
 
 
-def judge(task, submission, experiment, role, root, evidence, graph, fingerprint, metrics, call=adapter_call):
+def judge(task, submission, experiment, role, root, evidence, graph, fingerprint, metrics, call=adapter_call,
+          *, source_catalog=None, evidence_reader=None, evidence_transform=None, training_partial_credit=False):
+    if training_partial_credit and role != 'training':
+        raise ValueError('Training partial credit cannot change evaluation grading')
     family = experiment["training_judge_family" if role == "training" else "evaluation_judge_family"]
     common = {"policy": POLICY, "prompt_version": "1.0", "routing_role": role}
     # A compact source catalog enables independently requested alternative
     # locations, including files absent from the reference citations.
     from .security import safe_path, file_hash
-    catalog = []
-    for path in git(root, "ls-files").splitlines():
-        p = safe_path(root, path)
-        if p.is_file() and not p.is_symlink():
-            catalog.append({"path": path, "file_sha256": file_hash(p)})
+    catalog = source_catalog
+    if catalog is None:
+        catalog = []
+        for path in git(root, "ls-files").splitlines():
+            p = safe_path(root, path)
+            if p.is_file() and not p.is_symlink():
+                catalog.append({"path": path, "file_sha256": file_hash(p)})
     if len(canonical(catalog)) > experiment["max_evidence_bytes"]:
         raise ValueError("Repository catalog exceeds judge budget; partition the task explicitly")
     extraction = call(experiment["judge_command"], {
         **common, "stage": "extract", "output_schema": EXTRACTION,
-        "instructions": "Independently enumerate EVERY substantive factual assertion in text and graph, including optional elaboration, execution claims, conditions and negations. Collapse semantic duplicates; do not rely on agent-declared claims. Evidence requests must target this snapshot. Set extraction_complete=false if you cannot complete the audit.",
+        "instructions": "Independently enumerate EVERY substantive factual assertion in text and graph, including optional elaboration, execution claims, conditions and negations. Collapse semantic duplicates; do not rely on agent-declared claims. Evidence requests must target this snapshot. Set extraction_complete=false if you cannot complete the audit." + (" Extract claims only from the submitted answer and graph. The question provides context, not candidate assertions. Do not turn question premises or source facts into claims the candidate never made. An abstention with no factual assertions may have an empty claims list." if training_partial_credit else ""),
         "untrusted": {"question": task["question"], "answer": submission["text"],
-                      "graph": graph, "citations": submission["citations"], "repository_catalog": catalog}},
+                      "graph": graph, "citations": submission["citations"], "repository_catalog": catalog,
+                      "repository_catalog_scope": "observed_and_reference_files_only" if source_catalog is not None else "tracked_source_files"}},
         experiment["judge_timeout_seconds"])
     validate(extraction, EXTRACTION)
     unique_ids(extraction["claims"], "extracted claim")
@@ -70,19 +76,36 @@ def judge(task, submission, experiment, role, root, evidence, graph, fingerprint
         raise ValueError("Incomplete claim extraction")
     evidence = dict(evidence)
     evidence["repository_snapshot"] = {"commit": task["repository"]["commit"],
-                                        "tracked_files": git(root, "ls-files").splitlines()}
+        **({'catalogued_files': [row['path'] for row in catalog], 'catalog_is_complete': False}
+           if source_catalog is not None else {'tracked_files': git(root, "ls-files").splitlines()})}
     # A second stage may inspect alternative evidence requested independently by
     # the extractor. A miss fails closed instead of fabricating a reference.
     for claim in extraction["claims"]:
         for ref in claim["evidence_requests"]:
-            key, text = read_evidence(root, ref)
+            key, text = (evidence_reader(ref) if evidence_reader else read_evidence(root, ref))
             evidence[key] = text
+    if evidence_transform is not None:
+        evidence = evidence_transform(evidence)
     if len(canonical(evidence)) > experiment["max_evidence_bytes"]:
         raise ValueError("Evidence exceeds judge context budget; no silent truncation")
     extracted = [{k: c[k] for k in ("id", "text", "source")} for c in extraction["claims"]]
+    partial_instruction = (
+        "For required claims, award supported/partial coverage when the answer states a "
+        "source-verified, relevant part of the claim, even when separable_subparts is empty. "
+        "Explain exactly which part is correct and which parts are missing or wrong. "
+        "Use supported/complete only when the entire required fact is correctly answered; "
+        "use absent when no relevant part is correct. A mixed answer can have supported/partial "
+        "required coverage while its incorrect extracted assertions are contradicted or insufficient. "
+        "Record those errors separately; do not erase verified partial coverage because of them. "
+        "Missing or bad citations do not change factual coverage: verify against supplied source "
+        "and report citation defects separately. Do not credit statements found only in the "
+        "question, reference, or evidence rather than the submitted answer. "
+        if training_partial_credit else
+        "Required partial credit is allowed only for separable_subparts. "
+    )
     result = call(experiment["judge_command"], {
         **common, "stage": "assess", "output_schema": ASSESSMENT,
-        "instructions": "Assess each required claim and every extracted claim by ID, even if they overlap. Mark additional material falsehoods without diluting them by correct content. Required partial credit is allowed only for separable_subparts. Associate every submitted citation with claims it actually supports; flag uncited substantive claims. Check diagram criteria, allowed abstractions, branch conditions, direction, readability and prose consistency. An existing file or symbol is not entailment. Determine answerability against the rubric. Unsupported is not synonymous with contradicted. Evidence keys must name supplied evidence. Report uncertainty/disagreement explicitly.",
+        "instructions": "Assess each required claim and every extracted claim by ID, even if they overlap. Mark additional material falsehoods without diluting them by correct content. " + partial_instruction + "Associate every submitted citation with claims it actually supports; flag uncited substantive claims. Check diagram criteria, allowed abstractions, branch conditions, direction, readability and prose consistency. An existing file or symbol is not entailment. Determine answerability against the rubric. Unsupported is not synonymous with contradicted. Evidence keys must name supplied evidence. Report uncertainty/disagreement explicitly.",
         "rubric": {k: task[k] for k in ("answerability", "claims", "critical_errors", "diagram")},
         "untrusted": {"question": task["question"], "answer": submission["text"],
                       "graph": graph, "citations": submission["citations"],

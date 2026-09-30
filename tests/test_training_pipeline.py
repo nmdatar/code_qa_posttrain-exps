@@ -112,6 +112,42 @@ class TrainingMathTests(unittest.TestCase):
         with self.assertRaises(ValueError): r.supervised({**example,'assistant_turns':[]})
         with self.assertRaises(ValueError): ChatRenderer(Tokenizer(), 30).supervised(example)
 
+    def test_reward_curve_counts_excluded_and_zero_signal_groups(self):
+        good = [trajectory(0, 0), trajectory(1, 1)]
+        excluded = [trajectory(2, 1), trajectory(3, 0)]
+        excluded[1].verification = VerificationResult('unresolved', None, 'v1')
+        _, stats = grpo_batch([good, excluded])
+        self.assertAlmostEqual(stats['mean_reward'], 2/3)
+        self.assertEqual(stats['eligible_mean_reward'], .5)
+        self.assertEqual(stats['scoring_coverage'], .75)
+        self.assertEqual(stats['excluded_group_fraction'], .5)
+        _, stats = grpo_batch([[trajectory(0, 0), trajectory(1, 0)]])
+        self.assertEqual(stats['mean_reward'], 0)
+        self.assertEqual(stats['zero_variance_groups'], 1)
+
+    def test_reward_curve_local_and_remote_metrics(self):
+        import csv
+        from unittest.mock import MagicMock
+        with tempfile.TemporaryDirectory() as tmp:
+            wandb = MagicMock()
+            wandb.init.return_value.url = 'https://example.test/run'
+            tracker = Tracker(tmp, {'mode': 'online'}, 'test', wandb_module=wandb)
+            tracker.event('training_batch', attempted_batches=1, optimizer_step=0,
+                          mean_reward=0, reward_ema=0, scoring_coverage=1,
+                          excluded_groups=0, zero_variance_groups=2)
+            tracker.event('training_batch', attempted_batches=2, optimizer_step=0,
+                          mean_reward=None, reward_ema=None, scoring_coverage=0,
+                          excluded_groups=2, zero_variance_groups=0)
+            with (Path(tmp)/'reward-curve.csv').open() as stream:
+                rows = list(csv.DictReader(stream))
+            self.assertEqual(rows[0]['mean_reward'], '0')
+            self.assertEqual(rows[1]['mean_reward'], '')
+            self.assertEqual(rows[1]['attempted_batches'], '2')
+            logged = wandb.init.return_value.log.call_args.args[0]
+            self.assertIsNone(logged['training/mean_reward'])
+            self.assertEqual(logged['training/scoring_coverage'], 0)
+            wandb.init.return_value.define_metric.assert_any_call('training/*', step_metric='attempted_batches')
+
     def test_grpo_population_and_equal_trajectory_weight(self):
         a,b = trajectory(0,0,2), trajectory(1,1,6)
         self.assertEqual(group_advantages([a,b]), [-1,1])
@@ -170,6 +206,7 @@ class PipelineTests(unittest.TestCase):
         eval_backend=FakeBackend(self.backend.registry)
         report=evaluate_checkpoint(final,self.root/'evaluation',backend=eval_backend)
         self.assertEqual(report['resolved'],2)
+        self.assertEqual(report['optimizer_step'],3)
         self.assertEqual(eval_backend.trainer_count,0)
         self.assertEqual(report['policy_id'],load_checkpoint(final)['artifacts']['sampler'])
         changed=copy.deepcopy(self.config);changed['seed']+=1

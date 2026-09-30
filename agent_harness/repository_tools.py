@@ -18,9 +18,13 @@ if name=='list_files':
  offset=a.get('offset',0)
  print(json.dumps({'files':matches[offset:offset+100],'next_offset':offset+100 if len(matches)>offset+100 else None}))
 elif name=='read_file':
- p=path(a['path']); raw=p.read_bytes(); lines=raw.decode().splitlines(); start=a.get('start_line',1); end=a.get('end_line',min(start+119,len(lines)))
- if start<1 or end<start or end-start>=120 or end>len(lines): raise ValueError('Invalid line range')
- print(json.dumps({'path':a['path'],'start_line':start,'end_line':end,'file_sha256':hashlib.sha256(raw).hexdigest(),'lines':lines[start-1:end]}))
+ p=path(a['path']); raw=p.read_bytes(); lines=raw.decode().splitlines(); start=a.get('start_line',1); end=min(a.get('end_line',start+119),len(lines))
+ if start<1 or end<start: raise ValueError('Invalid line range')
+ page_end=min(end,start+119) if request.get('paginate_reads',False) else end
+ if page_end-start>=120: raise ValueError('Invalid line range; read at most 120 lines')
+ next_line=page_end+1 if page_end<end else None
+ end=page_end
+ print(json.dumps({'path':a['path'],'start_line':start,'end_line':end,'file_sha256':hashlib.sha256(raw).hexdigest(),**({'next_start_line':next_line} if request.get('paginate_reads',False) else {}),'lines':[str(i)+': '+lines[i-1] for i in range(start,end+1)]}))
 elif name=='search_code':
  found=[]
  for f in files:
@@ -35,7 +39,7 @@ elif name=='search_code':
 '''
 
 
-def command(name, arguments, source_files=(), workspace_path="/repo"):
+def command(name, arguments, source_files=(), workspace_path="/repo", *, paginate_reads=False):
     if workspace_path not in {"/repo", "/workspace"}:
         raise ValueError("Unsupported workspace")
     specs = {'list_files': ({}, {'glob': str, 'offset': int}),
@@ -67,4 +71,4 @@ def command(name, arguments, source_files=(), workspace_path="/repo"):
     # git archive images deliberately contain no .git. Supply only the public
     # catalog from the pristine host checkout, split below Linux's argv limit.
     chunks = [catalog[i:i+32000] for i in range(0, len(catalog), 32000)]
-    return ['python3', '-c', READ_SCRIPT.replace("pathlib.Path('/repo')", 'pathlib.Path(' + repr(workspace_path) + ')'), json.dumps({'tool': name, 'arguments': arguments}), *chunks]
+    return ['python3', '-c', READ_SCRIPT.replace("pathlib.Path('/repo')", 'pathlib.Path(' + repr(workspace_path) + ')'), json.dumps({'tool': name, 'arguments': arguments, **({'paginate_reads':True} if paginate_reads else {})}), *chunks]

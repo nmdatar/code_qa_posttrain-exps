@@ -20,7 +20,50 @@ def positive(value, name, integer=False):
 
 def validate_config(c):
     exact(c, ['schema_version', 'run_id', 'output', 'model', 'seed', 'limits', 'stages',
-              'environment', 'evaluation', 'tracking', 'checkpoint_every', 'spend'], ['judge', 'group_retries', 'stopping', 'concurrency', 'benchmark'])
+              'environment', 'evaluation', 'tracking', 'checkpoint_every', 'spend'], ['judge', 'group_retries', 'stopping', 'concurrency', 'benchmark', 'execution', 'best_checkpoint', 'training_reward', 'supervised', 'harness', 'task_subset', 'prompt_decomposition'])
+    if 'prompt_decomposition' in c:
+        from .prompt_decomposition import VERSION
+        if (c['prompt_decomposition'] != {'version':VERSION}
+                or c['environment']['kind'] != 'collection' or 'task_subset' not in c
+                or c.get('judge', {}).get('base_model') != 'Qwen/Qwen3.5-397B-A17B'):
+            raise ConfigurationError('Question decomposition requires pinned Qwen397 and task subset')
+    if 'task_subset' in c:
+        exact(c['task_subset'], ['manifest', 'sha256'])
+        if c['environment']['kind'] != 'collection' or 'cohort_manifest' not in c['evaluation']:
+            raise ConfigurationError('Task subset requires collection and a frozen evaluation cohort')
+    if 'harness' in c:
+        from .harness_variants import validate
+        validate(c['harness'])
+        if c['environment']['kind'] != 'collection':
+            raise ConfigurationError('Experimental harness requires collection')
+    if 'supervised' in c:
+        exact(c['supervised'], ['manifest', 'sha256'], ['loss_scope'])
+        if c['supervised'].get('loss_scope', 'all-admitted-turns') not in {'all-admitted-turns', 'final-answer-only'}:
+            raise ConfigurationError('Unsupported supervised loss scope')
+        if c['environment']['kind'] != 'collection':
+            raise ConfigurationError('Experimental supervised adapter requires collection')
+    if 'training_reward' in c:
+        from .shaped_reward import VERSION as reward_version
+        from .efficiency_reward import VERSIONS as tier_versions
+        from .reward_alignment import VERSION as aligned_version
+        exact(c['training_reward'], ['version'], ['efficiency_penalty'])
+        if 'efficiency_penalty' in c['training_reward']:
+            if (c['training_reward']['efficiency_penalty'] != 'output-token-fraction-v1'
+                    or c['training_reward']['version'] != 'positive-coverage-v4'
+                    or c['environment'].get('scoring_policy') != 'correctness-only-v1'):
+                raise ConfigurationError('Token penalty requires correctness-only positive coverage')
+        if c['training_reward']['version'] not in (reward_version, aligned_version, *tier_versions) or c['environment'].get('grading_version') not in ('all-claims-v6', 'all-claims-v7'):
+            raise ConfigurationError('Shaped reward requires a versioned reliable grader')
+        if c['training_reward']['version'] == aligned_version and c['environment'].get('grading_version') != 'all-claims-v7':
+            raise ConfigurationError('Aligned reward requires the v7 independent factual coverage pass')
+    if 'best_checkpoint' in c:
+        exact(c['best_checkpoint'], ['retention_seconds'])
+        positive(c['best_checkpoint']['retention_seconds'], 'best checkpoint retention', True)
+        if c['best_checkpoint']['retention_seconds'] > 28*86400:
+            raise ConfigurationError('Best checkpoint retention exceeds the bounded 28-day allowance')
+    if 'execution' in c:
+        from .remote import validate_execution
+        validate_execution(c['execution'])
     if 'benchmark' in c:
         exact(c['benchmark'], ['task_manifest', 'manifest_hash', 'attempts'])
         positive(c['benchmark']['attempts'], 'benchmark.attempts', True)
@@ -60,8 +103,8 @@ def validate_config(c):
     if not isinstance(c['stages'], list) or not c['stages']:
         raise ConfigurationError('At least one training stage required')
     for s in c['stages']:
-        exact(s, ['kind', 'max_updates', 'max_batches', 'batch_size', 'learning_rate'], ['group_size', 'temperature', 'optimizer'])
-        if s['kind'] not in {'sft', 'grpo'}:
+        exact(s, ['kind', 'max_updates', 'max_batches', 'batch_size', 'learning_rate'], ['group_size', 'temperature', 'optimizer', 'baseline'])
+        if s['kind'] not in {'sft', 'grpo', 'reinforce'}:
             raise ConfigurationError('Unsupported training strategy')
         for k in ('max_updates', 'max_batches', 'batch_size'):
             positive(s[k], k, True)
@@ -77,12 +120,31 @@ def validate_config(c):
                     raise ConfigurationError('Optimizer eps must be positive')
                 if key in {'weight_decay', 'grad_clip_norm'} and value < 0:
                     raise ConfigurationError('Optimizer '+key+' must be nonnegative')
-        if s['kind'] == 'grpo':
+        if s['kind'] in {'grpo', 'reinforce'}:
             if type(s.get('group_size')) is not int or s['group_size'] < 2 or s.get('temperature') != 1:
-                raise ConfigurationError('GRPO requires group_size >= 2 and temperature=1')
+                raise ConfigurationError('Grouped RL requires group_size >= 2 and temperature=1')
+        if s['kind'] == 'reinforce' and s.get('baseline') != 'prior-mean-v1':
+            raise ConfigurationError('REINFORCE requires baseline=prior-mean-v1')
+        if s['kind'] != 'reinforce' and 'baseline' in s:
+            raise ConfigurationError('Baseline is only supported for REINFORCE')
     if type(c.get('group_retries', 1)) is not int or c.get('group_retries', 1) < 0:
         raise ConfigurationError('group_retries must be a nonnegative integer')
-    exact(c['environment'], ['kind'], ['release', 'manifest_sha256', 'calibration', 'calibration_sha256', 'modal_prices', 'protocol_version'])
+    exact(c['environment'], ['kind'], ['release', 'manifest_sha256', 'calibration', 'calibration_sha256', 'modal_prices', 'protocol_version', 'grading_version', 'tool_read_policy', 'tool_action_policy', 'judge_evidence_policy', 'solver_tools', 'scoring_policy'])
+    for key, allowed in [('scoring_policy', ('strict-v1', 'correctness-only-v1')),
+                         ('solver_tools', ('structured-v1', 'bash-only-v1')),
+                         ('tool_action_policy', ('strict-v1', 'action-alias-v1')),
+                         ('judge_evidence_policy', ('legacy-v1', 'definition-context-v1'))]:
+        if c['environment'].get(key, allowed[0]) not in allowed:
+            raise ConfigurationError('Unsupported ' + key)
+    if c['environment'].get('tool_read_policy', 'strict-v1') not in ('strict-v1', 'paginate-v1'):
+        raise ConfigurationError('Unknown tool read policy')
+    if c['environment'].get('scoring_policy') == 'correctness-only-v1' and (c['environment'].get('grading_version') != 'all-claims-v7' or c.get('training_reward', {}).get('version') != 'positive-coverage-v4'):
+        raise ConfigurationError('Correctness-only requires v7 positive coverage')
+    if 'grading_version' in c['environment']:
+        from .claim_grading import VERSION as claim_version
+        from .strict_grading import VERSIONS
+        if c['environment']['kind'] != 'collection' or c['environment']['grading_version'] not in (claim_version, *VERSIONS):
+            raise ConfigurationError('Unsupported collection grading version; use a new versioned run')
     if c['environment']['kind'] not in {'toy', 'repository', 'collection'}:
         raise ConfigurationError('Unsupported environment')
     if c['environment']['kind'] == 'repository' and not all(c['environment'].get(k) for k in
@@ -97,13 +159,13 @@ def validate_config(c):
             positive(prices.get(key), key)
         if not prices.get('source') or not prices.get('checked_at'):
             raise ConfigurationError('Missing Modal price provenance')
-        if any(s['kind'] != 'grpo' for s in c['stages']):
-            raise ConfigurationError('Collection inputs support GRPO only')
+        if any(s['kind'] == 'sft' for s in c['stages']) and 'supervised' not in c:
+            raise ConfigurationError('Collection SFT requires a verified supervised manifest')
     if 'judge' in c:
         if c['environment']['kind'] != 'collection':
             raise ConfigurationError('Independent judge currently supports collection environments only')
         j = c['judge']
-        exact(j, ['base_model', 'renderer', 'context_tokens', 'max_tokens', 'provider_timeout_seconds', 'prices'], ['temperature'])
+        exact(j, ['base_model', 'renderer', 'context_tokens', 'max_tokens', 'provider_timeout_seconds', 'prices'], ['temperature', 'repair_attempts'])
         for key in ('base_model', 'renderer'):
             if not isinstance(j[key], str) or not j[key]:
                 raise ConfigurationError('Judge '+key+' is required')
@@ -111,6 +173,10 @@ def validate_config(c):
             positive(j[key], 'judge '+key, True)
         if j['max_tokens'] >= j['context_tokens']:
             raise ConfigurationError('Judge generation budget must leave room for context')
+        if type(j.get('repair_attempts', 0)) is not int or not 0 <= j.get('repair_attempts', 0) <= 1:
+            raise ConfigurationError('At most one mechanical judge repair is allowed')
+        if j.get('repair_attempts', 0) and c['environment'].get('grading_version') not in ('all-claims-v4', 'all-claims-v5', 'all-claims-v6', 'all-claims-v7'):
+            raise ConfigurationError('Judge repairs require a versioned reliable grader')
         temperature(j.get('temperature', 0), 'judge.temperature')
         if j['prices'] is not None:
             exact(j['prices'], ['model', 'prefill', 'sample', 'source', 'checked_at'])
@@ -127,7 +193,11 @@ def validate_config(c):
         raise ConfigurationError('Invalid evaluation cadence')
     positive(c['evaluation']['max_tasks'], 'max_tasks', True)
     temperature(c['evaluation']['temperature'], 'evaluation.temperature')
-    exact(c['tracking'], ['mode', 'project'], ['entity', 'experiment_id', 'run_name', 'tags', 'notes'])
+    exact(c['tracking'], ['mode', 'project'], ['entity', 'experiment_id', 'run_name', 'tags', 'notes', 'flush_every', 'upload_policy'])
+    if c['tracking'].get('upload_policy', 'metrics-only') not in {'metrics-only', 'full'}:
+        raise ConfigurationError('tracking.upload_policy must be metrics-only or full')
+    if 'flush_every' in c['tracking'] and (type(c['tracking']['flush_every']) is not int or c['tracking']['flush_every'] < 0):
+        raise ConfigurationError('tracking.flush_every must be a nonnegative integer; zero means final-only')
     if c['tracking']['mode'] not in {'disabled', 'offline', 'online'}:
         raise ConfigurationError('Invalid tracking mode')
     for key in ('project', 'entity', 'experiment_id', 'run_name', 'notes'):
@@ -161,6 +231,9 @@ def resolve_run_config(config):
     import uuid
     from datetime import datetime, timezone
     c = copy.deepcopy(validate_config(config))
+    if c['environment']['kind'] == 'collection':
+        from .claim_grading import VERSION as claim_version
+        c['environment'].setdefault('grading_version', claim_version)
     if c['run_id'] == 'auto':
         prefix = c['tracking'].get('experiment_id', c['model']['base_model'].rsplit('/', 1)[-1])
         prefix = re.sub(r'[^A-Za-z0-9_-]+', '-', prefix).strip('-')[:60] or 'training'
@@ -229,11 +302,27 @@ def inputs(config):
         from .repository import validate_repository_task
         for row in data['tasks'] + data['development']:
             validate_repository_task(row)
+    if 'task_subset' in config:
+        from .task_subset import apply_subset
+        data = apply_subset(config, data)
+    if 'supervised' in config:
+        from .sft_collection import load_supervised
+        data['sft'] = load_supervised(config['supervised'], data)
+        from .investigation_sft import VERSION as investigation_version
+        supervised_manifest = read(config['supervised']['manifest'])
+        if supervised_manifest['version'] == investigation_version:
+            from .collection import CollectionFactory
+            expected = CollectionFactory(config, Path(config['output']), None).reward_version
+            if supervised_manifest['grading_version'] != expected:
+                raise ConfigurationError('Investigation SFT judge/reward identity changed')
     for s in config['stages']:
         if not data['sft' if s['kind'] == 'sft' else 'tasks']:
             raise ConfigurationError('Training input is empty for ' + s['kind'])
     if not data['development']:
         raise ConfigurationError('Development evaluation input is empty')
+    if 'harness' in config:
+        from .harness_variants import validate_sources
+        validate_sources(config['harness'], data)
     if 'cohort_manifest' in config['evaluation']:
         from .cohorts import select_tasks
         selected, _ = select_tasks(data, config['evaluation'])

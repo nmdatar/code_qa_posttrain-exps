@@ -10,12 +10,12 @@ from pathlib import Path
 from agent_harness.runner import run_episode
 from .config import inputs, resolve_run_config
 from .storage import Tracker, Checkpoints, atomic_json, load_checkpoint, semantic_hash, read
-from .strategies import grpo_batch
+from .strategies import grpo_batch, reinforce_batch
 from .rendering import sft_batch
 from .toy import ToyFactory
 from .repository import RepositoryFactory
 from .contracts import ConfigurationError
-from .budget import SpendLedger, current_prices
+from .budget import SpendLedger, current_prices, process_lock_path
 from .tinker_backend import TinkerBackend
 
 
@@ -24,6 +24,9 @@ def tuples(value):
 
 
 def make_backend(config, evaluation_only=False):
+    if config['environment']['kind'] == 'collection':
+        from .remote import require_remote_worker
+        require_remote_worker(config)
     settings = config['spend']
     ledger_path = Path(settings['ledger'])
     if ledger_path.exists():
@@ -64,6 +67,9 @@ class Pipeline:
         self._lock = None
 
     def setup(self, create_run, job_type='training'):
+        if self.backend is None and self.config['environment']['kind'] == 'collection':
+            from .remote import require_remote_worker
+            require_remote_worker(self.config)
         if 'judge' in self.config and self.config['judge']['prices'] is None:
             self.config['judge']['prices'] = current_prices(self.config['judge']['base_model'], sampling_only=True)
         if create_run:
@@ -88,8 +94,13 @@ class Pipeline:
         if self.factory is None and self.config['environment']['kind'] == 'collection':
             from .collection import CollectionFactory
             self.factory = CollectionFactory(self.config, self.root, self.backend.ledger)
+            self.factory.solver_tokenizer = self.backend.renderer.tokenizer
             try:
                 self.factory.prepare_judge()
+                if 'prompt_decomposition' in self.config:
+                    from .prompt_decomposition import prepare
+                    self.factory.prompt_decompositions = prepare(
+                        self.config, self.data, self.root, self.backend.ledger)
             except BaseException:
                 self.backend.close()
                 raise
@@ -142,6 +153,8 @@ class Pipeline:
         return self.groups([task], size, temperature)[0]
 
     def groups(self, tasks, size, temperature):
+        self.tracker.context = {'phase': 'benchmark' if self.tracker.organization.get('job_type') == 'benchmark' else 'training',
+                                'optimizer_step': self.state['optimizer_step']}
         workers = self.config.get('concurrency', {}).get('rollouts', 1)
         policy = self.backend.policy_id
         output = [None] * len(tasks)
@@ -167,7 +180,8 @@ class Pipeline:
                 return output
         raise AssertionError('Unreachable')
 
-    def evaluate(self, manifest=None, tasks=None, cohort=None, base=False):
+    def evaluate(self, manifest=None, tasks=None, cohort=None, base=False, select_best=True):
+        self.tracker.context = {'phase': 'evaluation', 'optimizer_step': self.state['optimizer_step']}
         manifest = manifest or self.last_manifest
         if not base and (manifest is None or self.backend.policy_id != manifest['artifacts']['sampler']):
             raise ConfigurationError('Evaluation sampler does not match checkpoint')
@@ -196,9 +210,11 @@ class Pipeline:
             rows.append({'task_id': task['id'], 'episode_id': trajectory.episode_id,
                          'family_id': task['family_id'], 'usage': trajectory.usage,
                          'status': v.status if v else 'unresolved', 'reward': v.reward if v else None,
-                         'termination': trajectory.termination})
+                         'termination': trajectory.termination,
+                         'tier': v.diagnostics.get('tier') if v else None})
         resolved = [r for r in rows if r['status'] == 'resolved']
         report = {'checkpoint_id': manifest['id'] if manifest else 'unchanged-base', 'policy_id': self.backend.policy_id,
+                  'optimizer_step': self.state['optimizer_step'],
                   'cohort': cohort_identity, 'wall_seconds': elapsed,
                   'episodes_per_second': len(rows)/elapsed if elapsed else None,
                   'reserved_cost_usd': read(ledger.path)['reserved_usd']-reserved_before if ledger else None,
@@ -214,11 +230,33 @@ class Pipeline:
                   'completion_rate': sum(r['termination'] == 'completed' for r in rows)/len(rows) if rows else 0,
                   'coverage_eligible': bool(rows) and len(resolved)/len(rows) >= .95,
                   'mean_reward': sum(r['reward'] for r in resolved)/len(resolved) if resolved else None, 'results': rows}
+        from .efficiency_metrics import summarize as summarize_efficiency
+        report.update(summarize_efficiency(trajectories))
         path = self.root / 'evaluations' / (report['checkpoint_id'] + '-' + uuid.uuid4().hex + '.json')
         atomic_json(path, report)
         self.tracker.event('evaluation', artifact=str(path), **{k: v for k, v in report.items() if k != 'results'})
         self.tracker.artifact(path, 'evaluation')
+        if select_best and manifest and self.config.get('best_checkpoint') and report['coverage_eligible'] and cohort != 'confirmation':
+            self.retain_best(manifest, report, path)
         return report
+
+    def retain_best(self, manifest, report, report_path):
+        target = self.root/'checkpoints'/'best.json'
+        prior = read(target) if target.exists() else None
+        quality = report['demonstrated_quality']
+        # Under 0.01 is a quality tie; unknown actual bills cannot win a cost tie.
+        tokens = sum(r['usage']['output_tokens'] for r in report['results'])
+        if prior and (quality < prior['quality'] + .01 and
+                      (quality < prior['quality'] - .01 or tokens >= prior['output_tokens'])):
+            return
+        archive = self.backend.archive(manifest['artifacts'], self.root/'archives'/manifest['id'],
+            self.config['best_checkpoint']['retention_seconds'])
+        atomic_json(target, {'checkpoint_id':manifest['id'], 'manifest':str(self.last_path),
+            'evaluation':str(report_path), 'quality':quality, 'output_tokens':tokens,
+            'optimizer_step':self.state['optimizer_step'], 'archive':archive})
+        self.tracker.event('best_checkpoint', checkpoint_id=manifest['id'],
+            optimizer_step=self.state['optimizer_step'], demonstrated_quality=quality, artifact=str(target))
+        self.tracker.artifact(target, 'best-checkpoint')
 
     def _regression_stop(self, report):
         """Persist selection-only regression decisions in checkpoint framework state."""
@@ -249,7 +287,7 @@ class Pipeline:
             raise ConfigurationError('Incompatible checkpoint model')
         self.setup(create_run=purpose != 'resume')
         status = 'failed'
-        self._lock = (self.root / '.training.lock').open('a')
+        self._lock = process_lock_path(self.root / '.training.lock').open('a')
         try:
             fcntl.flock(self._lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
@@ -264,6 +302,9 @@ class Pipeline:
             if any(s['kind'] == 'sft' for s in self.config['stages']):
                 for example in self.data['sft']:
                     sft_batch(self.backend.renderer, [example])
+                if 'supervised' in self.config:
+                    from .sft_collection import validate_rendering
+                    validate_rendering(self.backend.renderer, self.data['sft'])
             self.backend.create_trainer(self.config['seed'])
             if original:
                 self.backend.load(original['artifacts'], purpose)
@@ -285,6 +326,7 @@ class Pipeline:
                 self.evaluate()
             self.tracker.event('run_start', purpose=purpose, optimizer_step=self.state['optimizer_step'])
             while self.state['stage'] < len(self.config['stages']):
+                batch_started = time.monotonic()
                 stage_index = self.state['stage']
                 stage = self.config['stages'][stage_index]
                 if self.state['needs_fresh_optimizer']:
@@ -301,13 +343,34 @@ class Pipeline:
                     groups = (self.groups(tasks, stage['group_size'], stage['temperature'])
                         if self.config.get('concurrency', {}).get('rollouts', 1) > 1 else
                         [self.group(t, stage['group_size'], stage['temperature']) for t in tasks])
-                    rows, stats = grpo_batch(groups)
+                    if stage['kind'] == 'reinforce':
+                        baselines = self.state.setdefault('reinforce_baselines', {})
+                        rows, stats, baseline = reinforce_batch(groups, baselines.get(str(stage_index)))
+                        baselines[str(stage_index)] = baseline
+                    else:
+                        rows, stats = grpo_batch(groups)
                     loss = 'importance_sampling'
+                collection_and_grading_seconds = time.monotonic() - batch_started
+                update_seconds = 0.0
                 self.state['attempted_batches'] += 1
                 self.state['stage_batches'] += 1
+                if stage['kind'] in {'grpo', 'reinforce'}:
+                    from .efficiency_metrics import summarize as summarize_efficiency
+                    stats.update(summarize_efficiency(t for group in groups for t in group))
+                    mean = stats['mean_reward']
+                    previous = self.state.get('reward_ema')
+                    if mean is not None:
+                        self.state['reward_ema'] = mean if previous is None else .3*mean + .7*previous
+                    self.tracker.event('training_batch', stage=stage_index,
+                        optimizer_step=self.state['optimizer_step'],
+                        attempted_batches=self.state['attempted_batches'],
+                        reward_ema=self.state.get('reward_ema') if mean is not None else None,
+                        **stats)
                 if rows:
                     options = {'optimizer': stage['optimizer']} if 'optimizer' in stage else {}
+                    update_started = time.monotonic()
                     result = self.backend.update(rows, loss, stage['learning_rate'], **options)
+                    update_seconds = time.monotonic() - update_started
                     self.state['optimizer_step'] += 1
                     self.state['stage_updates'] += 1
                     self.tracker.event('update', stage=stage_index, optimizer_step=self.state['optimizer_step'],
@@ -316,8 +379,9 @@ class Pipeline:
                         group_size=stage.get('group_size'), optimizer=stage.get('optimizer', {}),
                         **result, **stats)
                 else:
-                    self.tracker.event('skipped_update', stage=stage_index, **stats)
-                if (stage['kind'] == 'grpo' and not self.state['stage_updates'] and
+                    self.tracker.event('skipped_update', stage=stage_index, optimizer_step=self.state['optimizer_step'],
+                        attempted_batches=self.state['attempted_batches'], **stats)
+                if (stage['kind'] in {'grpo', 'reinforce'} and not self.state['stage_updates'] and
                         self.state['stage_batches'] >= controls.get('initial_zero_batches', float('inf'))):
                     self.state['stop_reason'] = 'initial_zero_batches'
                     self.tracker.event('experiment_stop', reason=self.state['stop_reason'])
@@ -335,22 +399,31 @@ class Pipeline:
                 # optimizer so it is also a resumable boundary. SFT honors cadence.
                 every = self.config['evaluation']['every']
                 scheduled_evaluation = bool(rows) and every and self.state['optimizer_step'] % every == 0
-                should_commit = done or scheduled_evaluation or (bool(rows) and (stage['kind'] == 'grpo' or
+                should_commit = done or scheduled_evaluation or (bool(rows) and (stage['kind'] in {'grpo', 'reinforce'} or
                     self.state['optimizer_step'] % self.config['checkpoint_every'] == 0))
+                checkpoint_seconds = 0.0
                 if should_commit:
+                    checkpoint_started = time.monotonic()
                     self.commit()
-                    if done or scheduled_evaluation:
-                        regression = self._regression_stop(self.evaluate())
-                        if 'regression_delta' in controls:
-                            # Save the evaluated decision state, including a stop,
-                            # so a resume cannot forget a regression streak.
-                            if regression:
-                                self.state['stop_reason'] = 'selection_regression'
-                            self.commit()
+                    checkpoint_seconds = time.monotonic() - checkpoint_started
+                self.tracker.event('training_step_timing',
+                    optimizer_step=self.state['optimizer_step'],
+                    attempted_batches=self.state['attempted_batches'],
+                    batch_seconds=time.monotonic() - batch_started,
+                    collection_and_grading_seconds=collection_and_grading_seconds,
+                    update_seconds=update_seconds, checkpoint_seconds=checkpoint_seconds)
+                if should_commit and (done or scheduled_evaluation):
+                    regression = self._regression_stop(self.evaluate())
+                    if 'regression_delta' in controls:
+                        # Save the evaluated decision state, including a stop,
+                        # so a resume cannot forget a regression streak.
                         if regression:
-                            self.tracker.event('experiment_stop', reason='selection_regression')
-                            status = 'stopped_selection_regression'
-                            return self.last_path
+                            self.state['stop_reason'] = 'selection_regression'
+                        self.commit()
+                    if regression:
+                        self.tracker.event('experiment_stop', reason='selection_regression')
+                        status = 'stopped_selection_regression'
+                        return self.last_path
                 if stop_after_updates is not None and self.state['optimizer_step'] >= stop_after_updates:
                     if not should_commit:
                         self.commit()
@@ -376,15 +449,37 @@ class Pipeline:
                         self.tracker.event('client_cleanup_failure', error_type=type(exc).__name__)
 
 
-def evaluate_checkpoint(path, output=None, backend=None, tracker=None, factory=None, cohort=None):
+def evaluation_scientific_config(config):
+    """Allow relocated verified inputs and accounting, never changed evaluation science."""
+    ignored = {'model': {'checkpoint_ttl_seconds'},
+               'environment': {'release', 'calibration', 'modal_prices'},
+               'judge': {'prices'}, 'evaluation': {'cohort_manifest', 'every'},
+               'supervised': {'manifest'}, 'harness': {'source_manifest'}}
+    result = {}
+    for key in ('model', 'seed', 'limits', 'environment', 'judge', 'evaluation',
+                'training_reward', 'supervised', 'harness'):
+        value = copy.deepcopy(config.get(key))
+        if isinstance(value, dict):
+            value = {k: v for k, v in value.items() if k not in ignored.get(key, set())}
+        result[key] = value
+    return result
+
+
+def evaluate_checkpoint(path, output=None, backend=None, tracker=None, factory=None, cohort=None,
+                        config=None):
     manifest = load_checkpoint(path)
-    config = copy.deepcopy(manifest['config'])
+    supplied_config = config is not None
+    if supplied_config and evaluation_scientific_config(config) != evaluation_scientific_config(manifest['config']):
+        raise ConfigurationError('Evaluation scientific configuration differs from checkpoint')
+    config = copy.deepcopy(config if supplied_config else manifest['config'])
     if output:
         config['output'] = str(output)
     pipeline = Pipeline(config, backend=backend, tracker=tracker, factory=factory)
+    if supplied_config and pipeline.data['identity'] != manifest['state']['data_identity']:
+        raise ConfigurationError('Evaluation dataset identity differs from checkpoint')
     from .cohorts import select_tasks
     select_tasks(pipeline.data, pipeline.config['evaluation'], cohort)
-    pipeline.setup(create_run=False, job_type='evaluation')
+    pipeline.setup(create_run=supplied_config, job_type='evaluation')
     status = 'failed'
     try:
         for key in ('base_model', 'rank', 'template_hash', 'tokenizer_class', 'renderer'):
@@ -392,7 +487,8 @@ def evaluate_checkpoint(path, output=None, backend=None, tracker=None, factory=N
                 raise ConfigurationError('Evaluation checkpoint identity mismatch')
         pipeline.backend.load(manifest['artifacts'], 'evaluate')
         pipeline.last_manifest = manifest
-        report = pipeline.evaluate(manifest, cohort=cohort)
+        pipeline.state = copy.deepcopy(manifest['state'])
+        report = pipeline.evaluate(manifest, cohort=cohort, select_best=False)
         status = 'complete'
         return report
     finally:

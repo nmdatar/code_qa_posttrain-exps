@@ -27,27 +27,95 @@ def bounded(call, timeout):
     return value
 
 
+def _reduction_failure(reason, **summary):
+    error = ValueError('Provider loss reduction validation failed: ' + reason)
+    # Fixed categorical reason plus aggregate numeric diagnostics only: never
+    # token IDs, text, SDK exception messages or per-token observations.
+    error.reduction_diagnostics = {'reason': reason, **summary}
+    return error
+
+
 def check_reduction(rows, loss, output):
-    """Check the provider's reported sum loss against its returned token scores."""
+    """Validate sum loss; unchanged tolerances, with safe failure diagnostics."""
     scores = output.loss_fn_outputs
     if len(scores) != len(rows):
-        raise ValueError('Provider returned misaligned training outputs')
+        raise _reduction_failure('output_count_mismatch', expected_rows=len(rows), returned_rows=len(scores))
     expected = 0.0
-    for row, score in zip(rows, scores):
+    terms = []
+    wire_inputs = []
+    positive = negative = 0
+    for row_index, (row, score) in enumerate(zip(rows, scores)):
         logprobs = list(score['logprobs'].data)
         if len(logprobs) != len(row.weights):
-            raise ValueError('Provider returned misaligned token scores')
+            raise _reduction_failure('token_count_mismatch', row_index=row_index,
+                                     expected_tokens=len(row.weights), returned_tokens=len(logprobs))
         for i, weight in enumerate(row.weights):
             if not weight:
                 continue
             lp = logprobs[i]
             if not math.isfinite(lp):
-                raise ValueError('Nonfinite learner probability')
-            expected -= weight * (lp if loss == 'cross_entropy' else math.exp(lp-row.logprobs[i]))
+                raise _reduction_failure('nonfinite_learner_logprob', row_index=row_index)
+            factor = lp if loss == 'cross_entropy' else math.exp(lp-row.logprobs[i])
+            term = -weight * factor
+            expected += term
+            terms.append(term)
+            wire_inputs.append((weight, lp, None if loss == 'cross_entropy' else row.logprobs[i]))
+            positive += term > 0
+            negative += term < 0
     measured = output.metrics['loss:sum']
     if not math.isclose(expected, measured, rel_tol=1e-3, abs_tol=1e-5):
-        raise ValueError('Provider loss reduction differs from configured sum objective')
+        finite = lambda value: value if math.isfinite(value) else None
+        absolute_sum = math.fsum(abs(term) for term in terms)
+        stable_expected = math.fsum(terms)
+        # Inputs are serialized as float32 by datum(). Quantify, but do not
+        # silently substitute, the effect of that rounding on local validation.
+        import struct
+        f32 = lambda value: struct.unpack('f', struct.pack('f', value))[0]
+        wire_expected = math.fsum(-f32(weight) * (lp if old is None else math.exp(lp-f32(old)))
+                                  for weight, lp, old in wire_inputs)
+        raise _reduction_failure('sum_mismatch', expected=finite(expected), measured=finite(measured),
+            absolute_error=finite(abs(expected-measured)), sum_absolute_terms=finite(absolute_sum),
+            stable_expected=finite(stable_expected), float32_input_expected=finite(wire_expected),
+            accepted_tolerance=finite(max(1e-5, 1e-3*max(abs(expected), abs(measured)))),
+            cancellation_ratio=finite(absolute_sum/abs(stable_expected)) if stable_expected else None,
+            weighted_tokens=len(terms), positive_terms=positive, negative_terms=negative,
+            rows=len(rows), measured_finite=math.isfinite(measured))
     return expected
+
+
+def training_chunks(rows, data, trainer):
+    """Keep each checked RPC below SDK splitting thresholds, preserving weights.
+
+    Dense text RL datums use 20 encoded bytes/token (int32 input, int64
+    target, float32 advantage and old logprob). Budget 24 conservatively.
+    SFT uses fewer bytes. No token sequence or trajectory is split here.
+    """
+    max_bytes, max_rows = 1024 * 1024, 32
+    config = getattr(getattr(trainer, 'holder', None), '_client_config', None)
+    for name, default in (('fwdbwd_max_chunk_bytes_count', max_bytes),
+                          ('fwdbwd_max_chunk_len', max_rows)):
+        value = getattr(config, name, None)
+        if type(value) is int and value > 0:
+            if name.endswith('bytes_count'):
+                max_bytes = min(default, value)
+            else:
+                max_rows = min(default, value)
+    if len(rows) != len(data):
+        raise ValueError('Training datum alignment mismatch')
+    chunks, row_chunk, data_chunk, size = [], [], [], 0
+    for row, datum in zip(rows, data):
+        row_bytes = 24 * len(row.input_tokens)
+        if row_bytes > max_bytes:
+            raise ConfigurationError('Single training datum exceeds safe unsplit request bound')
+        if row_chunk and (len(row_chunk) >= max_rows or size + row_bytes > max_bytes):
+            chunks.append((row_chunk, data_chunk))
+            row_chunk, data_chunk, size = [], [], 0
+        row_chunk.append(row)
+        data_chunk.append(datum)
+        size += row_bytes
+    if row_chunk:
+        chunks.append((row_chunk, data_chunk))
+    return chunks
 
 
 class TinkerBackend:
@@ -131,20 +199,51 @@ class TinkerBackend:
         if not rows or not any(any(r.weights) for r in rows):
             raise ValueError('Cannot update an empty or zero-contribution batch')
         data = [self.datum(row, loss) for row in rows]
+        chunks = training_chunks(rows, data, self.trainer)
         # Validate optimizer settings locally before any paid forward/backward call.
         params = self.sdk.AdamParams(learning_rate=learning_rate, **(optimizer or {}))
         if self.ledger:
             self.ledger.reserve('train', input_tokens=sum(len(r.input_tokens) for r in rows))
+        phase = 'forward_backward'
+        chunk_index = 0
+        verified_losses, chunk_metrics = [], []
         try:
-            fw = self.trainer.forward_backward(data, loss_fn=loss).result(timeout=self.timeout)
-            checked_loss = check_reduction(rows, loss, fw)
+            # The provider accumulates gradients across calls. Validate each
+            # sequential response before sending the next; update weights ONCE
+            # after the entire original batch, with its original global weights.
+            for chunk_index, (chunk_rows, chunk_data) in enumerate(chunks):
+                phase = 'forward_backward'
+                fw = self.trainer.forward_backward(chunk_data, loss_fn=loss).result(timeout=self.timeout)
+                phase = 'loss_reduction_validation'
+                verified_losses.append(check_reduction(chunk_rows, loss, fw))
+                chunk_metrics.append(fw.metrics)
+            phase = 'optimizer_step'
             op = self.trainer.optim_step(params).result(timeout=self.timeout)
         except Exception as exc:
             self.poisoned = True
-            raise AmbiguousUpdate('Unknown training outcome; restore last committed checkpoint (' +
-                                  type(exc).__name__ + ')') from None
-        return {'acknowledged': True, 'loss': loss, 'metrics': fw.metrics,
-                'verified_sum_loss': checked_loss,
+            failure = AmbiguousUpdate('Unknown training outcome; restore last committed checkpoint (' +
+                                      type(exc).__name__ + ')')
+            # Only locally generated categorical fields are safe to expose. SDK
+            # exception text may contain credentials or request payloads.
+            failure.update_diagnostics = {
+                'phase': phase,
+                'cause_type': ''.join(c for c in type(exc).__name__ if c.isalnum() or c == '_')[:64],
+                'optimizer_call_attempted': phase == 'optimizer_step',
+                'optimizer_acknowledged': False,
+                'trainer_poisoned': True,
+                'replay_safe': False,
+                'chunk_index': chunk_index,
+                'chunk_count': len(chunks),
+                'verified_chunks': len(verified_losses),
+            }
+            if phase == 'loss_reduction_validation' and hasattr(exc, 'reduction_diagnostics'):
+                failure.update_diagnostics['reduction'] = exc.reduction_diagnostics
+            raise failure from None
+        metrics = dict(chunk_metrics[0]) if len(chunk_metrics) == 1 else {
+            'loss:sum': math.fsum(item['loss:sum'] for item in chunk_metrics)}
+        return {'acknowledged': True, 'loss': loss, 'metrics': metrics,
+                'verified_sum_loss': math.fsum(verified_losses),
+                'forward_backward_chunks': len(chunks), 'chunk_metrics': chunk_metrics,
                 'optimizer_metrics': getattr(op, 'metrics', {})}
 
     def inspect_loss(self, rows, loss):
@@ -199,6 +298,64 @@ class TinkerBackend:
             self.poisoned = False
         self.use_sampler(artifacts)
         self.load_receipt = {'purpose': purpose, 'artifacts': artifacts, 'acknowledged': True}
+
+    def archive(self, artifacts, directory, retention_seconds):
+        """Keep private checkpoint bytes on the durable volume; verify live restore.
+
+        Downloaded archives do not imply a supported Tinker upload/import API.
+        Remote references retain a separately budgeted, bounded restoration window.
+        """
+        import hashlib
+        import os
+        from pathlib import Path
+        import urllib.request
+        from .storage import atomic_json
+        root = Path(directory)
+        root.mkdir(parents=True, exist_ok=True)
+        if self.ledger:
+            self.ledger.reserve('checkpoint', ttl_seconds=retention_seconds)
+        rest = self.service.create_rest_client()
+        files = {}
+        for kind in ('training','sampler'):
+            rest.set_checkpoint_ttl_from_tinker_path(artifacts[kind], retention_seconds).result(timeout=self.timeout)
+        # The live service rejects archive export for optimizer-state checkpoints.
+        # Preserve those remotely for the explicitly budgeted restoration window.
+        for kind in ('sampler',):
+            url = rest.get_checkpoint_archive_url_from_tinker_path(artifacts[kind]).result(timeout=max(self.timeout,300)).url
+            path = root/(kind+'.tar'); pending = root/(kind+'.pending')
+            sha = hashlib.sha256(); size = 0
+            with urllib.request.urlopen(url, timeout=self.timeout) as source, pending.open('wb') as target:
+                while chunk := source.read(1024*1024):
+                    size += len(chunk)
+                    if size > 8*1024**3:
+                        raise ConfigurationError('Checkpoint archive exceeds 8 GiB bound')
+                    target.write(chunk); sha.update(chunk)
+                target.flush(); os.fsync(target.fileno())
+            if not size:
+                raise ConfigurationError('Empty checkpoint archive')
+            os.replace(pending,path)
+            check = hashlib.sha256()
+            with path.open('rb') as source:
+                while chunk := source.read(1024*1024): check.update(chunk)
+            if check.hexdigest() != sha.hexdigest():
+                raise ConfigurationError('Checkpoint archive readback failed')
+            files[kind] = {'path':str(path),'sha256':sha.hexdigest(),'bytes':size}
+        # No uncommitted update exists at a selection evaluation boundary.
+        # Fail closed on ambiguous restoration instead of continuing training.
+        self.poisoned = True
+        # Tinker only accepts LoadWeights at a fresh client's first operation.
+        # A new client also verifies recovery independently of the live trainer.
+        self.create_trainer(0)
+        self.poisoned = True
+        self.load(artifacts,'resume')
+        result = {'files':files,'remote_artifacts':artifacts,'remote_retention_seconds':retention_seconds,
+                  'optimizer_restore_acknowledged':True,'sampler_reload_acknowledged':True,
+                  'optimizer_archive_download_supported':False,
+                  'archive_import_to_tinker_supported':False}
+        atomic_json(root/'archive.json',result)
+        from .budget import persist_remote_reservation
+        persist_remote_reservation(root/'archive.json')
+        return result
 
     def close(self, status='success'):
         self.service.close(status).result(timeout=self.timeout)
