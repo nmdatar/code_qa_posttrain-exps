@@ -1,3 +1,4 @@
+from tests.test_claim_grading import request_fixture, judgments
 import json
 from pathlib import Path
 import tempfile
@@ -85,11 +86,11 @@ class ConcurrencyTests(unittest.TestCase):
                 try:
                     if n<=2:barrier.wait(timeout=3)
                     time.sleep(.003)
-                    return Generation([1],[2],[-.1],'{"status":"resolved","score":0.5,"reason":"test"}','stop','frozen')
+                    return Generation([1],[2],[-.1],json.dumps(judgments()),'stop','frozen')
                 finally:
                     with lock:active-=1
         f=CollectionFactory(c,self.root,None,judge=Judge())
-        results=ordered_map(lambda i:f.grade({'episode_id':str(i)}),range(12),8)
+        results=ordered_map(lambda i:f.grade({**request_fixture(), 'episode_id':str(i)}),range(12),8)
         self.assertEqual(len(results),12);self.assertEqual(peak,2);self.assertEqual(active,0)
         self.assertEqual(len(list((self.root/'private').glob('*.judge.json'))),12)
 
@@ -103,9 +104,9 @@ class ConcurrencyTests(unittest.TestCase):
         self.assertLessEqual(read(ledger.path)['reserved_usd'],.05)
         tracker=Tracker(self.root,{'mode':'disabled','project':'test'},'test')
         tracker.remote=Mock();tracker.remote.log.side_effect=RuntimeError('outage')
-        ordered_map(lambda i:tracker.event('test',index=i),range(100),16)
+        ordered_map(lambda i:tracker.event('training_step_timing',index=i),range(100),16)
         rows=[json.loads(l) for l in (self.root/'events.jsonl').read_text().splitlines()]
-        self.assertEqual(sum(r['event']=='test' for r in rows),100)
+        self.assertEqual(sum(r['event']=='training_step_timing' for r in rows),100)
         self.assertEqual(sum(r['event']=='tracking_failure' for r in rows),100)
 
     def test_sdk_dispatch_is_serialized_but_futures_overlap(self):

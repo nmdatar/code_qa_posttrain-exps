@@ -25,6 +25,23 @@ class ReadinessTests(unittest.TestCase):
         data['development'] = [dict(id=f'd{i}', split='development', family_id=f'f{i%3}') for i in range(117)]
         return data, build_cohorts(data)
 
+    def test_estimate_bounds_schedule_without_pricing_confirmation_for_training(self):
+        from training_pipeline.launch import estimate
+        from training_pipeline.storage import read
+        c = read('configs/experiments/02-direct-grpo.json')
+        # Exercise a fixed schedule independently of the live campaign budget.
+        c['stages'][0].update(max_updates=30, max_batches=30)
+        prices = c['spend']['prices']
+        self.assertEqual(estimate(c, prices)['evaluation_episodes_upper_bound'], 256)
+        self.assertEqual(estimate(c, prices, evaluation_only=True)['evaluation_episodes_upper_bound'], 85)
+        c['evaluation']['every'] = 0
+        self.assertEqual(estimate(c, prices)['evaluation_episodes_upper_bound'], 64)
+        c['stopping'] = {'initial_zero_batches': 3}
+        self.assertEqual(estimate(c, prices)['evaluation_episodes_upper_bound'], 96)
+        c['stages'].append(copy.deepcopy(c['stages'][0]))
+        c['evaluation']['every'] = 7
+        self.assertEqual(estimate(c, prices)['evaluation_episodes_upper_bound'], (1+2+60//7+1)*32)
+
     def test_cohorts_are_stratified_disjoint_and_order_independent(self):
         data, manifest = self.cohorts()
         self.assertEqual(len(manifest['selection']), 32)
@@ -101,7 +118,7 @@ class ReadinessTests(unittest.TestCase):
             batch_size=2, group_size=4, temperature=1, learning_rate=1e-5)]
         self.config['stopping'] = {'initial_zero_batches': 5}
         backend = FakeBackend()
-        with patch('training_pipeline.orchestrator.grpo_batch', return_value=([], {})):
+        with patch('training_pipeline.orchestrator.grpo_batch', return_value=([], {"mean_reward": 0.0})):
             checkpoint = Pipeline(self.config, backend=backend).run()
         state = load_checkpoint(checkpoint)['state']
         self.assertEqual(state['stage_batches'], 5)

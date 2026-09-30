@@ -8,14 +8,14 @@ from copy import deepcopy
 import math
 import time
 import uuid
-from .contracts import FinalAnswer, ModelActionError, ModelError, ModelResponse, ToolCall, Usage
+from .contracts import FinalAnswer, ModelActionError, ModelError, ModelResponse, ToolCall, ToolCallBatch, Usage
 from .models import _loads, _NonFiniteJSON
 
 
 class TinkerModel:
     def __init__(self, *, base_model=None, model=None, model_path=None, renderer_name,
                  temperature=1.0, seed=None, input_price_per_million=None,
-                 output_price_per_million=None):
+                 output_price_per_million=None, max_parallel_tool_calls=1):
         if model is not None and base_model is not None and model != base_model:
             raise ValueError("model and base_model disagree")
         base_model = base_model or model
@@ -32,6 +32,9 @@ class TinkerModel:
         for price in (input_price_per_million, output_price_per_million):
             if price is not None and (isinstance(price, bool) or not math.isfinite(price) or price < 0):
                 raise ValueError("Token prices must be finite and nonnegative")
+        if type(max_parallel_tool_calls) is not int or not 1 <= max_parallel_tool_calls <= 8:
+            raise ValueError("max_parallel_tool_calls must be between 1 and 8")
+        self.max_parallel_tool_calls = max_parallel_tool_calls
         self.base_model, self.model_path, self.renderer_name = base_model, model_path, renderer_name
         self.model_id = model_path or base_model
         self.temperature, self.seed = temperature, seed
@@ -125,13 +128,19 @@ class TinkerModel:
                 raise ValueError("Malformed rendered action")
             calls = parsed.get("tool_calls") or []
             if calls:
-                if len(calls) != 1:
-                    raise ValueError("Expected one tool action")
-                call = calls[0]
-                arguments = _loads(call.function.arguments)
-                if not isinstance(arguments, dict) or not isinstance(call.function.name, str) or not call.function.name:
-                    raise ValueError("Invalid tool action")
-                action = ToolCall(call.function.name, arguments, call.id or "call_" + uuid.uuid4().hex)
+                if not 1 <= len(calls) <= self.max_parallel_tool_calls:
+                    raise ValueError("Too many tool actions")
+                actions = []
+                for call in calls:
+                    arguments = _loads(call.function.arguments)
+                    if not isinstance(arguments, dict) or not isinstance(call.function.name, str) or not call.function.name:
+                        raise ValueError("Invalid tool action")
+                    if call.id and not isinstance(call.id, str):
+                        raise ValueError("Invalid call ID")
+                    actions.append(ToolCall(call.function.name, arguments, call.id or "call_" + uuid.uuid4().hex))
+                if len({a.call_id for a in actions}) != len(actions):
+                    raise ValueError("Duplicate call ID")
+                action = actions[0] if len(actions) == 1 else ToolCallBatch(tuple(actions))
             else:
                 content = parsed.get("content", "")
                 # Thinking stays in sampled tokens, but not in the final submission.

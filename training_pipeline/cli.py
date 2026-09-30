@@ -39,6 +39,7 @@ def main(argv=None):
     resume.add_argument('--config', type=Path)
     evaluate = subs.add_parser('evaluate')
     evaluate.add_argument('--checkpoint', type=Path, required=True)
+    evaluate.add_argument('--config', type=Path)
     evaluate.add_argument('--output', type=Path)
     evaluate.add_argument('--cohort', choices=['selection', 'confirmation'])
     smoke = subs.add_parser('smoke')
@@ -78,7 +79,8 @@ def main(argv=None):
         print(json.dumps({'report': str(path), 'status': result['status']}))
         return 0 if result['status'] == 'passed' else 1
     if a.command == 'evaluate':
-        print(json.dumps(evaluate_checkpoint(a.checkpoint, a.output, cohort=a.cohort), indent=2))
+        print(json.dumps(evaluate_checkpoint(a.checkpoint, a.output, cohort=a.cohort,
+                                            config=read(a.config) if a.config else None), indent=2))
         return 0
     config = read(a.config) if a.config else load_checkpoint(a.checkpoint)['config']
     if a.command == 'resume' and config['run_id'] == 'auto':
@@ -125,6 +127,9 @@ def entrypoint():
     except Exception as exc:
         # No raw SDK errors (they may contain auth headers or URLs).
         print('Training stopped: ' + type(exc).__name__, file=sys.stderr)
+        from .contracts import AmbiguousUpdate
+        if isinstance(exc, AmbiguousUpdate) and hasattr(exc, 'update_diagnostics'):
+            print(json.dumps({'event': 'ambiguous_update', **exc.update_diagnostics}), file=sys.stderr)
         if isinstance(exc, ValueError):
             print(str(exc), file=sys.stderr)
         return 1

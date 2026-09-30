@@ -1,3 +1,4 @@
+from tests.test_claim_grading import request_fixture, judgments
 import json
 from pathlib import Path
 import tempfile
@@ -25,6 +26,7 @@ class CollectionTests(unittest.TestCase):
             'environment':{'image_id':'im-test','snapshot_sha256':'b'*64,'repository':self.repo},
             'image_result':{'readiness_command':['test','-d','/workspace'],'readiness':{'exit_code':0},'snapshot_files':{'a.py':sha(b'pass\n')}},
             'snapshot_root':'/unused','reference':{'reference_answer':'SECRET REFERENCE'},'excerpts':[]}
+        self.row['rubric'] = request_fixture()['rubric']
         self.modal = FakeModal()
         self.modal.Sandbox.create.side_effect = lambda *args, **kwargs: self.modal.create(**kwargs)
         self.stream = patch('agent_harness.modal_backend.StreamProcess')
@@ -64,7 +66,7 @@ class CollectionTests(unittest.TestCase):
 
     def test_real_verifier_and_telemetry_with_injected_judge(self):
         episode=self.episode()
-        self.factory.judge=type('Judge',(),{'sample':lambda s,m,n,t:Generation([1],[2],[-.1],json.dumps({'status':'resolved','score':.75,'reason':'supported'}),'stop','base:judge')})()
+        self.factory.judge=type('Judge',(),{'sample':lambda s,m,n,t:Generation([1],[2],[-.1],json.dumps(judgments()),'stop','base:judge')})()
         answer={'schema_version':'1.0','task_id':'task','text':'It passes.', 'diagram':None,
                 'citations':[{'id':'c','path':'a.py','start_line':1,'end_line':1,'file_sha256':sha(b'pass\n')}]}
         self.assertTrue(episode.step({'answer':answer})[0])

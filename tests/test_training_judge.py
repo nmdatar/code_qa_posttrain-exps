@@ -1,3 +1,4 @@
+from tests.test_claim_grading import request_fixture, judgments
 import copy
 import tempfile
 import unittest
@@ -72,7 +73,7 @@ class JudgeTests(unittest.TestCase):
         self.assertNotEqual(semantic_hash(old),semantic_hash(self.config))
         newfactory=CollectionFactory(self.config,self.root,None)
         oldfactory=CollectionFactory(old,self.root,None)
-        self.assertEqual(oldfactory.reward_version,VERSION)
+        self.assertTrue(oldfactory.reward_version.startswith('source-claims-v2'))
         self.assertNotEqual(newfactory.reward_version,VERSION)
         prices=self.config['spend']['prices'];plan=estimate(self.config,prices)
         self.assertAlmostEqual(plan['components_usd']['reference_grading'],plan['episodes_including_retries']*(16384*.195+1024*.495)/1e6)
@@ -83,7 +84,7 @@ class JudgeTests(unittest.TestCase):
         judge=Mock(identity={'base_model':self.j['base_model']})
         judge.sample.return_value=Generation([1],[2],[-.1],'{"status":"resolved","score":1,"reason":"yes"}','length','frozen')
         factory=CollectionFactory(self.config,self.root,None,judge=judge)
-        with self.assertRaisesRegex(ValueError,'Truncated'):factory.grade({'episode_id':'test'})
+        with self.assertRaisesRegex(ValueError,'Truncated'):factory.grade(request_fixture())
         raw=read(self.root/'private/test.judge-raw.json')
         self.assertEqual(raw['generation']['stop_reason'],'length')
         self.assertEqual(raw['judge_identity']['base_model'],self.j['base_model'])

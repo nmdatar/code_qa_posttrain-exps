@@ -64,5 +64,12 @@ def select_tasks(data, evaluation, cohort=None):
         raise ConfigurationError('Unknown evaluation cohort')
     indexed = {r['id']: r for r in data['development']}
     # Explicit cohorts are never silently truncated by the legacy prefix limit.
-    return [indexed[ident] for ident in manifest[name]], {
-        'name': name, 'manifest_hash': manifest['manifest_hash']}
+    ids = manifest[name]
+    identity = {'name': name, 'manifest_hash': manifest['manifest_hash']}
+    if name == 'selection' and 'evaluation_subset' in data:
+        subset = data['evaluation_subset']
+        if not subset['task_ids'] or len(set(subset['task_ids'])) != len(subset['task_ids']) or not set(subset['task_ids']) <= set(ids):
+            raise ConfigurationError('Invalid pinned validation subset')
+        ids = subset['task_ids']
+        identity['subset_sha256'] = subset['sha256']
+    return [indexed[ident] for ident in ids], identity

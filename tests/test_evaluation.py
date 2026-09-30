@@ -288,7 +288,15 @@ class EvaluationTests(unittest.TestCase):
                 return {"claims": [{"id": "a1", "text": "Sets cancelled to True.", "source": "text", "evidence_requests": []}],
                         "answer_mode": "answer", "extraction_complete": True}
             from qa_eval.schema import ASSESSMENT
-            return {k: self.semantic[k] for k in ASSESSMENT["properties"]}
+            import copy
+            result = copy.deepcopy({k: self.semantic[k] for k in ASSESSMENT["properties"]})
+            extracted_id = request["untrusted"]["extracted_claims"][0]["id"]
+            self.assertNotIn(extracted_id, {c["id"] for c in request["rubric"]["claims"]})
+            for claim in result["additional_claims"]:
+                if claim["id"] == "a1": claim["id"] = extracted_id
+            for link in result["citation_links"]:
+                if link["claim_id"] == "a1": link["claim_id"] = extracted_id
+            return result
         report, _ = evaluate(self.task, self.answer, seal("EpisodeMetrics", self.metrics, KEY), self.config,
                              self.root, KEY, call=adapter)
         self.assertEqual(report["tier"], "accepted")

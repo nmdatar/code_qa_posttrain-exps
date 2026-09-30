@@ -241,6 +241,63 @@ class ModalEpisode:
                     raise
                 raise SandboxInfrastructureError("Command outcome unknown; do not replay or grade as failure") from exc
 
+    def execute_many(self, commands, *, max_parallel=4, timeout_seconds=None):
+        """Run an already-authorized read batch using independent bounded execs.
+
+        The persistent stream protocol is sequential; never share it across workers.
+        Reserve the whole batch under the episode lock, drain workers before cleanup,
+        and treat any uncertain outcome as an episode failure without replay.
+        """
+        from concurrent.futures import ThreadPoolExecutor
+        if type(max_parallel) is not int or not 1 <= max_parallel <= 8:
+            raise ValueError('Invalid tool parallelism')
+        if not isinstance(commands, (list, tuple)) or not 1 <= len(commands) <= max_parallel:
+            raise ValueError('Invalid command batch size')
+        for argv in commands:
+            if (not isinstance(argv, (list, tuple)) or not argv or not argv[0]
+                    or any(not isinstance(a, str) or "\0" in a for a in argv)):
+                raise ValueError('Invalid command argv')
+        timeout = self._limits.command_timeout_seconds if timeout_seconds is None else timeout_seconds
+        if type(timeout) is not int or not 0 < timeout <= self._limits.command_timeout_seconds:
+            raise ValueError('Requested timeout exceeds command budget')
+        with self._lock:
+            if self._closed:
+                raise RuntimeError('Episode is closed')
+            if self._calls + len(commands) > self._limits.max_tool_calls:
+                raise BudgetExceeded('Tool-call batch exceeds budget')
+            remaining = int(self._limits.lifetime_seconds - (time.monotonic() - self._started))
+            if remaining < 1:
+                raise BudgetExceeded('Sandbox lifetime exhausted')
+            timeout = min(timeout, remaining)
+            first = self._calls + 1
+            self._calls += len(commands)
+            try:
+                for i, argv in enumerate(commands):
+                    self._journal.write('command_started', sequence=first+i, argv=list(argv), parallel=True)
+                with ThreadPoolExecutor(max_workers=max_parallel, thread_name_prefix='qa-tool') as pool:
+                    futures = [pool.submit(run_process, self._sandbox, argv, timeout,
+                        self._limits.max_output_bytes, workdir=self._workspace_path) for argv in commands]
+                    results, failures = [], []
+                    for i, future in enumerate(futures):
+                        try:
+                            result = future.result()
+                            results.append(result)
+                            self._journal.write('command_finished', sequence=first+i, result=asdict(result))
+                        except Exception as exc:
+                            failures.append(exc)
+                            self._journal.write('command_failed', sequence=first+i, error_type=type(exc).__name__)
+                    if failures:
+                        raise failures[0]
+                return results
+            except BaseException as exc:
+                try:
+                    self.close('infrastructure_error')
+                except BaseException as cleanup:
+                    exc.add_note(f'Cleanup failed for {self.sandbox_id}: {cleanup}')
+                if isinstance(exc, (BudgetExceeded, TimeoutError, KeyboardInterrupt, SystemExit)):
+                    raise
+                raise SandboxInfrastructureError('Parallel command outcome unknown; do not replay') from exc
+
     def close(self, reason="completed"):
         """Terminate remote compute before detaching; repeated success is a no-op.
 

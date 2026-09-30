@@ -14,6 +14,8 @@ def git(root, *args):
 
 
 def snapshot(root, commit):
+    from .source import GitSource
+    if isinstance(root, GitSource): return root.fingerprint(commit)
     if git(root, "rev-parse", "HEAD") != commit:
         raise ValueError("Checkout commit differs from task snapshot")
     # Include untracked and ignored files: an agent might use either as evidence.
@@ -25,27 +27,34 @@ def snapshot(root, commit):
 
 
 def read_evidence(root, ref):
-    p = safe_path(root, ref["path"])
-    try:
-        git(root, "ls-files", "--error-unmatch", "--", ref["path"])
-    except subprocess.SubprocessError:
-        raise ValueError("Evidence must be tracked in the pinned source tree") from None
-    base = Path(root).resolve()
-    original = base / ref["path"]
-    if any(part.is_symlink() for part in [original, *original.parents] if part.is_relative_to(base) and part != base):
-        # Disallow symlinked evidence even if it points inside the repository;
-        # otherwise tracked links can expose untracked state such as .git data.
-        raise ValueError("Symlink evidence is unsupported")
-    if not p.is_file() or file_hash(p) != ref["file_sha256"]:
-        raise ValueError("Evidence file missing or hash mismatch")
-    lines = p.read_text(encoding="utf-8").splitlines()
+    from .source import GitSource
+    if isinstance(root, GitSource):
+        text = root.bytes(ref["path"]).decode("utf-8")
+        if root.sha(ref["path"]) != ref["file_sha256"]: raise ValueError("Evidence hash mismatch")
+        p = Path(ref["path"])
+    else:
+        p = safe_path(root, ref["path"])
+        try:
+            git(root, "ls-files", "--error-unmatch", "--", ref["path"])
+        except subprocess.SubprocessError:
+            raise ValueError("Evidence must be tracked in the pinned source tree") from None
+        base = Path(root).resolve()
+        original = base / ref["path"]
+        if any(part.is_symlink() for part in [original, *original.parents] if part.is_relative_to(base) and part != base):
+            # Disallow symlinked evidence even if it points inside the repository;
+            # otherwise tracked links can expose untracked state such as .git data.
+            raise ValueError("Symlink evidence is unsupported")
+        if not p.is_file() or file_hash(p) != ref["file_sha256"]:
+            raise ValueError("Evidence file missing or hash mismatch")
+        text = p.read_text(encoding="utf-8")
+    lines = text.splitlines()
     a, b = ref["start_line"], ref["end_line"]
     if not (1 <= a <= b <= len(lines)):
         raise ValueError("Invalid evidence line range")
     if "symbol" in ref:
         if p.suffix != ".py":
             raise ValueError("Symbol validation currently supports Python only; omit symbol for other languages")
-        tree = ast.parse(p.read_text())
+        tree = ast.parse(text)
         found = []
         def visit(node, prefix=""):
             for child in ast.iter_child_nodes(node):
@@ -63,7 +72,7 @@ def read_evidence(root, ref):
                  "text": "\n".join(f"{i}: {lines[i-1]}" for i in range(a, b+1))}
 
 
-def inspect(task, submission, metrics, root):
+def inspect(task, submission, metrics, root, diagnostic_machine_review=False, automated_review=None):
     checks, evidence = [], {}
     def record(name, status, detail):
         checks.append({"name": name, "status": status, "detail": detail})
@@ -73,8 +82,16 @@ def inspect(task, submission, metrics, root):
         record("snapshot", "pass", fingerprint)
     except (ValueError, OSError, subprocess.SubprocessError) as exc:
         record("snapshot", "unresolved", str(exc))
-    if task["gold_status"] != "accepted" or not task["human_reviewed"]:
+    from .review import automated_rubric_supported
+    if automated_review is not None:
+        if automated_rubric_supported(task, automated_review):
+            record("automated_rubric_review", "pass", "Independent source-supported automated rubric; human review not required or asserted")
+        else:
+            record("gold", "unresolved", "Independent automated rubric review is missing, stale, disputed, or not independent")
+    elif (task["gold_status"] != "accepted" or not task["human_reviewed"]) and not (diagnostic_machine_review and task["gold_status"] in {"draft", "accepted"}):
         record("gold", "unresolved", "Task requires reviewed, accepted gold")
+    if diagnostic_machine_review and automated_review is None:
+        record("diagnostic_machine_review", "pass", "Provisional machine-reviewed rubric; human admission remains pending")
     for claim in task["claims"]:
         for ref in claim["evidence"]:
             try:

@@ -20,6 +20,7 @@ class ToolSpec:
     max_output_bytes: int = 32_000
     description: str = ""
     required_resources: tuple[str, ...] = ()
+    parallel_safe: bool = False
 
 
 @dataclass
@@ -52,6 +53,11 @@ class ToolCall:
 
 
 @dataclass(frozen=True)
+class ToolCallBatch:
+    calls: tuple[ToolCall, ...]
+
+
+@dataclass(frozen=True)
 class FinalAnswer:
     value: Any
 
@@ -65,7 +71,7 @@ class Usage:
 
 @dataclass(frozen=True)
 class ModelResponse:
-    action: ToolCall | FinalAnswer
+    action: ToolCall | ToolCallBatch | FinalAnswer
     usage: Usage = field(default_factory=Usage)
     token_ids: tuple[int, ...] | None = None
     logprobs: tuple[float, ...] | None = None
@@ -84,6 +90,7 @@ class RunLimits:
     max_output_tokens: int = 16_000
     wall_time_seconds: float = 300.0
     max_context_chars: int = 64_000
+    max_parallel_tool_calls: int = 1
 
 
 @dataclass(frozen=True)
@@ -116,7 +123,8 @@ class ModelActionError(ModelError):
     """A policy-authored invalid action with preserved provider usage."""
 
     def __init__(self, message: str, usage: Usage, termination_reason: str = "agent_error", *,
-                 conditioning_token_ids=None, token_ids=None, logprobs=None):
+                 conditioning_token_ids=None, token_ids=None, logprobs=None,
+                 raw_response: str | None = None, repair_feedback: str | None = None):
         if termination_reason not in {"agent_error", "budget_exhausted"}:
             raise ValueError("invalid model action termination reason")
         super().__init__(message)
@@ -125,3 +133,5 @@ class ModelActionError(ModelError):
         self.conditioning_token_ids = conditioning_token_ids
         self.token_ids = token_ids
         self.logprobs = logprobs
+        self.raw_response = raw_response
+        self.repair_feedback = repair_feedback

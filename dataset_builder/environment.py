@@ -9,6 +9,7 @@ import hashlib
 import inspect
 import json
 import os
+import posixpath
 from pathlib import Path
 import selectors
 import shlex
@@ -163,6 +164,107 @@ def _git(snapshot, *args):
     return result.stdout
 
 
+def _git_blobs(snapshot, object_ids):
+    """Read distinct blobs in one Git process with binary-safe batch framing."""
+    ids = list(dict.fromkeys(object_ids))
+    if not ids:
+        return {}
+    result = subprocess.run(
+        ["git", "-C", str(snapshot), "cat-file", "--batch"],
+        input=("\n".join(ids) + "\n").encode("ascii"), capture_output=True,
+        check=True, timeout=30)
+    data, offset, blobs = result.stdout, 0, {}
+    for expected in ids:
+        end = data.find(b"\n", offset)
+        if end < 0:
+            raise EnvironmentError("Truncated Git batch header")
+        header = data[offset:end].split()
+        if len(header) != 3 or header[0].decode("ascii") != expected or header[1] != b"blob":
+            raise EnvironmentError("Unexpected Git batch object")
+        try:
+            size = int(header[2])
+        except ValueError as exc:
+            raise EnvironmentError("Invalid Git batch size") from exc
+        offset = end + 1
+        if size < 0 or offset + size >= len(data) or data[offset + size:offset + size + 1] != b"\n":
+            raise EnvironmentError("Truncated Git batch blob")
+        blobs[expected] = data[offset:offset + size]
+        offset += size + 1
+    if offset != len(data):
+        raise EnvironmentError("Unexpected trailing Git batch data")
+    return blobs
+
+
+def _export_snapshot(snapshot, commit, source=None):
+    """Export tracked Git blobs; materialize internal tracked file/tree links.
+
+    The image builder need not follow arbitrary host symlinks. Link metadata is
+    preserved in the environment manifest; hashes describe the resolved bytes
+    tools observe. Internal tracked directories are expanded; external links, cycles, and submodules fail.
+    """
+    entries = {}
+    for entry in _git(snapshot, "ls-tree", "-rz", "--full-tree", commit).split(b"\0"):
+        if not entry:
+            continue
+        metadata, raw_path = entry.split(b"\t", 1)
+        mode, kind, object_id = metadata.decode().split()
+        path = raw_path.decode("utf-8")
+        if kind != "blob" or mode not in ("100644", "100755", "120000"):
+            raise EnvironmentError(f"Unsupported repository object: {path}")
+        if path.startswith("/") or ".." in path.split("/") or "\\" in path:
+            raise EnvironmentError("Unsafe repository path")
+        entries[path] = (mode, object_id)
+    blobs = _git_blobs(snapshot, (entry[1] for entry in entries.values()))
+    symlinks, hashes = {}, {}
+
+    def content(path):
+        return blobs[entries[path][1]]
+
+    exported = {}
+
+    def expand(path, output_path, seen=()):
+        if path not in entries or path in seen:
+            raise EnvironmentError("Symlink must resolve to a tracked internal file/tree")
+        mode, _ = entries[path]
+        if mode != "120000":
+            exported[output_path] = (content(path), mode)
+            return path
+        target = content(path).decode("utf-8")
+        if target.startswith("/") or "\\" in target or "\0" in target:
+            raise EnvironmentError("Unsafe symlink target")
+        resolved = posixpath.normpath(posixpath.join(posixpath.dirname(path), target))
+        if resolved.startswith("../") or resolved in ("..", "."):
+            raise EnvironmentError("Unsafe symlink target")
+        next_seen = (*seen, path)
+        directory = resolved not in entries
+        if directory:
+            children = [p for p in entries if p.startswith(resolved + "/")]
+            if not children:
+                raise EnvironmentError("Symlink target is not a tracked tree")
+            for child in children:
+                suffix = child[len(resolved) + 1:]
+                expand(child, output_path + "/" + suffix, next_seen)
+            final_path = resolved
+        else:
+            final_path = expand(resolved, output_path, next_seen)
+        symlinks[path] = {"target": target, "resolved_path": final_path,
+                          "materialized": True, "directory": directory}
+        return final_path
+
+    for path in entries:
+        expand(path, path)
+    for path, (data, mode) in exported.items():
+        if source is not None:
+            destination = source / path
+            if not destination.resolve().is_relative_to(source.resolve()):
+                raise EnvironmentError("Unsafe repository path")
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes(data)
+            destination.chmod(0o755 if mode == "100755" else 0o644)
+        hashes[path] = hashlib.sha256(data).hexdigest()
+    return hashes, symlinks
+
+
 def build_environment(snapshot: Path, commit: str, recipe: EnvironmentRecipe,
                       output_dir: Path, backend: DockerBackend | None = None):
     """Build from git objects, not working-tree files; save manifest and logs.
@@ -191,23 +293,7 @@ def build_environment(snapshot: Path, commit: str, recipe: EnvironmentRecipe,
         context = Path(temporary)
         source = context / "repo"
         source.mkdir()
-        file_hashes = {}
-        for entry in _git(snapshot, "ls-tree", "-rz", "--full-tree", commit).split(b"\0"):
-            if not entry:
-                continue
-            metadata, raw_path = entry.split(b"\t", 1)
-            mode, kind, object_id = metadata.decode().split()
-            path = raw_path.decode("utf-8")
-            if mode not in ("100644", "100755") or kind != "blob":
-                raise EnvironmentError(f"Unsupported symlink/submodule in snapshot: {path}")
-            destination = source / path
-            if not destination.resolve().is_relative_to(source.resolve()):
-                raise EnvironmentError("Unsafe repository path")
-            content = _git(snapshot, "cat-file", "blob", object_id)
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            destination.write_bytes(content)
-            destination.chmod(0o755 if mode == "100755" else 0o644)
-            file_hashes[path] = hashlib.sha256(content).hexdigest()
+        file_hashes, materialized_symlinks = _export_snapshot(snapshot, commit, source)
         dockerfile = f"FROM {base_digest}\nWORKDIR /workspace\nCOPY repo/ /workspace/\n"
         for command in recipe.install_commands:
             dockerfile += "RUN " + json.dumps(command) + "\n"
@@ -225,6 +311,7 @@ def build_environment(snapshot: Path, commit: str, recipe: EnvironmentRecipe,
         "schema_version": "1", "environment_id": "env-" + image_id.removeprefix("sha256:")[:16],
         "commit": commit, "capability": recipe.capability, "image_digest": image_id,
         "base_image_digest": base_digest, "snapshot_files": file_hashes,
+        "materialized_symlinks": materialized_symlinks,
         "snapshot_sha256": hashlib.sha256(json.dumps(file_hashes, sort_keys=True).encode()).hexdigest(),
         "recipe_sha256": hashlib.sha256(dockerfile.encode()).hexdigest(),
         "install_commands": recipe.install_commands, "readiness_command": recipe.readiness_command,
@@ -275,6 +362,11 @@ class ModalBackend:
             "class EnvironmentError(RuntimeError): pass\n"
             + inspect.getsource(_capture)
             + "\npayload=json.loads(input())\n"
+            + "import ctypes\n"
+            + "libc=ctypes.CDLL(None, use_errno=True)\n"
+            + "assert libc.prctl(38, 1, 0, 0, 0) == 0, 'no_new_privs failed'\n"
+            + "if os.geteuid() == 0:\n    os.setgroups([])\n    os.setgid(65534)\n    os.setuid(65534)\n"
+            + "assert os.geteuid() != 0, 'privilege drop failed'\n"
             + "resource.setrlimit(resource.RLIMIT_NPROC, (payload['pids'], payload['pids']))\n"
             + "resource.setrlimit(resource.RLIMIT_FSIZE, (67108864, 67108864))\n"
             + "result=_capture(payload['command'], timeout_seconds=payload['timeout'], "
@@ -293,9 +385,15 @@ class ModalBackend:
                     workdir="/workspace", env={"HOME": "/tmp", "PYTHONDONTWRITEBYTECODE": "1"},
                     secrets=[], volumes={}, include_oidc_identity_token=False,
                 )
-                sandbox.stdin.write(json.dumps({"command": command, "stdin": stdin,
+                payload = json.dumps({"command": command, "stdin": stdin,
                     "timeout": limits.timeout_seconds, "output_bytes": limits.output_bytes,
-                    "pids": limits.pids}) + "\n")
+                    "pids": limits.pids}) + "\n"
+                # Large source inventories can exceed Modal's local stdin buffer.
+                # Drain bounded chunks before EOF; the remote input() still sees
+                # exactly one complete JSON line and never a partial request.
+                for offset in range(0, len(payload), 65536):
+                    sandbox.stdin.write(payload[offset:offset + 65536])
+                    sandbox.stdin.drain()
                 sandbox.stdin.write_eof()
                 sandbox.stdin.drain()
                 stdout = sandbox.stdout.read()
@@ -325,22 +423,7 @@ def build_modal_environment(snapshot: Path, commit: str, recipe: EnvironmentReci
     with tempfile.TemporaryDirectory(prefix="dataset-modal-build-") as temporary:
         source = Path(temporary) / "repo"
         source.mkdir()
-        for entry in _git(snapshot, "ls-tree", "-rz", "--full-tree", commit).split(b"\0"):
-            if not entry:
-                continue
-            metadata, raw_path = entry.split(b"\t", 1)
-            mode, kind, object_id = metadata.decode().split()
-            path = raw_path.decode("utf-8")
-            if mode not in ("100644", "100755") or kind != "blob":
-                raise EnvironmentError(f"Unsupported symlink/submodule in snapshot: {path}")
-            destination = source / path
-            if not destination.resolve().is_relative_to(source.resolve()):
-                raise EnvironmentError("Unsafe repository path")
-            content = _git(snapshot, "cat-file", "blob", object_id)
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            destination.write_bytes(content)
-            destination.chmod(0o755 if mode == "100755" else 0o644)
-            file_hashes[path] = hashlib.sha256(content).hexdigest()
+        file_hashes, materialized_symlinks = _export_snapshot(snapshot, commit, source)
         image = modal.Image.from_registry(recipe.base_image).add_local_dir(
             source, "/workspace", copy=True).workdir("/workspace")
         if recipe.install_commands:
@@ -359,11 +442,12 @@ def build_modal_environment(snapshot: Path, commit: str, recipe: EnvironmentReci
         "schema_version": "1", "environment_id": "env-" + image_id,
         "commit": commit, "capability": recipe.capability, "image_digest": image_id,
         "base_image_reference": recipe.base_image, "snapshot_files": file_hashes,
+        "materialized_symlinks": materialized_symlinks,
         "snapshot_sha256": hashlib.sha256(json.dumps(file_hashes, sort_keys=True).encode()).hexdigest(),
         "recipe_sha256": hashlib.sha256(json.dumps(recipe_record, sort_keys=True).encode()).hexdigest(),
         **recipe_record, "readiness": readiness,
         "status": "ready" if readiness["exit_code"] == 0 and not readiness["timed_out"] and not readiness.get("truncated") else "quarantined",
-        "backend": "modal", "tool_version": "dataset-modal-v1", "modal_version": modal.__version__,
+        "backend": "modal", "tool_version": "dataset-modal-v2", "modal_version": modal.__version__,
         "runtime_policy": {"network": "blocked", "host_mounts": False, "secrets": False,
                            "source_read_only": True, "fresh_sandbox_per_operation": True},
     }

@@ -91,6 +91,8 @@ def validate_job(job):
         value = getattr(limits, field)
         if type(value) is not int or value < (0 if field == 'max_tool_calls' else 1):
             raise ValueError('Invalid limit: ' + field)
+    if type(limits.max_parallel_tool_calls) is not int or not 1 <= limits.max_parallel_tool_calls <= 8:
+        raise ValueError('Parallel tool limit must be in [1, 8]')
     if type(limits.wall_time_seconds) not in (float, int) or not 0 < limits.wall_time_seconds <= 3600:
         raise ValueError('Episode wall time must be in (0, 3600] seconds')
     if type(job['max_submission_bytes']) is not int or not 0 < job['max_submission_bytes'] <= 4_000_000:
@@ -160,8 +162,8 @@ def validate_model(model):
     if not isinstance(model, dict) or model.get('kind') not in ('http', 'tinker', 'scripted'):
         raise ValueError('Unknown model adapter')
     allowed = {
-        'http': {'kind', 'model', 'base_url', 'timeout_seconds', 'max_response_bytes', 'input_price_per_million', 'output_price_per_million'},
-        'tinker': {'kind', 'model', 'base_model', 'model_path', 'renderer_name', 'temperature', 'seed', 'input_price_per_million', 'output_price_per_million'},
+        'http': {'kind', 'model', 'base_url', 'timeout_seconds', 'max_response_bytes', 'max_parallel_tool_calls', 'input_price_per_million', 'output_price_per_million'},
+        'tinker': {'kind', 'model', 'base_model', 'model_path', 'renderer_name', 'temperature', 'seed', 'max_parallel_tool_calls', 'input_price_per_million', 'output_price_per_million'},
         'scripted': {'kind', 'actions'},
     }[model['kind']]
     if set(model) - allowed:

@@ -29,6 +29,12 @@ def selected_tasks(config, data):
     spec=config.get('benchmark')
     if not spec:raise ConfigurationError('Benchmark needs a pinned training-task manifest')
     manifest=read(spec['task_manifest'])
+    from .task_expansion import VERSION as expansion_version, validate as validate_expansion
+    if manifest.get('kind') == expansion_version:
+        return validate_expansion(manifest, config, data)
+    from .collection_recovery import VERSION as recovery_version, validate_manifest
+    if manifest.get('kind') == recovery_version:
+        return validate_manifest(manifest, config, data)
     expected=task_manifest(data,len(manifest['task_ids']))
     if manifest!=expected or manifest['manifest_hash']!=spec['manifest_hash']:
         raise ConfigurationError('Throughput cohort identity mismatch')
@@ -53,7 +59,10 @@ def benchmark(config, backend=None, factory=None):
         ledger=getattr(p.backend,'ledger',None)
         before=read(ledger.path)['reserved_usd'] if ledger else None
         started=time.monotonic()
-        groups=p.groups(tasks,attempts,1)
+        recovery_manifest=read(config['benchmark']['task_manifest'])
+        from .collection_recovery import VERSION as recovery_version, run_recovery_slots
+        groups=(run_recovery_slots(p,tasks,recovery_manifest) if recovery_manifest.get('kind')==recovery_version
+                else p.groups(tasks,attempts,1))
         elapsed=time.monotonic()-started
         traces=[read(path) for path in (p.root/'trajectories').glob('*.json')]
         resolved=[t for t in traces if t.get('verification',{}).get('status')=='resolved']
@@ -74,6 +83,9 @@ def benchmark(config, backend=None, factory=None):
             'judge_queue_seconds':sum(g.get('timing',{}).get('queue_seconds',0) for g in grades),
             'judge_sampling_seconds':sum(g.get('timing',{}).get('sampling_seconds',0) for g in grades),
             'actual_billing_usd':None,'optimizer_updates':0,'checkpoint_saves':0}
+        from .shaped_reward import group_signal
+        report['reward_signal'] = group_signal(groups)
+        atomic_json(p.root/'reward-signal.json',report['reward_signal'])
         atomic_json(p.root/'benchmark.json',report)
         p.tracker.event('throughput_benchmark',**report)
         status='complete';return report

@@ -6,7 +6,7 @@ import math
 import urllib.error
 import urllib.parse
 import urllib.request
-from .contracts import ModelError, ModelActionError, FinalAnswer, ModelResponse, ToolCall, ToolSpec, Usage
+from .contracts import ModelError, ModelActionError, FinalAnswer, ModelResponse, ToolCall, ToolCallBatch, ToolSpec, Usage
 
 class _NonFiniteJSON(ValueError):
     pass
@@ -51,7 +51,7 @@ class ChatCompletionsModel:
     are not available from this adapter and must not be inferred for training.
     """
     def __init__(self, *, model, base_url, api_key=None, timeout_seconds=120,
-                 max_response_bytes=4 * 1024 * 1024,
+                 max_response_bytes=4 * 1024 * 1024, max_parallel_tool_calls=1,
                  input_price_per_million=None, output_price_per_million=None):
         parsed = urllib.parse.urlsplit(base_url)
         if (parsed.scheme not in {'http', 'https'} or not parsed.hostname
@@ -66,6 +66,9 @@ class ChatCompletionsModel:
         for price in (input_price_per_million, output_price_per_million):
             if price is not None and (not math.isfinite(price) or price < 0):
                 raise ValueError('Token prices must be finite and nonnegative')
+        if type(max_parallel_tool_calls) is not int or not 1 <= max_parallel_tool_calls <= 8:
+            raise ValueError("max_parallel_tool_calls must be between 1 and 8")
+        self.max_parallel_tool_calls = max_parallel_tool_calls
         self.model, self.base_url, self._api_key = model, base_url.rstrip('/'), api_key
         self.timeout_seconds, self.max_response_bytes = timeout_seconds, max_response_bytes
         self.input_price, self.output_price = input_price_per_million, output_price_per_million
@@ -80,7 +83,7 @@ class ChatCompletionsModel:
         if tools:
             body['tools'] = [dict(type='function', function=dict(name=t.name, description=t.description,
                                                                parameters=t.input_schema)) for t in tools]
-            body['parallel_tool_calls'] = False
+            body['parallel_tool_calls'] = self.max_parallel_tool_calls > 1
         headers = {'Content-Type': 'application/json'}
         if self._api_key:
             headers['Authorization'] = 'Bearer ' + self._api_key
@@ -122,15 +125,22 @@ class ChatCompletionsModel:
     def _action(self, message):
         calls = message.get('tool_calls') or []
         if calls:
-            if len(calls) != 1 or calls[0].get('type') != 'function':
-                raise ValueError('Expected one tool action')
-            call, function = calls[0], calls[0]['function']
-            arguments = _loads(function['arguments'])
-            if not isinstance(arguments, dict) or not isinstance(function['name'], str) or not function['name']:
-                raise ValueError('Invalid tool action')
-            if not isinstance(call.get('id'), str) or not call['id']:
-                raise ValueError('Missing call ID')
-            action = ToolCall(name=function['name'], arguments=arguments, call_id=call['id'])
+            if not isinstance(calls, list) or not 1 <= len(calls) <= self.max_parallel_tool_calls:
+                raise ValueError('Too many tool actions')
+            actions = []
+            for call in calls:
+                if call.get('type') != 'function':
+                    raise ValueError('Expected function action')
+                function = call['function']
+                arguments = _loads(function['arguments'])
+                if not isinstance(arguments, dict) or not isinstance(function['name'], str) or not function['name']:
+                    raise ValueError('Invalid tool action')
+                if not isinstance(call.get('id'), str) or not call['id']:
+                    raise ValueError('Missing call ID')
+                actions.append(ToolCall(function['name'], arguments, call['id']))
+            if len({a.call_id for a in actions}) != len(actions):
+                raise ValueError('Duplicate call ID')
+            action = actions[0] if len(actions) == 1 else ToolCallBatch(tuple(actions))
         else:
             content = message['content']
             if not isinstance(content, str) or not content.strip():

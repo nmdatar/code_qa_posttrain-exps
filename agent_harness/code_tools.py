@@ -238,6 +238,6 @@ def code_understanding_tools(repository_resource="repository", sandbox_resource=
         spec = ToolSpec(name=name, version="1", type="code_understanding", capabilities=(capability,),
                         input_schema=schema, required_resources=resources, description=description,
                         timeout_seconds=120 if capability == "execute" else 15,
-                        max_output_bytes=32000)
+                        max_output_bytes=32000, parallel_safe=capability != "execute")
         tools.append(CodeTool(spec, repository_resource, sandbox_resource))
     return tools
